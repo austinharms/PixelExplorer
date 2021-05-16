@@ -1,6 +1,68 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include<fstream>
+#include<iostream>
+#include <string>
+#include <sstream>
+
+
+static unsigned int CompileShader(unsigned int type, const std::string source) {
+  unsigned int id = glCreateShader(type);
+  const char* src = source.c_str();
+  glShaderSource(id, 1, &src, nullptr);
+  glCompileShader(id);
+
+  int res;
+  glGetShaderiv(id, GL_COMPILE_STATUS, &res);
+  if (res == GL_FALSE) {
+    std::cout << "Failed to compile shader" << std::endl;
+    glDeleteShader(id);
+    return 0;
+  }
+
+  return id;
+}
+
+static unsigned int CreateProgram(const std::string path) { 
+  std::ifstream stream(path);
+
+  enum class ShaderType {
+    NONE = -1, VERTEX = 0, FRAGMENT = 1
+  };
+
+  std::string line;
+  std::stringstream ss[2];
+  ShaderType type = ShaderType::NONE;
+  while (getline(stream, line)) {
+    if (line.find("#shader") != std::string::npos) {
+      if (line.find("vertex") != std::string::npos) {
+        type = ShaderType::VERTEX;
+      } else if (line.find("fragment") != std::string::npos) {
+        type = ShaderType::FRAGMENT;
+      } else {
+        type = ShaderType::NONE;
+      }
+    } else {
+      ss[(int)type] << line << "\n";
+    }
+  }
+
+  unsigned int program = glCreateProgram();
+  unsigned int vs =
+      CompileShader(GL_VERTEX_SHADER, ss[(int)ShaderType::VERTEX].str());
+  unsigned int fs =
+      CompileShader(GL_FRAGMENT_SHADER, ss[(int)ShaderType::FRAGMENT].str());
+  glAttachShader(program, vs);
+  glAttachShader(program, fs);
+  glLinkProgram(program);
+  glValidateProgram(program);
+  glDeleteShader(vs);
+  glDeleteShader(fs);
+
+  return program;
+}
+
 int main(void) {
   GLFWwindow* window;
 
@@ -8,7 +70,7 @@ int main(void) {
   if (!glfwInit()) return -1;
 
   /* Create a windowed mode window and its OpenGL context */
-  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+  window = glfwCreateWindow(500, 500, "Hello World", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -26,6 +88,7 @@ int main(void) {
     1, 0, 0
   };
 
+  glUseProgram(CreateProgram("./res/shaders/Basic.shader"));
 
   unsigned int vertBuff;
   glGenBuffers(1, &vertBuff);
@@ -33,7 +96,6 @@ int main(void) {
   glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), block, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
