@@ -79,6 +79,9 @@ int main(void) {
   /* Initialize the library */
   if (!glfwInit()) return -1;
 
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
   /* Create a windowed mode window and its OpenGL context */
   window = glfwCreateWindow(500, 500, "Hello World", NULL, NULL);
   if (!window) {
@@ -106,6 +109,10 @@ int main(void) {
   };
 
   glUseProgram(CreateProgram("./res/shaders/Basic.shader"));
+
+  unsigned int vertArray;
+  glGenVertexArrays(1, &vertArray);
+  glBindVertexArray(vertArray);
 
   unsigned int vertBuff;
   glGenBuffers(1, &vertBuff);
