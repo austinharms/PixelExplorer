@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "Renderer.h"
+#include "vendor/stb_image.h"
 
 static unsigned int CompileShader(unsigned int type, const std::string source) {
   unsigned int id = glCreateShader(type);
@@ -86,13 +87,35 @@ int main(void) {
   if (glewInit() != GLEW_OK) return -1;
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(GLErrorCallback, 0);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  float block[12] = {
+  //load texture
+  int tWidth = 0;
+  int tHeight = 0;
+  int BPP = 0;
+  stbi_set_flip_vertically_on_load(1);
+  void* imgBuffer = stbi_load("./res/textures/textures.png", &tWidth, &tHeight, &BPP, 4);
+  unsigned int texId;
+  glGenTextures(1, &texId);
+  glBindTexture(GL_TEXTURE_2D, texId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tWidth, tHeight, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, imgBuffer);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  stbi_image_free(imgBuffer);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texId);
+
+  float block[20] = {
   //Front Face
-    0, 0, 0,
-    0, 1, 0,
-    1, 1, 0,
-    1, 0, 0
+    0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0.25f,
+    1, 1, 0, 0.16666666f, 0.25f,
+    1, 0, 0, 0.16666666f, 0
   };
 
   unsigned short index[] = {
@@ -100,7 +123,10 @@ int main(void) {
      2,1,0
   };
 
-  glUseProgram(CreateProgram("./res/shaders/Basic.shader"));
+  unsigned int shader = CreateProgram("./res/shaders/Basic.shader");
+  glUseProgram(shader);
+  int loc = glGetUniformLocation(shader, "u_Texture");
+  glUniform1i(loc, 0);
 
   unsigned int vertArray;
   glGenVertexArrays(1, &vertArray);
@@ -109,9 +135,12 @@ int main(void) {
   unsigned int vertBuff;
   glGenBuffers(1, &vertBuff);
   glBindBuffer(GL_ARRAY_BUFFER, vertBuff);
-  glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), block, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+  glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), block, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
+                        (const void*)(sizeof(float) * 3));
   glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
 
   unsigned int indexBuff;
   glGenBuffers(1, &indexBuff);
