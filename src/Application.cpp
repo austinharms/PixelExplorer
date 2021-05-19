@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "Renderer.h"
-#include "vendor/stb_image.h"
+#include "stb_image/stb_image.h"
 
 static unsigned int CompileShader(unsigned int type, const std::string source) {
   unsigned int id = glCreateShader(type);
