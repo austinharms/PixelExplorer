@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "Renderer.h"
-#include "stb_image/stb_image.h"
+#include "Texture.h"
 
 static unsigned int CompileShader(unsigned int type, const std::string source) {
   unsigned int id = glCreateShader(type);
@@ -90,25 +90,8 @@ int main(void) {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  //load texture
-  int tWidth = 0;
-  int tHeight = 0;
-  int BPP = 0;
-  stbi_set_flip_vertically_on_load(1);
-  void* imgBuffer = stbi_load("./res/textures/textures.png", &tWidth, &tHeight, &BPP, 4);
-  unsigned int texId;
-  glGenTextures(1, &texId);
-  glBindTexture(GL_TEXTURE_2D, texId);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tWidth, tHeight, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, imgBuffer);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  stbi_image_free(imgBuffer);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texId);
+  Texture* text = new Texture("./res/textures/textures.png");
+  text->Bind();
 
   float block[20] = {
   //Front Face
@@ -163,6 +146,7 @@ int main(void) {
     glfwPollEvents();
   }
 
+  delete text;
   glfwTerminate();
   return 0;
 }
