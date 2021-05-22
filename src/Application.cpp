@@ -8,6 +8,7 @@
 
 #include "Renderer.h"
 #include "Texture.h"
+#include "IndexBuffer.h"
 
 static unsigned int CompileShader(unsigned int type, const std::string source) {
   unsigned int id = glCreateShader(type);
@@ -91,7 +92,7 @@ int main(void) {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   Texture* text = new Texture("./res/textures/textures.png");
-  text->Bind();
+  text->bind();
 
   float block[20] = {
   //Front Face
@@ -105,6 +106,8 @@ int main(void) {
      0,3,2,
      2,1,0
   };
+
+  IndexBuffer* iBuffer = new IndexBuffer(sizeof(unsigned short), 6, index);
 
   unsigned int shader = CreateProgram("./res/shaders/Basic.shader");
   glUseProgram(shader);
@@ -125,11 +128,7 @@ int main(void) {
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
 
-  unsigned int indexBuff;
-  glGenBuffers(1, &indexBuff);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuff);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned short), index,
-               GL_STATIC_DRAW);
+  iBuffer->bind();
 
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
@@ -146,7 +145,9 @@ int main(void) {
     glfwPollEvents();
   }
 
-  delete text;
+  text->drop();
+  iBuffer->drop();
+
   glfwTerminate();
   return 0;
 }

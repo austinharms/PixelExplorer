@@ -1,12 +1,20 @@
 #pragma once
 class RefCounted {
  public:
-  RefCounted(void (*delFunc)(void*));
-  RefCounted();
-  ~RefCounted();
-  RefCounted* Get();
-  bool Drop();
-  short GetRefCount() const { return _refCount; }
+  RefCounted(void (*delFunc)(void*)) : _refCount(1), _delFunc(delFunc) {}
+  RefCounted() : _refCount(1), _delFunc(nullptr) {}
+  virtual ~RefCounted(){};
+  void grab() { ++_refCount; }
+  bool drop() {
+    --_refCount;
+    if (_refCount > 0) return false;
+    if (_delFunc != nullptr)
+      _delFunc(this);
+    delete this;
+    return true;
+  }
+  short getRefCount() const { return _refCount; }
+
  private:
   void (*_delFunc)(void*);
   short _refCount;

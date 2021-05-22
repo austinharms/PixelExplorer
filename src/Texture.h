@@ -1,13 +1,14 @@
 #pragma once
 #include <string>
+#include "RefCounted.h"
 
-class Texture {
+class Texture : public virtual RefCounted {
  public:
   Texture(unsigned int width, unsigned int height);
   Texture(std::string path);
-  ~Texture();
-  void Bind(unsigned int slot = 0) const;
-  void Unbind() const;
+  virtual ~Texture();
+  void bind(unsigned int slot = 0) const;
+  void unbind() const;
   int getWidth() const { return _width; };
   int getHeight() const { return _height; };
  private:
