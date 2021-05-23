@@ -4,7 +4,7 @@ class RefCounted {
   RefCounted(void (*delFunc)(void*)) : _refCount(1), _delFunc(delFunc) {}
   RefCounted() : _refCount(1), _delFunc(nullptr) {}
   virtual ~RefCounted(){};
-  void grab() { ++_refCount; }
+  void grab() const { ++_refCount; }
   bool drop() {
     --_refCount;
     if (_refCount > 0) return false;
@@ -17,5 +17,5 @@ class RefCounted {
 
  private:
   void (*_delFunc)(void*);
-  short _refCount;
+  mutable short _refCount;
 };

@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 
+#include "glm/glm.hpp"
 #include "Renderer.h"
 #include "Texture.h"
 #include "IndexBuffer.h"
