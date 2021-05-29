@@ -3,7 +3,9 @@
 #include <GL/glew.h>
 
 VertexBuffer::VertexBuffer()
-    : _renderId(0), _dirtyBuffer(false), _size(0), _buffer(nullptr) {}
+    : _renderId(0), _dirtyBuffer(false), _size(0), _buffer(nullptr) {
+  genGLBuffer();
+}
 
 VertexBuffer::~VertexBuffer() { glDeleteBuffers(1, &_renderId); }
 

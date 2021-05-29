@@ -10,6 +10,9 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "VertexBufferAttrib.h"
 
 static unsigned int CompileShader(unsigned int type, const std::string source) {
   unsigned int id = glCreateShader(type);
@@ -115,19 +118,20 @@ int main(void) {
   int loc = glGetUniformLocation(shader, "u_Texture");
   glUniform1i(loc, 0);
 
-  unsigned int vertArray;
-  glGenVertexArrays(1, &vertArray);
-  glBindVertexArray(vertArray);
+  VertexArray* vArray = new VertexArray();
+  vArray->bind();
 
-  unsigned int vertBuff;
-  glGenBuffers(1, &vertBuff);
-  glBindBuffer(GL_ARRAY_BUFFER, vertBuff);
-  glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), block, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
-                        (const void*)(sizeof(float) * 3));
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
+  VertexBuffer* vBuffer = new VertexBuffer();
+  vBuffer->updateVertices(20 * sizeof(float), block);
+  //vBuffer->bind();
+  VertexBufferAttrib* attribs[2] = {
+      new VertexBufferAttrib(3, GL_FLOAT),
+      new VertexBufferAttrib(2, GL_FLOAT)
+  };
+  vArray->addVertexBuffer(vBuffer, attribs, 2);
+  vBuffer->drop();
+  attribs[0]->drop();
+  attribs[1]->drop();
 
   iBuffer->bind();
 
@@ -148,6 +152,7 @@ int main(void) {
 
   text->drop();
   iBuffer->drop();
+  vArray->drop();
 
   glfwTerminate();
   return 0;

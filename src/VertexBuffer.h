@@ -9,6 +9,7 @@ class VertexBuffer : public virtual RefCounted {
   void unbind() const;
   void updateVertices(unsigned int size, void* data);
   void updateGLBuffer() const;
+  unsigned int getGLID() const { return _renderId; }
 
  private:
   mutable bool _dirtyBuffer;

@@ -11,6 +11,8 @@ class Texture : public virtual RefCounted {
   void unbind() const;
   int getWidth() const { return _width; };
   int getHeight() const { return _height; };
+  unsigned int getGLID() const { return _renderId; }
+
  private:
   int _width;
   int _height;
