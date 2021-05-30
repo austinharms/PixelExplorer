@@ -1,11 +1,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include<fstream>
-#include<iostream>
-#include <string>
-#include <sstream>
-
 #include "glm/glm.hpp"
 #include "Renderer.h"
 #include "Texture.h"
@@ -13,62 +8,8 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "VertexBufferAttrib.h"
+#include "Shader.h"
 
-static unsigned int CompileShader(unsigned int type, const std::string source) {
-  unsigned int id = glCreateShader(type);
-  const char* src = source.c_str();
-  glShaderSource(id, 1, &src, nullptr);
-  glCompileShader(id);
-
-  int res;
-  glGetShaderiv(id, GL_COMPILE_STATUS, &res);
-  if (res == GL_FALSE) {
-    std::cout << "Failed to compile shader" << std::endl;
-    glDeleteShader(id);
-    return 0;
-  }
-
-  return id;
-}
-
-static unsigned int CreateProgram(const std::string path) { 
-  std::ifstream stream(path);
-
-  enum class ShaderType {
-    NONE = -1, VERTEX = 0, FRAGMENT = 1
-  };
-
-  std::string line;
-  std::stringstream ss[2];
-  ShaderType type = ShaderType::NONE;
-  while (getline(stream, line)) {
-    if (line.find("#shader") != std::string::npos) {
-      if (line.find("vertex") != std::string::npos) {
-        type = ShaderType::VERTEX;
-      } else if (line.find("fragment") != std::string::npos) {
-        type = ShaderType::FRAGMENT;
-      } else {
-        type = ShaderType::NONE;
-      }
-    } else {
-      ss[(int)type] << line << "\n";
-    }
-  }
-
-  unsigned int program = glCreateProgram();
-  unsigned int vs =
-      CompileShader(GL_VERTEX_SHADER, ss[(int)ShaderType::VERTEX].str());
-  unsigned int fs =
-      CompileShader(GL_FRAGMENT_SHADER, ss[(int)ShaderType::FRAGMENT].str());
-  glAttachShader(program, vs);
-  glAttachShader(program, fs);
-  glLinkProgram(program);
-  glValidateProgram(program);
-  glDeleteShader(vs);
-  glDeleteShader(fs);
-
-  return program;
-}
 
 int main(void) {
 
@@ -113,9 +54,9 @@ int main(void) {
 
   IndexBuffer* iBuffer = new IndexBuffer(sizeof(unsigned short), 6, index);
 
-  unsigned int shader = CreateProgram("./res/shaders/Basic.shader");
-  glUseProgram(shader);
-  int loc = glGetUniformLocation(shader, "u_Texture");
+  Shader* shader = new Shader("./res/shaders/Basic.shader");
+  glUseProgram(shader->getGLID());
+  int loc = glGetUniformLocation(shader->getGLID(), "u_Texture");
   glUniform1i(loc, 0);
 
   VertexArray* vArray = new VertexArray();
@@ -153,7 +94,7 @@ int main(void) {
   text->drop();
   iBuffer->drop();
   vArray->drop();
-
+  shader->drop();
   glfwTerminate();
   return 0;
 }

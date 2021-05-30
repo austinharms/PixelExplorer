@@ -1,5 +1,4 @@
-#ifndef VERTEXBUFFERATTRIB_H
-#define VERTEXBUFFERATTRIB_H
+#pragma once
 #include "RefCounted.h"
 
 class VertexBufferAttrib : public virtual RefCounted {
@@ -19,5 +18,3 @@ class VertexBufferAttrib : public virtual RefCounted {
   unsigned int index;
   void* offset;
 };
-
-#endif

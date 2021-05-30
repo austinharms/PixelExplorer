@@ -1,5 +1,4 @@
-#ifndef VERTEXBUFFERLAYOUT_H
-#define VERTEXBUFFERLAYOUT_H
+#pragma once
 #include <GL/glew.h>
 
 #include <list>
@@ -70,4 +69,3 @@ class VertexBufferLayout : public virtual RefCounted {
   int stride;
   std::list<VertexBufferAttrib*>* layout;
 };
-#endif

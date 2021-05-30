@@ -1,5 +1,4 @@
-#ifndef VERTEXARRAY_H
-#define VERTEXARRAY_H
+#pragma once
 #include <list>
 #include <GL/glew.h>
 
@@ -17,12 +16,9 @@ class VertexArray : public virtual RefCounted {
   unsigned int addVertexBuffer(VertexBuffer* buffer,
                                VertexBufferAttrib* layout[],
                        short layoutAttribCount);
-  // void updateGLArray() const;
   unsigned int getGLID() const { return _renderId; }
 
  private:
-
-  // mutable bool _dirtyBuffer;
   unsigned int _renderId;
   unsigned int _nextBufferId;
   unsigned int _nextAttribIndex;
@@ -45,4 +41,3 @@ unsigned int vertArray;
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
 */
-#endif
