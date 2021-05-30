@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 
 #include "RefCounted.h"
 
@@ -10,9 +11,11 @@ class Shader : public virtual RefCounted {
   void bind() const;
   void unbind() const;
   unsigned int getGLID() const { return _renderId; }
-
+  void setUniform1i(const char* name, int value);
  private:
   unsigned int _renderId;
+  std::unordered_map<const char*, int> _uniforms;
+  int getUniformLocation(const char* name);
   static unsigned int compileShader(unsigned int type,
                                     const std::string source);
   static unsigned int createProgram(const std::string path);

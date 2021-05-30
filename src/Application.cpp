@@ -55,9 +55,8 @@ int main(void) {
   IndexBuffer* iBuffer = new IndexBuffer(sizeof(unsigned short), 6, index);
 
   Shader* shader = new Shader("./res/shaders/Basic.shader");
+  shader->setUniform1i("u_Texture", 0);
   glUseProgram(shader->getGLID());
-  int loc = glGetUniformLocation(shader->getGLID(), "u_Texture");
-  glUniform1i(loc, 0);
 
   VertexArray* vArray = new VertexArray();
   vArray->bind();

@@ -5,6 +5,7 @@
 #include<iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
@@ -33,6 +34,23 @@ unsigned int Shader::compileShader(unsigned int type,
   }
 
   return id;
+}
+
+int Shader::getUniformLocation(const char* name) { 
+  auto uniform = _uniforms.find(name);
+  if (uniform != _uniforms.end()) {
+    return uniform->second;
+  } else {
+    int u = glGetUniformLocation(_renderId, name);
+    _uniforms.insert({name, u});
+    return u;
+  }
+}
+
+void Shader::setUniform1i(const char* name, int value) {
+  int loc = getUniformLocation(name);
+  if (loc == -1) return;
+  glUniform1i(loc, value);
 }
 
 unsigned int Shader::createProgram(const std::string path) {
