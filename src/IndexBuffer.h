@@ -9,7 +9,6 @@ class IndexBuffer : public virtual RefCounted {
   void bind() const;
   void unbind() const;
   void updateIndices(unsigned char size, unsigned int length, void* data);
-  void updateGLBuffer() const;
   unsigned int getGLID() const { return _renderId; }
 
  private:
@@ -19,4 +18,5 @@ class IndexBuffer : public virtual RefCounted {
   unsigned int _length;
   unsigned int _renderId;
   void genGLBuffer();
+  void updateGLBuffer() const;
 };

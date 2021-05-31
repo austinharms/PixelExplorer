@@ -7,6 +7,15 @@ VertexBuffer::VertexBuffer()
   genGLBuffer();
 }
 
+VertexBuffer::VertexBuffer(unsigned char size, unsigned int length, void* data)
+    : _renderId(0), _dirtyBuffer(false), _size(0), _buffer(nullptr) {
+  genGLBuffer();
+  _size = size;
+  _length = length;
+  _buffer = data;
+  _dirtyBuffer = true;
+}
+
 VertexBuffer::~VertexBuffer() { glDeleteBuffers(1, &_renderId); }
 
 void VertexBuffer::bind() const {
@@ -16,14 +25,19 @@ void VertexBuffer::bind() const {
 
 void VertexBuffer::unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
-void VertexBuffer::updateVertices(unsigned int size, void* data) {
+void VertexBuffer::updateVertices(unsigned char size, unsigned int length, void* data) {
   _size = size;
+  _length = length;
   _buffer = data;
   _dirtyBuffer = true;
 }
 
+void VertexBuffer::updateDirtyBuffer() {
+  if (_dirtyBuffer) updateGLBuffer();
+}
+
 void VertexBuffer::updateGLBuffer() const {
-  glBufferData(GL_ARRAY_BUFFER, _size, _buffer, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, _size*_length, _buffer, GL_STATIC_DRAW);
   _dirtyBuffer = false;
 }
 

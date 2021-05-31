@@ -4,11 +4,8 @@
 #include "glm/glm.hpp"
 #include "Renderer.h"
 #include "Texture.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "VertexBufferAttrib.h"
 #include "Shader.h"
+#include "Mesh.h"
 
 
 int main(void) {
@@ -22,7 +19,7 @@ int main(void) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
   /* Create a windowed mode window and its OpenGL context */
-  window = glfwCreateWindow(500, 500, "Hello World", NULL, NULL);
+  window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -31,13 +28,16 @@ int main(void) {
   /* Make the window's context current */
   glfwMakeContextCurrent(window);
   if (glewInit() != GLEW_OK) return -1;
-  glEnable(GL_DEBUG_OUTPUT);
-  glDebugMessageCallback(GLErrorCallback, 0);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+  Renderer* renderer = new Renderer();
+  Shader* shader = new Shader("./res/shaders/Basic.shader");
   Texture* text = new Texture("./res/textures/textures.png");
-  text->bind();
+  text->bind(0);
+  shader->setUniform1i("u_Texture", 0);
+  renderer->useShader(shader); 
+
+  Mesh* mesh = new Mesh();
+  mesh->setIndexCount(6);
+  mesh->setVertexCount(4);
 
   float block[20] = {
   //Front Face
@@ -47,33 +47,18 @@ int main(void) {
     1, 0, 0, 0.16666666f, 0
   };
 
-  unsigned short index[] = {
-     0,3,2,
-     2,1,0
-  };
+  for (short i = 0; i < 20; i += 5) {
+    mesh->setVertexPosition(i / 5, block[i], block[i + 1], block[i + 2]);
+    mesh->setVertexUV(i / 5, block[i + 3], block[i + 4]);
+  }
 
-  IndexBuffer* iBuffer = new IndexBuffer(sizeof(unsigned short), 6, index);
+  unsigned short index[6] = {0, 3, 2, 2, 1, 0};
 
-  Shader* shader = new Shader("./res/shaders/Basic.shader");
-  shader->setUniform1i("u_Texture", 0);
-  glUseProgram(shader->getGLID());
+  for (short i = 0; i < 6; ++i) {
+    mesh->setIndex(i, index[i]);
+  }
 
-  VertexArray* vArray = new VertexArray();
-  vArray->bind();
-
-  VertexBuffer* vBuffer = new VertexBuffer();
-  vBuffer->updateVertices(20 * sizeof(float), block);
-  //vBuffer->bind();
-  VertexBufferAttrib* attribs[2] = {
-      new VertexBufferAttrib(3, GL_FLOAT),
-      new VertexBufferAttrib(2, GL_FLOAT)
-  };
-  vArray->addVertexBuffer(vBuffer, attribs, 2);
-  vBuffer->drop();
-  attribs[0]->drop();
-  attribs[1]->drop();
-
-  iBuffer->bind();
+  mesh->updateBuffers();
 
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
@@ -81,7 +66,8 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     //glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+    renderer->drawMesh(mesh);
 
     /* Swap front and back buffers */
     glfwSwapBuffers(window);
@@ -90,10 +76,10 @@ int main(void) {
     glfwPollEvents();
   }
 
-  text->drop();
-  iBuffer->drop();
-  vArray->drop();
+  renderer->drop();
   shader->drop();
+  text->drop();
+  mesh->drop();
   glfwTerminate();
   return 0;
 }
