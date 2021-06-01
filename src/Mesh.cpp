@@ -1,8 +1,18 @@
 #include "Mesh.h"
+
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "VertexBufferAttrib.h"
 
 Mesh::Mesh()
-    : _transform(glm::mat4()), _vertexBuffer(nullptr), _indexBuffer(nullptr), _vertexArray(nullptr), _indexCount(0), _vertexCount(0), _indices(nullptr), _vertices(nullptr) {
+    : _transform(glm::mat4(1.0f)),
+      _vertexBuffer(nullptr),
+      _indexBuffer(nullptr),
+      _vertexArray(nullptr),
+      _indexCount(0),
+      _vertexCount(0),
+      _indices(nullptr),
+      _vertices(nullptr) {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -11,6 +21,9 @@ Mesh::Mesh()
   _vertexArray->addVertexBuffer(_vertexBuffer, attribs, 2);
   attribs[0]->drop();
   attribs[1]->drop();
+
+  //_transform = glm::scale(_transform, glm::vec3(5.0f));
+  _transform = glm::translate(_transform, glm::vec3(0, 0, -20));
 }
 
 Mesh::~Mesh() {
@@ -31,7 +44,7 @@ void Mesh::unbind() const {
   _indexBuffer->unbind();
 }
 
-void Mesh::setIndexCount(unsigned int count) { 
+void Mesh::setIndexCount(unsigned int count) {
   delete[] _indices;
   _indices = new unsigned short[count];
   _indexCount = count;
@@ -39,7 +52,7 @@ void Mesh::setIndexCount(unsigned int count) {
 
 void Mesh::setVertexCount(unsigned int count) {
   delete[] _vertices;
-  _vertices = new float[count*5];
+  _vertices = new float[count * 5];
   _vertexCount = count;
 }
 
@@ -61,4 +74,8 @@ void Mesh::setVertexUV(unsigned int index, float u, float v) {
 void Mesh::updateBuffers() {
   _indexBuffer->updateIndices(sizeof(unsigned short), _indexCount, _indices);
   _vertexBuffer->updateVertices(sizeof(float), _vertexCount * 5, _vertices);
+}
+
+void Mesh::updateTransfrom(float dt) {
+  _transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 0.0f, 1.0f));
 }

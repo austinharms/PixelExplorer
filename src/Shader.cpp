@@ -1,12 +1,13 @@
 #include "Shader.h"
 
 #include <GL/glew.h>
-#include<fstream>
-#include<iostream>
+
+#include <fstream>
+#include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-
 
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
   _renderId = createProgram(shaderFilepath);
@@ -28,7 +29,15 @@ unsigned int Shader::compileShader(unsigned int type,
   int res;
   glGetShaderiv(id, GL_COMPILE_STATUS, &res);
   if (res == GL_FALSE) {
-    std::cout << "Failed to compile shader" << std::endl;
+    int maxLength = 0;
+    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
+    std::vector<GLchar> errorLog(maxLength);
+    glGetShaderInfoLog(id, maxLength, &maxLength, &errorLog[0]);
+    std::cout << "Failed to compile shader: ";
+    for (std::vector<char>::const_iterator i = errorLog.begin();
+         i != errorLog.end(); ++i)
+      std::cout << *i;
+    std::cout << std::endl;
     glDeleteShader(id);
     return 0;
   }
@@ -36,7 +45,7 @@ unsigned int Shader::compileShader(unsigned int type,
   return id;
 }
 
-int Shader::getUniformLocation(const char* name) { 
+int Shader::getUniformLocation(const char* name) {
   auto uniform = _uniforms.find(name);
   if (uniform != _uniforms.end()) {
     return uniform->second;
@@ -51,6 +60,12 @@ void Shader::setUniform1i(const char* name, int value) {
   int loc = getUniformLocation(name);
   if (loc == -1) return;
   glUniform1i(loc, value);
+}
+
+void Shader::setUniformm4f(const char* name, glm::mat4 value) {
+  int loc = getUniformLocation(name);
+  if (loc == -1) return;
+  glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 unsigned int Shader::createProgram(const std::string path) {
@@ -89,7 +104,6 @@ unsigned int Shader::createProgram(const std::string path) {
 
   return program;
 }
-
 
 /*
 #include<fstream>

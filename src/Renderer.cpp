@@ -4,10 +4,10 @@
 #include <iostream>
 
 Renderer::Renderer()
-    : _projection(glm::perspective(45.0f, 800.0f / 600.0f, 0.0f, 10.0f)),
-      _view(glm::lookAt(glm::vec3(2.5f, 2.5f, 2.0f),
-                        glm::vec3(0.0f, 0.0f, 0.0f),
-                        glm::vec3(0.0f, 0.0f, 1.0f))), _activeShader(nullptr) {
+    : _projection(
+          glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)),
+      _view(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f))),
+      _activeShader(nullptr) {
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(GLErrorCallback, 0);
   glEnable(GL_BLEND);
@@ -28,7 +28,10 @@ void Renderer::useShader(Shader* s) {
 
 void Renderer::drawMesh(Mesh* mesh) {
   mesh->grab();
+  mesh->updateTransfrom(0.1f);
   mesh->bind();
+  glm::mat4 mvp = _projection * _view * mesh->getTransform();
+  _activeShader->setUniformm4f("u_MVP", mvp);
   glDrawElements(GL_TRIANGLES, mesh->getVertexBuffer()->getIndexCount(),
                  mesh->getVertexBuffer()->getIndexType(), nullptr);
   mesh->drop();

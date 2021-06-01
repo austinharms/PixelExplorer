@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
-
+#include <glm/mat4x4.hpp>
 #include "RefCounted.h"
 
 class Shader : public virtual RefCounted {
@@ -12,6 +12,7 @@ class Shader : public virtual RefCounted {
   void unbind() const;
   unsigned int getGLID() const { return _renderId; }
   void setUniform1i(const char* name, int value);
+  void setUniformm4f(const char* name, glm::mat4 value);
  private:
   unsigned int _renderId;
   std::unordered_map<const char*, int> _uniforms;

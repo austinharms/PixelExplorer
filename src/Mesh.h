@@ -20,6 +20,7 @@ class Mesh : public virtual RefCounted{
   void setVertexPosition(unsigned int index, float x, float y, float z);
   void setVertexUV(unsigned int index, float u, float v);
   void updateBuffers();
+  void updateTransfrom(float dt);
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
  private:
   glm::mat4 _transform;
