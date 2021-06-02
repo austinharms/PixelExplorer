@@ -8,6 +8,7 @@
 #include "Mesh.h"
 #include "RefCounted.h"
 #include "Shader.h"
+#include "Material.h"
 
 class Renderer : public virtual RefCounted {
  public:
@@ -15,6 +16,7 @@ class Renderer : public virtual RefCounted {
   virtual ~Renderer();
   bool renderInit() const { return _renderInit; }
   void useShader(Shader* s);
+  void useMaterial(Material* m);
   void addMesh(Mesh* mesh);
   void removeMesh(unsigned int id);
   void removeMesh(Mesh* mesh);
@@ -26,10 +28,13 @@ class Renderer : public virtual RefCounted {
     width = _windowWidth;
     height = _windowHeight;
   };
+  void setCameraTransform(glm::mat4 t) { _view = t; }
+  glm::mat4 getCameraTransform() const { return _view; }
 
  private:
   GLFWwindow* _window;
-  Shader* _activeShader;
+  Shader* _boundShader;
+  Material* _boundMaterial;
   glm::mat4 _projection;
   glm::mat4 _view;
   std::list<Mesh*> _meshes;

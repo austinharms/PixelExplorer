@@ -1,6 +1,5 @@
 #include "Renderer.h"
 
-#include <functional>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
@@ -8,9 +7,10 @@ bool Renderer::s_windowSizeChange = false;
 
 Renderer::Renderer(int width, int height, const char* title)
     : _projection(glm::perspective(glm::radians(45.0f),
-                                   1.0f, 0.1f, 100.0f)),
+                                   (float)width / (float)height, 0.1f, 100.0f)),
       _view(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f))),
-      _activeShader(nullptr),
+      _boundShader(nullptr),
+      _boundMaterial(nullptr),
       _avgFPS(0),
       _deltaTime(0),
       _lastFrame(0),
@@ -50,7 +50,8 @@ Renderer::Renderer(int width, int height, const char* title)
 }
 
 Renderer::~Renderer() {
-  if (_activeShader != nullptr) _activeShader->drop();
+  if (_boundShader != nullptr) _boundShader->drop();
+  if (_boundMaterial != nullptr) _boundMaterial->drop();
   for (Mesh* m : _meshes) {
     m->drop();
   }
@@ -58,12 +59,28 @@ Renderer::~Renderer() {
 }
 
 void Renderer::useShader(Shader* s) {
-  if (_activeShader != nullptr && s->getGLID() == _activeShader->getGLID())
+  if (_boundShader != nullptr && s->getGLID() == _boundShader->getGLID())
     return;
-  if (_activeShader != nullptr) _activeShader->drop();
+  if (_boundShader != nullptr) _boundShader->drop();
   s->grab();
-  _activeShader = s;
+  _boundShader = s;
   s->bind();
+}
+
+void Renderer::useMaterial(Material* m) {
+  if (_boundMaterial != nullptr && m->getID() == _boundMaterial->getID())
+    return;
+  if (_boundMaterial != nullptr) _boundMaterial->drop();
+  m->grab();
+  _boundMaterial = m;
+  if (_boundMaterial->hasTexture()) {
+    _boundMaterial->bindTexture(0);
+    _boundShader->setUniform1i("u_Texture", 0);
+    _boundShader->setUniform1i("u_UseTexture", 1);
+  } else {
+    _boundShader->setUniform1i("u_UseTexture", 0);
+  }
+  _boundShader->setUniformv4("u_Color", _boundMaterial->getColor());
 }
 
 void Renderer::addMesh(Mesh* mesh) {
@@ -72,7 +89,7 @@ void Renderer::addMesh(Mesh* mesh) {
 }
 
 void Renderer::removeMesh(unsigned int id) {
-  auto mesh = std::remove_if(_meshes.begin(), _meshes.end(), [&id](Mesh* mesh) {
+  std::remove_if(_meshes.begin(), _meshes.end(), [&id](Mesh* mesh) {
     if (mesh->getID() == id) {
       mesh->drop();
       return true;
@@ -99,6 +116,8 @@ void Renderer::render() {
   for (Mesh* m : _meshes) {
     drawMesh(m);
   }
+  if (_boundMaterial != nullptr) _boundMaterial->drop();
+  _boundMaterial = nullptr;
   glfwSwapBuffers(_window);
   glfwPollEvents();
   ++_frameCount;
@@ -108,17 +127,18 @@ void Renderer::drawMesh(Mesh* mesh) {
   mesh->updateTransfrom(_deltaTime);
   mesh->bind();
   glm::mat4 mvp = _projection * _view * mesh->getTransform();
-  _activeShader->setUniformm4f("u_MVP", mvp);
+  _boundShader->setUniformm4("u_MVP", mvp);
+  if (mesh->getMaterial() != nullptr) useMaterial(mesh->getMaterial());
   glDrawElements(GL_TRIANGLES, mesh->getVertexBuffer()->getIndexCount(),
                  mesh->getVertexBuffer()->getIndexType(), nullptr);
 }
 
 void Renderer::updateWindowSize() {
-  glfwGetWindowSize(_window, &_windowWidth, &_windowHeight);
+  glfwGetFramebufferSize(_window, &_windowWidth, &_windowHeight);
   Renderer::s_windowSizeChange = false;
   _projection = glm::perspective(glm::radians(45.0f),
-                                    1.0f,
-                                    0.1f, 100.0f);
+                                 (float)_windowWidth / (float)_windowHeight,
+                                 0.1f, 100.0f);
 }
 
 void Renderer::windowResizeEvent(GLFWwindow* window, int width, int height) {

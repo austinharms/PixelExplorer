@@ -1,11 +1,13 @@
 #pragma once
-#include "RefCounted.h"
 #include <glm/mat4x4.hpp>
+
 #include "IndexBuffer.h"
+#include "Material.h"
+#include "RefCounted.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 
-class Mesh : public virtual RefCounted{
+class Mesh : public virtual RefCounted {
  public:
   Mesh();
   virtual ~Mesh();
@@ -23,11 +25,21 @@ class Mesh : public virtual RefCounted{
   void updateTransfrom(float dt);
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
   unsigned int getID() const { return _id; }
+  void setTransform(glm::mat4 t) { _transform = t; }
+  void setMaterial(Material* m) {
+    if (_material != nullptr) _material->drop();
+    m->grab();
+    _material = m;
+  }
+  Material* getMaterial() const { return _material; }
+
  private:
+  static unsigned int s_nextId;
   glm::mat4 _transform;
   VertexBuffer* _vertexBuffer;
   IndexBuffer* _indexBuffer;
   VertexArray* _vertexArray;
+  Material* _material;
   unsigned int _indexCount;
   unsigned int _vertexCount;
   unsigned short* _indices;

@@ -1,25 +1,31 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-#include "glm/glm.hpp"
-#include "Renderer.h"
-#include "Texture.h"
-#include "Shader.h"
+#include "Material.h"
 #include "Mesh.h"
-
-
+#include "Renderer.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "glm/glm.hpp"
 
 int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Test");
   if (!renderer->renderInit()) return -1;
+  renderer->setCameraTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -20.0f)));
   Shader* shader = new Shader("./res/shaders/Basic.shader");
   Texture* text = new Texture("./res/textures/textures.png");
-  text->bind(0);
-  shader->setUniform1i("u_Texture", 0);
   renderer->useShader(shader); 
-
+  shader->drop();
+  Material* mat = new Material();
+  mat->setTexture(text);
+  mat->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+  text->drop();
   Mesh* mesh = new Mesh();
+  mesh->setMaterial(mat);
+  mat->drop();
   mesh->setIndexCount(36);
   mesh->setVertexCount(24);
 
@@ -90,8 +96,6 @@ int main(void) {
   }
 
   renderer->drop();
-  shader->drop();
-  text->drop();
   mesh->drop();
   return 0;
 }
