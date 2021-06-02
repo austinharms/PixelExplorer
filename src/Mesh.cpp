@@ -12,7 +12,8 @@ Mesh::Mesh()
       _indexCount(0),
       _vertexCount(0),
       _indices(nullptr),
-      _vertices(nullptr) {
+      _vertices(nullptr),
+      _id(0) {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -22,8 +23,15 @@ Mesh::Mesh()
   attribs[0]->drop();
   attribs[1]->drop();
 
+  _id = ((_vertexArray->getGLID() + _indexBuffer->getGLID()) *
+         (_vertexArray->getGLID() + _indexBuffer->getGLID() + 1)) /
+            2 +
+        _indexBuffer->getGLID();
+
   //_transform = glm::scale(_transform, glm::vec3(5.0f));
   _transform = glm::translate(_transform, glm::vec3(0, 0, -20));
+  //_transform = glm::rotate(_transform, glm::radians(-90.0f), glm::vec3(1.0f,
+  // 0.0f, 0.0f));
 }
 
 Mesh::~Mesh() {
@@ -77,5 +85,7 @@ void Mesh::updateBuffers() {
 }
 
 void Mesh::updateTransfrom(float dt) {
-  _transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 0.0f, 1.0f));
+  //_transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 1.0f,
+  // 0.0f));
+  _transform = glm::rotate(_transform, 5.0f * dt, glm::vec3(1.0f, 1.0f, 0.0f));
 }

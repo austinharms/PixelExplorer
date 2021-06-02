@@ -28,7 +28,7 @@ void Texture::bind(unsigned int slot) const {
 void Texture::unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
 void Texture::loadTex(std::string path) { 
-  stbi_set_flip_vertically_on_load(1); 
+  //stbi_set_flip_vertically_on_load(1); 
   _buffer =
       stbi_load("./res/textures/textures.png", &_width, &_height, &_bpp, 4);
 }

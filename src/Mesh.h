@@ -22,6 +22,7 @@ class Mesh : public virtual RefCounted{
   void updateBuffers();
   void updateTransfrom(float dt);
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
+  unsigned int getID() const { return _id; }
  private:
   glm::mat4 _transform;
   VertexBuffer* _vertexBuffer;
@@ -31,4 +32,5 @@ class Mesh : public virtual RefCounted{
   unsigned int _vertexCount;
   unsigned short* _indices;
   float* _vertices;
+  unsigned int _id;
 };
