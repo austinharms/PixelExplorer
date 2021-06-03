@@ -86,5 +86,5 @@ void Mesh::updateBuffers() {
 void Mesh::updateTransfrom(float dt) {
   //_transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 1.0f,
   // 0.0f));
-  _transform = glm::rotate(_transform, 0.25f * dt, glm::vec3(1.0f, 1.0f, 0.0f));
+  //_transform = glm::rotate(_transform, 0.25f * dt, glm::vec3(1.0f, 1.0f, 0.0f));
 }
