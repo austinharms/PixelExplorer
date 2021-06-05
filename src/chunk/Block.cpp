@@ -19,6 +19,7 @@ Block* Block::getBlock(uint32_t id) {
 }
 
 bool Block::addBlock(Block* block) {
+  block->grab();
   return Block::s_blocks.insert({block->_id, block}).second;
 }
 

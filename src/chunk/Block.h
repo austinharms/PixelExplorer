@@ -8,6 +8,19 @@ class Block : public virtual RefCounted {
  public:
   enum Face { TOP = 0, BOTTOM = 1, FRONT = 2, BACK = 3, LEFT = 4, RIGHT = 5 };
   struct BlockFace {
+    BlockFace() { vertexCount = 0;
+      indexCount = 0;
+      vertices = nullptr;
+      uvs = nullptr;
+      indices = nullptr;
+    }
+
+    ~BlockFace() {
+      delete[] vertices;
+      delete[] uvs;
+      delete[] indices;
+    }
+
     unsigned char vertexCount;
     unsigned char indexCount;
     float* vertices;
@@ -17,7 +30,7 @@ class Block : public virtual RefCounted {
   Block(uint32_t id, bool transparent, BlockFace* blockFaces);
   virtual ~Block();
   uint32_t getID() const { return _id; }
-  BlockFace getBlockFace(Face f) const { return _faces[(int)f]; }
+  BlockFace* getBlockFace(Face f) const { return &_faces[(int)f]; }
   bool getTransparent() const { return _transparent; }
   static Block* getBlock(uint32_t id);
   static bool addBlock(Block* block);

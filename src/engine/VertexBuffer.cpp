@@ -33,7 +33,10 @@ void VertexBuffer::updateVertices(unsigned char size, unsigned int length, void*
 }
 
 void VertexBuffer::updateDirtyBuffer() {
-  if (_dirtyBuffer) updateGLBuffer();
+  if (_dirtyBuffer) {
+    bind();
+    unbind();
+  }
 }
 
 void VertexBuffer::updateGLBuffer() const {

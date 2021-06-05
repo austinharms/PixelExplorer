@@ -30,6 +30,7 @@ unsigned int VertexArray::addVertexBuffer(VertexBuffer* buffer,
     glVertexAttribPointer(attrib->index, attrib->componentCount, attrib->datatype, attrib->normalized, buffferLayout->stride, (const void*)attrib->offset);
     glEnableVertexAttribArray(attrib->index);
   }
+  buffer->unbind();
   return buffferLayout->id;
 }
 
