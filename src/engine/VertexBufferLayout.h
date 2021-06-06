@@ -12,7 +12,7 @@ class VertexBufferLayout : public virtual RefCounted {
   VertexBufferLayout(unsigned int id, unsigned int& attribIndex,
                      VertexBuffer* buffer, VertexBufferAttrib* layout[],
                      short layoutAttribCount)
-      : id(id), stride(0), buffer(buffer), layout(nullptr) {
+      : id(id), stride(0), buffer(buffer), layout(nullptr), componentStride(0) {
     buffer->grab();
     this->layout = new std::list<VertexBufferAttrib*>();
     unsigned int size;
@@ -53,9 +53,11 @@ class VertexBufferLayout : public virtual RefCounted {
           size = 0;
           break;
       }
+      layout[i]->componentOffset = componentStride;
       layout[i]->index = attribIndex++;
       layout[i]->offset = (void*)stride;
       stride += layout[i]->componentCount * size;
+      componentStride += layout[i]->componentCount;
       this->layout->push_back(layout[i]);
     }
   }
@@ -67,5 +69,14 @@ class VertexBufferLayout : public virtual RefCounted {
   unsigned int id;
   VertexBuffer* buffer;
   int stride;
+  int componentStride;
   std::list<VertexBufferAttrib*>* layout;
+  unsigned short getAttribComponentOffset(unsigned short attribIndex) const {
+    auto layoutI = layout->begin();
+    for (unsigned short i = 0; i < attribIndex; ++i) layoutI++;
+    return (*layoutI)->componentOffset;
+  }
+
+  int getStride() const { return stride; }
+  int getComponentStride() const { return componentStride; }
 };

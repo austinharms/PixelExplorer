@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
+    <None Include="res\shaders\Chunk.shader" />
     <None Include="src\engine\vendor\glm\detail\func_common.inl" />
     <None Include="src\engine\vendor\glm\detail\func_common_simd.inl" />
     <None Include="src\engine\vendor\glm\detail\func_exponential.inl" />
@@ -605,6 +606,9 @@
     <ClInclude Include="src\engine\VertexBuffer.h" />
     <ClInclude Include="src\engine\VertexBufferAttrib.h" />
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\textures.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

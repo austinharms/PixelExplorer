@@ -1,11 +1,12 @@
 #pragma once
-#include <list>
 #include <GL/glew.h>
+
+#include <list>
 
 #include "RefCounted.h"
 #include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
 #include "VertexBufferAttrib.h"
+#include "VertexBufferLayout.h"
 
 class VertexArray : public virtual RefCounted {
  public:
@@ -15,8 +16,12 @@ class VertexArray : public virtual RefCounted {
   void unbind() const;
   unsigned int addVertexBuffer(VertexBuffer* buffer,
                                VertexBufferAttrib* layout[],
-                       short layoutAttribCount);
+                               short layoutAttribCount);
   unsigned int getGLID() const { return _renderId; }
+  int getBufferStride(unsigned short bufferIndex) const;
+  unsigned short getBufferAttribComponentOffset(
+      unsigned short bufferIndex, unsigned short attribIndex) const;
+  int getBufferComponentStride(unsigned short bufferIndex) const;
 
  private:
   unsigned int _renderId;

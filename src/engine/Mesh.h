@@ -10,6 +10,7 @@
 class Mesh : public virtual RefCounted {
  public:
   Mesh();
+  Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount);
   virtual ~Mesh();
   void bind() const;
   void unbind() const;
@@ -21,6 +22,10 @@ class Mesh : public virtual RefCounted {
   void setIndex(unsigned int index, unsigned short value);
   void setVertexPosition(unsigned int index, float x, float y, float z);
   void setVertexUV(unsigned int index, float u, float v);
+  void setAttribVec2(unsigned short attribIndex, unsigned int index, float x,
+                     float y);
+  void setAttribVec3(unsigned short attribIndex, unsigned int index, float x,
+                     float y, float z);
   void updateBuffers();
   void updateTransfrom(float dt);
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
@@ -45,4 +50,5 @@ class Mesh : public virtual RefCounted {
   unsigned short* _indices;
   float* _vertices;
   unsigned int _id;
+  int _attribStride;
 };

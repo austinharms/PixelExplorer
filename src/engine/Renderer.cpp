@@ -110,6 +110,7 @@ void Renderer::render() {
     _avgFPS = _frameCount * 4;
     _frameCount = 0;
     _lastFPSFrame = currentFrame;
+    std::cout << "FPS: " << _avgFPS << std::endl;
   }
   _lastFrame = currentFrame;
   glClear(GL_COLOR_BUFFER_BIT);

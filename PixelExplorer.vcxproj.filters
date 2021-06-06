@@ -465,6 +465,7 @@
     <None Include="src\engine\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="res\shaders\Chunk.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\Renderer.h">
@@ -1355,5 +1356,10 @@
     <ClInclude Include="src\chunk\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\textures.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

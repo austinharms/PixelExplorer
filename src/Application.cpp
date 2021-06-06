@@ -18,8 +18,13 @@
 int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Test");
   if (!renderer->renderInit()) return -1;
+
+  int count;
+  glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &count);
+  std::cout << "layer count: " << count << std::endl;
+
   renderer->setCameraTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -40.0f)));
-  Shader* shader = new Shader("./res/shaders/Basic.shader");
+  Shader* shader = new Shader("./res/shaders/Chunk.shader");
   Texture* text = new Texture("./res/textures/textures.png");
   renderer->useShader(shader); 
   shader->drop();
@@ -173,7 +178,7 @@ int main(void) {
   mat->drop();
   chunk->generateChunk();
   chunk->updateMesh();
-  renderer->addMesh(chunk->getMesh());
+  //renderer->addMesh(chunk->getMesh());
 
   while (renderer->windowOpen()) {
     renderer->render();
