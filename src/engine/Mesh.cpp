@@ -50,7 +50,7 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
   attribs[1] = new VertexBufferAttrib(2, GL_FLOAT);
   for (unsigned short i = 0; i < attribCount; ++i)
     attribs[i + 2] = customAttribs[i];
-  _vertexArray->addVertexBuffer(_vertexBuffer, attribs, 2);
+  _vertexArray->addVertexBuffer(_vertexBuffer, attribs, attribCount + 2);
   attribs[0]->drop();
   attribs[1]->drop();
   delete[] attribs;
@@ -85,7 +85,7 @@ void Mesh::setIndexCount(unsigned int count) {
 
 void Mesh::setVertexCount(unsigned int count) {
   delete[] _vertices;
-  _vertices = new float[count * 5];
+  _vertices = new float[count * _attribStride];
   _vertexCount = count;
 }
 
@@ -95,15 +95,10 @@ void Mesh::setIndex(unsigned int index, unsigned short value) {
 
 void Mesh::setVertexPosition(unsigned int index, float x, float y, float z) {
   setAttribVec3(0, index, x, y, z);
-  //_vertices[(index * 5)] = x;
-  //_vertices[(index * 5) + 1] = y;
-  //_vertices[(index * 5) + 2] = z;
 }
 
 void Mesh::setVertexUV(unsigned int index, float u, float v) {
   setAttribVec2(1, index, u, v);
-  //_vertices[(index * 5) + 3] = u;
-  //_vertices[(index * 5) + 4] = v;
 }
 
 void Mesh::setAttribVec2(unsigned short attribIndex, unsigned int index,
@@ -125,7 +120,7 @@ void Mesh::setAttribVec3(unsigned short attribIndex, unsigned int index,
 
 void Mesh::updateBuffers() {
   _indexBuffer->updateIndices(sizeof(unsigned short), _indexCount, _indices);
-  _vertexBuffer->updateVertices(sizeof(float), _vertexCount * 5, _vertices);
+  _vertexBuffer->updateVertices(sizeof(float), _vertexCount * _attribStride, _vertices);
 }
 
 void Mesh::updateTransfrom(float dt) {
