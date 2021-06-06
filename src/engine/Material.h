@@ -2,18 +2,15 @@
 #include <glm/vec4.hpp>
 
 #include "RefCounted.h"
+#include "Shader.h"
 #include "Texture.h"
 
 class Material : public virtual RefCounted {
  public:
-  Material() : _color(1.0f), _texture(nullptr), _id(s_nextID++) {}
-  Material(float r, float g, float b, float a)
-      : _color(1.0f), _texture(nullptr), _id(s_nextID++) {
-    setColor(r, g, b, a);
-  }
-  Material(glm::vec4 color) : _color(1.0f), _texture(nullptr), _id(s_nextID++) {
-    setColor(color);
-  }
+  Material() : _color(1.0f), _texture(nullptr), _id(s_nextID++), _shader(nullptr) {}
+  Material(glm::vec4 color, Texture* texture = nullptr,
+           Shader* shader = nullptr)
+      : _color(color), _texture(texture), _id(s_nextID++), _shader(shader) {}
   virtual ~Material() {
     if (_texture != nullptr) _texture->drop();
   }
@@ -33,9 +30,13 @@ class Material : public virtual RefCounted {
   void setColor(glm::vec4 color) { _color = color; }
   void bindTexture(unsigned int slot) { _texture->bind(slot); }
   bool hasTexture() const { return _texture != nullptr; }
+  bool hasShader() const { return _shader != nullptr; }
+  Shader* getShader() const { return _shader; }
+
  private:
   static unsigned int s_nextID;
   unsigned int _id;
   Texture* _texture;
+  Shader* _shader;
   glm::vec4 _color;
 };
