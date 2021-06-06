@@ -19,30 +19,37 @@ int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Test");
   if (!renderer->renderInit()) return -1;
 
-  int count;
-  glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &count);
-  std::cout << "layer count: " << count << std::endl;
+  renderer->setCameraTransform(
+      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -40.0f)));
 
-  renderer->setCameraTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -40.0f)));
-  Shader* shader = new Shader("./res/shaders/Chunk.shader");
-  Texture* text = new Texture("./res/textures/textures.png");
-  renderer->useShader(shader); 
-  shader->drop();
-  Material* mat = new Material();
-  mat->setTexture(text);
-  text->drop();
+  // set default material and shader
+  {
+    Shader* defaultShader = new Shader("./res/shaders/Basic.shader");
+    Material* defaultMaterial = new Material(defaultShader);
+    defaultShader->drop();
+    renderer->setDefaultMaterial(defaultMaterial);
+    defaultMaterial->drop();
+  }
+
+  Material* chunkMaterial = nullptr;
+  //create chunk material
+  {
+    Shader* chunkShader = new Shader("./res/shaders/Chunk.shader");
+    Texture* blockTextures = new Texture("./res/textures/textures.png");
+    chunkMaterial = new Material(chunkShader, blockTextures);
+    chunkShader->drop();
+    blockTextures->drop();
+  }
+
   Mesh* mesh = new Mesh();
-  mesh->setMaterial(mat);
+  mesh->setMaterial(chunkMaterial);
   mesh->setTransform(
       glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f)));
-  //mat->drop();
   mesh->setIndexCount(36);
   mesh->setVertexCount(24);
 
   float tw = (1.0f / 96.0f)*16.0f;
   float th = (1.0f / 64.0f)*16.0f;
-
-
 
   float block[] = {
     //Front Face
@@ -174,8 +181,8 @@ int main(void) {
   Block* blockPtr = new Block(0, false, faces);
   Block::setDefaultBlock(blockPtr);
   blockPtr->drop();
-  Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0), mat);
-  mat->drop();
+  Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0), chunkMaterial);
+  chunkMaterial->drop();
   chunk->generateChunk();
   chunk->updateMesh();
   //renderer->addMesh(chunk->getMesh());

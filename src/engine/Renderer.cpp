@@ -5,7 +5,8 @@
 
 bool Renderer::s_windowSizeChange = false;
 
-Renderer::Renderer(int width, int height, const char* title)
+Renderer::Renderer(int width, int height, const char* title,
+                   Material* defaultMaterial)
     : _projection(glm::perspective(glm::radians(45.0f),
                                    (float)width / (float)height, 0.1f, 100.0f)),
       _view(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f))),
@@ -19,7 +20,8 @@ Renderer::Renderer(int width, int height, const char* title)
       _windowWidth(height),
       _renderInit(false),
       _frameCount(0),
-      _lastFPSFrame(0) {
+      _lastFPSFrame(0),
+      _defaultMaterial(nullptr) {
   if (!glfwInit()) {
     std::cout << "Failed to init glfw" << std::endl;
     return;
@@ -46,12 +48,14 @@ Renderer::Renderer(int width, int height, const char* title)
   glCullFace(GL_BACK);
   glfwSwapInterval(0);
   glfwSetFramebufferSizeCallback(_window, Renderer::windowResizeEvent);
+  setDefaultMaterial(defaultMaterial);
   _renderInit = true;
 }
 
 Renderer::~Renderer() {
   if (_boundShader != nullptr) _boundShader->drop();
   if (_boundMaterial != nullptr) _boundMaterial->drop();
+  if (_defaultMaterial != nullptr) _defaultMaterial->drop();
   for (Mesh* m : _meshes) {
     m->drop();
   }
@@ -62,17 +66,25 @@ void Renderer::useShader(Shader* s) {
   if (_boundShader != nullptr && s->getGLID() == _boundShader->getGLID())
     return;
   if (_boundShader != nullptr) _boundShader->drop();
-  s->grab();
   _boundShader = s;
-  s->bind();
+  if (_boundShader == nullptr) return;
+  _boundShader->grab();
+  _boundShader->bind();
 }
 
 void Renderer::useMaterial(Material* m) {
   if (_boundMaterial != nullptr && m->getID() == _boundMaterial->getID())
     return;
   if (_boundMaterial != nullptr) _boundMaterial->drop();
-  m->grab();
   _boundMaterial = m;
+  if (_boundMaterial == nullptr) return;
+  _boundMaterial->grab();
+  if (_boundMaterial->hasShader()) {
+    useShader(_boundMaterial->getShader());
+  } else {
+    useShader(_defaultMaterial->getShader());
+  }
+
   if (_boundMaterial->hasTexture()) {
     _boundMaterial->bindTexture(0);
     _boundShader->setUniform1i("u_Texture", 0);
@@ -81,6 +93,13 @@ void Renderer::useMaterial(Material* m) {
     _boundShader->setUniform1i("u_UseTexture", 0);
   }
   _boundShader->setUniformv4("u_Color", _boundMaterial->getColor());
+}
+
+void Renderer::setDefaultMaterial(Material* m) {
+  if (_defaultMaterial != nullptr) _defaultMaterial->drop();
+  _defaultMaterial = m;
+  if (_defaultMaterial == nullptr) return;
+  _defaultMaterial->grab();
 }
 
 void Renderer::addMesh(Mesh* mesh) {
@@ -106,19 +125,26 @@ void Renderer::render() {
   if (Renderer::s_windowSizeChange) updateWindowSize();
   double currentFrame = glfwGetTime();
   _deltaTime = (currentFrame - _lastFrame);
+
   if (currentFrame - _lastFPSFrame >= 0.25) {
     _avgFPS = _frameCount * 4;
     _frameCount = 0;
     _lastFPSFrame = currentFrame;
     std::cout << "FPS: " << _avgFPS << std::endl;
   }
+
   _lastFrame = currentFrame;
   glClear(GL_COLOR_BUFFER_BIT);
-  for (Mesh* m : _meshes) {
-    drawMesh(m);
-  }
+  for (Mesh* m : _meshes) drawMesh(m);
   if (_boundMaterial != nullptr) _boundMaterial->drop();
+
+  if (_boundShader != nullptr) {
+    _boundShader->unbind();
+    _boundShader->drop();
+  }
+
   _boundMaterial = nullptr;
+  _boundShader = nullptr;
   glfwSwapBuffers(_window);
   glfwPollEvents();
   ++_frameCount;
@@ -126,6 +152,12 @@ void Renderer::render() {
 
 void Renderer::drawMesh(Mesh* mesh) {
   mesh->updateTransfrom(_deltaTime);
+  if (mesh->hasMaterial()) {
+    useMaterial(mesh->getMaterial());
+  } else {
+    useMaterial(_defaultMaterial);
+  }
+
   mesh->bind();
   glm::mat4 mvp = _projection * _view * mesh->getTransform();
   _boundShader->setUniformm4("u_MVP", mvp);

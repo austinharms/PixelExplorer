@@ -28,14 +28,21 @@ class Mesh : public virtual RefCounted {
                      float y, float z);
   void updateBuffers();
   void updateTransfrom(float dt);
+
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
+
   unsigned int getID() const { return _id; }
+
   void setTransform(glm::mat4 t) { _transform = t; }
+
   void setMaterial(Material* m) {
     if (_material != nullptr) _material->drop();
     m->grab();
     _material = m;
   }
+
+  bool hasMaterial() const { return _material != nullptr; }
+
   Material* getMaterial() const { return _material; }
 
  private:
