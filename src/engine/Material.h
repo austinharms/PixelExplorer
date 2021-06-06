@@ -10,6 +10,12 @@ class Material : public virtual RefCounted {
   Material()
       : _color(1.0f), _texture(nullptr), _id(s_nextID++), _shader(nullptr) {}
 
+  Material(Shader* shader, Texture* texture = nullptr)
+      : _color(1.0f), _texture(nullptr), _id(s_nextID++), _shader(nullptr) {
+    setShader(shader);
+    setTexture(texture);
+  }
+
   Material(glm::vec4 color, Texture* texture = nullptr,
            Shader* shader = nullptr)
       : _color(color), _id(s_nextID++), _shader(nullptr), _texture(nullptr) {
@@ -19,6 +25,7 @@ class Material : public virtual RefCounted {
 
   virtual ~Material() {
     if (_texture != nullptr) _texture->drop();
+    if (_shader != nullptr) _shader->drop();
   }
 
   unsigned int getID() const { return _id; }
