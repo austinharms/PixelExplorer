@@ -172,6 +172,7 @@ void Renderer::updateWindowSize() {
   _projection = glm::perspective(glm::radians(45.0f),
                                  (float)_windowWidth / (float)_windowHeight,
                                  0.1f, 100.0f);
+  glViewport(0, 0, _windowWidth, _windowHeight);
 }
 
 void Renderer::windowResizeEvent(GLFWwindow* window, int width, int height) {

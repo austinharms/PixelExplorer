@@ -16,7 +16,7 @@ class Chunk : public virtual RefCounted {
   glm::vec<3, int> getPosition() const { return _position; }
   Mesh* getMesh() const { return _mesh; }
  private:
-  const unsigned int CHUNK_SIZE = 20;
+  const unsigned int CHUNK_SIZE = 40;
   const unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   const unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
   Block** _blocks;
