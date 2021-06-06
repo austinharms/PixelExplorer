@@ -42,7 +42,7 @@ class Block : public virtual RefCounted {
   }
 
  private:
-  static std::unordered_map<uint32_t, Block*> s_blocks;
+  static std::unordered_map<uint32_t, Block*>* s_blocks;
   static Block* s_defaultBlock;
   uint32_t _id;
   bool _transparent;

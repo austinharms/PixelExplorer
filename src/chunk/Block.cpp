@@ -1,7 +1,7 @@
 #include "Block.h"
 #include <unordered_map>
-std::unordered_map<uint32_t, Block*> Block::s_blocks =
-    std::unordered_map<uint32_t, Block*>();
+std::unordered_map<uint32_t, Block*>* Block::s_blocks =
+    new std::unordered_map<uint32_t, Block*>();
 Block* Block::s_defaultBlock = nullptr;
 
 Block::Block(uint32_t id, bool transparent, BlockFace* blockFaces)
@@ -10,8 +10,8 @@ Block::Block(uint32_t id, bool transparent, BlockFace* blockFaces)
 Block::~Block() { delete[] _faces; }
 
 Block* Block::getBlock(uint32_t id) {
-  auto block = Block::s_blocks.find(id);
-  if (block != Block::s_blocks.end()) {
+  auto block = Block::s_blocks->find(id);
+  if (block != Block::s_blocks->end()) {
     return block->second;
   } else {
     return s_defaultBlock;
@@ -20,12 +20,13 @@ Block* Block::getBlock(uint32_t id) {
 
 bool Block::addBlock(Block* block) {
   block->grab();
-  return Block::s_blocks.insert({block->_id, block}).second;
+  return Block::s_blocks->insert({block->_id, block}).second;
 }
 
 void Block::dropBlocks() {
   if (s_defaultBlock != nullptr) s_defaultBlock->drop();
-  for (const std::pair<uint32_t, Block*>& block : Block::s_blocks) {
+  for (const std::pair<uint32_t, Block*>& block : *Block::s_blocks) {
     block.second->drop();
   }
+  delete Block::s_blocks;
 }

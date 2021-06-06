@@ -1,3 +1,7 @@
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -185,7 +189,7 @@ int main(void) {
   chunkMaterial->drop();
   chunk->generateChunk();
   chunk->updateMesh();
-  //renderer->addMesh(chunk->getMesh());
+  renderer->addMesh(chunk->getMesh());
 
   while (renderer->windowOpen()) {
     renderer->render();
@@ -195,5 +199,6 @@ int main(void) {
   chunk->drop();
   mesh->drop();
   Block::dropBlocks();
+  _CrtDumpMemoryLeaks();
   return 0;
 }
