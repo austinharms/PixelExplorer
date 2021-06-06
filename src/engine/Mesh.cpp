@@ -79,7 +79,7 @@ void Mesh::unbind() const {
 
 void Mesh::setIndexCount(unsigned int count) {
   delete[] _indices;
-  _indices = new unsigned short[count];
+  _indices = new unsigned int[count];
   _indexCount = count;
 }
 
@@ -89,7 +89,7 @@ void Mesh::setVertexCount(unsigned int count) {
   _vertexCount = count;
 }
 
-void Mesh::setIndex(unsigned int index, unsigned short value) {
+void Mesh::setIndex(unsigned int index, unsigned int value) {
   _indices[index] = value;
 }
 
@@ -119,7 +119,7 @@ void Mesh::setAttribVec3(unsigned short attribIndex, unsigned int index,
 }
 
 void Mesh::updateBuffers() {
-  _indexBuffer->updateIndices(sizeof(unsigned short), _indexCount, _indices);
+  _indexBuffer->updateIndices(sizeof(unsigned int), _indexCount, _indices);
   _vertexBuffer->updateVertices(sizeof(float), _vertexCount * _attribStride, _vertices);
 }
 

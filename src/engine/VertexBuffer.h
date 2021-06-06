@@ -11,7 +11,6 @@ class VertexBuffer : public virtual RefCounted {
   void updateVertices(unsigned char size, unsigned int length, void* data);
   void updateDirtyBuffer();
   unsigned int getGLID() const { return _renderId; }
-  unsigned int getIndexType() const { return 0x1403; }
   unsigned int getIndexCount() const { return _length; }
  private:
   mutable bool _dirtyBuffer;

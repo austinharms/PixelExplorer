@@ -162,8 +162,8 @@ void Renderer::drawMesh(Mesh* mesh) {
   glm::mat4 mvp = _projection * _view * mesh->getTransform();
   _boundShader->setUniformm4("u_MVP", mvp);
   if (mesh->getMaterial() != nullptr) useMaterial(mesh->getMaterial());
-  glDrawElements(GL_TRIANGLES, mesh->getVertexBuffer()->getIndexCount(),
-                 mesh->getVertexBuffer()->getIndexType(), nullptr);
+  glDrawElements(GL_TRIANGLES, mesh->getIndexCount(),
+                 mesh->getIndexType(), nullptr);
 }
 
 void Renderer::updateWindowSize() {
