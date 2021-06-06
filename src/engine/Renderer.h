@@ -59,8 +59,8 @@ class Renderer : public virtual RefCounted {
   void useShader(Shader* s);
   static void windowResizeEvent(GLFWwindow* window, int width, int height);
   static bool s_windowSizeChange;
+  static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
+                                         GLenum severity, GLsizei length,
+                                         const GLchar* message,
+                                         const void* userParam);
 };
-
-void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
-                                GLenum severity, GLsizei length,
-                                const GLchar* message, const void* userParam);

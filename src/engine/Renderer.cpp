@@ -41,7 +41,7 @@ Renderer::Renderer(int width, int height, const char* title,
     return;
   }
   glEnable(GL_DEBUG_OUTPUT);
-  glDebugMessageCallback(GLErrorCallback, 0);
+  glDebugMessageCallback(Renderer::GLErrorCallback, 0);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_CULL_FACE);
@@ -178,7 +178,7 @@ void Renderer::windowResizeEvent(GLFWwindow* window, int width, int height) {
   Renderer::s_windowSizeChange = true;
 }
 
-void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
+void GLAPIENTRY Renderer::GLErrorCallback(GLenum source, GLenum type, GLuint id,
                                 GLenum severity, GLsizei length,
                                 const GLchar* message, const void* userParam) {
   fprintf(stderr,
