@@ -29,10 +29,12 @@ int main(void) {
   // set default material and shader
   {
     Shader* defaultShader = new Shader("./res/shaders/Basic.shader");
-    Material* defaultMaterial = new Material(defaultShader);
+    Texture* blockTextures = new Texture("./res/textures/textures.png");
+    Material* defaultMaterial = new Material(defaultShader, blockTextures);
     defaultShader->drop();
     renderer->setDefaultMaterial(defaultMaterial);
     defaultMaterial->drop();
+    blockTextures->drop();
   }
 
   Material* chunkMaterial = nullptr;
@@ -46,7 +48,7 @@ int main(void) {
   }
 
   Mesh* mesh = new Mesh();
-  mesh->setMaterial(chunkMaterial);
+  //mesh->setMaterial(chunkMaterial);
   mesh->setTransform(
       glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f)));
   mesh->setIndexCount(36);

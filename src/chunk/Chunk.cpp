@@ -1,15 +1,20 @@
 #include "Chunk.h"
 
+#include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <list>
+
+#include "VertexBufferAttrib.h"
 
 Chunk::Chunk(glm::vec<3, int> pos, Material* material)
     : _position(pos), _blocks(nullptr), _mesh(nullptr) {
   //_mesh->setTransform(glm::translate(
   //    glm::mat4(1.0f),
   //    glm::vec3(pos.x * c_size, pos.y * c_size, pos.z * c_size)));
-  _mesh = new Mesh();
+  VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
+  _mesh = new Mesh(&repeatAttrib, 1);
+  repeatAttrib->drop();
   _mesh->setMaterial(material);
 }
 
@@ -70,6 +75,7 @@ void Chunk::updateMesh() {
         _mesh->setVertexUV(vertexCount + v,
                            face->uvs[v * 2],
                            face->uvs[v * 2 + 1]);
+        _mesh->setAttribVec2(2, vertexCount + v, 1, 1);
       }
       for (unsigned char in = 0; in < face->indexCount; ++in) {
         _mesh->setIndex(indexCount + in,  vertexCount + face->indices[in]);
