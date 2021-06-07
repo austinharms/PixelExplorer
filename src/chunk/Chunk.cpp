@@ -9,9 +9,6 @@
 
 Chunk::Chunk(glm::vec<3, int> pos, Material* material)
     : _position(pos), _blocks(nullptr), _mesh(nullptr) {
-  //_mesh->setTransform(glm::translate(
-  //    glm::mat4(1.0f),
-  //    glm::vec3(pos.x * c_size, pos.y * c_size, pos.z * c_size)));
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
   repeatAttrib->drop();
@@ -44,7 +41,9 @@ void Chunk::updateMesh() {
       if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr && !_blocks[i - CHUNK_SIZE]->getTransparent()) || 
           (f == Block::BACK && z != CHUNK_SIZE - 1 && _blocks[i + CHUNK_SIZE] != nullptr && !_blocks[i + CHUNK_SIZE]->getTransparent()) || 
           (f == Block::LEFT && x != 0 && _blocks[i - 1] != nullptr && !_blocks[i - 1]->getTransparent()) ||
-          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && !_blocks[i + 1]->getTransparent())) continue;
+          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && !_blocks[i + 1]->getTransparent()) ||
+          (f == Block::BOTTOM && y != 0 && _blocks[i - LAYER_SIZE] != nullptr && !_blocks[i - LAYER_SIZE]->getTransparent()) ||
+          (f == Block::TOP && y != CHUNK_SIZE - 1 && _blocks[i + LAYER_SIZE] != nullptr && !_blocks[i + LAYER_SIZE]->getTransparent())) continue;
       Block::BlockFace* face = _blocks[i]->getBlockFace((Block::Face)f);
       vertexCount += face->vertexCount;
       indexCount += face->indexCount;
@@ -65,7 +64,9 @@ void Chunk::updateMesh() {
       if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr && !_blocks[i - CHUNK_SIZE]->getTransparent()) || 
           (f == Block::BACK && z != CHUNK_SIZE - 1 && _blocks[i + CHUNK_SIZE] != nullptr && !_blocks[i + CHUNK_SIZE]->getTransparent()) || 
           (f == Block::LEFT && x != 0 && _blocks[i - 1] != nullptr && !_blocks[i - 1]->getTransparent()) ||
-          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && !_blocks[i + 1]->getTransparent())) continue;
+          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && !_blocks[i + 1]->getTransparent()) ||
+          (f == Block::BOTTOM && y != 0 && _blocks[i - LAYER_SIZE] != nullptr && !_blocks[i - LAYER_SIZE]->getTransparent()) ||
+          (f == Block::TOP && y != CHUNK_SIZE - 1 && _blocks[i + LAYER_SIZE] != nullptr && !_blocks[i + LAYER_SIZE]->getTransparent())) continue;
       Block::BlockFace* face = _blocks[i]->getBlockFace((Block::Face)f);
       for (unsigned char v = 0; v < face->vertexCount; ++v) {
         _mesh->setVertexPosition(vertexCount + v,

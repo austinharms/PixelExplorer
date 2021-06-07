@@ -24,7 +24,7 @@ int main(void) {
   if (!renderer->renderInit()) return -1;
 
   renderer->setCameraTransform(
-      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -40.0f)));
+      glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, -20.0f, -80.0f)));
 
   // set default material and shader
   {
@@ -182,7 +182,37 @@ int main(void) {
     tw * 5, th * 1,
   };
 
+  faces[Block::TOP].indexCount = 6;
+  faces[Block::TOP].vertexCount = 4;
+  faces[Block::TOP].vertices = new float[12]{
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 
+    1.0f, 1.0f, 0.0f
+  };
+  faces[Block::TOP].indices = new short[6]{2, 3, 0, 0, 1, 2};
+  faces[Block::TOP].uvs = new float[8]{
+    tw * 0, th * 0,
+    tw * 0, th * 1,
+    tw * 1, th * 1,
+    tw * 1, th * 0,
+  };
 
+  faces[Block::BOTTOM].indexCount = 6;
+  faces[Block::BOTTOM].vertexCount = 4;
+  faces[Block::BOTTOM].vertices = new float[12]{
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,
+    1.0f, 0.0f, 1.0f, 
+    1.0f, 0.0f, 0.0f
+  };
+  faces[Block::BOTTOM].indices = new short[6]{0, 3, 2, 2, 1, 0};
+  faces[Block::BOTTOM].uvs = new float[8]{
+    tw * 1, th * 0,
+    tw * 1, th * 1,
+    tw * 2, th * 1,
+    tw * 2, th * 0,
+  };
 
   Block* blockPtr = new Block(0, false, faces);
   Block::setDefaultBlock(blockPtr);
