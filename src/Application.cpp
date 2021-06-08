@@ -8,6 +8,7 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <fstream>
 
 #include "Material.h"
 #include "Mesh.h"
@@ -116,107 +117,10 @@ int main(void) {
   mesh->updateBuffers();
   renderer->addMesh(mesh);
 
-  Block::BlockFace* faces = new Block::BlockFace[6];
-  faces[Block::FRONT].indexCount = 6;
-  faces[Block::FRONT].vertexCount = 4;
-  faces[Block::FRONT].vertices = new float[12]{
-    0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 
-    1.0f, 0.0f, 1.0f
-  };
-  faces[Block::FRONT].indices = new short[6]{0, 3, 2, 2, 1, 0};
-  faces[Block::FRONT].uvs = new float[8]{
-    tw * 2, th * 1,
-    tw * 2, th * 0,
-    tw * 3, th * 0,
-    tw * 3, th * 1,
-  };
+  Block::loadBlocks("./res/blocks.dat");
 
-  faces[Block::BACK].indexCount = 6;
-  faces[Block::BACK].vertexCount = 4;
-  faces[Block::BACK].vertices = new float[12]{
-    0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f, 
-    1.0f, 0.0f, 0.0f
-  };
-  faces[Block::BACK].indices = new short[6]{2, 3, 0, 0, 1, 2};
-  faces[Block::BACK].uvs = new float[8]{
-    tw * 4, th * 1,
-    tw * 4, th * 0,
-    tw * 3, th * 0,
-    tw * 3, th * 1,
-  };
-
-  faces[Block::LEFT].indexCount = 6;
-  faces[Block::LEFT].vertexCount = 4;
-  faces[Block::LEFT].vertices = new float[12]{
-    0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 1.0f, 
-    0.0f, 0.0f, 1.0f
-  };
-  faces[Block::LEFT].indices = new short[6]{0, 3, 2, 2, 1, 0};
-  faces[Block::LEFT].uvs = new float[8]{
-    tw * 4, th * 1,
-    tw * 4, th * 0,
-    tw * 5, th * 0,
-    tw * 5, th * 1,
-  };
-
-  
-  faces[Block::RIGHT].indexCount = 6;
-  faces[Block::RIGHT].vertexCount = 4;
-  faces[Block::RIGHT].vertices = new float[12]{
-    1.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 1.0f, 
-    1.0f, 0.0f, 1.0f
-  };
-  faces[Block::RIGHT].indices = new short[6]{2, 3, 0, 0, 1, 2};
-  faces[Block::RIGHT].uvs = new float[8]{
-    tw * 6, th * 1,
-    tw * 6, th * 0,
-    tw * 5, th * 0,
-    tw * 5, th * 1,
-  };
-
-  faces[Block::TOP].indexCount = 6;
-  faces[Block::TOP].vertexCount = 4;
-  faces[Block::TOP].vertices = new float[12]{
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 
-    1.0f, 1.0f, 0.0f
-  };
-  faces[Block::TOP].indices = new short[6]{2, 3, 0, 0, 1, 2};
-  faces[Block::TOP].uvs = new float[8]{
-    tw * 0, th * 0,
-    tw * 0, th * 1,
-    tw * 1, th * 1,
-    tw * 1, th * 0,
-  };
-
-  faces[Block::BOTTOM].indexCount = 6;
-  faces[Block::BOTTOM].vertexCount = 4;
-  faces[Block::BOTTOM].vertices = new float[12]{
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,
-    1.0f, 0.0f, 1.0f, 
-    1.0f, 0.0f, 0.0f
-  };
-  faces[Block::BOTTOM].indices = new short[6]{0, 3, 2, 2, 1, 0};
-  faces[Block::BOTTOM].uvs = new float[8]{
-    tw * 1, th * 0,
-    tw * 1, th * 1,
-    tw * 2, th * 1,
-    tw * 2, th * 0,
-  };
-
-  Block* blockPtr = new Block(0, false, faces);
-  Block::setDefaultBlock(blockPtr);
-  blockPtr->drop();
+  Block::setDefaultBlock(Block::getBlock(0));
+  Block::saveBlocks("res/blocks.dat");
   Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0), chunkMaterial);
   chunkMaterial->drop();
   chunk->generateChunk();

@@ -466,6 +466,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\shaders\Chunk.shader" />
+    <None Include="res\blocks.dat" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\Renderer.h">

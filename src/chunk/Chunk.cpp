@@ -38,12 +38,12 @@ void Chunk::updateMesh() {
     float z = (int)((int)(i/CHUNK_SIZE) % CHUNK_SIZE);
     if (_blocks[i] == nullptr) continue;
     for (char f = 0; f < 6; ++f) {
-      if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr && !_blocks[i - CHUNK_SIZE]->getTransparent()) || 
-          (f == Block::BACK && z != CHUNK_SIZE - 1 && _blocks[i + CHUNK_SIZE] != nullptr && !_blocks[i + CHUNK_SIZE]->getTransparent()) || 
-          (f == Block::LEFT && x != 0 && _blocks[i - 1] != nullptr && !_blocks[i - 1]->getTransparent()) ||
-          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && !_blocks[i + 1]->getTransparent()) ||
-          (f == Block::BOTTOM && y != 0 && _blocks[i - LAYER_SIZE] != nullptr && !_blocks[i - LAYER_SIZE]->getTransparent()) ||
-          (f == Block::TOP && y != CHUNK_SIZE - 1 && _blocks[i + LAYER_SIZE] != nullptr && !_blocks[i + LAYER_SIZE]->getTransparent())) continue;
+      if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr && _blocks[i - CHUNK_SIZE]->getFullBlockFace((Block::Face)f)) || 
+          (f == Block::BACK && z != CHUNK_SIZE - 1 && _blocks[i + CHUNK_SIZE] != nullptr && _blocks[i + CHUNK_SIZE]->getFullBlockFace((Block::Face)f)) || 
+          (f == Block::LEFT && x != 0 && _blocks[i - 1] != nullptr && _blocks[i - 1]->getFullBlockFace((Block::Face)f)) ||
+          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && _blocks[i + 1]->getFullBlockFace((Block::Face)f)) ||
+          (f == Block::BOTTOM && y != 0 && _blocks[i - LAYER_SIZE] != nullptr && _blocks[i - LAYER_SIZE]->getFullBlockFace((Block::Face)f)) ||
+          (f == Block::TOP && y != CHUNK_SIZE - 1 && _blocks[i + LAYER_SIZE] != nullptr && _blocks[i + LAYER_SIZE]->getFullBlockFace((Block::Face)f))) continue;
       Block::BlockFace* face = _blocks[i]->getBlockFace((Block::Face)f);
       vertexCount += face->vertexCount;
       indexCount += face->indexCount;
@@ -61,12 +61,12 @@ void Chunk::updateMesh() {
     float z = (int)((int)(i/CHUNK_SIZE) % CHUNK_SIZE);
     if (_blocks[i] == nullptr) continue;
     for (char f = 0; f < 6; ++f) {
-      if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr && !_blocks[i - CHUNK_SIZE]->getTransparent()) || 
-          (f == Block::BACK && z != CHUNK_SIZE - 1 && _blocks[i + CHUNK_SIZE] != nullptr && !_blocks[i + CHUNK_SIZE]->getTransparent()) || 
-          (f == Block::LEFT && x != 0 && _blocks[i - 1] != nullptr && !_blocks[i - 1]->getTransparent()) ||
-          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && !_blocks[i + 1]->getTransparent()) ||
-          (f == Block::BOTTOM && y != 0 && _blocks[i - LAYER_SIZE] != nullptr && !_blocks[i - LAYER_SIZE]->getTransparent()) ||
-          (f == Block::TOP && y != CHUNK_SIZE - 1 && _blocks[i + LAYER_SIZE] != nullptr && !_blocks[i + LAYER_SIZE]->getTransparent())) continue;
+      if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr && _blocks[i - CHUNK_SIZE]->getFullBlockFace((Block::Face)f)) || 
+          (f == Block::BACK && z != CHUNK_SIZE - 1 && _blocks[i + CHUNK_SIZE] != nullptr && _blocks[i + CHUNK_SIZE]->getFullBlockFace((Block::Face)f)) || 
+          (f == Block::LEFT && x != 0 && _blocks[i - 1] != nullptr && _blocks[i - 1]->getFullBlockFace((Block::Face)f)) ||
+          (f == Block::RIGHT && x != CHUNK_SIZE - 1 && _blocks[i + 1] != nullptr && _blocks[i + 1]->getFullBlockFace((Block::Face)f)) ||
+          (f == Block::BOTTOM && y != 0 && _blocks[i - LAYER_SIZE] != nullptr && _blocks[i - LAYER_SIZE]->getFullBlockFace((Block::Face)f)) ||
+          (f == Block::TOP && y != CHUNK_SIZE - 1 && _blocks[i + LAYER_SIZE] != nullptr && _blocks[i + LAYER_SIZE]->getFullBlockFace((Block::Face)f))) continue;
       Block::BlockFace* face = _blocks[i]->getBlockFace((Block::Face)f);
       for (unsigned char v = 0; v < face->vertexCount; ++v) {
         _mesh->setVertexPosition(vertexCount + v,

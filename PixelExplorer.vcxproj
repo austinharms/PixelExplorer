@@ -170,6 +170,7 @@
     <ClCompile Include="src\engine\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\blocks.dat" />
     <None Include="res\shaders\Basic.shader" />
     <None Include="res\shaders\Chunk.shader" />
     <None Include="src\engine\vendor\glm\detail\func_common.inl" />
