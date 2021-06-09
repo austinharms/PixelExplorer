@@ -1362,5 +1362,8 @@
     <Image Include="res\textures\textures.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\textures\default.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

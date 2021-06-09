@@ -58,6 +58,7 @@ void Block::loadBlocks(const char* blockDataPath) {
     }
     Block* block = new Block(id, transparent, blockFace);
     addBlock(block);
+    block->drop();
   }
   blocksFile.close();
 }
