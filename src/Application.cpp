@@ -50,6 +50,11 @@ int main(void) {
 
   Block::loadBlocks("./res/blocks.dat");
   Block::setDefaultBlock(Block::getBlock(0));
+
+
+
+
+
   Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0), chunkMaterial);
   chunkMaterial->drop();
   chunk->generateChunk();

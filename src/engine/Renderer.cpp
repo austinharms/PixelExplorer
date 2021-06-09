@@ -169,6 +169,7 @@ void Renderer::drawMesh(Mesh* mesh) {
 void Renderer::updateWindowSize() {
   glfwGetFramebufferSize(_window, &_windowWidth, &_windowHeight);
   Renderer::s_windowSizeChange = false;
+  if (_windowWidth == 0 || _windowHeight == 0) return;
   _projection = glm::perspective(glm::radians(45.0f),
                                  (float)_windowWidth / (float)_windowHeight,
                                  0.1f, 100.0f);
