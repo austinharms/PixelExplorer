@@ -24,8 +24,9 @@ int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Test");
   if (!renderer->renderInit()) return -1;
 
-  renderer->setCameraTransform(
-      glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, -20.0f, -80.0f)));
+  renderer->setCameraTransform(glm::rotate(
+      glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, -20.0f, -80.0f)),
+      glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
   // set default material and shader
   {
@@ -50,10 +51,6 @@ int main(void) {
 
   Block::loadBlocks("./res/blocks.dat");
   Block::setDefaultBlock(Block::getBlock(0));
-
-
-
-
 
   Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0), chunkMaterial);
   chunkMaterial->drop();

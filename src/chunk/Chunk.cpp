@@ -24,7 +24,7 @@ void Chunk::generateChunk() {
   _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
   if (_blocks == nullptr) return;
   for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-    _blocks[i] = Block::getBlock(0);
+    _blocks[i] = Block::getBlock(i%4);
   }
 }
 

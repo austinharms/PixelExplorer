@@ -121,6 +121,8 @@ void Block::dropBlocks() {
 
 
 /*
+  float tw = (1.0f / 96.0f) * 16.0f;
+  float th = (1.0f / 64.0f) * 16.0f;
   Block::BlockFace* faces = new Block::BlockFace[6];
   faces[Block::FRONT].indexCount = 6;
   faces[Block::FRONT].vertexCount = 4;
