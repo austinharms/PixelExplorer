@@ -18,16 +18,16 @@
 #include "glm/glm.hpp"
 #include "chunk/Chunk.h"
 #include "chunk/Block.h"
+#include "Player.h"
 
 
 int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Test");
   if (!renderer->renderInit()) return -1;
 
-  renderer->setCameraTransform(glm::rotate(
-      glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, -20.0f, -80.0f)),
-      glm::radians(40.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
-
+  renderer->hideCursor(true);
+  //renderer->setCameraTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, -20.0f, -80.0f)));
+  Player* player = new Player(renderer);
   // set default material and shader
   {
     Shader* defaultShader = new Shader("./res/shaders/Basic.shader");
@@ -59,9 +59,11 @@ int main(void) {
   renderer->addMesh(chunk->getMesh());
 
   while (renderer->windowOpen()) {
+    player->update();
     renderer->render();
   }
 
+  player->drop();
   renderer->drop();
   chunk->drop();
   Block::dropBlocks();

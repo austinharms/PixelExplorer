@@ -21,6 +21,15 @@ class Renderer : public virtual RefCounted {
   void removeMesh(Mesh* mesh);
   bool windowOpen();
   void render();
+  void hideCursor(bool hide);
+
+  int getKey(int keyCode) { return glfwGetKey(_window, keyCode); }
+
+  bool getCursorHidden() const { return _cursorHidden; }
+
+  void getCursorPosition(double& const x, double& const y);
+
+  void setCursorPosition(double x, double y);
 
   bool renderInit() const { return _renderInit; }
 
@@ -28,7 +37,7 @@ class Renderer : public virtual RefCounted {
 
   float getDeltaTime() const { return _deltaTime; }
 
-  void getWindowSize(int& width, int& height) {
+  void getWindowSize(int& const width, int& const height) {
     width = _windowWidth;
     height = _windowHeight;
   };
@@ -36,6 +45,13 @@ class Renderer : public virtual RefCounted {
   void setCameraTransform(glm::mat4 t) { _view = t; }
 
   glm::mat4 getCameraTransform() const { return _view; }
+
+  float getFOV() const { return _FOV; }
+
+  void setFOV(float FOV) {
+    _FOV = FOV;
+    updateWindowSize();
+  }
 
  private:
   GLFWwindow* _window;
@@ -48,11 +64,13 @@ class Renderer : public virtual RefCounted {
   int _windowWidth;
   int _windowHeight;
   float _deltaTime;
+  float _FOV;
   double _lastFrame;
   double _lastFPSFrame;
   int _avgFPS;
   int _frameCount;
   bool _renderInit;
+  bool _cursorHidden;
   void drawMesh(Mesh* mesh);
   void updateWindowSize();
   void useMaterial(Material* m);

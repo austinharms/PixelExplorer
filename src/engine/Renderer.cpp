@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
@@ -7,7 +8,7 @@ bool Renderer::s_windowSizeChange = false;
 
 Renderer::Renderer(int width, int height, const char* title,
                    Material* defaultMaterial)
-    : _projection(glm::perspective(glm::radians(45.0f),
+    : _FOV(40.0f), _projection(glm::perspective(glm::radians(40.0f),
                                    (float)width / (float)height, 0.1f, 100.0f)),
       _view(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f))),
       _boundShader(nullptr),
@@ -150,6 +151,23 @@ void Renderer::render() {
   ++_frameCount;
 }
 
+void Renderer::hideCursor(bool hidden) {
+  _cursorHidden = hidden;
+  if (hidden) {
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  } else {
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  }
+}
+
+void Renderer::getCursorPosition(double& const x, double& const y) {
+  glfwGetCursorPos(_window, &x, &y);
+}
+
+void Renderer::setCursorPosition(double x, double y) {
+  glfwSetCursorPos(_window, x, y);
+}
+
 void Renderer::drawMesh(Mesh* mesh) {
   mesh->updateTransfrom(_deltaTime);
   if (mesh->hasMaterial()) {
@@ -170,7 +188,7 @@ void Renderer::updateWindowSize() {
   glfwGetFramebufferSize(_window, &_windowWidth, &_windowHeight);
   Renderer::s_windowSizeChange = false;
   if (_windowWidth == 0 || _windowHeight == 0) return;
-  _projection = glm::perspective(glm::radians(45.0f),
+  _projection = glm::perspective(glm::radians(_FOV),
                                  (float)_windowWidth / (float)_windowHeight,
                                  0.1f, 100.0f);
   glViewport(0, 0, _windowWidth, _windowHeight);
