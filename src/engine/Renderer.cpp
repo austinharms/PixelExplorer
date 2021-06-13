@@ -136,7 +136,20 @@ void Renderer::render() {
 
   _lastFrame = currentFrame;
   glClear(GL_COLOR_BUFFER_BIT);
-  for (Mesh* m : _meshes) drawMesh(m);
+
+  std::list<Mesh*>::iterator iter = _meshes.begin();
+  std::list<Mesh*>::iterator end = _meshes.end();
+  while (iter != end) {
+    Mesh* m = *iter;
+    if (!m->getRendererDropFlag()) {
+      drawMesh(m);
+      ++iter;
+    } else {
+      iter = _meshes.erase(iter);
+      m->drop();
+    }
+  }
+
   if (_boundMaterial != nullptr) _boundMaterial->drop();
 
   if (_boundShader != nullptr) {

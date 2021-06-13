@@ -5,7 +5,7 @@
 class Texture : public virtual RefCounted {
  public:
   Texture(unsigned int width, unsigned int height);
-  Texture(std::string path);
+  Texture(const char* path);
   virtual ~Texture();
   void bind(unsigned int slot = 0) const;
   void unbind() const;
@@ -19,6 +19,6 @@ class Texture : public virtual RefCounted {
   int _bpp;
   void* _buffer;
   unsigned int _renderId;
-  void loadTex(std::string path);
+  void loadTex(const char* path);
   void createGLTexture();
 };

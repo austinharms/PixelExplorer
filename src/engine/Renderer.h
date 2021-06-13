@@ -17,8 +17,8 @@ class Renderer : public virtual RefCounted {
   virtual ~Renderer();
   void setDefaultMaterial(Material* m);
   void addMesh(Mesh* mesh);
-  void removeMesh(unsigned int id);
-  void removeMesh(Mesh* mesh);
+  void removeMesh(unsigned int id); //better to set mesh drop flag
+  void removeMesh(Mesh* mesh); //better to set mesh drop flag
   bool windowOpen();
   void render();
   void hideCursor(bool hide);

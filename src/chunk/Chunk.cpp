@@ -9,6 +9,7 @@
 
 Chunk::Chunk(glm::vec<3, int> pos, Material* material)
     : _position(pos), _blocks(nullptr), _mesh(nullptr) {
+  _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
   repeatAttrib->drop();
@@ -17,6 +18,7 @@ Chunk::Chunk(glm::vec<3, int> pos, Material* material)
 
 Chunk::~Chunk() {
   if (_blocks != nullptr) free(_blocks);
+  _mesh->setRendererDropFlag(true);
   _mesh->drop();
 }
 

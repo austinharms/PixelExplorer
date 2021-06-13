@@ -47,6 +47,10 @@ class Mesh : public virtual RefCounted {
 
   unsigned int getIndexType() const { return 0x1405; }
 
+  void setRendererDropFlag(bool flag) { _rendererDropFlag = flag; }
+
+  bool getRendererDropFlag() const { return _rendererDropFlag; }
+
  private:
   static unsigned int s_nextId;
   glm::mat4 _transform;
@@ -60,4 +64,5 @@ class Mesh : public virtual RefCounted {
   float* _vertices;
   unsigned int _id;
   int _attribStride;
+  bool _rendererDropFlag;
 };

@@ -8,7 +8,7 @@ Texture::Texture(unsigned int width, unsigned int height)
   createGLTexture();
 }
 
-Texture::Texture(std::string path)
+Texture::Texture(const char* path)
     : _renderId(0), _width(0), _height(0), _bpp(0), _buffer(nullptr) {
   loadTex(path);
   createGLTexture();
@@ -27,10 +27,10 @@ void Texture::bind(unsigned int slot) const {
 
 void Texture::unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
-void Texture::loadTex(std::string path) { 
+void Texture::loadTex(const char* path) { 
   //stbi_set_flip_vertically_on_load(1); 
   _buffer =
-      stbi_load("./res/textures/textures.png", &_width, &_height, &_bpp, 4);
+      stbi_load(path, &_width, &_height, &_bpp, 4);
 }
 
 void Texture::createGLTexture() {
