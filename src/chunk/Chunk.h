@@ -18,7 +18,8 @@ class Chunk : public virtual RefCounted {
     LOADING = 2,
     LOADED = 3,
   };
-  Chunk(glm::vec<3, int> pos, Material* material);
+
+  Chunk(glm::vec<3, int> pos);
   virtual ~Chunk();
   void generateChunk();
   void updateMesh();
@@ -37,10 +38,29 @@ class Chunk : public virtual RefCounted {
     _status = s;
   }
 
+  void setUnloadTime(unsigned long long int time) {
+    std::lock_guard<std::mutex> locker(_unloadDelayLock);
+    _unloadTime = time;
+  }
+
+  unsigned long long int getUnloadTime() {
+    std::lock_guard<std::mutex> locker(_unloadDelayLock);
+    return _unloadTime;
+  }
+
+  static void setBlockMaterial(Material* mat) {
+    if (_blockMaterial != nullptr) _blockMaterial->drop();
+    _blockMaterial = mat;
+    if (_blockMaterial != nullptr) _blockMaterial->grab();
+  }
+
  private:
+  static Material* _blockMaterial;
   Block** _blocks;
   glm::vec<3, int> _position;
   Mesh* _mesh;
   std::mutex _statusLock;
   Status _status;
+  std::mutex _unloadDelayLock;
+  unsigned long long int _unloadTime;
 };

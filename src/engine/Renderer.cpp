@@ -1,14 +1,15 @@
 #include "Renderer.h"
 
-#include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/vec3.hpp>
 #include <iostream>
 
 bool Renderer::s_windowSizeChange = false;
 
 Renderer::Renderer(int width, int height, const char* title,
                    Material* defaultMaterial)
-    : _FOV(40.0f), _projection(glm::perspective(glm::radians(40.0f),
+    : _FOV(40.0f),
+      _projection(glm::perspective(glm::radians(40.0f),
                                    (float)width / (float)height, 0.1f, 100.0f)),
       _view(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f))),
       _boundShader(nullptr),
@@ -131,7 +132,9 @@ void Renderer::render() {
     _avgFPS = _frameCount * 4;
     _frameCount = 0;
     _lastFPSFrame = currentFrame;
-    std::cout << "FPS: " << _avgFPS << std::endl;
+    std::cout << "FPS: " << _avgFPS << "  Clock: " << std::clock()
+              << "t Clock: " << (std::clock() / CLOCKS_PER_SEC) << "s"
+              << std::endl;
   }
 
   _lastFrame = currentFrame;
@@ -193,8 +196,8 @@ void Renderer::drawMesh(Mesh* mesh) {
   glm::mat4 mvp = _projection * _view * mesh->getTransform();
   _boundShader->setUniformm4("u_MVP", mvp);
   if (mesh->getMaterial() != nullptr) useMaterial(mesh->getMaterial());
-  glDrawElements(GL_TRIANGLES, mesh->getIndexCount(),
-                 mesh->getIndexType(), nullptr);
+  glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), mesh->getIndexType(),
+                 nullptr);
 }
 
 void Renderer::updateWindowSize() {
@@ -212,8 +215,9 @@ void Renderer::windowResizeEvent(GLFWwindow* window, int width, int height) {
 }
 
 void GLAPIENTRY Renderer::GLErrorCallback(GLenum source, GLenum type, GLuint id,
-                                GLenum severity, GLsizei length,
-                                const GLchar* message, const void* userParam) {
+                                          GLenum severity, GLsizei length,
+                                          const GLchar* message,
+                                          const void* userParam) {
   fprintf(stderr,
           "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
           (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,

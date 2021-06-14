@@ -158,6 +158,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\chunk\Block.cpp" />
     <ClCompile Include="src\chunk\Chunk.cpp" />
+    <ClCompile Include="src\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\engine\IndexBuffer.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
     <ClCompile Include="src\engine\Mesh.cpp" />
