@@ -2,17 +2,27 @@
 
 #include <iostream>
 
-ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer)
+ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
+                           int threadPoolSize)
     : _runningThreadCount(0),
       _killRunningThreads(false),
       _renderer(renderer),
-      unloadThread(&ChunkManager::unloadThreadFunction, this) {
+      _unloadThread(&ChunkManager::unloadThreadFunction, this),
+      _threadPool(),
+      _jobQueue() {
   _renderer->grab();
-  unloadThread.detach();
+  _unloadThread.detach();
+  _threadPool.reserve(threadPoolSize);
+  for (int i = 0; i < threadPoolSize; ++i) {
+    _threadPool.emplace_back(
+        std::thread(&ChunkManager::jobThreadPoolFunction, this));
+    _threadPool[i].detach();
+  }
 }
 
 ChunkManager::~ChunkManager() {
   _killRunningThreads = true;
+  _jobCondition.notify_all();
   _renderer->drop();
   unloadAllChunks();
   while (getRunningThreadCount() > 0)
@@ -20,18 +30,37 @@ ChunkManager::~ChunkManager() {
 }
 
 void ChunkManager::loadChunksInRadiusAsync(glm::vec<3, int> pos,
-                                           unsigned short radius) {}
+                                           unsigned short radius) {
+  Job* job = new Job();
+  job->type = Job::LOADR;
+  job->pos = pos;
+  job->ptr = (void*)radius;
+  addJob(job);
+}
 
 void ChunkManager::loadChunksInRadius(glm::vec<3, int> pos,
-                                      unsigned short radius) {
+                                      unsigned short radius,
+                                      bool useAsyncChunkLoading) {
   unsigned int chunkCount = radius * radius * radius;
   glm::vec<3, int> chunkPos;
   for (unsigned int i = 0; i < chunkCount; ++i) {
     chunkPos.x = (int)(i % radius);
     chunkPos.y = (int)(i / (radius * radius));
     chunkPos.z = (int)((int)(i / radius) % radius);
-    loadChunk(chunkPos + pos);
+    if (useAsyncChunkLoading) {
+      loadChunkAsync(chunkPos + pos);
+    } else {
+      loadChunk(chunkPos + pos);
+    }
   }
+}
+
+void ChunkManager::loadChunkAsync(glm::vec<3, int> pos) {
+  Job* job = new Job();
+  job->type = Job::LOAD;
+  job->pos = pos;
+  job->ptr = nullptr;
+  addJob(job);
 }
 
 void ChunkManager::loadChunk(glm::vec<3, int> pos) {
@@ -52,8 +81,11 @@ void ChunkManager::loadChunk(glm::vec<3, int> pos) {
   chunk->generateChunk();
   chunk->updateMesh();
   chunk->setUnloadTime(((unsigned long long int)clock() / CLOCKS_PER_SEC) + 10);
+  {
+    std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
+    _chunkMap.insert({posToString(pos), chunk});
+  }
   _renderer->addMesh(chunk->getMesh());
-  _chunkMap.insert({posToString(pos), chunk});
   chunk->setStatus(Chunk::LOADED);
 }
 
@@ -82,6 +114,36 @@ Chunk* ChunkManager::getChunkPointer(glm::vec<3, int> pos) {
   auto chunk = _chunkMap.find(posToString(pos));
   if (chunk != _chunkMap.end()) return chunk->second;
   return nullptr;
+}
+
+void ChunkManager::jobThreadPoolFunction() {
+  incrementRunningThreadCount();
+  while (!_killRunningThreads) {
+    Job* job = nullptr;
+
+    {
+      std::unique_lock<std::mutex> lock(_jobQueueLock);
+      _jobCondition.wait(
+          lock, [this] { return !_jobQueue.empty() || _killRunningThreads; });
+      if (_killRunningThreads) continue;
+      job = getNextJob();
+      if (job == nullptr) continue;
+    }
+
+    switch (job->type) {
+      case Job::LOADR:
+        loadChunksInRadius(job->pos, (unsigned short)job->ptr, true);
+        break;
+
+      case Job::LOAD:
+        loadChunk(job->pos);
+        break;
+    }
+
+    delete job;
+  }
+
+  decrementRunningThreadCount();
 }
 
 void ChunkManager::unloadThreadFunction() {
