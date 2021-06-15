@@ -53,16 +53,13 @@ int main(void) {
   Block::setDefaultBlock(Block::getBlock(0));
 
   ChunkManager* chunkManager = new ChunkManager(nullptr, renderer);
-  chunkManager->loadChunk(glm::vec<3, int>(0, 0, 0));
-  chunkManager->loadChunk(glm::vec<3, int>(1, 0, 0));
-  chunkManager->loadChunk(glm::vec<3, int>(0, 0, 1));
-  chunkManager->loadChunk(glm::vec<3, int>(1, 0, 1));
   // Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0));
   // chunk->generateChunk();
   // chunk->updateMesh();
   // renderer->addMesh(chunk->getMesh());
 
   while (renderer->windowOpen()) {
+    chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 4);
     player->update();
     renderer->render();
   }

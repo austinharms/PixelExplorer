@@ -18,7 +18,8 @@ Mesh::Mesh()
       _id(s_nextId++),
       _material(nullptr),
       _attribStride(0),
-      _rendererDropFlag(false) {
+      _rendererDropFlag(false),
+      _bufferOffsetMap() {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -43,7 +44,8 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
       _id(s_nextId++),
       _material(nullptr),
       _attribStride(0),
-      _rendererDropFlag(false) {
+      _rendererDropFlag(false),
+      _bufferOffsetMap() {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -128,5 +130,5 @@ void Mesh::updateBuffers() {
 
 void Mesh::updateTransfrom(float dt) {
   //_transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 1.0f,
-  //0.0f));
+  // 0.0f));
 }

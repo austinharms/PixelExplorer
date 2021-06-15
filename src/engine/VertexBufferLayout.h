@@ -1,7 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 
-#include <list>
+#include <vector>
 
 #include "RefCounted.h"
 #include "VertexBuffer.h"
@@ -12,10 +12,11 @@ class VertexBufferLayout : public virtual RefCounted {
   VertexBufferLayout(unsigned int id, unsigned int& attribIndex,
                      VertexBuffer* buffer, VertexBufferAttrib* layout[],
                      short layoutAttribCount)
-      : id(id), stride(0), buffer(buffer), layout(nullptr), componentStride(0) {
+      : id(id), stride(0), buffer(buffer), layout(), componentStride(0) {
     buffer->grab();
-    this->layout = new std::list<VertexBufferAttrib*>();
     unsigned int size;
+
+    this->layout.reserve(layoutAttribCount);
     for (short i = 0; i < layoutAttribCount; i++) {
       layout[i]->grab();
       switch (layout[i]->datatype) {
@@ -58,22 +59,24 @@ class VertexBufferLayout : public virtual RefCounted {
       layout[i]->offset = (void*)stride;
       stride += layout[i]->componentCount * size;
       componentStride += layout[i]->componentCount;
-      this->layout->push_back(layout[i]);
+      this->layout.emplace_back(layout[i]);
     }
   }
+
   virtual ~VertexBufferLayout() {
-    for (VertexBufferAttrib* attrib : *layout) attrib->drop();
-    delete layout;
+    for (VertexBufferAttrib* attrib : layout) attrib->drop();
     buffer->drop();
   }
+
   unsigned int id;
   VertexBuffer* buffer;
   int stride;
   int componentStride;
-  std::list<VertexBufferAttrib*>* layout;
+  std::vector<VertexBufferAttrib*> layout;
+
   unsigned short getAttribComponentOffset(unsigned short attribIndex) const {
-    auto layoutI = layout->begin();
-    for (unsigned short i = 0; i < attribIndex; ++i) layoutI++;
+    auto layoutI = layout.begin();
+    if (attribIndex > 0) layoutI += attribIndex;
     return (*layoutI)->componentOffset;
   }
 

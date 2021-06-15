@@ -1,7 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 
-#include <list>
+#include <vector>
 
 #include "RefCounted.h"
 #include "VertexBuffer.h"
@@ -27,7 +27,7 @@ class VertexArray : public virtual RefCounted {
   unsigned int _renderId;
   unsigned int _nextBufferId;
   unsigned int _nextAttribIndex;
-  std::list<VertexBufferLayout*>* _buffers;
+  std::vector<VertexBufferLayout*> _buffers;
   void genGLArray();
 };
 

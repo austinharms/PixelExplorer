@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/mat4x4.hpp>
+#include <unordered_map>
 
 #include "IndexBuffer.h"
 #include "Material.h"
@@ -54,6 +55,7 @@ class Mesh : public virtual RefCounted {
  private:
   static unsigned int s_nextId;
   glm::mat4 _transform;
+  std::unordered_map<unsigned short, unsigned short> _bufferOffsetMap;
   VertexBuffer* _vertexBuffer;
   IndexBuffer* _indexBuffer;
   VertexArray* _vertexArray;

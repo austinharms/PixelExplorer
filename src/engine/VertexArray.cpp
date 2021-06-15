@@ -1,18 +1,17 @@
 #include "VertexArray.h"
 
 VertexArray::VertexArray()
-    : _renderId(0), _nextBufferId(0), _nextAttribIndex(0), _buffers(nullptr) {
-  _buffers = new std::list<VertexBufferLayout*>();
+    : _renderId(0), _nextBufferId(0), _nextAttribIndex(0), _buffers() {
   genGLArray();
 }
+
 VertexArray::~VertexArray() {
-  for (VertexBufferLayout* buf : *_buffers) buf->drop();
-  delete _buffers;
+  for (VertexBufferLayout* buf : _buffers) buf->drop();
   glDeleteVertexArrays(1, &_renderId);
 }
 
 void VertexArray::bind() const {
-  for (VertexBufferLayout* buf : *_buffers) buf->buffer->updateDirtyBuffer();
+  for (VertexBufferLayout* buf : _buffers) buf->buffer->updateDirtyBuffer();
   glBindVertexArray(_renderId);
 }
 
@@ -23,35 +22,36 @@ unsigned int VertexArray::addVertexBuffer(VertexBuffer* buffer,
                                           short layoutAttribCount) {
   VertexBufferLayout* buffferLayout = new VertexBufferLayout(
       _nextBufferId++, _nextAttribIndex, buffer, layout, layoutAttribCount);
-  _buffers->push_back(buffferLayout);
+  _buffers.emplace_back(buffferLayout);
   bind();
   buffer->bind();
-  for (VertexBufferAttrib* attrib : *buffferLayout->layout) {
+  for (VertexBufferAttrib* attrib : buffferLayout->layout) {
     glVertexAttribPointer(attrib->index, attrib->componentCount,
                           attrib->datatype, attrib->normalized,
                           buffferLayout->stride, (const void*)attrib->offset);
     glEnableVertexAttribArray(attrib->index);
   }
+
   buffer->unbind();
   return buffferLayout->id;
 }
 
 int VertexArray::getBufferStride(unsigned short bufferIndex) const {
-  auto buffersI = _buffers->begin();
-  for (unsigned short i = 0; i < bufferIndex; ++i) buffersI++;
+  auto buffersI = _buffers.begin();
+  if (bufferIndex > 0) buffersI += bufferIndex;
   return (*buffersI)->getStride();
 }
 
 int VertexArray::getBufferComponentStride(unsigned short bufferIndex) const {
-  auto buffersI = _buffers->begin();
-  for (unsigned short i = 0; i < bufferIndex; ++i) buffersI++;
+  auto buffersI = _buffers.begin();
+  if (bufferIndex > 0) buffersI += bufferIndex;
   return (*buffersI)->getComponentStride();
 }
 
 unsigned short VertexArray::getBufferAttribComponentOffset(
     unsigned short bufferIndex, unsigned short attribIndex) const {
-  auto buffersI = _buffers->begin();
-  for (unsigned short i = 0; i < bufferIndex; ++i) buffersI++;
+  auto buffersI = _buffers.begin();
+  if (bufferIndex > 0) buffersI += bufferIndex;
   return (*buffersI)->getAttribComponentOffset(attribIndex);
 }
 
