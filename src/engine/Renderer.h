@@ -4,6 +4,7 @@
 
 #include <glm/mat4x4.hpp>
 #include <list>
+#include <mutex>
 
 #include "Material.h"
 #include "Mesh.h"
@@ -60,6 +61,7 @@ class Renderer : public virtual RefCounted {
   Material* _defaultMaterial;
   glm::mat4 _projection;
   glm::mat4 _view;
+  std::mutex _meshListLock;
   std::list<Mesh*> _meshes;
   int _windowWidth;
   int _windowHeight;

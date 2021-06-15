@@ -106,11 +106,13 @@ void Renderer::setDefaultMaterial(Material* m) {
 }
 
 void Renderer::addMesh(Mesh* mesh) {
+  std::lock_guard<std::mutex> locker(_meshListLock);
   mesh->grab();
-  _meshes.push_back(mesh);
+  _meshes.emplace_back(mesh);
 }
 
 void Renderer::removeMesh(unsigned int id) {
+  std::lock_guard<std::mutex> locker(_meshListLock);
   std::remove_if(_meshes.begin(), _meshes.end(), [&id](Mesh* mesh) {
     if (mesh->getID() == id) {
       mesh->drop();
@@ -141,16 +143,19 @@ void Renderer::render() {
   _lastFrame = currentFrame;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  std::list<Mesh*>::iterator iter = _meshes.begin();
-  std::list<Mesh*>::iterator end = _meshes.end();
-  while (iter != end) {
-    Mesh* m = *iter;
-    if (!m->getRendererDropFlag()) {
-      drawMesh(m);
-      ++iter;
-    } else {
-      iter = _meshes.erase(iter);
-      m->drop();
+  {
+    std::lock_guard<std::mutex> locker(_meshListLock);
+    std::list<Mesh*>::iterator iter = _meshes.begin();
+    std::list<Mesh*>::iterator end = _meshes.end();
+    while (iter != end) {
+      Mesh* m = *iter;
+      if (!m->getRendererDropFlag()) {
+        drawMesh(m);
+        ++iter;
+      } else {
+        iter = _meshes.erase(iter);
+        m->drop();
+      }
     }
   }
 
