@@ -17,9 +17,11 @@ class Mesh : public virtual RefCounted {
   void unbind() const;
   glm::mat4 getTransform() const { return _transform; }
   void setIndexCount(unsigned int count);
-  unsigned int getIndexCount() const { return _indexCount; }
+  unsigned int getIndexCount() const { return _currentIndexCount; }
+  unsigned int getLatestIndexCount() const { return _latestIndexCount; }
   void setVertexCount(unsigned int count);
-  unsigned int getVertexCount() const { return _vertexCount; }
+  unsigned int getVertexCount() const { return _currentVertexCount; }
+  unsigned int getLatestVertexCount() const { return _latestVertexCount; }
   void setIndex(unsigned int index, unsigned int value);
   void setVertexPosition(unsigned int index, float x, float y, float z);
   void setVertexUV(unsigned int index, float u, float v);
@@ -60,11 +62,14 @@ class Mesh : public virtual RefCounted {
   IndexBuffer* _indexBuffer;
   VertexArray* _vertexArray;
   Material* _material;
-  unsigned int _indexCount;
-  unsigned int _vertexCount;
+  unsigned int _latestIndexCount;
+  unsigned int _latestVertexCount;
+  unsigned int _currentIndexCount;
+  unsigned int _currentVertexCount;
   unsigned int* _indices;
   float* _vertices;
   unsigned int _id;
   int _attribStride;
   bool _rendererDropFlag;
+  bool _dirtyBuffers;
 };

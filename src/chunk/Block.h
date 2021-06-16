@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <mutex>
 #include <unordered_map>
 
 #include "RefCounted.h"
@@ -8,7 +9,7 @@ class Block : public virtual RefCounted {
  public:
   enum Face { TOP = 0, BOTTOM = 1, FRONT = 2, BACK = 3, LEFT = 4, RIGHT = 5 };
   struct BlockFace {
-    BlockFace() { 
+    BlockFace() {
       vertexCount = 0;
       indexCount = 0;
       vertices = nullptr;
@@ -41,6 +42,7 @@ class Block : public virtual RefCounted {
   static void dropBlocks();
 
   static void setDefaultBlock(Block* block) {
+    std::lock_guard<std::recursive_mutex> lock(s_blockMapLock);
     if (s_defaultBlock != nullptr) s_defaultBlock->drop();
     block->grab();
     s_defaultBlock = block;
@@ -53,6 +55,7 @@ class Block : public virtual RefCounted {
   bool getTransparent() const { return _transparent; }
 
  private:
+  static std::recursive_mutex s_blockMapLock;
   static std::unordered_map<uint32_t, Block*>* s_blocks;
   static Block* s_defaultBlock;
   uint32_t _id;

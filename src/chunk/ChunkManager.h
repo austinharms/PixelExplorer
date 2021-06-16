@@ -15,12 +15,14 @@
 class ChunkManager : public virtual RefCounted {
  public:
   ChunkManager(const char* chunkPath, Renderer* renderer,
-               int threadPoolSize = 1);
+               int threadPoolSize = 10, int maxChunksPerFrame = 5);
   virtual ~ChunkManager();
   void loadChunksInRadiusAsync(glm::vec<3, int> pos, unsigned short radius);
-  void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius, bool useAsyncChunkLoading = false);
+  void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius,
+                          bool useAsyncChunkLoading = false);
   void saveAllChunks();
   void unloadAllChunks();
+  void update();  // MUST be ran on main thread with openGL context
 
  private:
   struct Job {
@@ -41,6 +43,11 @@ class ChunkManager : public virtual RefCounted {
   std::vector<std::thread> _threadPool;
   std::queue<Job*> _jobQueue;
   std::condition_variable _jobCondition;
+  std::mutex _createChunkLock;
+  int _maxChunkCreationsPerFrame;
+  int _chunkCreationRequestCount;
+  int _createdChunkQueueLength;
+  std::queue<Chunk*> _createdChunkQueue;
 
   void unloadThreadFunction();
   void jobThreadPoolFunction();
@@ -73,7 +80,7 @@ class ChunkManager : public virtual RefCounted {
     _jobCondition.notify_one();
   }
 
-  Job* getNextJob() { 
+  Job* getNextJob() {
     if (_jobQueue.empty()) return nullptr;
     Job* job = _jobQueue.front();
     _jobQueue.pop();
@@ -83,5 +90,20 @@ class ChunkManager : public virtual RefCounted {
   std::string posToString(glm::vec<3, int> pos) {
     return std::to_string(pos.x) + "-" + std::to_string(pos.y) + "-" +
            std::to_string(pos.z);
+  }
+
+  void requestChunkCreation() {
+    _createChunkLock.lock();
+    ++_chunkCreationRequestCount;
+    _createChunkLock.unlock();
+  }
+
+  Chunk* getCreatedChunk() {
+    if (_createdChunkQueueLength == 0) return nullptr;
+    std::lock_guard<std::mutex> lock(_createChunkLock);
+    Chunk* chunk = _createdChunkQueue.front();
+    _createdChunkQueue.pop();
+    --_createdChunkQueueLength;
+    return chunk;
   }
 };

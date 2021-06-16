@@ -16,7 +16,18 @@ Chunk::Chunk(glm::vec<3, int> pos)
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
   repeatAttrib->drop();
-  _mesh->setTransform(glm::translate(glm::mat4(1.0f), glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
+  _mesh->setTransform(glm::translate(
+      glm::mat4(1.0f),
+      glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
+  _mesh->setMaterial(Chunk::_blockMaterial);
+}
+
+Chunk::Chunk()
+    : _position(0.0f), _blocks(nullptr), _mesh(nullptr), _unloadTime(0) {
+  _status = Status::LOADING;
+  VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
+  _mesh = new Mesh(&repeatAttrib, 1);
+  repeatAttrib->drop();
   _mesh->setMaterial(Chunk::_blockMaterial);
 }
 
@@ -111,4 +122,11 @@ void Chunk::updateMesh() {
   }
 
   _mesh->updateBuffers();
+}
+
+void Chunk::setChunkPosition(glm::vec<3, int> pos) {
+  _position = pos;
+  _mesh->setTransform(glm::translate(
+      glm::mat4(1.0f),
+      glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
 }

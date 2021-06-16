@@ -3,13 +3,17 @@
 #include <iostream>
 
 ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
-                           int threadPoolSize)
+                           int threadPoolSize, int maxChunksPerFrame)
     : _runningThreadCount(0),
       _killRunningThreads(false),
       _renderer(renderer),
       _unloadThread(&ChunkManager::unloadThreadFunction, this),
       _threadPool(),
-      _jobQueue() {
+      _jobQueue(),
+      _maxChunkCreationsPerFrame(maxChunksPerFrame),
+      _createdChunkQueue(),
+      _createdChunkQueueLength(0),
+      _chunkCreationRequestCount(0) {
   _renderer->grab();
   _unloadThread.detach();
   _threadPool.reserve(threadPoolSize);
@@ -27,6 +31,10 @@ ChunkManager::~ChunkManager() {
   unloadAllChunks();
   while (getRunningThreadCount() > 0)
     ;
+  while (!_createdChunkQueue.empty()) {
+    _createdChunkQueue.front()->drop();
+    _createdChunkQueue.pop();
+  }
 }
 
 void ChunkManager::loadChunksInRadiusAsync(glm::vec<3, int> pos,
@@ -97,6 +105,20 @@ void ChunkManager::unloadAllChunks() {
   _chunkMap.clear();
 }
 
+void ChunkManager::update() {
+  if (_chunkCreationRequestCount > 0 && _createChunkLock.try_lock()) {
+    int createdChunkCount = 0;
+    while (_chunkCreationRequestCount > 0 &&
+           (_maxChunkCreationsPerFrame == -1 ||
+            createdChunkCount < _maxChunkCreationsPerFrame)) {
+      _createdChunkQueue.emplace(new Chunk());
+      --_chunkCreationRequestCount;
+      ++_createdChunkQueueLength;
+      ++createdChunkCount;
+    }
+  }
+}
+
 void ChunkManager::unloadChunk(glm::vec<3, int> pos) {
   std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
   auto chunk = _chunkMap.find(posToString(pos));
@@ -114,6 +136,12 @@ Chunk* ChunkManager::getChunkPointer(glm::vec<3, int> pos) {
   auto chunk = _chunkMap.find(posToString(pos));
   if (chunk != _chunkMap.end()) return chunk->second;
   return nullptr;
+}
+
+Chunk::Status ChunkManager::getChunkStatus(glm::vec<3, int> pos) {
+  Chunk* chunk = getChunkPointer(pos);
+  if (chunk == nullptr) return Chunk::UNLOADED;
+  return chunk->getStatus();
 }
 
 void ChunkManager::jobThreadPoolFunction() {
@@ -135,9 +163,30 @@ void ChunkManager::jobThreadPoolFunction() {
         loadChunksInRadius(job->pos, (unsigned short)job->ptr, true);
         break;
 
-      case Job::LOAD:
-        loadChunk(job->pos);
-        break;
+      case Job::LOAD: {
+        Chunk* chunk = getChunkPointer(job->pos);
+        if (chunk != nullptr) {
+          if (chunk->getStatus() == Chunk::LOADED)
+            chunk->setUnloadTime(
+                ((unsigned long long int)clock() / CLOCKS_PER_SEC) + 10);
+        } else {
+          requestChunkCreation();
+          while (!_killRunningThreads && chunk == nullptr)
+            chunk = getCreatedChunk();
+          if (_killRunningThreads) continue;
+          chunk->setChunkPosition(job->pos);
+          chunk->generateChunk();
+          chunk->updateMesh();
+          chunk->setUnloadTime(
+              ((unsigned long long int)clock() / CLOCKS_PER_SEC) + 10);
+          {
+            std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
+            _chunkMap.insert({posToString(job->pos), chunk});
+          }
+          _renderer->addMesh(chunk->getMesh());
+          chunk->setStatus(Chunk::LOADED);
+        }
+      } break;
     }
 
     delete job;
@@ -154,18 +203,18 @@ void ChunkManager::unloadThreadFunction() {
     std::unordered_map<std::string, Chunk*>::iterator iter = _chunkMap.begin();
     std::unordered_map<std::string, Chunk*>::iterator end = _chunkMap.end();
     unsigned long long int curTime = clock() / CLOCKS_PER_SEC;
-    while (iter != end) {
-      const std::pair<std::string, Chunk*>& chunkPair = *iter;
-      if (chunkPair.second->getUnloadTime() < curTime) {
-        chunkPair.second->setStatus(Chunk::UNLOADING);
-        iter = _chunkMap.erase(iter);
-        if (!chunkPair.second->drop()) {
-          chunkPair.second->setStatus(Chunk::UNLOADED);
-        }
-      } else {
-        ++iter;
-      }
-    }
+    // while (iter != end) {
+    //  const std::pair<std::string, Chunk*>& chunkPair = *iter;
+    //  if (chunkPair.second->getUnloadTime() < curTime) {
+    //    chunkPair.second->setStatus(Chunk::UNLOADING);
+    //    iter = _chunkMap.erase(iter);
+    //    if (!chunkPair.second->drop()) {
+    //      chunkPair.second->setStatus(Chunk::UNLOADED);
+    //    }
+    //  } else {
+    //    ++iter;
+    //  }
+    //}
   }
 
   decrementRunningThreadCount();

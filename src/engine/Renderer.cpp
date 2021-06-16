@@ -201,9 +201,10 @@ void Renderer::drawMesh(Mesh* mesh) {
   mesh->bind();
   glm::mat4 mvp = _projection * _view * mesh->getTransform();
   _boundShader->setUniformm4("u_MVP", mvp);
-  if (mesh->getMaterial() != nullptr) useMaterial(mesh->getMaterial());
-  glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), mesh->getIndexType(),
-                 nullptr);
+  if (mesh->hasMaterial()) useMaterial(mesh->getMaterial());
+  unsigned int indexCount = mesh->getIndexCount();
+  unsigned int indexType = mesh->getIndexType();
+  glDrawElements(GL_TRIANGLES, indexCount, indexType, nullptr);
 }
 
 void Renderer::updateWindowSize() {

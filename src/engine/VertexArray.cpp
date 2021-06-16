@@ -11,8 +11,8 @@ VertexArray::~VertexArray() {
 }
 
 void VertexArray::bind() const {
-  for (VertexBufferLayout* buf : _buffers) buf->buffer->updateDirtyBuffer();
   glBindVertexArray(_renderId);
+  for (VertexBufferLayout* buf : _buffers) buf->buffer->updateDirtyBuffer();
 }
 
 void VertexArray::unbind() const { glBindVertexArray(0); }

@@ -20,9 +20,11 @@ class Chunk : public virtual RefCounted {
   };
 
   Chunk(glm::vec<3, int> pos);
+  Chunk();
   virtual ~Chunk();
   void generateChunk();
   void updateMesh();
+  void setChunkPosition(glm::vec<3, int> pos);
 
   glm::vec<3, int> getPosition() const { return _position; }
 

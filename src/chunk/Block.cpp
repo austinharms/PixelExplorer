@@ -6,6 +6,7 @@
 
 std::unordered_map<uint32_t, Block*>* Block::s_blocks = nullptr;
 Block* Block::s_defaultBlock = nullptr;
+std::recursive_mutex Block::s_blockMapLock;
 
 Block::Block(uint32_t id, bool transparent, BlockFace* blockFaces)
     : _id(id), _transparent(transparent), _faces(blockFaces) {}
@@ -13,6 +14,7 @@ Block::Block(uint32_t id, bool transparent, BlockFace* blockFaces)
 Block::~Block() { delete[] _faces; }
 
 void Block::loadBlocks(const char* blockDataPath) {
+  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
   Block::s_blocks = new std::unordered_map<uint32_t, Block*>();
   std::ifstream blocksFile;
   blocksFile.open(blockDataPath, std::ios::binary);
@@ -64,6 +66,7 @@ void Block::loadBlocks(const char* blockDataPath) {
 }
 
 Block* Block::getBlock(uint32_t id) {
+  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
   auto block = Block::s_blocks->find(id);
   if (block != Block::s_blocks->end()) {
     return block->second;
@@ -73,11 +76,13 @@ Block* Block::getBlock(uint32_t id) {
 }
 
 bool Block::addBlock(Block* block) {
+  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
   block->grab();
   return Block::s_blocks->insert({block->_id, block}).second;
 }
 
 void Block::saveBlocks(const char* blockDataPath) {
+  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
   if (Block::s_blocks != nullptr) {
     std::ofstream blocksFile;
     blocksFile.open(blockDataPath, std::ios::binary);
@@ -111,6 +116,7 @@ void Block::saveBlocks(const char* blockDataPath) {
 }
 
 void Block::dropBlocks() {
+  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
   if (s_defaultBlock != nullptr) s_defaultBlock->drop();
   if (Block::s_blocks != nullptr) {
     for (const std::pair<uint32_t, Block*>& block : *Block::s_blocks)

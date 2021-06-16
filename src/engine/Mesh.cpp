@@ -11,8 +11,10 @@ Mesh::Mesh()
       _vertexBuffer(nullptr),
       _indexBuffer(nullptr),
       _vertexArray(nullptr),
-      _indexCount(0),
-      _vertexCount(0),
+      _currentIndexCount(0),
+      _currentVertexCount(0),
+      _latestIndexCount(0),
+      _latestVertexCount(0),
       _indices(nullptr),
       _vertices(nullptr),
       _id(s_nextId++),
@@ -37,8 +39,10 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
       _vertexBuffer(nullptr),
       _indexBuffer(nullptr),
       _vertexArray(nullptr),
-      _indexCount(0),
-      _vertexCount(0),
+      _currentIndexCount(0),
+      _currentVertexCount(0),
+      _latestIndexCount(0),
+      _latestVertexCount(0),
       _indices(nullptr),
       _vertices(nullptr),
       _id(s_nextId++),
@@ -84,13 +88,13 @@ void Mesh::unbind() const {
 void Mesh::setIndexCount(unsigned int count) {
   delete[] _indices;
   _indices = new unsigned int[count];
-  _indexCount = count;
+  _latestIndexCount = count;
 }
 
 void Mesh::setVertexCount(unsigned int count) {
   delete[] _vertices;
   _vertices = new float[count * _attribStride];
-  _vertexCount = count;
+  _latestVertexCount = count;
 }
 
 void Mesh::setIndex(unsigned int index, unsigned int value) {
@@ -123,8 +127,10 @@ void Mesh::setAttribVec3(unsigned short attribIndex, unsigned int index,
 }
 
 void Mesh::updateBuffers() {
-  _indexBuffer->updateIndices(sizeof(unsigned int), _indexCount, _indices);
-  _vertexBuffer->updateVertices(sizeof(float), _vertexCount * _attribStride,
+  _currentVertexCount = _latestVertexCount;
+  _currentIndexCount = _latestIndexCount;
+  _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount, _indices);
+  _vertexBuffer->updateVertices(sizeof(float), _currentVertexCount * _attribStride,
                                 _vertices);
 }
 

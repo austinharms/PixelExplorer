@@ -59,7 +59,7 @@ int main(void) {
   // renderer->addMesh(chunk->getMesh());
 
   while (renderer->windowOpen()) {
-    chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 4);
+    chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 1);
     player->update();
     renderer->render();
   }
