@@ -1,6 +1,7 @@
 #pragma once
 #include <condition_variable>
 #include <glm/vec3.hpp>
+#include <iostream>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -48,6 +49,7 @@ class ChunkManager : public virtual RefCounted {
   int _chunkCreationRequestCount;
   int _createdChunkQueueLength;
   std::queue<Chunk*> _createdChunkQueue;
+  void* _chunkPlaceholderPointer;
 
   void unloadThreadFunction();
   void jobThreadPoolFunction();
@@ -99,8 +101,9 @@ class ChunkManager : public virtual RefCounted {
   }
 
   Chunk* getCreatedChunk() {
-    if (_createdChunkQueueLength == 0) return nullptr;
+    if (_createdChunkQueueLength < 1) return nullptr;
     std::lock_guard<std::mutex> lock(_createChunkLock);
+    if (_createdChunkQueue.size() < 1) return nullptr;
     Chunk* chunk = _createdChunkQueue.front();
     _createdChunkQueue.pop();
     --_createdChunkQueueLength;

@@ -1,7 +1,5 @@
 #include "ChunkManager.h"
 
-#include <iostream>
-
 ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
                            int threadPoolSize, int maxChunksPerFrame)
     : _runningThreadCount(0),
@@ -14,6 +12,7 @@ ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
       _createdChunkQueue(),
       _createdChunkQueueLength(0),
       _chunkCreationRequestCount(0) {
+  _chunkPlaceholderPointer = malloc(1);
   _renderer->grab();
   _unloadThread.detach();
   _threadPool.reserve(threadPoolSize);
@@ -31,6 +30,7 @@ ChunkManager::~ChunkManager() {
   unloadAllChunks();
   while (getRunningThreadCount() > 0)
     ;
+  free(_chunkPlaceholderPointer);
   while (!_createdChunkQueue.empty()) {
     _createdChunkQueue.front()->drop();
     _createdChunkQueue.pop();
@@ -100,8 +100,9 @@ void ChunkManager::loadChunk(glm::vec<3, int> pos) {
 void ChunkManager::saveAllChunks() {}
 
 void ChunkManager::unloadAllChunks() {
-  for (const std::pair<std::string, Chunk*>& chunkPair : _chunkMap)
-    chunkPair.second->drop();
+  for (const std::pair<std::string, Chunk*>& chunkPair : _chunkMap) {
+    if (chunkPair.second != _chunkPlaceholderPointer) chunkPair.second->drop();
+  }
   _chunkMap.clear();
 }
 
@@ -116,6 +117,8 @@ void ChunkManager::update() {
       ++_createdChunkQueueLength;
       ++createdChunkCount;
     }
+
+    _createChunkLock.unlock();
   }
 }
 
@@ -156,6 +159,7 @@ void ChunkManager::jobThreadPoolFunction() {
       if (_killRunningThreads) continue;
       job = getNextJob();
       if (job == nullptr) continue;
+      std::cout << "New Job Processing" << std::endl;
     }
 
     switch (job->type) {
@@ -164,16 +168,33 @@ void ChunkManager::jobThreadPoolFunction() {
         break;
 
       case Job::LOAD: {
+        _chunkMapLock.lock();
         Chunk* chunk = getChunkPointer(job->pos);
-        if (chunk != nullptr) {
-          if (chunk->getStatus() == Chunk::LOADED)
-            chunk->setUnloadTime(
-                ((unsigned long long int)clock() / CLOCKS_PER_SEC) + 10);
-        } else {
+        // if chunk is already pending load
+        if (chunk == _chunkPlaceholderPointer) {
+          delete job;
+          _chunkMapLock.unlock();
+          continue;
+        }
+
+        if (chunk == nullptr) {
+          _chunkMap.insert(
+              {posToString(job->pos), (Chunk*)_chunkPlaceholderPointer});
+          _chunkMapLock.unlock();
           requestChunkCreation();
-          while (!_killRunningThreads && chunk == nullptr)
+          do {
             chunk = getCreatedChunk();
-          if (_killRunningThreads) continue;
+            if (chunk == nullptr) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+          } while ((!_killRunningThreads) && chunk == nullptr);
+
+          if (_killRunningThreads) {
+            if (chunk != nullptr) chunk->drop();
+            delete job;
+            continue;
+          }
+
           chunk->setChunkPosition(job->pos);
           chunk->generateChunk();
           chunk->updateMesh();
@@ -181,10 +202,15 @@ void ChunkManager::jobThreadPoolFunction() {
               ((unsigned long long int)clock() / CLOCKS_PER_SEC) + 10);
           {
             std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
-            _chunkMap.insert({posToString(job->pos), chunk});
+            _chunkMap.insert_or_assign(posToString(job->pos), chunk);
           }
           _renderer->addMesh(chunk->getMesh());
           chunk->setStatus(Chunk::LOADED);
+        } else {
+          _chunkMapLock.unlock();
+          if (chunk->getStatus() == Chunk::LOADED)
+            chunk->setUnloadTime(
+                ((unsigned long long int)clock() / CLOCKS_PER_SEC) + 10);
         }
       } break;
     }
@@ -203,18 +229,19 @@ void ChunkManager::unloadThreadFunction() {
     std::unordered_map<std::string, Chunk*>::iterator iter = _chunkMap.begin();
     std::unordered_map<std::string, Chunk*>::iterator end = _chunkMap.end();
     unsigned long long int curTime = clock() / CLOCKS_PER_SEC;
-    // while (iter != end) {
-    //  const std::pair<std::string, Chunk*>& chunkPair = *iter;
-    //  if (chunkPair.second->getUnloadTime() < curTime) {
-    //    chunkPair.second->setStatus(Chunk::UNLOADING);
-    //    iter = _chunkMap.erase(iter);
-    //    if (!chunkPair.second->drop()) {
-    //      chunkPair.second->setStatus(Chunk::UNLOADED);
-    //    }
-    //  } else {
-    //    ++iter;
-    //  }
-    //}
+    while (iter != end) {
+      const std::pair<std::string, Chunk*>& chunkPair = *iter;
+      if (chunkPair.second != _chunkPlaceholderPointer &&
+          chunkPair.second->getUnloadTime() < curTime) {
+        chunkPair.second->setStatus(Chunk::UNLOADING);
+        iter = _chunkMap.erase(iter);
+        if (!chunkPair.second->drop()) {
+          chunkPair.second->setStatus(Chunk::UNLOADED);
+        }
+      } else {
+        ++iter;
+      }
+    }
   }
 
   decrementRunningThreadCount();

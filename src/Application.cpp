@@ -58,8 +58,10 @@ int main(void) {
   // chunk->updateMesh();
   // renderer->addMesh(chunk->getMesh());
 
+  chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 5);
   while (renderer->windowOpen()) {
-    chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 1);
+    //chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 1);
+    chunkManager->update();
     player->update();
     renderer->render();
   }
