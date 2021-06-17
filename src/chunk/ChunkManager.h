@@ -15,50 +15,23 @@
 
 class ChunkManager : public virtual RefCounted {
  public:
-  ChunkManager(const char* chunkPath, Renderer* renderer,
-               int threadPoolSize = 10, int maxChunksPerFrame = 5);
+  ChunkManager(const char* chunkPath, Renderer* renderer, int jobPoolSize = 5,
+               int loadPoolSize = 20, int maxChunksPerFrame = 50);
   virtual ~ChunkManager();
-  void loadChunksInRadiusAsync(glm::vec<3, int> pos, unsigned short radius);
-  void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius,
-                          bool useAsyncChunkLoading = false);
+  void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius);
   void saveAllChunks();
   void unloadAllChunks();
   void update();  // MUST be ran on main thread with openGL context
 
  private:
-  struct Job {
-    enum JobType { LOAD, LOADR };
-    JobType type;
-    glm::vec<3, int> pos;
-    void* ptr;
-  };
-
   Renderer* _renderer;
-  std::recursive_mutex _chunkMapLock;
-  std::unordered_map<std::string, Chunk*> _chunkMap;
+  unsigned long long int _lastUnloadUpdate;
+
+  // Threading
   std::mutex _threadCountLock;
+  std::vector<std::thread> _threadPool;
   int _runningThreadCount;
   bool _killRunningThreads;
-  std::thread _unloadThread;
-  std::mutex _jobQueueLock;
-  std::vector<std::thread> _threadPool;
-  std::queue<Job*> _jobQueue;
-  std::condition_variable _jobCondition;
-  std::mutex _createChunkLock;
-  int _maxChunkCreationsPerFrame;
-  int _chunkCreationRequestCount;
-  int _createdChunkQueueLength;
-  std::queue<Chunk*> _createdChunkQueue;
-  void* _chunkPlaceholderPointer;
-
-  void unloadThreadFunction();
-  void jobThreadPoolFunction();
-  void unloadChunk(glm::vec<3, int> pos);
-  Chunk* getChunk(glm::vec<3, int> pos);
-  Chunk* getChunkPointer(glm::vec<3, int> pos);
-  Chunk::Status getChunkStatus(glm::vec<3, int> pos);
-  void loadChunkAsync(glm::vec<3, int> pos);
-  void loadChunk(glm::vec<3, int> pos);
 
   int getRunningThreadCount() {
     std::lock_guard<std::mutex> locker(_threadCountLock);
@@ -75,24 +48,73 @@ class ChunkManager : public virtual RefCounted {
     --_runningThreadCount;
   }
 
+  // Job Pool
+  struct Job {
+    enum JobType { LOADRADIUS, UPDATEUNLOADING };
+    JobType type;
+    glm::vec<3, int> pos;
+    void* ptr;
+  };
+
+  std::mutex _jobQueueLock;
+  std::queue<Job*> _jobQueue;
+  int _jobQueueLength;
+  std::condition_variable _jobCondition;
+  int _jobPoolSize;
+  void jobThreadPoolFunction();
+
   void addJob(Job* job) {
-    _jobQueueLock.lock();
-    _jobQueue.emplace(job);
-    _jobQueueLock.unlock();
+    {
+      std::lock_guard<std::mutex> lock(_jobQueueLock);
+      _jobQueue.emplace(job);
+      ++_jobQueueLength;
+    }
     _jobCondition.notify_one();
   }
 
   Job* getNextJob() {
-    if (_jobQueue.empty()) return nullptr;
+    if (_jobQueueLength < 1) return nullptr;
     Job* job = _jobQueue.front();
+    --_jobQueueLength;
     _jobQueue.pop();
     return job;
   }
 
-  std::string posToString(glm::vec<3, int> pos) {
-    return std::to_string(pos.x) + "-" + std::to_string(pos.y) + "-" +
-           std::to_string(pos.z);
+  // Chunk Loading
+  std::recursive_mutex _chunkMapLock;
+  std::unordered_map<std::string, Chunk*> _chunkMap;
+  void* _chunkPlaceholderPointer;
+  std::mutex _loadChunkLock;
+  std::queue<glm::vec<3, int>> _loadChunkQueue;
+  int _loadChunkQueueLength;
+  std::condition_variable _loadCondition;
+  int _loadPoolSize;
+  void loadThreadPoolFunction();
+
+  void loadChunk(glm::vec<3, int> pos) {
+    {
+      std::lock_guard<std::mutex> lock(_loadChunkLock);
+      _loadChunkQueue.emplace(pos);
+      ++_loadChunkQueueLength;
+    }
+    _loadCondition.notify_one();
   }
+
+  bool getChunkLoadPos(glm::vec<3, int>* pos) {
+    if (_loadChunkQueueLength == 0) return false;
+    *pos = _loadChunkQueue.front();
+    _loadChunkQueue.pop();
+    --_loadChunkQueueLength;
+    return true;
+  }
+
+  // Main Thread Chunk Creation
+  std::mutex _createChunkLock;
+  std::queue<Chunk*> _createdChunkQueue;
+  int _maxChunkCreationsPerFrame;
+  int _chunkCreationRequestCount;
+  int _createdChunkQueueLength;
+  void updateChunkCreation();
 
   void requestChunkCreation() {
     _createChunkLock.lock();
@@ -101,12 +123,22 @@ class ChunkManager : public virtual RefCounted {
   }
 
   Chunk* getCreatedChunk() {
-    if (_createdChunkQueueLength < 1) return nullptr;
     std::lock_guard<std::mutex> lock(_createChunkLock);
-    if (_createdChunkQueue.size() < 1) return nullptr;
+    if (_createdChunkQueueLength < 1) return nullptr;
     Chunk* chunk = _createdChunkQueue.front();
     _createdChunkQueue.pop();
     --_createdChunkQueueLength;
     return chunk;
+  }
+
+  // Chunk Helpers
+  Chunk* getChunkPointer(glm::vec<3, int> pos);
+  Chunk* getChunk(glm::vec<3, int> pos);
+  Chunk::Status getChunkStatus(glm::vec<3, int> pos);
+  Chunk::Status getChunkStatus(Chunk* chunk);
+
+  std::string posToString(glm::vec<3, int> pos) {
+    return std::to_string(pos.x) + "-" + std::to_string(pos.y) + "-" +
+           std::to_string(pos.z);
   }
 };

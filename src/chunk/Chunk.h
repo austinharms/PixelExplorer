@@ -13,10 +13,10 @@ class Chunk : public virtual RefCounted {
   const unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   const unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
   enum Status {
-    UNLOADED = 0,
-    UNLOADING = 1,
-    LOADING = 2,
-    LOADED = 3,
+    UNLOADED = -1,
+    UNLOADING = 0,
+    LOADING = 1,
+    LOADED = 2,
   };
 
   Chunk(glm::vec<3, int> pos);

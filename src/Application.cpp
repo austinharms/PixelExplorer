@@ -53,14 +53,10 @@ int main(void) {
   Block::setDefaultBlock(Block::getBlock(0));
 
   ChunkManager* chunkManager = new ChunkManager(nullptr, renderer);
-  // Chunk* chunk = new Chunk(glm::vec<3, int>(0, 0, 0));
-  // chunk->generateChunk();
-  // chunk->updateMesh();
-  // renderer->addMesh(chunk->getMesh());
 
-  chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 5);
+  chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 100);
   while (renderer->windowOpen()) {
-    //chunkManager->loadChunksInRadiusAsync(glm::vec<3, int>(0, 0, 0), 1);
+    //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 5);
     chunkManager->update();
     player->update();
     renderer->render();
@@ -69,7 +65,6 @@ int main(void) {
   chunkManager->drop();
   player->drop();
   renderer->drop();
-  // chunk->drop();
   Chunk::setBlockMaterial(nullptr);
   Block::dropBlocks();
   _CrtDumpMemoryLeaks();
