@@ -9,7 +9,7 @@
 
 class Chunk : public virtual RefCounted {
  public:
-  const unsigned int CHUNK_SIZE = 20;
+  const unsigned int CHUNK_SIZE = 25;
   const unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   const unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
   enum Status {

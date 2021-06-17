@@ -71,7 +71,7 @@ void ChunkManager::update() {
     _lastUnloadUpdate = clock() / CLOCKS_PER_SEC;
   }
 
-  if (_jobQueueLength > 100) {
+  if (_jobQueueLength > 25) {
     std::cout << "Job Queue Overloaded" << std::endl;
   }
 
@@ -171,7 +171,7 @@ void ChunkManager::jobThreadPoolFunction() {
           if (status == Chunk::UNLOADED) {
             loadChunk(chunkPos);
           } else if (status == Chunk::LOADED) {
-            chunk->setUnloadTime((clock() / CLOCKS_PER_SEC) + 10);
+            chunk->setUnloadTime((unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
           }
         }
       } break;
