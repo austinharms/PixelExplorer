@@ -100,7 +100,6 @@ void ChunkManager::loadThreadPoolFunction() {
       });
       if (_killRunningThreads) continue;
       if (!getChunkLoadPos(&pos)) continue;
-      std::cout << "New Load Processing" << std::endl;
     }
 
     _chunkMapLock.lock();
@@ -156,7 +155,6 @@ void ChunkManager::jobThreadPoolFunction() {
       if (_killRunningThreads) continue;
       job = getNextJob();
       if (job == nullptr) continue;
-      std::cout << "New Job Processing" << std::endl;
     }
 
     switch (job->type) {

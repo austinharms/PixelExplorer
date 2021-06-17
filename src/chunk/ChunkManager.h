@@ -16,7 +16,7 @@
 class ChunkManager : public virtual RefCounted {
  public:
   ChunkManager(const char* chunkPath, Renderer* renderer, int jobPoolSize = 5,
-               int loadPoolSize = 20, int maxChunksPerFrame = 50);
+               int loadPoolSize = 6, int maxChunksPerFrame = 2);
   virtual ~ChunkManager();
   void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius);
   void saveAllChunks();
