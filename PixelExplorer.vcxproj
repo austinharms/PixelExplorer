@@ -616,6 +616,9 @@
     <Image Include="res\textures\default.png" />
     <Image Include="res\textures\textures.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="TODO List.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

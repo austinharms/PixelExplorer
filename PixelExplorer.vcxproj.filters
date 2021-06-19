@@ -1378,4 +1378,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="TODO List.txt" />
+  </ItemGroup>
 </Project>

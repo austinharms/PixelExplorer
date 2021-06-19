@@ -1,0 +1,9 @@
+Chunk Manager
+-Add chunk saving
+-Use file path in constructor
+-get ajacent chunks when loading
+-add greedy meshing
+
+LIGHTING!
+-can use openGL lighting?
+-how will mob spawing work?
