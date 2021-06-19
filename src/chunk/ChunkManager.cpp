@@ -113,6 +113,7 @@ void ChunkManager::loadThreadPoolFunction() {
 
     _chunkMap.insert({posToString(pos), (Chunk*)_chunkPlaceholderPointer});
     _chunkMapLock.unlock();
+
     requestChunkCreation();
     do {
       chunk = getCreatedChunk();
@@ -131,7 +132,7 @@ void ChunkManager::loadThreadPoolFunction() {
     chunk->setUnloadTime(((unsigned long long int)clock() / CLOCKS_PER_SEC) +
                          10);
     {
-      std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
+      std::lock_guard<std::shared_mutex> locker(_chunkMapLock);
       _chunkMap.insert_or_assign(posToString(pos), chunk);
     }
 
@@ -166,18 +167,21 @@ void ChunkManager::jobThreadPoolFunction() {
           chunkPos.x = (int)(i % radius);
           chunkPos.y = (int)(i / (radius * radius));
           chunkPos.z = (int)((int)(i / radius) % radius);
+          _chunkMapLock.lock_shared();
           Chunk* chunk = getChunkPointer(chunkPos + job->pos);
+          _chunkMapLock.unlock_shared();
           Chunk::Status status = getChunkStatus(chunk);
           if (status == Chunk::UNLOADED) {
             loadChunk(chunkPos);
           } else if (status == Chunk::LOADED) {
-            chunk->setUnloadTime((unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
+            chunk->setUnloadTime(
+                (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
           }
         }
       } break;
 
       case Job::UPDATEUNLOADING: {
-        std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
+        std::lock_guard<std::shared_mutex> locker(_chunkMapLock);
         std::unordered_map<std::string, Chunk*>::iterator iter =
             _chunkMap.begin();
         std::unordered_map<std::string, Chunk*>::iterator end = _chunkMap.end();
@@ -222,7 +226,6 @@ void ChunkManager::updateChunkCreation() {
 
 // Chunk Helpers
 Chunk* ChunkManager::getChunkPointer(glm::vec<3, int> pos) {
-  std::lock_guard<std::recursive_mutex> locker(_chunkMapLock);
   auto chunk = _chunkMap.find(posToString(pos));
   if (chunk != _chunkMap.end()) return chunk->second;
   return nullptr;
@@ -240,6 +243,7 @@ Chunk::Status ChunkManager::getChunkStatus(Chunk* chunk) {
   if (chunk == _chunkPlaceholderPointer) return Chunk::LOADING;
   return chunk->getStatus();
 }
+
 
 Chunk* ChunkManager::getChunk(glm::vec<3, int> pos) {
   Chunk* chunk = getChunkPointer(pos);

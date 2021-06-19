@@ -12,6 +12,7 @@
 #include "Chunk.h"
 #include "RefCounted.h"
 #include "Renderer.h"
+#include <shared_mutex>
 
 class ChunkManager : public virtual RefCounted {
  public:
@@ -81,7 +82,7 @@ class ChunkManager : public virtual RefCounted {
   }
 
   // Chunk Loading
-  std::recursive_mutex _chunkMapLock;
+  std::shared_mutex _chunkMapLock;
   std::unordered_map<std::string, Chunk*> _chunkMap;
   void* _chunkPlaceholderPointer;
   std::mutex _loadChunkLock;
