@@ -169,7 +169,7 @@ void ChunkManager::jobThreadPoolFunction() {
           _chunkMapLock.unlock_shared();
           Chunk::Status status = getChunkStatus(chunk);
           if (status == Chunk::UNLOADED) {
-            _loadQueue.addPosition(chunkPos);
+            _loadQueue.addPosition(chunkPos + job->pos);
           } else if (status == Chunk::LOADED) {
             chunk->setUnloadTime(
                 (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
