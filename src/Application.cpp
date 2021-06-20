@@ -18,6 +18,7 @@
 #include "chunk/Chunk.h"
 #include "chunk/ChunkManager.h"
 #include "glm/glm.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Test");
@@ -58,7 +59,7 @@ int main(void) {
   unsigned long long int nextUpdateTime = 0;
   while (renderer->windowOpen()) {
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime) {
-      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 10);
+      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 25);
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5;
     }
     chunkManager->update();

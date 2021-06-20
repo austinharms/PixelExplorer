@@ -3,6 +3,7 @@ Chunk Manager
 -Use file path in constructor
 -get ajacent chunks when loading
 -add greedy meshing
+-add lazzy loading
 
 LIGHTING!
 -can use openGL lighting?

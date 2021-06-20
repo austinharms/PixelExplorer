@@ -4,15 +4,16 @@
 #include <iostream>
 #include <mutex>
 #include <queue>
+#include <shared_mutex>
 #include <string>
 #include <thread>
 #include <unordered_map>
 #include <vector>
 
 #include "Chunk.h"
+#include "ChunkPositionQueue.h"
 #include "RefCounted.h"
 #include "Renderer.h"
-#include <shared_mutex>
 
 class ChunkManager : public virtual RefCounted {
  public:
@@ -84,30 +85,12 @@ class ChunkManager : public virtual RefCounted {
   // Chunk Loading
   std::shared_mutex _chunkMapLock;
   std::unordered_map<std::string, Chunk*> _chunkMap;
-  void* _chunkPlaceholderPointer;
-  std::mutex _loadChunkLock;
-  std::queue<glm::vec<3, int>> _loadChunkQueue;
-  int _loadChunkQueueLength;
-  std::condition_variable _loadCondition;
+  ChunkPositionQueue _unloadQueue;
+  ChunkPositionQueue _loadQueue;
+  std::mutex _loadAndUnloadLock;
+  std::condition_variable _loadAndUnloadCondition;
   int _loadPoolSize;
   void loadThreadPoolFunction();
-
-  void loadChunk(glm::vec<3, int> pos) {
-    {
-      std::lock_guard<std::mutex> lock(_loadChunkLock);
-      _loadChunkQueue.emplace(pos);
-      ++_loadChunkQueueLength;
-    }
-    _loadCondition.notify_one();
-  }
-
-  bool getChunkLoadPos(glm::vec<3, int>* pos) {
-    if (_loadChunkQueueLength == 0) return false;
-    *pos = _loadChunkQueue.front();
-    _loadChunkQueue.pop();
-    --_loadChunkQueueLength;
-    return true;
-  }
 
   // Main Thread Chunk Creation
   std::mutex _createChunkLock;
