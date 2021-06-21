@@ -19,12 +19,23 @@ class Chunk : public virtual RefCounted {
     LOADED = 2,
   };
 
+  enum ChunkFace {
+    FRONT = 0,
+    TOP = 1,
+    RIGHT = 2,
+    BACK = 3,
+    BOTTOM = 4,
+    LEFT = 5
+  };
+
   Chunk(glm::vec<3, int> pos);
   Chunk();
   virtual ~Chunk();
   void generateChunk();
   void updateMesh();
   void setChunkPosition(glm::vec<3, int> pos);
+  void setAdjacentChunk(ChunkFace side, Chunk* chunk);
+  void dropAdjacentChunks();
 
   glm::vec<3, int> getPosition() const { return _position; }
 
@@ -50,6 +61,11 @@ class Chunk : public virtual RefCounted {
     return _unloadTime;
   }
 
+  Chunk* getAdjacentChunk(ChunkFace side) {
+    std::lock_guard<std::recursive_mutex> lock(_adjacentLock);
+    return _adjacentChunks[(int)side];
+  }
+
   static void setBlockMaterial(Material* mat) {
     if (_blockMaterial != nullptr) _blockMaterial->drop();
     _blockMaterial = mat;
@@ -65,4 +81,7 @@ class Chunk : public virtual RefCounted {
   Status _status;
   std::mutex _unloadDelayLock;
   unsigned long long int _unloadTime;
+  std::recursive_mutex _adjacentLock;
+  Chunk* _adjacentChunks[6] = {nullptr, nullptr, nullptr,
+                               nullptr, nullptr, nullptr};
 };

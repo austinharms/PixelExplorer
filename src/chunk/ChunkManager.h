@@ -117,6 +117,7 @@ class ChunkManager : public virtual RefCounted {
 
   // Chunk Helpers
   Chunk* getChunkPointer(glm::vec<3, int> pos);
+  Chunk* getLoadedChunk(glm::vec<3, int> pos);
   Chunk* getChunk(glm::vec<3, int> pos);
   Chunk::Status getChunkStatus(glm::vec<3, int> pos);
   Chunk::Status getChunkStatus(Chunk* chunk);

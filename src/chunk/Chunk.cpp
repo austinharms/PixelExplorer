@@ -130,3 +130,30 @@ void Chunk::setChunkPosition(glm::vec<3, int> pos) {
       glm::mat4(1.0f),
       glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
 }
+
+void Chunk::setAdjacentChunk(ChunkFace side, Chunk* chunk) {
+  {
+    std::lock_guard<std::recursive_mutex> lock(_adjacentLock);
+    Chunk* curChunk = getAdjacentChunk(side);
+    if (curChunk == chunk) return;
+    if (curChunk != nullptr) curChunk->drop();
+    if (chunk != nullptr) {
+      chunk->grab();
+      _adjacentChunks[(int)side] = chunk;
+    } else {
+      _adjacentChunks[(int)side] = nullptr;
+      return;
+    }
+  }
+
+  chunk->setAdjacentChunk((ChunkFace)(((int)side + 3) % 6), this);
+}
+
+void Chunk::dropAdjacentChunks() {
+  for (char i = 0; i < 6; ++i) {
+    Chunk* adjChunk = getAdjacentChunk((ChunkFace)i);
+    if (adjChunk != nullptr)
+      adjChunk->setAdjacentChunk((ChunkFace)(((int)i + 3) % 6), nullptr);
+    setAdjacentChunk((ChunkFace)i, nullptr);
+  }
+}
