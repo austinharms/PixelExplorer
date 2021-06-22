@@ -130,18 +130,73 @@ void ChunkManager::loadThreadPoolFunction() {
       }
 
       chunk->generateChunk();
-      chunk->setAdjacentChunk(Chunk::FRONT,
-                              getChunk(pos + glm::vec<3, int>(0, 0, 1)));
-      chunk->setAdjacentChunk(Chunk::BACK,
-                              getChunk(pos + glm::vec<3, int>(0, 0, -1)));
-      chunk->setAdjacentChunk(Chunk::LEFT,
-                              getChunk(pos + glm::vec<3, int>(-1, 0, 0)));
-      chunk->setAdjacentChunk(Chunk::RIGHT,
-                              getChunk(pos + glm::vec<3, int>(1, 0, 0)));
-      chunk->setAdjacentChunk(Chunk::TOP,
-                              getChunk(pos + glm::vec<3, int>(0, 1, 0)));
-      chunk->setAdjacentChunk(Chunk::BOTTOM,
-                              getChunk(pos + glm::vec<3, int>(0, -1, 0)));
+      Chunk* adjChunk = nullptr;
+      if (chunk->getAdjacentChunk(Chunk::FRONT) == nullptr) {
+        _chunkMapLock.lock_shared();
+        adjChunk = getChunk(pos + glm::vec<3, int>(0, 0, 1));
+        _chunkMapLock.unlock_shared();
+        if (adjChunk != nullptr) {
+          chunk->setAdjacentChunk(Chunk::FRONT, adjChunk);
+          adjChunk->setAdjacentChunk(Chunk::BACK, chunk);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
+
+      if (chunk->getAdjacentChunk(Chunk::BACK) == nullptr) {
+        _chunkMapLock.lock_shared();
+        adjChunk = getChunk(pos + glm::vec<3, int>(0, 0, -1));
+        _chunkMapLock.unlock_shared();
+        if (adjChunk != nullptr) {
+          chunk->setAdjacentChunk(Chunk::BACK, adjChunk);
+          adjChunk->setAdjacentChunk(Chunk::FRONT, chunk);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
+
+      if (chunk->getAdjacentChunk(Chunk::LEFT) == nullptr) {
+        _chunkMapLock.lock_shared();
+        adjChunk = getChunk(pos + glm::vec<3, int>(-1, 0, 0));
+        _chunkMapLock.unlock_shared();
+        if (adjChunk != nullptr) {
+          chunk->setAdjacentChunk(Chunk::LEFT, adjChunk);
+          adjChunk->setAdjacentChunk(Chunk::RIGHT, chunk);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
+
+      if (chunk->getAdjacentChunk(Chunk::RIGHT) == nullptr) {
+        _chunkMapLock.lock_shared();
+        adjChunk = getChunk(pos + glm::vec<3, int>(1, 0, 0));
+        _chunkMapLock.unlock_shared();
+        if (adjChunk != nullptr) {
+          chunk->setAdjacentChunk(Chunk::RIGHT, adjChunk);
+          adjChunk->setAdjacentChunk(Chunk::LEFT, chunk);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
+
+      if (chunk->getAdjacentChunk(Chunk::TOP) == nullptr) {
+        _chunkMapLock.lock_shared();
+        adjChunk = getChunk(pos + glm::vec<3, int>(0, 1, 0));
+        _chunkMapLock.unlock_shared();
+        if (adjChunk != nullptr) {
+          chunk->setAdjacentChunk(Chunk::TOP, adjChunk);
+          adjChunk->setAdjacentChunk(Chunk::BOTTOM, chunk);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
+
+      if (chunk->getAdjacentChunk(Chunk::BOTTOM) == nullptr) {
+        _chunkMapLock.lock_shared();
+        adjChunk = getChunk(pos + glm::vec<3, int>(0, -1, 0));
+        _chunkMapLock.unlock_shared();
+        if (adjChunk != nullptr) {
+          chunk->setAdjacentChunk(Chunk::BOTTOM, adjChunk);
+          adjChunk->setAdjacentChunk(Chunk::TOP, chunk);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
+
       chunk->updateMesh();
       chunk->setUnloadTime(((unsigned long long int)clock() / CLOCKS_PER_SEC) +
                            10);
@@ -207,12 +262,27 @@ void ChunkManager::jobThreadPoolFunction() {
         }
         _chunkMapLock.unlock_shared();
       } break;
+
+      case Job::UPDATECHUNK: {
+        if (getChunkStatus((Chunk*)job->ptr) >= Chunk::LOADING &&
+            ((Chunk*)job->ptr)->getChunkModified()) {
+          ((Chunk*)job->ptr)->updateMesh();
+        }
+      } break;
     }
 
     delete job;
   }
 
   decrementRunningThreadCount();
+}
+
+void ChunkManager::addUpdateChunkJob(Chunk* chunk) {
+  chunk->grab();
+  Job* job = new Job();
+  job->ptr = chunk;
+  job->type = Job::UPDATECHUNK;
+  addJob(job);
 }
 
 // Main Thread Chunk Creation

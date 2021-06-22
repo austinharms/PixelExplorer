@@ -11,7 +11,11 @@
 Material* Chunk::_blockMaterial = nullptr;
 
 Chunk::Chunk(glm::vec<3, int> pos)
-    : _position(pos), _blocks(nullptr), _mesh(nullptr), _unloadTime(0) {
+    : _position(pos),
+      _blocks(nullptr),
+      _mesh(nullptr),
+      _unloadTime(0),
+      _chunkModified(false) {
   _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
@@ -23,7 +27,11 @@ Chunk::Chunk(glm::vec<3, int> pos)
 }
 
 Chunk::Chunk()
-    : _position(0.0f), _blocks(nullptr), _mesh(nullptr), _unloadTime(0) {
+    : _position(0.0f),
+      _blocks(nullptr),
+      _mesh(nullptr),
+      _unloadTime(0),
+      _chunkModified(false) {
   _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
@@ -38,14 +46,22 @@ Chunk::~Chunk() {
 }
 
 void Chunk::generateChunk() {
+  std::lock_guard<std::mutex> lock(_blockLock);
+  if (_blocks != nullptr) free(_blocks);
   _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
   if (_blocks == nullptr) return;
   for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
     _blocks[i] = Block::getBlock(i % 4);
   }
+  setChunkModified(true);
 }
 
 void Chunk::updateMesh() {
+  std::lock_guard<std::recursive_mutex> adjLock(_adjacentLock);
+  std::lock_guard<std::mutex> blockLock(_blockLock);
+
+  setChunkModified(false);
+
   unsigned int vertexCount = 0;
   unsigned int indexCount = 0;
 
@@ -55,6 +71,8 @@ void Chunk::updateMesh() {
     float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
     if (_blocks[i] == nullptr) continue;
     for (char f = 0; f < 6; ++f) {
+      if (getAdjacentChunk(blockFaceToChunkFace((Block::Face)f)) != nullptr)
+        continue;
       if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr &&
            _blocks[i - CHUNK_SIZE]->getFullBlockFace((Block::Face)f)) ||
           (f == Block::BACK && z != CHUNK_SIZE - 1 &&
@@ -88,6 +106,8 @@ void Chunk::updateMesh() {
     float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
     if (_blocks[i] == nullptr) continue;
     for (char f = 0; f < 6; ++f) {
+      if (getAdjacentChunk(blockFaceToChunkFace((Block::Face)f)) != nullptr)
+        continue;
       if ((f == Block::FRONT && z != 0 && _blocks[i - CHUNK_SIZE] != nullptr &&
            _blocks[i - CHUNK_SIZE]->getFullBlockFace((Block::Face)f)) ||
           (f == Block::BACK && z != CHUNK_SIZE - 1 &&
@@ -129,6 +149,7 @@ void Chunk::setChunkPosition(glm::vec<3, int> pos) {
   _mesh->setTransform(glm::translate(
       glm::mat4(1.0f),
       glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
+  setChunkModified(true);
 }
 
 void Chunk::setAdjacentChunk(ChunkFace side, Chunk* chunk) {
@@ -137,16 +158,10 @@ void Chunk::setAdjacentChunk(ChunkFace side, Chunk* chunk) {
     Chunk* curChunk = getAdjacentChunk(side);
     if (curChunk == chunk) return;
     if (curChunk != nullptr) curChunk->drop();
-    if (chunk != nullptr) {
-      chunk->grab();
-      _adjacentChunks[(int)side] = chunk;
-    } else {
-      _adjacentChunks[(int)side] = nullptr;
-      return;
-    }
+    if (chunk != nullptr) chunk->grab();
+    _adjacentChunks[(int)side] = chunk;
+    setChunkModified(true);
   }
-
-  chunk->setAdjacentChunk((ChunkFace)(((int)side + 3) % 6), this);
 }
 
 void Chunk::dropAdjacentChunks() {
@@ -155,5 +170,23 @@ void Chunk::dropAdjacentChunks() {
     if (adjChunk != nullptr)
       adjChunk->setAdjacentChunk((ChunkFace)(((int)i + 3) % 6), nullptr);
     setAdjacentChunk((ChunkFace)i, nullptr);
+  }
+  setChunkModified(true);
+}
+
+Chunk::ChunkFace Chunk::blockFaceToChunkFace(Block::Face face) {
+  switch (face) {
+    case Block::FRONT:
+      return ChunkFace::FRONT;
+    case Block::BACK:
+      return ChunkFace::BACK;
+    case Block::LEFT:
+      return ChunkFace::LEFT;
+    case Block::RIGHT:
+      return ChunkFace::RIGHT;
+    case Block::TOP:
+      return ChunkFace::TOP;
+    case Block::BOTTOM:
+      return ChunkFace::BOTTOM;
   }
 }

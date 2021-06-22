@@ -52,10 +52,13 @@ class ChunkManager : public virtual RefCounted {
 
   // Job Pool
   struct Job {
-    enum JobType { LOADRADIUS, UPDATEUNLOADING };
+    enum JobType { LOADRADIUS, UPDATEUNLOADING, UPDATECHUNK };
     JobType type;
     glm::vec<3, int> pos;
     void* ptr;
+    ~Job() {
+      if (this->type == UPDATECHUNK) ((Chunk*)ptr)->drop();
+    }
   };
 
   std::mutex _jobQueueLock;
@@ -64,6 +67,7 @@ class ChunkManager : public virtual RefCounted {
   std::condition_variable _jobCondition;
   int _jobPoolSize;
   void jobThreadPoolFunction();
+  void addUpdateChunkJob(Chunk* chunk);
 
   void addJob(Job* job) {
     {

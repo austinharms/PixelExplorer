@@ -56,7 +56,7 @@ int main(void) {
   ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 4, 5, -1);
 
   //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 100);
-  chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 2);
+  //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 2);
   unsigned long long int nextUpdateTime = 0;
   while (renderer->windowOpen()) {
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime) {
