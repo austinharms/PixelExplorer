@@ -13,9 +13,9 @@ class Player : public virtual RefCounted {
  private:
   Renderer* _renderer;
   glm::vec3 _position;
+  float _mouseSpeed = 1.5f;
   glm::mat4 _viewMatrix;
   float _horizontalAngle = 3.14f;
   float _verticalAngle = 0.0f;
   float _moveSpeed = 10.0f;
-  float _mouseSpeed = 1.5f;
 };

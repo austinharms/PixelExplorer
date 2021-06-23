@@ -28,7 +28,7 @@ class Renderer : public virtual RefCounted {
 
   bool getCursorHidden() const { return _cursorHidden; }
 
-  void getCursorPosition(double& const x, double& const y);
+  void getCursorPosition(double& x, double& y);
 
   void setCursorPosition(double x, double y);
 
@@ -38,7 +38,7 @@ class Renderer : public virtual RefCounted {
 
   float getDeltaTime() const { return _deltaTime; }
 
-  void getWindowSize(int& const width, int& const height) {
+  void getWindowSize(int& width, int& height) {
     width = _windowWidth;
     height = _windowHeight;
   };
@@ -66,11 +66,11 @@ class Renderer : public virtual RefCounted {
   int _windowWidth;
   int _windowHeight;
   float _deltaTime;
-  float _FOV;
   double _lastFrame;
   double _lastFPSFrame;
   int _avgFPS;
   int _frameCount;
+  float _FOV;
   bool _renderInit;
   bool _cursorHidden;
   void drawMesh(Mesh* mesh);

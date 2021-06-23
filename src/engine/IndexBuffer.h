@@ -13,8 +13,8 @@ class IndexBuffer : public virtual RefCounted {
 
  private:
   mutable bool _dirtyBuffer;
-  void* _buffer;
   unsigned char _size;
+  void* _buffer;
   unsigned int _length;
   unsigned int _renderId;
   void genGLBuffer();

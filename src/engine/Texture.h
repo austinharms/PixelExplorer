@@ -14,10 +14,10 @@ class Texture : public virtual RefCounted {
   unsigned int getGLID() const { return _renderId; }
 
  private:
+  void* _buffer;
   int _width;
   int _height;
   int _bpp;
-  void* _buffer;
   unsigned int _renderId;
   void loadTex(const char* path);
   void createGLTexture();

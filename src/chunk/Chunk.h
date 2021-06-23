@@ -82,19 +82,24 @@ class Chunk : public virtual RefCounted {
     _chunkModified = modified;
   }
 
+  Block* getBlockAtIndexUnsafe(unsigned int index) {
+    if (_blocks != nullptr) return _blocks[index];
+    return nullptr;
+  }
+
  private:
   static Material* _blockMaterial;
-  std::mutex _blockLock;
-  Block** _blocks;
-  glm::vec<3, int> _position;
-  Mesh* _mesh;
-  std::mutex _statusLock;
   Status _status;
+  Mesh* _mesh;
+  Block** _blocks;
+  std::mutex _blockLock;
+  std::mutex _statusLock;
   std::mutex _unloadDelayLock;
+  std::recursive_mutex _adjacentLock;
+  glm::vec<3, int> _position;
+  bool _chunkModified;
   unsigned long long int _unloadTime;
   std::mutex _modifiedLock;
-  bool _chunkModified;
-  std::recursive_mutex _adjacentLock;
   Chunk* _adjacentChunks[6] = {nullptr, nullptr, nullptr,
                                nullptr, nullptr, nullptr};
   static ChunkFace blockFaceToChunkFace(Block::Face face);

@@ -182,7 +182,7 @@ void Renderer::hideCursor(bool hidden) {
   }
 }
 
-void Renderer::getCursorPosition(double& const x, double& const y) {
+void Renderer::getCursorPosition(double& x, double& y) {
   glfwGetCursorPos(_window, &x, &y);
 }
 

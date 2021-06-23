@@ -15,8 +15,8 @@ class VertexBufferAttrib : public virtual RefCounted {
   virtual ~VertexBufferAttrib(){};
   int componentCount;
   unsigned int datatype;
-  bool normalized;
   unsigned int index;
   unsigned short componentOffset;
+  bool normalized;
   void* offset;
 };

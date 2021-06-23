@@ -13,11 +13,11 @@ class VertexBuffer : public virtual RefCounted {
   unsigned int getGLID() const { return _renderId; }
   unsigned int getIndexCount() const { return _length; }
  private:
-  mutable bool _dirtyBuffer;
-  unsigned int _renderId;
   void* _buffer;
-  unsigned char _size;
+  unsigned int _renderId;
   unsigned int _length;
+  unsigned char _size;
+  mutable bool _dirtyBuffer;
   void genGLBuffer();
   void updateGLBuffer() const;
 };

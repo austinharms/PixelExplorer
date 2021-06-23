@@ -24,11 +24,11 @@ class Block : public virtual RefCounted {
       delete[] indices;
     }
 
-    unsigned char vertexCount;
-    unsigned char indexCount;
     float* vertices;
     float* uvs;
     unsigned char* indices;
+    unsigned char vertexCount;
+    unsigned char indexCount;
     bool fullFace;
   };
 
@@ -58,7 +58,7 @@ class Block : public virtual RefCounted {
   static std::recursive_mutex s_blockMapLock;
   static std::unordered_map<uint32_t, Block*>* s_blocks;
   static Block* s_defaultBlock;
+  BlockFace* _faces;
   uint32_t _id;
   bool _transparent;
-  BlockFace* _faces;
 };

@@ -25,8 +25,6 @@ int main(void) {
   if (!renderer->renderInit()) return -1;
 
   renderer->hideCursor(true);
-  // renderer->setCameraTransform(glm::translate(glm::mat4(1.0f),
-  // glm::vec3(-20.0f, -20.0f, -80.0f)));
   Player* player = new Player(renderer);
   // set default material and shader
   {
@@ -53,7 +51,7 @@ int main(void) {
   Block::loadBlocks("./res/blocks.dat");
   Block::setDefaultBlock(Block::getBlock(0));
 
-  ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 4, 5, -1);
+  ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 10, 5, -1);
 
   //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 100);
   //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 2);
