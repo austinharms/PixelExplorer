@@ -1,21 +1,21 @@
-#include "Block.h"
+#include "BlockBase.h"
 
 #include <fstream>
 #include <iostream>
 #include <unordered_map>
 
-std::unordered_map<uint32_t, Block*>* Block::s_blocks = nullptr;
-Block* Block::s_defaultBlock = nullptr;
-std::recursive_mutex Block::s_blockMapLock;
+std::unordered_map<uint32_t, BlockBase*>* BlockBase::s_blocks = nullptr;
+BlockBase* BlockBase::s_defaultBlock = nullptr;
+std::recursive_mutex BlockBase::s_blockMapLock;
 
-Block::Block(uint32_t id, bool transparent, BlockFace* blockFaces)
+BlockBase::BlockBase(uint32_t id, bool transparent, BlockFace* blockFaces)
     : _id(id), _transparent(transparent), _faces(blockFaces) {}
 
-Block::~Block() { delete[] _faces; }
+BlockBase::~BlockBase() { delete[] _faces; }
 
-void Block::loadBlocks(const char* blockDataPath) {
-  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
-  Block::s_blocks = new std::unordered_map<uint32_t, Block*>();
+void BlockBase::loadBlocks(const char* blockDataPath) {
+  std::lock_guard<std::recursive_mutex> lock(BlockBase::s_blockMapLock);
+  BlockBase::s_blocks = new std::unordered_map<uint32_t, BlockBase*>();
   std::ifstream blocksFile;
   blocksFile.open(blockDataPath, std::ios::binary);
   uint32_t length;
@@ -58,38 +58,38 @@ void Block::loadBlocks(const char* blockDataPath) {
         blockFace[i].indices[in] = charVal;
       }
     }
-    Block* block = new Block(id, transparent, blockFace);
+    BlockBase* block = new BlockBase(id, transparent, blockFace);
     addBlock(block);
     block->drop();
   }
   blocksFile.close();
 }
 
-Block* Block::getBlock(uint32_t id) {
-  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
-  auto block = Block::s_blocks->find(id);
-  if (block != Block::s_blocks->end()) {
+BlockBase* BlockBase::getBlock(uint32_t id) {
+  std::lock_guard<std::recursive_mutex> lock(BlockBase::s_blockMapLock);
+  auto block = BlockBase::s_blocks->find(id);
+  if (block != BlockBase::s_blocks->end()) {
     return block->second;
   } else {
     return s_defaultBlock;
   }
 }
 
-bool Block::addBlock(Block* block) {
-  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
+bool BlockBase::addBlock(BlockBase* block) {
+  std::lock_guard<std::recursive_mutex> lock(BlockBase::s_blockMapLock);
   block->grab();
-  return Block::s_blocks->insert({block->_id, block}).second;
+  return BlockBase::s_blocks->insert({block->_id, block}).second;
 }
 
-void Block::saveBlocks(const char* blockDataPath) {
-  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
-  if (Block::s_blocks != nullptr) {
+void BlockBase::saveBlocks(const char* blockDataPath) {
+  std::lock_guard<std::recursive_mutex> lock(BlockBase::s_blockMapLock);
+  if (BlockBase::s_blocks != nullptr) {
     std::ofstream blocksFile;
     blocksFile.open(blockDataPath, std::ios::binary);
-    uint32_t length = Block::s_blocks->size();
+    uint32_t length = BlockBase::s_blocks->size();
     blocksFile.write((char*)&length, sizeof(uint32_t));
     char boolVal = 0;
-    for (const std::pair<uint32_t, Block*>& block : *Block::s_blocks) {
+    for (const std::pair<uint32_t, BlockBase*>& block : *BlockBase::s_blocks) {
       blocksFile.write((char*)(&(block.first)), sizeof(uint32_t));
       boolVal = block.second->_transparent ? 1 : 0;
       blocksFile.write((char*)(&(boolVal)), 1);
@@ -115,13 +115,13 @@ void Block::saveBlocks(const char* blockDataPath) {
   }
 }
 
-void Block::dropBlocks() {
-  std::lock_guard<std::recursive_mutex> lock(Block::s_blockMapLock);
+void BlockBase::dropBlocks() {
+  std::lock_guard<std::recursive_mutex> lock(BlockBase::s_blockMapLock);
   if (s_defaultBlock != nullptr) s_defaultBlock->drop();
-  if (Block::s_blocks != nullptr) {
-    for (const std::pair<uint32_t, Block*>& block : *Block::s_blocks)
+  if (BlockBase::s_blocks != nullptr) {
+    for (const std::pair<uint32_t, BlockBase*>& block : *BlockBase::s_blocks)
       block.second->drop();
-    delete Block::s_blocks;
+    delete BlockBase::s_blocks;
   }
 }
 

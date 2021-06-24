@@ -15,7 +15,8 @@ Chunk::Chunk(glm::vec<3, int> pos)
       _blocks(nullptr),
       _mesh(nullptr),
       _unloadTime(0),
-      _chunkModified(false) {
+      _chunkModified(false),
+      _chunkSaveRequired(false) {
   _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
@@ -31,7 +32,8 @@ Chunk::Chunk()
       _blocks(nullptr),
       _mesh(nullptr),
       _unloadTime(0),
-      _chunkModified(false) {
+      _chunkModified(false),
+      _chunkSaveRequired(false) {
   _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
@@ -40,7 +42,13 @@ Chunk::Chunk()
 }
 
 Chunk::~Chunk() {
-  if (_blocks != nullptr) free(_blocks);
+  if (_blocks != nullptr) {
+    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+      if (_blocks[i] != nullptr) delete _blocks[i];
+    }
+
+    free(_blocks);
+  }
   _mesh->setRendererDropFlag(true);
   _mesh->drop();
 }
@@ -51,11 +59,9 @@ void Chunk::generateChunk() {
   _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
   if (_blocks == nullptr) return;
   for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-    _blocks[i] = Block::getBlock(i % 4);
+    _blocks[i] = new Block(i % 4);
   }
-  //_blocks[0] = nullptr;
-  _blocks[1 + LAYER_SIZE - CHUNK_SIZE] = nullptr;
-  _blocks[0 + LAYER_SIZE - CHUNK_SIZE] = nullptr;
+
   setChunkModified(true);
 }
 
@@ -80,7 +86,7 @@ void Chunk::updateMesh() {
   bool hasBottomChunk = getAdjacentChunk(BOTTOM) != nullptr &&
                         getAdjacentChunk(BOTTOM)->getStatus() == LOADED;
   {
-    auto addBlockFace = [&](Block::BlockFace* face) {
+    auto addBlockFace = [&](BlockBase::BlockFace* face) {
       vertexCount += face->vertexCount;
       indexCount += face->indexCount;
     };
@@ -91,45 +97,62 @@ void Chunk::updateMesh() {
       float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
       if (_blocks[i] == nullptr) continue;
       if (z == 0) {
-        if (!hasFrontChunk || drawBlockFace(getAdjacentChunk(FRONT)->getBlockUnsafe( i + LAYER_SIZE - CHUNK_SIZE), Block::FRONT))
-          addBlockFace(_blocks[i]->getBlockFace(Block::FRONT));
-      } else if (drawBlockFace(_blocks[i - CHUNK_SIZE], Block::FRONT)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::FRONT));
+        if (!hasFrontChunk ||
+            drawBlockFace(getAdjacentChunk(FRONT)->getBlockUnsafe(
+                              i + LAYER_SIZE - CHUNK_SIZE),
+                          BlockBase::FRONT))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT));
+      } else if (drawBlockFace(_blocks[i - CHUNK_SIZE], BlockBase::FRONT)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT));
       }
 
       if (z == CHUNK_SIZE - 1) {
-        if (!hasBackChunk || drawBlockFace(getAdjacentChunk(BACK)->getBlockUnsafe( i - LAYER_SIZE + CHUNK_SIZE), Block::BACK))
-          addBlockFace(_blocks[i]->getBlockFace(Block::BACK));
-      } else if (drawBlockFace(_blocks[i + CHUNK_SIZE], Block::BACK)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::BACK));
+        if (!hasBackChunk ||
+            drawBlockFace(getAdjacentChunk(BACK)->getBlockUnsafe(
+                              i - LAYER_SIZE + CHUNK_SIZE),
+                          BlockBase::BACK))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK));
+      } else if (drawBlockFace(_blocks[i + CHUNK_SIZE], BlockBase::BACK)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK));
       }
 
       if (x == 0) {
-        if (!hasLeftChunk || drawBlockFace(getAdjacentChunk(LEFT)->getBlockUnsafe( i + CHUNK_SIZE - 1), Block::LEFT))
-          addBlockFace(_blocks[i]->getBlockFace(Block::LEFT));
-      } else if (drawBlockFace(_blocks[i - 1], Block::LEFT)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::LEFT));
+        if (!hasLeftChunk ||
+            drawBlockFace(
+                getAdjacentChunk(LEFT)->getBlockUnsafe(i + CHUNK_SIZE - 1),
+                BlockBase::LEFT))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT));
+      } else if (drawBlockFace(_blocks[i - 1], BlockBase::LEFT)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT));
       }
 
       if (x == CHUNK_SIZE - 1) {
-        if (!hasRightChunk || drawBlockFace(getAdjacentChunk(RIGHT)->getBlockUnsafe( i - CHUNK_SIZE + 1), Block::RIGHT))
-          addBlockFace(_blocks[i]->getBlockFace(Block::RIGHT));
-      } else if (drawBlockFace(_blocks[i + 1], Block::RIGHT)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::RIGHT));
+        if (!hasRightChunk ||
+            drawBlockFace(
+                getAdjacentChunk(RIGHT)->getBlockUnsafe(i - CHUNK_SIZE + 1),
+                BlockBase::RIGHT))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT));
+      } else if (drawBlockFace(_blocks[i + 1], BlockBase::RIGHT)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT));
       }
 
       if (y == 0) {
-        if (!hasBottomChunk || drawBlockFace(getAdjacentChunk(BOTTOM)->getBlockUnsafe( i + BLOCK_COUNT - LAYER_SIZE), Block::BOTTOM))
-          addBlockFace(_blocks[i]->getBlockFace(Block::BOTTOM));
-      } else if (drawBlockFace(_blocks[i - LAYER_SIZE], Block::BOTTOM)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::BOTTOM));
+        if (!hasBottomChunk ||
+            drawBlockFace(getAdjacentChunk(BOTTOM)->getBlockUnsafe(
+                              i + BLOCK_COUNT - LAYER_SIZE),
+                          BlockBase::BOTTOM))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM));
+      } else if (drawBlockFace(_blocks[i - LAYER_SIZE], BlockBase::BOTTOM)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM));
       }
 
       if (y == CHUNK_SIZE - 1) {
-        if (!hasTopChunk || drawBlockFace(getAdjacentChunk(TOP)->getBlockUnsafe( i - BLOCK_COUNT + LAYER_SIZE), Block::TOP))
-          addBlockFace(_blocks[i]->getBlockFace(Block::TOP));
-      } else if (drawBlockFace(_blocks[i + LAYER_SIZE], Block::TOP)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::TOP));
+        if (!hasTopChunk || drawBlockFace(getAdjacentChunk(TOP)->getBlockUnsafe(
+                                              i - BLOCK_COUNT + LAYER_SIZE),
+                                          BlockBase::TOP))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP));
+      } else if (drawBlockFace(_blocks[i + LAYER_SIZE], BlockBase::TOP)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP));
       }
     }
   }
@@ -139,7 +162,8 @@ void Chunk::updateMesh() {
   vertexCount = 0;
   indexCount = 0;
   {
-    auto addBlockFace = [&](Block::BlockFace* face, float x, float y, float z) {
+    auto addBlockFace = [&](BlockBase::BlockFace* face, float x, float y,
+                            float z) {
       for (unsigned char v = 0; v < face->vertexCount; ++v) {
         _mesh->setVertexPosition(vertexCount + v, face->vertices[v * 3] + x,
                                  face->vertices[v * 3 + 1] + y,
@@ -161,45 +185,62 @@ void Chunk::updateMesh() {
       float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
       if (_blocks[i] == nullptr) continue;
       if (z == 0) {
-        if (!hasFrontChunk || drawBlockFace(getAdjacentChunk(FRONT)->getBlockUnsafe( i + LAYER_SIZE - CHUNK_SIZE), Block::FRONT))
-          addBlockFace(_blocks[i]->getBlockFace(Block::FRONT), x, y, z);
-      } else if (drawBlockFace(_blocks[i - CHUNK_SIZE], Block::FRONT)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::FRONT), x, y, z);
+        if (!hasFrontChunk ||
+            drawBlockFace(getAdjacentChunk(FRONT)->getBlockUnsafe(
+                              i + LAYER_SIZE - CHUNK_SIZE),
+                          BlockBase::FRONT))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT), x, y, z);
+      } else if (drawBlockFace(_blocks[i - CHUNK_SIZE], BlockBase::FRONT)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT), x, y, z);
       }
-      
+
       if (z == CHUNK_SIZE - 1) {
-        if (!hasBackChunk || drawBlockFace(getAdjacentChunk(BACK)->getBlockUnsafe( i - LAYER_SIZE + CHUNK_SIZE), Block::BACK))
-          addBlockFace(_blocks[i]->getBlockFace(Block::BACK), x, y, z);
-      } else if (drawBlockFace(_blocks[i + CHUNK_SIZE], Block::BACK)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::BACK), x, y, z);
+        if (!hasBackChunk ||
+            drawBlockFace(getAdjacentChunk(BACK)->getBlockUnsafe(
+                              i - LAYER_SIZE + CHUNK_SIZE),
+                          BlockBase::BACK))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK), x, y, z);
+      } else if (drawBlockFace(_blocks[i + CHUNK_SIZE], BlockBase::BACK)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK), x, y, z);
       }
 
       if (x == 0) {
-        if (!hasLeftChunk || drawBlockFace(getAdjacentChunk(LEFT)->getBlockUnsafe( i + CHUNK_SIZE - 1), Block::LEFT))
-          addBlockFace(_blocks[i]->getBlockFace(Block::LEFT), x, y, z);
-      } else if (drawBlockFace(_blocks[i - 1], Block::LEFT)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::LEFT), x, y, z);
+        if (!hasLeftChunk ||
+            drawBlockFace(
+                getAdjacentChunk(LEFT)->getBlockUnsafe(i + CHUNK_SIZE - 1),
+                BlockBase::LEFT))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT), x, y, z);
+      } else if (drawBlockFace(_blocks[i - 1], BlockBase::LEFT)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT), x, y, z);
       }
 
       if (x == CHUNK_SIZE - 1) {
-        if (!hasRightChunk || drawBlockFace(getAdjacentChunk(RIGHT)->getBlockUnsafe( i - CHUNK_SIZE + 1), Block::RIGHT))
-          addBlockFace(_blocks[i]->getBlockFace(Block::RIGHT), x, y, z);
-      } else if (drawBlockFace(_blocks[i + 1], Block::RIGHT)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::RIGHT), x, y, z);
+        if (!hasRightChunk ||
+            drawBlockFace(
+                getAdjacentChunk(RIGHT)->getBlockUnsafe(i - CHUNK_SIZE + 1),
+                BlockBase::RIGHT))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT), x, y, z);
+      } else if (drawBlockFace(_blocks[i + 1], BlockBase::RIGHT)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT), x, y, z);
       }
 
       if (y == 0) {
-        if (!hasBottomChunk || drawBlockFace(getAdjacentChunk(BOTTOM)->getBlockUnsafe( i + BLOCK_COUNT - LAYER_SIZE), Block::BOTTOM))
-          addBlockFace(_blocks[i]->getBlockFace(Block::BOTTOM), x, y, z);
-      } else if (drawBlockFace(_blocks[i - LAYER_SIZE], Block::BOTTOM)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::BOTTOM), x, y, z);
+        if (!hasBottomChunk ||
+            drawBlockFace(getAdjacentChunk(BOTTOM)->getBlockUnsafe(
+                              i + BLOCK_COUNT - LAYER_SIZE),
+                          BlockBase::BOTTOM))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM), x, y, z);
+      } else if (drawBlockFace(_blocks[i - LAYER_SIZE], BlockBase::BOTTOM)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM), x, y, z);
       }
 
       if (y == CHUNK_SIZE - 1) {
-        if (!hasTopChunk || drawBlockFace(getAdjacentChunk(TOP)->getBlockUnsafe( i - BLOCK_COUNT + LAYER_SIZE), Block::TOP))
-          addBlockFace(_blocks[i]->getBlockFace(Block::TOP), x, y, z);
-      } else if (drawBlockFace(_blocks[i + LAYER_SIZE], Block::TOP)) {
-        addBlockFace(_blocks[i]->getBlockFace(Block::TOP), x, y, z);
+        if (!hasTopChunk || drawBlockFace(getAdjacentChunk(TOP)->getBlockUnsafe(
+                                              i - BLOCK_COUNT + LAYER_SIZE),
+                                          BlockBase::TOP))
+          addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP), x, y, z);
+      } else if (drawBlockFace(_blocks[i + LAYER_SIZE], BlockBase::TOP)) {
+        addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP), x, y, z);
       }
     }
   }
@@ -237,24 +278,7 @@ void Chunk::dropAdjacentChunks() {
   setChunkModified(true);
 }
 
-bool Chunk::drawBlockFace(Block* block, Block::Face face) {
+bool Chunk::drawBlockFace(Block* block, BlockBase::Face face) {
   if (block == nullptr) return true;
   return !block->getFullBlockFace(face);
-}
-
-Chunk::ChunkFace Chunk::blockFaceToChunkFace(Block::Face face) {
-  switch (face) {
-    case Block::FRONT:
-      return ChunkFace::FRONT;
-    case Block::BACK:
-      return ChunkFace::BACK;
-    case Block::LEFT:
-      return ChunkFace::LEFT;
-    case Block::RIGHT:
-      return ChunkFace::RIGHT;
-    case Block::TOP:
-      return ChunkFace::TOP;
-    case Block::BOTTOM:
-      return ChunkFace::BOTTOM;
-  }
 }

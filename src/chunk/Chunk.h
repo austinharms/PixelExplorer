@@ -2,6 +2,7 @@
 #include <glm/vec3.hpp>
 #include <mutex>
 
+#include "BlockBase.h"
 #include "Block.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -9,9 +10,9 @@
 
 class Chunk : public virtual RefCounted {
  public:
-  const unsigned int CHUNK_SIZE = 25;
-  const unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
-  const unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
+  const static unsigned int CHUNK_SIZE = 25;
+  const static unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
+  const static unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
   enum Status {
     UNLOADED = -1,
     UNLOADING = 0,
@@ -80,6 +81,7 @@ class Chunk : public virtual RefCounted {
   void setChunkModified(bool modified) {
     std::lock_guard<std::mutex> lock(_modifiedLock);
     _chunkModified = modified;
+    if (modified == true) _chunkSaveRequired = true;
   }
 
   Block* getBlockUnsafe(unsigned int index) {
@@ -89,7 +91,6 @@ class Chunk : public virtual RefCounted {
 
  private:
   static Material* _blockMaterial;
-  Status _status;
   Mesh* _mesh;
   Block** _blocks;
   std::mutex _blockLock;
@@ -97,11 +98,12 @@ class Chunk : public virtual RefCounted {
   std::mutex _unloadDelayLock;
   std::recursive_mutex _adjacentLock;
   glm::vec<3, int> _position;
+  Status _status;
   bool _chunkModified;
+  bool _chunkSaveRequired;
   unsigned long long int _unloadTime;
   std::mutex _modifiedLock;
   Chunk* _adjacentChunks[6] = {nullptr, nullptr, nullptr,
                                nullptr, nullptr, nullptr};
-  bool drawBlockFace(Block* block, Block::Face face);
-  static ChunkFace blockFaceToChunkFace(Block::Face face);
+  bool drawBlockFace(Block* block, BlockBase::Face face);
 };

@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "chunk/Block.h"
+#include "chunk/BlockBase.h"
 #include "chunk/Chunk.h"
 #include "chunk/ChunkManager.h"
 #include "glm/glm.hpp"
@@ -48,8 +48,8 @@ int main(void) {
     blockMaterial->drop();
   }
 
-  Block::loadBlocks("./res/blocks.dat");
-  Block::setDefaultBlock(Block::getBlock(0));
+  BlockBase::loadBlocks("./res/blocks.dat");
+  BlockBase::setDefaultBlock(BlockBase::getBlock(0));
 
   ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 10, 20, -1);
 
@@ -68,7 +68,7 @@ int main(void) {
   player->drop();
   renderer->drop();
   Chunk::setBlockMaterial(nullptr);
-  Block::dropBlocks();
+  BlockBase::dropBlocks();
   _CrtDumpMemoryLeaks();
   return 0;
 }
