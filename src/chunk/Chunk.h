@@ -82,7 +82,7 @@ class Chunk : public virtual RefCounted {
     _chunkModified = modified;
   }
 
-  Block* getBlockAtIndexUnsafe(unsigned int index) {
+  Block* getBlockUnsafe(unsigned int index) {
     if (_blocks != nullptr) return _blocks[index];
     return nullptr;
   }
@@ -102,5 +102,6 @@ class Chunk : public virtual RefCounted {
   std::mutex _modifiedLock;
   Chunk* _adjacentChunks[6] = {nullptr, nullptr, nullptr,
                                nullptr, nullptr, nullptr};
+  bool drawBlockFace(Block* block, Block::Face face);
   static ChunkFace blockFaceToChunkFace(Block::Face face);
 };

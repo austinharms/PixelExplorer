@@ -138,7 +138,6 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::FRONT, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::BACK, chunk);
-          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -149,7 +148,6 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::BACK, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::FRONT, chunk);
-          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -160,7 +158,6 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::LEFT, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::RIGHT, chunk);
-          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -171,7 +168,6 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::RIGHT, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::LEFT, chunk);
-          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -182,7 +178,6 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::TOP, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::BOTTOM, chunk);
-          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -193,7 +188,6 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::BOTTOM, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::TOP, chunk);
-          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -204,6 +198,13 @@ void ChunkManager::loadThreadPoolFunction() {
       _renderer->addMesh(chunk->getMesh());
       chunk->setStatus(Chunk::LOADED);
       _loadQueue.removePosition(pos);
+      for (char i = 0; i < 6; ++i) {
+        adjChunk = chunk->getAdjacentChunk((Chunk::ChunkFace)i);
+        if (adjChunk != nullptr) {
+          adjChunk->setChunkModified(true);
+          addUpdateChunkJob(adjChunk);
+        }
+      }
     }
   }
 

@@ -51,14 +51,12 @@ int main(void) {
   Block::loadBlocks("./res/blocks.dat");
   Block::setDefaultBlock(Block::getBlock(0));
 
-  ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 10, 5, -1);
+  ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 10, 20, -1);
 
-  //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 100);
-  //chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 2);
   unsigned long long int nextUpdateTime = 0;
   while (renderer->windowOpen()) {
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime) {
-      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 2);
+      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 20);
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5;
     }
     chunkManager->update();
