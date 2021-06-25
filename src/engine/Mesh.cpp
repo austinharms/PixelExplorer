@@ -15,8 +15,10 @@ Mesh::Mesh()
       _currentVertexCount(0),
       _latestIndexCount(0),
       _latestVertexCount(0),
-      _indices(nullptr),
-      _vertices(nullptr),
+      _latestIndices(nullptr),
+      _latestVertices(nullptr),
+      _currentIndices(nullptr),
+      _currentVertices(nullptr),
       _id(s_nextId++),
       _material(nullptr),
       _attribStride(0),
@@ -43,8 +45,10 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
       _currentVertexCount(0),
       _latestIndexCount(0),
       _latestVertexCount(0),
-      _indices(nullptr),
-      _vertices(nullptr),
+      _latestIndices(nullptr),
+      _latestVertices(nullptr),
+      _currentIndices(nullptr),
+      _currentVertices(nullptr),
       _id(s_nextId++),
       _material(nullptr),
       _attribStride(0),
@@ -71,8 +75,10 @@ Mesh::~Mesh() {
   _indexBuffer->drop();
   _vertexArray->drop();
   if (_material != nullptr) _material->drop();
-  delete[] _vertices;
-  delete[] _indices;
+  if (_currentIndices != nullptr) delete[] _currentIndices;
+  if (_latestIndices != nullptr) delete[] _latestIndices;
+  if (_currentVertices != nullptr) delete[] _currentVertices;
+  if (_latestVertices != nullptr) delete[] _latestVertices;
 }
 
 void Mesh::bind() const {
@@ -86,19 +92,19 @@ void Mesh::unbind() const {
 }
 
 void Mesh::setIndexCount(unsigned int count) {
-  delete[] _indices;
-  _indices = new unsigned int[count];
+  if (_latestIndices != nullptr) delete[] _latestIndices;
+  _latestIndices = new unsigned int[count];
   _latestIndexCount = count;
 }
 
 void Mesh::setVertexCount(unsigned int count) {
-  delete[] _vertices;
-  _vertices = new float[count * _attribStride];
+  if (_latestVertices != nullptr) delete[] _latestVertices;
+  _latestVertices = new float[count * _attribStride];
   _latestVertexCount = count;
 }
 
 void Mesh::setIndex(unsigned int index, unsigned int value) {
-  _indices[index] = value;
+  _latestIndices[index] = value;
 }
 
 void Mesh::setVertexPosition(unsigned int index, float x, float y, float z) {
@@ -113,28 +119,35 @@ void Mesh::setAttribVec2(unsigned short attribIndex, unsigned int index,
                          float x, float y) {
   unsigned short offset =
       _vertexArray->getBufferAttribComponentOffset(0, attribIndex);
-  _vertices[(index * _attribStride) + offset] = x;
-  _vertices[(index * _attribStride) + offset + 1] = y;
+  _latestVertices[(index * _attribStride) + offset] = x;
+  _latestVertices[(index * _attribStride) + offset + 1] = y;
 }
 
 void Mesh::setAttribVec3(unsigned short attribIndex, unsigned int index,
                          float x, float y, float z) {
   unsigned short offset =
       _vertexArray->getBufferAttribComponentOffset(0, attribIndex);
-  _vertices[(index * _attribStride) + offset] = x;
-  _vertices[(index * _attribStride) + offset + 1] = y;
-  _vertices[(index * _attribStride) + offset + 2] = z;
+  _latestVertices[(index * _attribStride) + offset] = x;
+  _latestVertices[(index * _attribStride) + offset + 1] = y;
+  _latestVertices[(index * _attribStride) + offset + 2] = z;
 }
 
 void Mesh::updateBuffers() {
   _currentVertexCount = _latestVertexCount;
   _currentIndexCount = _latestIndexCount;
-  _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount, _indices);
-  _vertexBuffer->updateVertices(sizeof(float), _currentVertexCount * _attribStride,
-                                _vertices);
+  if (_currentIndices != nullptr) delete[] _currentIndices;
+  if (_currentVertices != nullptr) delete[] _currentVertices;
+  _currentIndices = _latestIndices;
+  _latestIndices = nullptr;
+  _currentVertices = _latestVertices;
+  _latestVertices = nullptr;
+  _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount,
+                              _currentIndices);
+  _vertexBuffer->updateVertices(
+      sizeof(float), _currentVertexCount * _attribStride, _currentVertices);
 }
 
-void Mesh::updateTransfrom(float dt) {
-  //_transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 1.0f,
-  // 0.0f));
-}
+// void Mesh::updateTransfrom(float dt) {
+//  //_transform = glm::rotate(_transform, 1.0f * dt, glm::vec3(0.0f, 1.0f,
+//  // 0.0f));
+//}

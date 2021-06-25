@@ -37,6 +37,7 @@ class Chunk : public virtual RefCounted {
   void setChunkPosition(glm::vec<3, int> pos);
   void setAdjacentChunk(ChunkFace side, Chunk* chunk);
   void dropAdjacentChunks();
+  void saveChunk(const char* path);
 
   glm::vec<3, int> getPosition() const { return _position; }
 

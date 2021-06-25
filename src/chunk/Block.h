@@ -7,10 +7,10 @@ class Block {
  public:
   Block(uint32_t id) : _id(id) {
     _baseBlock = BlockBase::getBlock(id);
-    _baseBlock->grab();
+   // _baseBlock->grab();
   }
 
-  ~Block() { _baseBlock->drop(); }
+ // ~Block() { _baseBlock->drop(); }
 
   BlockBase::BlockFace* getBlockFace(BlockBase::Face f) const {
     return _baseBlock->getBlockFace(f);

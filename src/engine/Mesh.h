@@ -30,7 +30,7 @@ class Mesh : public virtual RefCounted {
   void setAttribVec3(unsigned short attribIndex, unsigned int index, float x,
                      float y, float z);
   void updateBuffers();
-  void updateTransfrom(float dt);
+  virtual void updateTransfrom(float dt){};
 
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
 
@@ -66,8 +66,10 @@ class Mesh : public virtual RefCounted {
   unsigned int _latestVertexCount;
   unsigned int _currentIndexCount;
   unsigned int _currentVertexCount;
-  unsigned int* _indices;
-  float* _vertices;
+  unsigned int* _latestIndices;
+  float* _latestVertices;
+  unsigned int* _currentIndices;
+  float* _currentVertices;
   unsigned int _id;
   int _attribStride;
   bool _rendererDropFlag;
