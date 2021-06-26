@@ -278,8 +278,8 @@ void Chunk::saveChunk(const char* path) {
     FILE* file = nullptr;
     if (fopen_s(&file, path, "wb") == 0 && file != 0) {
       fwrite(&CHUNK_VERSION, 2, 1, file);
-      uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a block id
-      fwrite(&byteSize, 4, 1, file);
+      // uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a block
+      // id fwrite(&byteSize, 4, 1, file);
       uint32_t unsetValue = 0xffffffff;
       for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
         if (_blocks[i] != nullptr) {
@@ -303,8 +303,32 @@ void Chunk::loadChunk(const char* path) {
   deleteBlocks();
   _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
   if (_blocks == nullptr) return;
-  for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-    _blocks[i] = new Block(i % 4);
+  FILE* file = nullptr;
+  if (fopen_s(&file, path, "rb") == 0 && file != 0) {
+    unsigned short fileVersion;
+    fread(&fileVersion, 2, 1, file);
+    // add check for file version vs current version
+
+    uint32_t unsetValue = 0xffffffff;
+    uint32_t id;
+    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+      fread(&id, 4, 1, file);
+      if (id == unsetValue) {
+        _blocks[i] = nullptr;
+      } else {
+        _blocks[i] = new Block(id);
+      }
+    }
+
+    fclose(file);
+    _chunkSaveRequired = false;
+  } else {
+    std::cout << "Chunk Read Error" << std::endl;
+    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+      _blocks[i] = new Block(i % 4);
+    }
+
+    _chunkSaveRequired = true;
   }
 }
 
