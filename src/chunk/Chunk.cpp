@@ -278,6 +278,10 @@ void Chunk::dropAdjacentChunks() {
   setChunkModified(true);
 }
 
+void Chunk::saveChunk(const char* dir) {
+  
+}
+
 bool Chunk::drawBlockFace(Block* block, BlockBase::Face face) {
   if (block == nullptr) return true;
   return !block->getFullBlockFace(face);

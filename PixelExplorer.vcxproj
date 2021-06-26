@@ -326,6 +326,7 @@
     <ClInclude Include="src\engine\Renderer.h" />
     <ClInclude Include="src\engine\Shader.h" />
     <ClInclude Include="src\engine\Texture.h" />
+    <ClInclude Include="src\engine\vendor\FastNoiseLite.h" />
     <ClInclude Include="src\engine\vendor\glm\common.hpp" />
     <ClInclude Include="src\engine\vendor\glm\detail\compute_common.hpp" />
     <ClInclude Include="src\engine\vendor\glm\detail\compute_vector_relational.hpp" />

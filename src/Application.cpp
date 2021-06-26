@@ -56,7 +56,7 @@ int main(void) {
   unsigned long long int nextUpdateTime = 0;
   while (renderer->windowOpen()) {
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime) {
-      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 20);
+      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 5);
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5;
     }
     chunkManager->update();
