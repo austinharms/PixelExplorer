@@ -9,6 +9,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 #include "Chunk.h"
 #include "ChunkPositionQueue.h"
@@ -27,6 +28,7 @@ class ChunkManager : public virtual RefCounted {
 
  private:
   Renderer* _renderer;
+  std::string _savePath;
   unsigned long long int _lastUnloadUpdate;
 
   // Threading

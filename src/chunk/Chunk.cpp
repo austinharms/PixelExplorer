@@ -2,8 +2,10 @@
 
 #include <GL/glew.h>
 
+#include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
+#include <iostream>
 #include <list>
 
 #include "VertexBufferAttrib.h"
@@ -42,26 +44,18 @@ Chunk::Chunk()
 }
 
 Chunk::~Chunk() {
-  if (_blocks != nullptr) {
-    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-      if (_blocks[i] != nullptr) delete _blocks[i];
-    }
-
-    free(_blocks);
+  {
+    std::lock_guard<std::mutex> lock(_blockLock);
+    deleteBlocks();
   }
   _mesh->setRendererDropFlag(true);
   _mesh->drop();
 }
 
-void Chunk::generateChunk() {
+void Chunk::setBlocks(Block** blocks) {
   std::lock_guard<std::mutex> lock(_blockLock);
-  if (_blocks != nullptr) free(_blocks);
-  _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
-  if (_blocks == nullptr) return;
-  for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-    _blocks[i] = new Block(i % 4);
-  }
-
+  deleteBlocks();
+  _blocks = blocks;
   setChunkModified(true);
 }
 
@@ -278,11 +272,55 @@ void Chunk::dropAdjacentChunks() {
   setChunkModified(true);
 }
 
-void Chunk::saveChunk(const char* dir) {
-  
+void Chunk::saveChunk(const char* path) {
+  std::lock_guard<std::mutex> lock(_blockLock);
+  if (_chunkSaveRequired) {
+    FILE* file = nullptr;
+    if (fopen_s(&file, path, "wb") == 0 && file != 0) {
+      fwrite(&CHUNK_VERSION, 2, 1, file);
+      uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a block id
+      fwrite(&byteSize, 4, 1, file);
+      uint32_t unsetValue = 0xffffffff;
+      for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+        if (_blocks[i] != nullptr) {
+          uint32_t id = _blocks[i]->getID();
+          fwrite(&id, 4, 1, file);
+        } else {
+          fwrite(&unsetValue, 4, 1, file);
+        }
+      }
+
+      fclose(file);
+      _chunkSaveRequired = false;
+    } else {
+      std::cout << "Chunk Write Error" << std::endl;
+    }
+  }
+}
+
+void Chunk::loadChunk(const char* path) {
+  std::lock_guard<std::mutex> lock(_blockLock);
+  deleteBlocks();
+  _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
+  if (_blocks == nullptr) return;
+  for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+    _blocks[i] = new Block(i % 4);
+  }
 }
 
 bool Chunk::drawBlockFace(Block* block, BlockBase::Face face) {
   if (block == nullptr) return true;
   return !block->getFullBlockFace(face);
+}
+
+void Chunk::deleteBlocks() {
+  if (_blocks != nullptr) {
+    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+      if (_blocks[i] != nullptr) delete _blocks[i];
+    }
+
+    free(_blocks);
+  }
+
+  _blocks = nullptr;
 }

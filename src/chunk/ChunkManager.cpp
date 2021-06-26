@@ -15,9 +15,9 @@ ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
       _createdChunkQueue(),
       _createdChunkQueueLength(0),
       _chunkCreationRequestCount(0),
-      _lastUnloadUpdate(0) {
+      _lastUnloadUpdate(0),
+      _savePath(chunkPath) {
   _renderer->grab();
-
   if (jobPoolSize < 1) jobPoolSize = 1;
   if (loadPoolSize < 1) loadPoolSize = 1;
   _threadPool.reserve(jobPoolSize + loadPoolSize);
@@ -105,6 +105,7 @@ void ChunkManager::loadThreadPoolFunction() {
       _chunkMap.erase(posToString(pos));
       _chunkMapLock.unlock();
       chunk->dropAdjacentChunks();
+      chunk->saveChunk((_savePath + posToString(pos)).c_str());
       if (!chunk->drop()) chunk->setStatus(Chunk::UNLOADED);
       _unloadQueue.removePosition(pos);
     } else if (!_loadQueue.isQueueEmpty()) {
@@ -129,7 +130,7 @@ void ChunkManager::loadThreadPoolFunction() {
         _chunkMap.insert({posToString(pos), chunk});
       }
 
-      chunk->generateChunk();
+      chunk->loadChunk((_savePath + posToString(pos)).c_str());
       Chunk* adjChunk = nullptr;
       if (chunk->getAdjacentChunk(Chunk::FRONT) == nullptr) {
         _chunkMapLock.lock_shared();
@@ -345,7 +346,9 @@ void ChunkManager::unloadAllChunks() {
     // if (chunkPair.second != _chunkPlaceholderPointer)
     // chunkPair.second->drop();
     chunkPair.second->dropAdjacentChunks();
+    chunkPair.second->saveChunk((_savePath + posToString(chunkPair.second->getPosition())).c_str());
     chunkPair.second->drop();
   }
+
   _chunkMap.clear();
 }

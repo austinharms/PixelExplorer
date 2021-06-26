@@ -51,7 +51,7 @@ int main(void) {
   BlockBase::loadBlocks("./res/blocks.dat");
   BlockBase::setDefaultBlock(BlockBase::getBlock(0));
 
-  ChunkManager* chunkManager = new ChunkManager(nullptr, renderer, 10, 20, -1);
+  ChunkManager* chunkManager = new ChunkManager("./world/D0/", renderer, 10, 20, -1);
 
   unsigned long long int nextUpdateTime = 0;
   while (renderer->windowOpen()) {

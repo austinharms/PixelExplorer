@@ -10,6 +10,7 @@
 
 class Chunk : public virtual RefCounted {
  public:
+  const static unsigned short CHUNK_VERSION = 0;
   const static unsigned int CHUNK_SIZE = 25;
   const static unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   const static unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
@@ -19,7 +20,7 @@ class Chunk : public virtual RefCounted {
     LOADING = 1,
     LOADED = 2,
   };
-
+  
   enum ChunkFace {
     FRONT = 0,
     TOP = 1,
@@ -32,12 +33,13 @@ class Chunk : public virtual RefCounted {
   Chunk(glm::vec<3, int> pos);
   Chunk();
   virtual ~Chunk();
-  void generateChunk();
   void updateMesh();
   void setChunkPosition(glm::vec<3, int> pos);
   void setAdjacentChunk(ChunkFace side, Chunk* chunk);
   void dropAdjacentChunks();
-  void saveChunk(const char* dir);
+  void saveChunk(const char* path);
+  void loadChunk(const char* path);
+  void setBlocks(Block** blocks);
 
   glm::vec<3, int> getPosition() const { return _position; }
 
@@ -107,4 +109,5 @@ class Chunk : public virtual RefCounted {
   Chunk* _adjacentChunks[6] = {nullptr, nullptr, nullptr,
                                nullptr, nullptr, nullptr};
   bool drawBlockFace(Block* block, BlockBase::Face face);
+  void deleteBlocks();
 };
