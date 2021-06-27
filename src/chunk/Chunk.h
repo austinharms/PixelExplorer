@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "RefCounted.h"
+#include "ChunkGenerator.h"
 
 class Chunk : public virtual RefCounted {
  public:
@@ -38,7 +39,7 @@ class Chunk : public virtual RefCounted {
   void setAdjacentChunk(ChunkFace side, Chunk* chunk);
   void dropAdjacentChunks();
   void saveChunk(const char* path);
-  void loadChunk(const char* path);
+  void loadChunk(const char* path, ChunkGenerator* gen);
   void setBlocks(Block** blocks);
 
   glm::vec<3, int> getPosition() const { return _position; }

@@ -1,8 +1,8 @@
 #include "ChunkManager.h"
 
 ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
-                           int jobPoolSize, int loadPoolSize,
-                           int maxChunksPerFrame)
+                           ChunkGenerator* generator, int jobPoolSize,
+                           int loadPoolSize, int maxChunksPerFrame)
     : _runningThreadCount(0),
       _jobPoolSize(jobPoolSize),
       _jobQueueLength(0),
@@ -16,8 +16,10 @@ ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
       _createdChunkQueueLength(0),
       _chunkCreationRequestCount(0),
       _lastUnloadUpdate(0),
-      _savePath(chunkPath) {
+      _savePath(chunkPath),
+      _generator(generator) {
   _renderer->grab();
+  _generator->grab();
   if (jobPoolSize < 1) jobPoolSize = 1;
   if (loadPoolSize < 1) loadPoolSize = 1;
   _threadPool.reserve(jobPoolSize + loadPoolSize);
@@ -43,6 +45,7 @@ ChunkManager::~ChunkManager() {
     ;
   unloadAllChunks();
   _renderer->drop();
+  _generator->drop();
 
   while (!_jobQueue.empty()) {
     delete _jobQueue.front();
@@ -130,7 +133,7 @@ void ChunkManager::loadThreadPoolFunction() {
         _chunkMap.insert({posToString(pos), chunk});
       }
 
-      chunk->loadChunk((_savePath + posToString(pos)).c_str());
+      chunk->loadChunk((_savePath + posToString(pos)).c_str(), _generator);
       Chunk* adjChunk = nullptr;
       if (chunk->getAdjacentChunk(Chunk::FRONT) == nullptr) {
         _chunkMapLock.lock_shared();
@@ -346,7 +349,8 @@ void ChunkManager::unloadAllChunks() {
     // if (chunkPair.second != _chunkPlaceholderPointer)
     // chunkPair.second->drop();
     chunkPair.second->dropAdjacentChunks();
-    chunkPair.second->saveChunk((_savePath + posToString(chunkPair.second->getPosition())).c_str());
+    chunkPair.second->saveChunk(
+        (_savePath + posToString(chunkPair.second->getPosition())).c_str());
     chunkPair.second->drop();
   }
 

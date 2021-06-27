@@ -158,6 +158,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\chunk\BlockBase.cpp" />
     <ClCompile Include="src\chunk\Chunk.cpp" />
+    <ClCompile Include="src\chunk\ChunkGenerator.cpp" />
     <ClCompile Include="src\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\chunk\ChunkPositionQueue.cpp" />
     <ClCompile Include="src\engine\IndexBuffer.cpp" />
@@ -317,6 +318,7 @@
     <ClInclude Include="src\chunk\Block.h" />
     <ClInclude Include="src\chunk\BlockBase.h" />
     <ClInclude Include="src\chunk\Chunk.h" />
+    <ClInclude Include="src\chunk\ChunkGenerator.h" />
     <ClInclude Include="src\chunk\ChunkManager.h" />
     <ClInclude Include="src\chunk\ChunkPositionQueue.h" />
     <ClInclude Include="src\engine\IndexBuffer.h" />

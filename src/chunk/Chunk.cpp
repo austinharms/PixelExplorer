@@ -298,7 +298,7 @@ void Chunk::saveChunk(const char* path) {
   }
 }
 
-void Chunk::loadChunk(const char* path) {
+void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
   std::lock_guard<std::mutex> lock(_blockLock);
   deleteBlocks();
   _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
@@ -324,10 +324,7 @@ void Chunk::loadChunk(const char* path) {
     _chunkSaveRequired = false;
   } else {
     std::cout << "Chunk Read Error" << std::endl;
-    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-      _blocks[i] = new Block(i % 4);
-    }
-
+    gen->genChunkBlocks(_position, _blocks);
     _chunkSaveRequired = true;
   }
 }

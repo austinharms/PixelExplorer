@@ -9,16 +9,17 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
 #include "Chunk.h"
+#include "ChunkGenerator.h"
 #include "ChunkPositionQueue.h"
 #include "RefCounted.h"
 #include "Renderer.h"
 
 class ChunkManager : public virtual RefCounted {
  public:
-  ChunkManager(const char* chunkPath, Renderer* renderer, int jobPoolSize = 5,
+  ChunkManager(const char* chunkPath, Renderer* renderer,
+               ChunkGenerator* generator, int jobPoolSize = 5,
                int loadPoolSize = 6, int maxChunksPerFrame = 2);
   virtual ~ChunkManager();
   void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius);
@@ -28,6 +29,7 @@ class ChunkManager : public virtual RefCounted {
 
  private:
   Renderer* _renderer;
+  ChunkGenerator* _generator;
   std::string _savePath;
   unsigned long long int _lastUnloadUpdate;
 
