@@ -67,10 +67,10 @@ void ChunkManager::update() {
     _lastUnloadUpdate = clock() / CLOCKS_PER_SEC;
   }
 
-  std::cout << "Job Queue: " << _jobQueueLength
+  std::cout << " Chunk Manager: Job Queue: " << _jobQueueLength
             << " UnloadQueue: " << _unloadQueue.getQueueLength()
             << " Load Queue: " << _loadQueue.getQueueLength()
-            << " Loaded Chunk Count: " << _chunkMap.size() << std::endl;
+            << " Loaded Chunk Count: " << _chunkMap.size();
 
   // if (_jobQueueLength > 200) {
   //  std::cout << "Job Queue Overloaded" << std::endl;
@@ -251,6 +251,7 @@ void ChunkManager::jobThreadPoolFunction() {
               Chunk::Status status = getChunkStatus(chunk);
               if (status == Chunk::UNLOADED) {
                 _loadQueue.addPosition(chunkPos + job->pos);
+                _loadAndUnloadCondition.notify_one();
               } else if (status == Chunk::LOADED) {
                 chunk->setUnloadTime(
                     (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
@@ -269,8 +270,10 @@ void ChunkManager::jobThreadPoolFunction() {
         while (iter != end) {
           const std::pair<std::string, Chunk*>& chunkPair = *iter;
           if (getChunkStatus(chunkPair.second) == Chunk::LOADED &&
-              chunkPair.second->getUnloadTime() < curTime)
+              chunkPair.second->getUnloadTime() < curTime) {
             _unloadQueue.addPosition(chunkPair.second->getPosition());
+            _loadAndUnloadCondition.notify_one();
+          }
           ++iter;
         }
         _chunkMapLock.unlock_shared();

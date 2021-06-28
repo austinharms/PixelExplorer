@@ -136,7 +136,7 @@ void Renderer::render() {
     _frameCount = 0;
     _lastFPSFrame = currentFrame;
     clock_t c = std::clock() / CLOCKS_PER_SEC;
-    std::cout << "FPS: " << _avgFPS << "Time: " << c << "s" << std::endl;
+    // std::cout << "FPS: " << _avgFPS << "Time: " << c << "s" << std::endl;
   }
 
   _lastFrame = currentFrame;
@@ -144,6 +144,7 @@ void Renderer::render() {
 
   {
     std::lock_guard<std::mutex> locker(_meshListLock);
+    std::cout << " Renderer: Mesh Count: " << _meshes.size();
     std::list<Mesh*>::iterator iter = _meshes.begin();
     std::list<Mesh*>::iterator end = _meshes.end();
     while (iter != end) {
@@ -191,6 +192,10 @@ void Renderer::setCursorPosition(double x, double y) {
 
 void Renderer::drawMesh(Mesh* mesh) {
   mesh->updateTransfrom(_deltaTime);
+
+  glm::vec3 pos(mesh->getTransform()[3]);
+  std::cout << " Mesh Pos: X: " << (int)pos.x << " Y:" << (int)pos.y
+            << " Z: " << (int)pos.z;
   if (mesh->hasMaterial()) {
     useMaterial(mesh->getMaterial());
   } else {

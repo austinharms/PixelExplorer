@@ -64,7 +64,7 @@ class ChunkManager : public virtual RefCounted {
       _jobQueue.emplace(job);
       ++_jobQueueLength;
     }
-    _jobCondition.notify_one();
+    _jobCondition.notify_all();
   }
 
   Job* getNextJob() {

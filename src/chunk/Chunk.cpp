@@ -164,9 +164,9 @@ void Chunk::updateMesh() {
     auto addBlockFace = [&](BlockBase::BlockFace* face, float x, float y,
                             float z) {
       for (unsigned char v = 0; v < face->vertexCount; ++v) {
-        _mesh->setRawAttribVec3(vertexOffset, vertexCount + v, face->vertices[v * 3] + x,
-                                face->vertices[v * 3 + 1] + y,
-                                face->vertices[v * 3 + 2] - z);
+        _mesh->setRawAttribVec3(
+            vertexOffset, vertexCount + v, face->vertices[v * 3] + x,
+            face->vertices[v * 3 + 1] + y, face->vertices[v * 3 + 2] - z);
         _mesh->setRawAttribVec2(uvOffset, vertexCount + v, face->uvs[v * 2],
                                 face->uvs[v * 2 + 1]);
         _mesh->setRawAttribVec2(repeatOffset, vertexCount + v, 1, 1);
@@ -257,9 +257,13 @@ void Chunk::updateMesh() {
 
 void Chunk::setChunkPosition(glm::vec<3, int> pos) {
   _position = pos;
-  _mesh->setTransform(glm::translate(
-      glm::mat4(1.0f),
-      glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
+  _mesh->setTransform(glm::mat4(
+      1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+      (float)(pos.x * (int)CHUNK_SIZE), (float)(pos.y * (int)CHUNK_SIZE),
+      (float)(pos.z * (int)CHUNK_SIZE), 1.0));
+  //_mesh->setTransform(glm::translate(
+  //    glm::mat4(1.0f), glm::vec3((float)(pos.x * (int)CHUNK_SIZE),
+  //                               pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
   setChunkModified(true);
 }
 

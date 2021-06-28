@@ -33,7 +33,6 @@ Mesh::Mesh()
   attribs[0]->drop();
   attribs[1]->drop();
   _attribStride = _vertexArray->getBufferComponentStride(0);
-  _transform = glm::translate(_transform, glm::vec3(0.0f));
 }
 
 Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
@@ -67,7 +66,6 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
   attribs[1]->drop();
   delete[] attribs;
   _attribStride = _vertexArray->getBufferComponentStride(0);
-  _transform = glm::translate(_transform, glm::vec3(0.0f));
 }
 
 Mesh::~Mesh() {
