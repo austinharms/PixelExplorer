@@ -9,6 +9,7 @@ class Player : public virtual RefCounted {
   Player(Renderer* renderer);
   virtual ~Player();
   void update();
+  glm::vec3 getPosition() const { return _position; }
 
  private:
   Renderer* _renderer;

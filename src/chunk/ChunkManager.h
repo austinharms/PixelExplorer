@@ -9,6 +9,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <atomic>
 
 #include "Chunk.h"
 #include "ChunkGenerator.h"
@@ -34,25 +35,9 @@ class ChunkManager : public virtual RefCounted {
   unsigned long long int _lastUnloadUpdate;
 
   // Threading
-  std::mutex _threadCountLock;
   std::vector<std::thread> _threadPool;
-  int _runningThreadCount;
-  bool _killRunningThreads;
-
-  int getRunningThreadCount() {
-    std::lock_guard<std::mutex> locker(_threadCountLock);
-    return _runningThreadCount;
-  }
-
-  void incrementRunningThreadCount() {
-    std::lock_guard<std::mutex> locker(_threadCountLock);
-    ++_runningThreadCount;
-  }
-
-  void decrementRunningThreadCount() {
-    std::lock_guard<std::mutex> locker(_threadCountLock);
-    --_runningThreadCount;
-  }
+  std::atomic<int> _runningThreadCount;
+  std::atomic<bool> _killRunningThreads;
 
   // Job Pool
   struct Job {
@@ -104,14 +89,12 @@ class ChunkManager : public virtual RefCounted {
   std::mutex _createChunkLock;
   std::queue<Chunk*> _createdChunkQueue;
   int _maxChunkCreationsPerFrame;
-  int _chunkCreationRequestCount;
-  int _createdChunkQueueLength;
+  std::atomic<int> _chunkCreationRequestCount;
+  std::atomic<int> _createdChunkQueueLength;
   void updateChunkCreation();
 
   void requestChunkCreation() {
-    _createChunkLock.lock();
     ++_chunkCreationRequestCount;
-    _createChunkLock.unlock();
   }
 
   Chunk* getCreatedChunk() {

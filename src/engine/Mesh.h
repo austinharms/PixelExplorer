@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/mat4x4.hpp>
+#include <mutex>
 #include <unordered_map>
 
 #include "IndexBuffer.h"
@@ -7,13 +7,14 @@
 #include "RefCounted.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "glm/mat4x4.hpp"
 
 class Mesh : public virtual RefCounted {
  public:
   Mesh();
   Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount);
   virtual ~Mesh();
-  void bind() const;
+  void bind();
   void unbind() const;
   glm::mat4 getTransform() const { return _transform; }
   void setIndexCount(unsigned int count);
@@ -29,6 +30,10 @@ class Mesh : public virtual RefCounted {
                      float y);
   void setAttribVec3(unsigned short attribIndex, unsigned int index, float x,
                      float y, float z);
+  void setRawAttribVec2(unsigned short attribOffset, unsigned int index,
+                        float x, float y);
+  void setRawAttribVec3(unsigned short attribOffset, unsigned int index,
+                        float x, float y, float z);
   void updateBuffers();
   virtual void updateTransfrom(float dt){};
 
@@ -54,8 +59,20 @@ class Mesh : public virtual RefCounted {
 
   bool getRendererDropFlag() const { return _rendererDropFlag; }
 
+  void lockMeshEditing() { _meshEditLock.lock(); }
+
+  void unlockMeshEditing() { _meshEditLock.unlock(); }
+
+  unsigned short getAttribOffset(unsigned short attribIndex) {
+    return _vertexArray->getBufferAttribComponentOffset(0, attribIndex);
+  }
+
+  void unbindLock() { _meshBindLock.unlock(); }
+
  private:
   static unsigned int s_nextId;
+  std::mutex _meshEditLock;
+  std::mutex _meshBindLock;
   glm::mat4 _transform;
   std::unordered_map<unsigned short, unsigned short> _bufferOffsetMap;
   VertexBuffer* _vertexBuffer;
@@ -73,5 +90,4 @@ class Mesh : public virtual RefCounted {
   unsigned int _id;
   int _attribStride;
   bool _rendererDropFlag;
-  bool _dirtyBuffers;
 };

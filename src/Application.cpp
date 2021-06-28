@@ -52,15 +52,28 @@ int main(void) {
   BlockBase::setDefaultBlock(BlockBase::getBlock(0));
 
   ChunkGenerator* chunkGen = new ChunkGenerator(458679840956);
-  ChunkManager* chunkManager = new ChunkManager("./world/D0/", renderer, chunkGen, 10, 20, -1);
+  ChunkManager* chunkManager =
+      new ChunkManager("./world/D0/", renderer, chunkGen, 6, 12, -1);
   chunkGen->drop();
 
   unsigned long long int nextUpdateTime = 0;
+  glm::vec<3, int> lastChunkPos(0.0f);
   while (renderer->windowOpen()) {
-    if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime) {
-      chunkManager->loadChunksInRadius(glm::vec<3, int>(0, 0, 0), 5);
+    glm::vec<3, int> playerChunkPos(0.0f);
+    playerChunkPos.x = (int)(player->getPosition().x / Chunk::CHUNK_SIZE);
+    playerChunkPos.y = (int)(player->getPosition().y / Chunk::CHUNK_SIZE);
+    playerChunkPos.z = (int)(player->getPosition().z / Chunk::CHUNK_SIZE);
+
+    if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
+        playerChunkPos != lastChunkPos) {
+      chunkManager->loadChunksInRadius(playerChunkPos, 1);
+      lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5;
+      std::cout << "Chunk Load Update: X:" << playerChunkPos.x
+                << " Y:" << playerChunkPos.y << " Z:" << playerChunkPos.z
+                << std::endl;
     }
+
     chunkManager->update();
     player->update();
     renderer->render();

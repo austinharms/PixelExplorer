@@ -9,8 +9,8 @@ bool Renderer::s_windowSizeChange = false;
 Renderer::Renderer(int width, int height, const char* title,
                    Material* defaultMaterial)
     : _FOV(40.0f),
-      _projection(glm::perspective(glm::radians(40.0f),
-                                   (float)width / (float)height, 0.1f, 1000.0f)),
+      _projection(glm::perspective(
+          glm::radians(40.0f), (float)width / (float)height, 0.1f, 1000.0f)),
       _view(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f))),
       _boundShader(nullptr),
       _boundMaterial(nullptr),
@@ -135,9 +135,8 @@ void Renderer::render() {
     _avgFPS = _frameCount * 4;
     _frameCount = 0;
     _lastFPSFrame = currentFrame;
-    std::cout << "FPS: " << _avgFPS << "  Clock: " << std::clock()
-              << "t Clock: " << (std::clock() / CLOCKS_PER_SEC) << "s"
-              << std::endl;
+    clock_t c = std::clock() / CLOCKS_PER_SEC;
+    std::cout << "FPS: " << _avgFPS << "Time: " << c << "s" << std::endl;
   }
 
   _lastFrame = currentFrame;
@@ -205,6 +204,7 @@ void Renderer::drawMesh(Mesh* mesh) {
   unsigned int indexCount = mesh->getIndexCount();
   unsigned int indexType = mesh->getIndexType();
   glDrawElements(GL_TRIANGLES, indexCount, indexType, nullptr);
+  mesh->unbindLock();
 }
 
 void Renderer::updateWindowSize() {

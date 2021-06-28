@@ -41,7 +41,7 @@ ChunkManager::~ChunkManager() {
   _killRunningThreads = true;
   _jobCondition.notify_all();
   _loadAndUnloadCondition.notify_all();
-  while (getRunningThreadCount() > 0)
+  while (_runningThreadCount > 0)
     ;
   unloadAllChunks();
   _renderer->drop();
@@ -67,9 +67,14 @@ void ChunkManager::update() {
     _lastUnloadUpdate = clock() / CLOCKS_PER_SEC;
   }
 
-  if (_jobQueueLength > 25) {
-    std::cout << "Job Queue Overloaded" << std::endl;
-  }
+  std::cout << "Job Queue: " << _jobQueueLength
+            << " UnloadQueue: " << _unloadQueue.getQueueLength()
+            << " Load Queue: " << _loadQueue.getQueueLength()
+            << " Loaded Chunk Count: " << _chunkMap.size() << std::endl;
+
+  // if (_jobQueueLength > 200) {
+  //  std::cout << "Job Queue Overloaded" << std::endl;
+  //}
 
   updateChunkCreation();
 }
@@ -85,7 +90,7 @@ void ChunkManager::loadChunksInRadius(glm::vec<3, int> pos,
 }
 
 void ChunkManager::loadThreadPoolFunction() {
-  incrementRunningThreadCount();
+  ++_runningThreadCount;
   while (!_killRunningThreads) {
     glm::vec<3, int> pos(0);
 
@@ -212,12 +217,12 @@ void ChunkManager::loadThreadPoolFunction() {
     }
   }
 
-  decrementRunningThreadCount();
+  --_runningThreadCount;
 }
 
 // Job Pool
 void ChunkManager::jobThreadPoolFunction() {
-  incrementRunningThreadCount();
+  ++_runningThreadCount;
   while (!_killRunningThreads) {
     Job* job = nullptr;
 
@@ -232,22 +237,25 @@ void ChunkManager::jobThreadPoolFunction() {
 
     switch (job->type) {
       case Job::LOADRADIUS: {
-        unsigned short radius = (unsigned short)job->ptr;
-        unsigned int chunkCount = radius * radius * radius;
+        int radius = (int)((unsigned short)job->ptr);
         glm::vec<3, int> chunkPos;
-        for (unsigned int i = 0; i < chunkCount; ++i) {
-          chunkPos.x = (int)(i % radius);
-          chunkPos.y = (int)(i / (radius * radius));
-          chunkPos.z = (int)((int)(i / radius) % radius);
-          _chunkMapLock.lock_shared();
-          Chunk* chunk = getChunkPointer(chunkPos + job->pos);
-          _chunkMapLock.unlock_shared();
-          Chunk::Status status = getChunkStatus(chunk);
-          if (status == Chunk::UNLOADED) {
-            _loadQueue.addPosition(chunkPos + job->pos);
-          } else if (status == Chunk::LOADED) {
-            chunk->setUnloadTime(
-                (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
+        for (int x = -radius; x <= radius; ++x) {
+          chunkPos.x = x;
+          for (int y = -radius; y <= radius; ++y) {
+            chunkPos.y = y;
+            for (int z = -radius; z <= radius; ++z) {
+              chunkPos.z = z;
+              _chunkMapLock.lock_shared();
+              Chunk* chunk = getChunkPointer(chunkPos + job->pos);
+              _chunkMapLock.unlock_shared();
+              Chunk::Status status = getChunkStatus(chunk);
+              if (status == Chunk::UNLOADED) {
+                _loadQueue.addPosition(chunkPos + job->pos);
+              } else if (status == Chunk::LOADED) {
+                chunk->setUnloadTime(
+                    (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
+              }
+            }
           }
         }
       } break;
@@ -279,7 +287,7 @@ void ChunkManager::jobThreadPoolFunction() {
     delete job;
   }
 
-  decrementRunningThreadCount();
+  --_runningThreadCount;
 }
 
 void ChunkManager::addUpdateChunkJob(Chunk* chunk) {

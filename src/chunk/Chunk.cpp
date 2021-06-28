@@ -62,6 +62,7 @@ void Chunk::setBlocks(Block** blocks) {
 void Chunk::updateMesh() {
   std::lock_guard<std::recursive_mutex> adjLock(_adjacentLock);
   std::lock_guard<std::mutex> blockLock(_blockLock);
+  _mesh->lockMeshEditing();
 
   setChunkModified(false);
 
@@ -155,17 +156,28 @@ void Chunk::updateMesh() {
   _mesh->setIndexCount(indexCount);
   vertexCount = 0;
   indexCount = 0;
+  unsigned short vertexOffset = _mesh->getAttribOffset(0);
+  unsigned short uvOffset = _mesh->getAttribOffset(1);
+  unsigned short repeatOffset = _mesh->getAttribOffset(2);
+
   {
     auto addBlockFace = [&](BlockBase::BlockFace* face, float x, float y,
                             float z) {
       for (unsigned char v = 0; v < face->vertexCount; ++v) {
-        _mesh->setVertexPosition(vertexCount + v, face->vertices[v * 3] + x,
-                                 face->vertices[v * 3 + 1] + y,
-                                 face->vertices[v * 3 + 2] - z);
-        _mesh->setVertexUV(vertexCount + v, face->uvs[v * 2],
-                           face->uvs[v * 2 + 1]);
-        _mesh->setAttribVec2(2, vertexCount + v, 1, 1);
+        _mesh->setRawAttribVec3(vertexOffset, vertexCount + v, face->vertices[v * 3] + x,
+                                face->vertices[v * 3 + 1] + y,
+                                face->vertices[v * 3 + 2] - z);
+        _mesh->setRawAttribVec2(uvOffset, vertexCount + v, face->uvs[v * 2],
+                                face->uvs[v * 2 + 1]);
+        _mesh->setRawAttribVec2(repeatOffset, vertexCount + v, 1, 1);
+        //_mesh->setVertexPosition(vertexCount + v, face->vertices[v * 3] + x,
+        //                         face->vertices[v * 3 + 1] + y,
+        //                         face->vertices[v * 3 + 2] - z);
+        //_mesh->setVertexUV(vertexCount + v, face->uvs[v * 2],
+        //                   face->uvs[v * 2 + 1]);
+        //_mesh->setAttribVec2(2, vertexCount + v, 1, 1);
       }
+
       for (unsigned char in = 0; in < face->indexCount; ++in) {
         _mesh->setIndex(indexCount + in, vertexCount + face->indices[in]);
       }
@@ -240,6 +252,7 @@ void Chunk::updateMesh() {
   }
 
   _mesh->updateBuffers();
+  _mesh->unlockMeshEditing();
 }
 
 void Chunk::setChunkPosition(glm::vec<3, int> pos) {
@@ -273,29 +286,30 @@ void Chunk::dropAdjacentChunks() {
 }
 
 void Chunk::saveChunk(const char* path) {
-  std::lock_guard<std::mutex> lock(_blockLock);
-  if (_chunkSaveRequired) {
-    FILE* file = nullptr;
-    if (fopen_s(&file, path, "wb") == 0 && file != 0) {
-      fwrite(&CHUNK_VERSION, 2, 1, file);
-      // uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a block
-      // id fwrite(&byteSize, 4, 1, file);
-      uint32_t unsetValue = 0xffffffff;
-      for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-        if (_blocks[i] != nullptr) {
-          uint32_t id = _blocks[i]->getID();
-          fwrite(&id, 4, 1, file);
-        } else {
-          fwrite(&unsetValue, 4, 1, file);
-        }
-      }
+  // std::lock_guard<std::mutex> lock(_blockLock);
+  // if (_chunkSaveRequired) {
+  //  FILE* file = nullptr;
+  //  if (fopen_s(&file, path, "wb") == 0 && file != 0) {
+  //    fwrite(&CHUNK_VERSION, 2, 1, file);
+  //    // uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a
+  //    block
+  //    // id fwrite(&byteSize, 4, 1, file);
+  //    uint32_t unsetValue = 0xffffffff;
+  //    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+  //      if (_blocks[i] != nullptr) {
+  //        uint32_t id = _blocks[i]->getID();
+  //        fwrite(&id, 4, 1, file);
+  //      } else {
+  //        fwrite(&unsetValue, 4, 1, file);
+  //      }
+  //    }
 
-      fclose(file);
-      _chunkSaveRequired = false;
-    } else {
-      std::cout << "Chunk Write Error" << std::endl;
-    }
-  }
+  //    fclose(file);
+  //    _chunkSaveRequired = false;
+  //  } else {
+  //    std::cout << "Chunk Write Error" << std::endl;
+  //  }
+  //}
 }
 
 void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
@@ -323,7 +337,6 @@ void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
     fclose(file);
     _chunkSaveRequired = false;
   } else {
-    std::cout << "Chunk Read Error" << std::endl;
     gen->genChunkBlocks(_position, _blocks);
     _chunkSaveRequired = true;
   }

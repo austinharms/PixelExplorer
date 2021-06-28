@@ -81,7 +81,8 @@ Mesh::~Mesh() {
   if (_latestVertices != nullptr) delete[] _latestVertices;
 }
 
-void Mesh::bind() const {
+void Mesh::bind() {
+  _meshBindLock.lock();
   _vertexArray->bind();
   _indexBuffer->bind();
 }
@@ -132,7 +133,21 @@ void Mesh::setAttribVec3(unsigned short attribIndex, unsigned int index,
   _latestVertices[(index * _attribStride) + offset + 2] = z;
 }
 
+void Mesh::setRawAttribVec2(unsigned short attribOffset, unsigned int index,
+                            float x, float y) {
+  _latestVertices[(index * _attribStride) + attribOffset] = x;
+  _latestVertices[(index * _attribStride) + attribOffset + 1] = y;
+}
+
+void Mesh::setRawAttribVec3(unsigned short attribOffset, unsigned int index,
+                            float x, float y, float z) {
+  _latestVertices[(index * _attribStride) + attribOffset] = x;
+  _latestVertices[(index * _attribStride) + attribOffset + 1] = y;
+  _latestVertices[(index * _attribStride) + attribOffset + 2] = z;
+}
+
 void Mesh::updateBuffers() {
+  _meshBindLock.lock();
   _currentVertexCount = _latestVertexCount;
   _currentIndexCount = _latestIndexCount;
   if (_currentIndices != nullptr) delete[] _currentIndices;
@@ -141,10 +156,11 @@ void Mesh::updateBuffers() {
   _latestIndices = nullptr;
   _currentVertices = _latestVertices;
   _latestVertices = nullptr;
-  _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount,
-                              _currentIndices);
   _vertexBuffer->updateVertices(
       sizeof(float), _currentVertexCount * _attribStride, _currentVertices);
+  _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount,
+                              _currentIndices);
+  _meshBindLock.unlock();
 }
 
 // void Mesh::updateTransfrom(float dt) {
