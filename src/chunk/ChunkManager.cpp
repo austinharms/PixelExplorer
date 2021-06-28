@@ -1,5 +1,7 @@
 #include "ChunkManager.h"
 
+//#define LOG_QUEUE_LENGTH
+
 ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
                            ChunkGenerator* generator, int jobPoolSize,
                            int loadPoolSize, int maxChunksPerFrame)
@@ -66,11 +68,12 @@ void ChunkManager::update() {
     addJob(job);
     _lastUnloadUpdate = clock() / CLOCKS_PER_SEC;
   }
-
-  std::cout << " Chunk Manager: Job Queue: " << _jobQueueLength
+#ifdef LOG_QUEUE_LENGTH
+  std::cout << "Job Queue: " << _jobQueueLength
             << " UnloadQueue: " << _unloadQueue.getQueueLength()
             << " Load Queue: " << _loadQueue.getQueueLength()
-            << " Loaded Chunk Count: " << _chunkMap.size();
+            << " Loaded Chunk Count: " << _chunkMap.size() << std::endl;
+#endif  // LOG_QUEUE_LENGTH
 
   // if (_jobQueueLength > 200) {
   //  std::cout << "Job Queue Overloaded" << std::endl;

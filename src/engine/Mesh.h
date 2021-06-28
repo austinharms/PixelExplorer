@@ -69,6 +69,8 @@ class Mesh : public virtual RefCounted {
 
   void unbindLock() { _meshBindLock.unlock(); }
 
+  bool getMeshVisible() const { return _meshVisible && !_meshEmpty; }
+
  private:
   static unsigned int s_nextId;
   std::mutex _meshEditLock;
@@ -90,4 +92,6 @@ class Mesh : public virtual RefCounted {
   unsigned int _id;
   int _attribStride;
   bool _rendererDropFlag;
+  bool _meshVisible;
+  bool _meshEmpty;
 };

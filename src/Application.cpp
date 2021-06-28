@@ -53,7 +53,7 @@ int main(void) {
 
   ChunkGenerator* chunkGen = new ChunkGenerator(458679840956);
   ChunkManager* chunkManager =
-      new ChunkManager("./world/D0/", renderer, chunkGen, 6, 1, -1);
+      new ChunkManager("./world/D0/", renderer, chunkGen, 6, 12, -1);
   chunkGen->drop();
 
   unsigned long long int nextUpdateTime = 0;
@@ -63,27 +63,19 @@ int main(void) {
     playerChunkPos.x = (int)(player->getPosition().x / Chunk::CHUNK_SIZE);
     playerChunkPos.y = (int)(player->getPosition().y / Chunk::CHUNK_SIZE);
     playerChunkPos.z = (int)(player->getPosition().z / Chunk::CHUNK_SIZE);
-    std::cout << "Player Pos: X: " << (int)player->getPosition().x
-              << " Y:" << (int)player->getPosition().y
-              << " Z: " << (int)player->getPosition().z
-              << " ChunkPos: X: " << (int)playerChunkPos.x
-              << " Y:" << (int)playerChunkPos.y
-              << " Z: " << (int)playerChunkPos.z;
-
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
       chunkManager->loadChunksInRadius(playerChunkPos, 1);
       lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5;
-      // std::cout << "Chunk Load Update: X:" << playerChunkPos.x
-      //          << " Y:" << playerChunkPos.y << " Z:" << playerChunkPos.z
-      //          << std::endl;
+       std::cout << "Chunk Load Update: X:" << playerChunkPos.x
+                << " Y:" << playerChunkPos.y << " Z:" << playerChunkPos.z
+                << std::endl;
     }
 
     chunkManager->update();
     player->update();
     renderer->render();
-    std::cout << std::endl;
   }
 
   chunkManager->drop();

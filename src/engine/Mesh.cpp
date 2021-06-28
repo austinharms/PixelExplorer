@@ -23,7 +23,9 @@ Mesh::Mesh()
       _material(nullptr),
       _attribStride(0),
       _rendererDropFlag(false),
-      _bufferOffsetMap() {
+      _bufferOffsetMap(),
+      _meshVisible(true),
+      _meshEmpty(true) {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -52,7 +54,9 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
       _material(nullptr),
       _attribStride(0),
       _rendererDropFlag(false),
-      _bufferOffsetMap() {
+      _bufferOffsetMap(),
+      _meshVisible(true),
+      _meshEmpty(true) {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -154,6 +158,7 @@ void Mesh::updateBuffers() {
   _latestIndices = nullptr;
   _currentVertices = _latestVertices;
   _latestVertices = nullptr;
+  _meshEmpty = _currentIndexCount == 0;
   _vertexBuffer->updateVertices(
       sizeof(float), _currentVertexCount * _attribStride, _currentVertices);
   _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount,
