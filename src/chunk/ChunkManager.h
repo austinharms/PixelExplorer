@@ -12,7 +12,7 @@
 #include <atomic>
 
 #include "Chunk.h"
-#include "ChunkGenerator.h"
+#include "generator/ChunkGenerator.h"
 #include "ChunkPositionQueue.h"
 #include "TimedChunkPositionQueue.h"
 #include "RefCounted.h"

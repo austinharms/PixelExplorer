@@ -7,7 +7,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "RefCounted.h"
-#include "ChunkGenerator.h"
+#include "generator/ChunkGenerator.h"
 
 class Chunk : public virtual RefCounted {
  public:

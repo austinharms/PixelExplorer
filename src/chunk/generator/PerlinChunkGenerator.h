@@ -1,15 +1,16 @@
 #pragma once
 #include <cstdint>
 
-#include "Block.h"
+#include "ChunkGenerator.h"
+#include "../Block.h"
 #include "FastNoiseLite.h"
 #include "RefCounted.h"
 #include "glm/vec3.hpp"
 
-class ChunkGenerator : public virtual RefCounted {
+class PerlinChunkGenerator : public ChunkGenerator {
  public:
-  ChunkGenerator(int seed);
-  virtual ~ChunkGenerator();
+  PerlinChunkGenerator(int seed);
+  ~PerlinChunkGenerator();
   Block** genChunkBlocks(glm::vec<3, int> pos, Block** blocks);
 
  private:

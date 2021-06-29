@@ -1,8 +1,8 @@
-#include "ChunkGenerator.h"
+#include "PerlinChunkGenerator.h"
 
-#include "Chunk.h"
+#include "../Chunk.h"
 
-ChunkGenerator::ChunkGenerator(int seed)
+PerlinChunkGenerator::PerlinChunkGenerator(int seed)
     : _baseNoise(seed),
       _baseNoiseLayer(seed + 1),
       _tempatureNoise(seed + 2),
@@ -21,9 +21,10 @@ ChunkGenerator::ChunkGenerator(int seed)
   _tempatureNoise.SetFrequency(0.0007);
 }
 
-ChunkGenerator::~ChunkGenerator() {}
+PerlinChunkGenerator::~PerlinChunkGenerator() {}
 
-Block** ChunkGenerator::genChunkBlocks(glm::vec<3, int> pos, Block** blocks) {
+Block** PerlinChunkGenerator::genChunkBlocks(glm::vec<3, int> pos,
+                                             Block** blocks) {
   for (int i = 0; i < Chunk::LAYER_SIZE; ++i) {
     float x = (i % Chunk::CHUNK_SIZE) + (pos.x * Chunk::CHUNK_SIZE);
     float z = ((i / Chunk::CHUNK_SIZE) % Chunk::CHUNK_SIZE) +
@@ -44,7 +45,7 @@ Block** ChunkGenerator::genChunkBlocks(glm::vec<3, int> pos, Block** blocks) {
       }
     }
   }
-  //for (int i = 0; i < Chunk::BLOCK_COUNT; ++i) {
+  // for (int i = 0; i < Chunk::BLOCK_COUNT; ++i) {
   //  if (i % 2) {
   //    blocks[i] = new Block(_defaultBlockId);
   //  } else {

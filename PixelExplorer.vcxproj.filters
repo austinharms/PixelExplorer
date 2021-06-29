@@ -63,10 +63,10 @@
     <ClCompile Include="src\chunk\ChunkPositionQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\ChunkGenerator.cpp">
+    <ClCompile Include="src\chunk\TimedChunkPositionQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\TimedChunkPositionQueue.cpp">
+    <ClCompile Include="src\chunk\generator\PerlinChunkGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1387,10 +1387,13 @@
     <ClInclude Include="src\engine\vendor\FastNoiseLite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\ChunkGenerator.h">
+    <ClInclude Include="src\chunk\generator\ChunkGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\TimedChunkPositionQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chunk\generator\PerlinChunkGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
