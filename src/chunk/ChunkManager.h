@@ -14,6 +14,7 @@
 #include "Chunk.h"
 #include "ChunkGenerator.h"
 #include "ChunkPositionQueue.h"
+#include "TimedChunkPositionQueue.h"
 #include "RefCounted.h"
 #include "Renderer.h"
 
@@ -79,7 +80,7 @@ class ChunkManager : public virtual RefCounted {
   std::shared_mutex _chunkMapLock;
   std::unordered_map<std::string, Chunk*> _chunkMap;
   ChunkPositionQueue _unloadQueue;
-  ChunkPositionQueue _loadQueue;
+  TimedChunkPositionQueue _loadQueue;
   std::mutex _loadAndUnloadLock;
   std::condition_variable _loadAndUnloadCondition;
   int _loadPoolSize;
@@ -92,6 +93,7 @@ class ChunkManager : public virtual RefCounted {
   std::atomic<int> _chunkCreationRequestCount;
   std::atomic<int> _createdChunkQueueLength;
   void updateChunkCreation();
+  void checkAndLoadChunk(glm::vec<3, int> pos);
 
   void requestChunkCreation() {
     ++_chunkCreationRequestCount;

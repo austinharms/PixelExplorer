@@ -290,30 +290,29 @@ void Chunk::dropAdjacentChunks() {
 }
 
 void Chunk::saveChunk(const char* path) {
-  // std::lock_guard<std::mutex> lock(_blockLock);
-  // if (_chunkSaveRequired) {
-  //  FILE* file = nullptr;
-  //  if (fopen_s(&file, path, "wb") == 0 && file != 0) {
-  //    fwrite(&CHUNK_VERSION, 2, 1, file);
-  //    // uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a
-  //    block
-  //    // id fwrite(&byteSize, 4, 1, file);
-  //    uint32_t unsetValue = 0xffffffff;
-  //    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-  //      if (_blocks[i] != nullptr) {
-  //        uint32_t id = _blocks[i]->getID();
-  //        fwrite(&id, 4, 1, file);
-  //      } else {
-  //        fwrite(&unsetValue, 4, 1, file);
-  //      }
-  //    }
+   std::lock_guard<std::mutex> lock(_blockLock);
+   if (_chunkSaveRequired) {
+    FILE* file = nullptr;
+    if (fopen_s(&file, path, "wb") == 0 && file != 0) {
+      fwrite(&CHUNK_VERSION, 2, 1, file);
+      // uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a block id
+      //fwrite(&byteSize, 4, 1, file);
+      uint32_t unsetValue = 0xffffffff;
+      for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+        if (_blocks[i] != nullptr) {
+          uint32_t id = _blocks[i]->getID();
+          fwrite(&id, 4, 1, file);
+        } else {
+          fwrite(&unsetValue, 4, 1, file);
+        }
+      }
 
-  //    fclose(file);
-  //    _chunkSaveRequired = false;
-  //  } else {
-  //    std::cout << "Chunk Write Error" << std::endl;
-  //  }
-  //}
+      fclose(file);
+      _chunkSaveRequired = false;
+    } else {
+      std::cout << "Chunk Write Error" << std::endl;
+    }
+  }
 }
 
 void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {

@@ -242,26 +242,41 @@ void ChunkManager::jobThreadPoolFunction() {
       case Job::LOADRADIUS: {
         int radius = (int)((unsigned short)job->ptr);
         glm::vec<3, int> chunkPos;
-        for (int x = -radius; x <= radius; ++x) {
-          chunkPos.x = x;
-          for (int y = -radius; y <= radius; ++y) {
-            chunkPos.y = y;
-            for (int z = -radius; z <= radius; ++z) {
-              chunkPos.z = z;
-              _chunkMapLock.lock_shared();
-              Chunk* chunk = getChunkPointer(chunkPos + job->pos);
-              _chunkMapLock.unlock_shared();
-              Chunk::Status status = getChunkStatus(chunk);
-              if (status == Chunk::UNLOADED) {
-                _loadQueue.addPosition(chunkPos + job->pos);
-                _loadAndUnloadCondition.notify_one();
-              } else if (status == Chunk::LOADED) {
-                chunk->setUnloadTime(
-                    (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
-              }
-            }
+        int size = 3;
+        int dist = 1;
+        checkAndLoadChunk(job->pos);
+        for (int i = 0; i < radius; ++i) {
+          chunkPos.z = dist;
+          for (int j = 0; j < size * size; ++j) {
+            int offset = (size - 1) / 2;
+            chunkPos.x = (j % size) - offset;
+            chunkPos.y = (j / size) - offset;
+            checkAndLoadChunk(chunkPos + job->pos);
           }
+          ++dist;
+          size += 2;
         }
+
+        // for (int x = -radius; x <= radius; ++x) {
+        //  chunkPos.x = x;
+        //  for (int y = -radius; y <= radius; ++y) {
+        //    chunkPos.y = y;
+        //    for (int z = -radius; z <= radius; ++z) {
+        //      chunkPos.z = z;
+        //      _chunkMapLock.lock_shared();
+        //      Chunk* chunk = getChunkPointer(chunkPos + job->pos);
+        //      _chunkMapLock.unlock_shared();
+        //      Chunk::Status status = getChunkStatus(chunk);
+        //      if (status == Chunk::UNLOADED) {
+        //        _loadQueue.addPosition(chunkPos + job->pos);
+        //        _loadAndUnloadCondition.notify_one();
+        //      } else if (status == Chunk::LOADED) {
+        //        chunk->setUnloadTime(
+        //            (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
+        //      }
+        //    }
+        //  }
+        //}
       } break;
 
       case Job::UPDATEUNLOADING: {
@@ -318,6 +333,19 @@ void ChunkManager::updateChunkCreation() {
     }
 
     _createChunkLock.unlock();
+  }
+}
+
+void ChunkManager::checkAndLoadChunk(glm::vec<3, int> pos) {
+  _chunkMapLock.lock_shared();
+  Chunk* chunk = getChunkPointer(pos);
+  _chunkMapLock.unlock_shared();
+  Chunk::Status status = getChunkStatus(chunk);
+  if (status == Chunk::UNLOADED) {
+    _loadQueue.addPosition(pos);
+    _loadAndUnloadCondition.notify_one();
+  } else if (status == Chunk::LOADED) {
+    chunk->setUnloadTime((unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5);
   }
 }
 

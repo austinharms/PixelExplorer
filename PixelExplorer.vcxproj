@@ -161,6 +161,7 @@
     <ClCompile Include="src\chunk\ChunkGenerator.cpp" />
     <ClCompile Include="src\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\chunk\ChunkPositionQueue.cpp" />
+    <ClCompile Include="src\chunk\TimedChunkPositionQueue.cpp" />
     <ClCompile Include="src\engine\IndexBuffer.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
     <ClCompile Include="src\engine\Mesh.cpp" />
@@ -321,6 +322,7 @@
     <ClInclude Include="src\chunk\ChunkGenerator.h" />
     <ClInclude Include="src\chunk\ChunkManager.h" />
     <ClInclude Include="src\chunk\ChunkPositionQueue.h" />
+    <ClInclude Include="src\chunk\TimedChunkPositionQueue.h" />
     <ClInclude Include="src\engine\IndexBuffer.h" />
     <ClInclude Include="src\engine\Material.h" />
     <ClInclude Include="src\engine\Mesh.h" />

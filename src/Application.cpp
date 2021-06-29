@@ -65,9 +65,9 @@ int main(void) {
     playerChunkPos.z = (int)(player->getPosition().z / Chunk::CHUNK_SIZE);
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
-      chunkManager->loadChunksInRadius(playerChunkPos, 1);
+      chunkManager->loadChunksInRadius(playerChunkPos, 20);
       lastChunkPos = playerChunkPos;
-      nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5;
+      nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 2;
        std::cout << "Chunk Load Update: X:" << playerChunkPos.x
                 << " Y:" << playerChunkPos.y << " Z:" << playerChunkPos.z
                 << std::endl;
