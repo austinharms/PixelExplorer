@@ -213,7 +213,7 @@ void ChunkManager::loadThreadPoolFunction() {
       for (char i = 0; i < 6; ++i) {
         adjChunk = chunk->getAdjacentChunk((Chunk::ChunkFace)i);
         if (adjChunk != nullptr) {
-          adjChunk->setChunkModified(true);
+          adjChunk->markChunkModified();
           addUpdateChunkJob(adjChunk);
         }
       }

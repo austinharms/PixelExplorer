@@ -18,7 +18,7 @@ Chunk::Chunk(glm::vec<3, int> pos)
       _mesh(nullptr),
       _unloadTime(0),
       _chunkModified(false),
-      _chunkSaveRequired(false) {
+      _blocksModified(false) {
   _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
@@ -35,7 +35,7 @@ Chunk::Chunk()
       _mesh(nullptr),
       _unloadTime(0),
       _chunkModified(false),
-      _chunkSaveRequired(false) {
+      _blocksModified(false) {
   _status = Status::LOADING;
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
@@ -56,15 +56,15 @@ void Chunk::setBlocks(Block** blocks) {
   std::lock_guard<std::mutex> lock(_blockLock);
   deleteBlocks();
   _blocks = blocks;
-  setChunkModified(true);
+  _chunkModified = true;
+  _blocksModified = true;
 }
 
 void Chunk::updateMesh() {
   std::lock_guard<std::recursive_mutex> adjLock(_adjacentLock);
   std::lock_guard<std::mutex> blockLock(_blockLock);
   _mesh->lockMeshEditing();
-
-  setChunkModified(false);
+  _chunkModified = false;
 
   unsigned int vertexCount = 0;
   unsigned int indexCount = 0;
@@ -261,10 +261,7 @@ void Chunk::setChunkPosition(glm::vec<3, int> pos) {
       1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
       (float)(pos.x * (int)CHUNK_SIZE), (float)(pos.y * (int)CHUNK_SIZE),
       (float)(pos.z * (int)CHUNK_SIZE), 1.0));
-  //_mesh->setTransform(glm::translate(
-  //    glm::mat4(1.0f), glm::vec3((float)(pos.x * (int)CHUNK_SIZE),
-  //                               pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
-  setChunkModified(true);
+  _chunkModified = true;
 }
 
 void Chunk::setAdjacentChunk(ChunkFace side, Chunk* chunk) {
@@ -275,7 +272,7 @@ void Chunk::setAdjacentChunk(ChunkFace side, Chunk* chunk) {
     if (curChunk != nullptr) curChunk->drop();
     if (chunk != nullptr) chunk->grab();
     _adjacentChunks[(int)side] = chunk;
-    setChunkModified(true);
+    _chunkModified = true;
   }
 }
 
@@ -286,12 +283,13 @@ void Chunk::dropAdjacentChunks() {
       adjChunk->setAdjacentChunk((ChunkFace)(((int)i + 3) % 6), nullptr);
     setAdjacentChunk((ChunkFace)i, nullptr);
   }
-  setChunkModified(true);
+  _chunkModified = true;
 }
 
 void Chunk::saveChunk(const char* path) {
    std::lock_guard<std::mutex> lock(_blockLock);
-   if (_chunkSaveRequired) {
+   if (_blocksModified) {
+     _blocksModified = false;
     FILE* file = nullptr;
     if (fopen_s(&file, path, "wb") == 0 && file != 0) {
       fwrite(&CHUNK_VERSION, 2, 1, file);
@@ -308,7 +306,6 @@ void Chunk::saveChunk(const char* path) {
       }
 
       fclose(file);
-      _chunkSaveRequired = false;
     } else {
       std::cout << "Chunk Write Error" << std::endl;
     }
@@ -338,10 +335,10 @@ void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
     }
 
     fclose(file);
-    _chunkSaveRequired = false;
+    _blocksModified = false;
   } else {
     gen->genChunkBlocks(_position, _blocks);
-    _chunkSaveRequired = true;
+    _blocksModified = true;
   }
 }
 

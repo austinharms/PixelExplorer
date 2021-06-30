@@ -1,9 +1,10 @@
 #pragma once
+#include <atomic>
 #include <glm/vec3.hpp>
 #include <mutex>
 
-#include "BlockBase.h"
 #include "Block.h"
+#include "BlockBase.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "RefCounted.h"
@@ -11,17 +12,17 @@
 
 class Chunk : public virtual RefCounted {
  public:
-  const static unsigned short CHUNK_VERSION = 0;
-  const static unsigned int CHUNK_SIZE = 25;
-  const static unsigned int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
-  const static unsigned int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
+  const static short CHUNK_VERSION = 0;
+  const static int CHUNK_SIZE = 25;
+  const static int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
+  const static int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
   enum Status {
     UNLOADED = -1,
     UNLOADING = 0,
     LOADING = 1,
     LOADED = 2,
   };
-  
+
   enum ChunkFace {
     FRONT = 0,
     TOP = 1,
@@ -77,21 +78,16 @@ class Chunk : public virtual RefCounted {
     if (_blockMaterial != nullptr) _blockMaterial->grab();
   }
 
-  bool getChunkModified() {
-    std::lock_guard<std::mutex> lock(_modifiedLock);
-    return _chunkModified;
-  }
-
-  void setChunkModified(bool modified) {
-    std::lock_guard<std::mutex> lock(_modifiedLock);
-    _chunkModified = modified;
-    if (modified == true) _chunkSaveRequired = true;
-  }
-
   Block* getBlockUnsafe(unsigned int index) {
     if (_blocks != nullptr) return _blocks[index];
     return nullptr;
   }
+
+  void markChunkModified() { _chunkModified = true; }
+  void markBlocksModified() { _blocksModified = true; }
+
+  bool getChunkModified() const { return _chunkModified; }
+  bool getBlocksModified() const { return _blocksModified; }
 
  private:
   static Material* _blockMaterial;
@@ -103,10 +99,9 @@ class Chunk : public virtual RefCounted {
   std::recursive_mutex _adjacentLock;
   glm::vec<3, int> _position;
   Status _status;
-  bool _chunkModified;
-  bool _chunkSaveRequired;
+  std::atomic<bool> _chunkModified;
+  std::atomic<bool> _blocksModified;
   unsigned long long int _unloadTime;
-  std::mutex _modifiedLock;
   Chunk* _adjacentChunks[6] = {nullptr, nullptr, nullptr,
                                nullptr, nullptr, nullptr};
   bool drawBlockFace(Block* block, BlockBase::Face face);

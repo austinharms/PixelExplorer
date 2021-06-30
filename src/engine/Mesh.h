@@ -15,7 +15,7 @@ class Mesh : public virtual RefCounted {
   Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount);
   virtual ~Mesh();
   void bind();
-  void unbind() const;
+  void unbind();
   glm::mat4 getTransform() const { return _transform; }
   void setIndexCount(unsigned int count);
   unsigned int getIndexCount() const { return _currentIndexCount; }
@@ -35,6 +35,7 @@ class Mesh : public virtual RefCounted {
   void setRawAttribVec3(unsigned short attribOffset, unsigned int index,
                         float x, float y, float z);
   void updateBuffers();
+  void unbindLock();
   virtual void updateTransfrom(float dt){};
 
   VertexBuffer* getVertexBuffer() const { return _vertexBuffer; }
@@ -66,8 +67,6 @@ class Mesh : public virtual RefCounted {
   unsigned short getAttribOffset(unsigned short attribIndex) {
     return _vertexArray->getBufferAttribComponentOffset(0, attribIndex);
   }
-
-  void unbindLock() { _meshBindLock.unlock(); }
 
   bool getMeshVisible() const { return _meshVisible && !_meshEmpty; }
 

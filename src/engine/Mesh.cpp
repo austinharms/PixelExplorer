@@ -89,9 +89,10 @@ void Mesh::bind() {
   _indexBuffer->bind();
 }
 
-void Mesh::unbind() const {
+void Mesh::unbind() {
   _vertexArray->unbind();
   _indexBuffer->unbind();
+  unbindLock();
 }
 
 void Mesh::setIndexCount(unsigned int count) {
@@ -163,6 +164,18 @@ void Mesh::updateBuffers() {
       sizeof(float), _currentVertexCount * _attribStride, _currentVertices);
   _indexBuffer->updateIndices(sizeof(unsigned int), _currentIndexCount,
                               _currentIndices);
+  _meshBindLock.unlock();
+}
+
+void Mesh::unbindLock() {
+  if (_currentIndices != nullptr) {
+    delete[] _currentIndices;
+    _currentIndices = nullptr;
+  }
+  if (_currentVertices != nullptr) {
+    delete[] _currentVertices;
+    _currentVertices = nullptr;
+  }
   _meshBindLock.unlock();
 }
 

@@ -6,7 +6,7 @@
 
 Player::Player(Renderer* renderer)
     : _renderer(renderer),
-      _position(0.0f, 0.0f, 50.0f),
+      _position(0.0f),
       _viewMatrix(1.0f) {
   _renderer->grab();
 }

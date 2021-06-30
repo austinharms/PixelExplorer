@@ -19,6 +19,7 @@
 #include "chunk/ChunkManager.h"
 #include "glm/glm.hpp"
 #include "chunk/generator/PerlinChunkGenerator.h"
+#include "chunk/generator/FlatChunkGenerator.h"
 #include "chunk/generator/ChunkGenerator.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -53,7 +54,8 @@ int main(void) {
   BlockBase::loadBlocks("./res/blocks.dat");
   BlockBase::setDefaultBlock(BlockBase::getBlock(0));
 
-  PerlinChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
+  //ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
+  ChunkGenerator* chunkGen = new FlatChunkGenerator(1, 0);
   ChunkManager* chunkManager =
       new ChunkManager("./world/D0/", renderer, chunkGen, 6, 12, -1);
   chunkGen->drop();
