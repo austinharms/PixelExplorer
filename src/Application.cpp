@@ -67,7 +67,7 @@ int main(void) {
         ChunkManager::vec3ToChunkSpace(player->getPosition());
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
-      chunkManager->loadChunksInRadius(playerChunkPos, 20);
+      chunkManager->loadChunksInRadius(playerChunkPos, 6);
       lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 2;
        std::cout << "Chunk Load Update: X:" << playerChunkPos.x

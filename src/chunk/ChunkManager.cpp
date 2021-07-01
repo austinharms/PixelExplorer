@@ -244,13 +244,34 @@ void ChunkManager::jobThreadPoolFunction() {
         glm::vec<3, int> chunkPos;
         int size = 3;
         int dist = 1;
+        int offset;
         checkAndLoadChunk(job->pos);
         for (int i = 0; i < radius; ++i) {
-          chunkPos.z = dist;
           for (int j = 0; j < size * size; ++j) {
-            int offset = (size - 1) / 2;
+            offset = (size - 1) / 2;
+            chunkPos.z = dist;
             chunkPos.x = (j % size) - offset;
             chunkPos.y = (j / size) - offset;
+            checkAndLoadChunk(chunkPos + job->pos);
+            chunkPos.z = -dist;
+            chunkPos.x = (j % size) - offset;
+            chunkPos.y = (j / size) - offset;
+            checkAndLoadChunk(chunkPos + job->pos);
+            chunkPos.z = (j % size) - offset;
+            chunkPos.x = -dist;
+            chunkPos.y = (j / size) - offset;
+            checkAndLoadChunk(chunkPos + job->pos);
+            chunkPos.z = (j % size) - offset;
+            chunkPos.x = dist;
+            chunkPos.y = (j / size) - offset;
+            checkAndLoadChunk(chunkPos + job->pos);
+            chunkPos.z = (j % size) - offset;
+            chunkPos.x = (j / size) - offset;
+            chunkPos.y = dist;
+            checkAndLoadChunk(chunkPos + job->pos);
+            chunkPos.z = (j % size) - offset;
+            chunkPos.x = (j / size) - offset;
+            chunkPos.y = -dist;
             checkAndLoadChunk(chunkPos + job->pos);
           }
           ++dist;
