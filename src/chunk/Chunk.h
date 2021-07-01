@@ -3,8 +3,9 @@
 #include <glm/vec3.hpp>
 #include <mutex>
 
-#include "Block.h"
-#include "BlockBase.h"
+#include "block/Block.h"
+#include "block/BlockBase.h"
+#include "block/Blocks.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "RefCounted.h"
@@ -41,7 +42,7 @@ class Chunk : public virtual RefCounted {
   void dropAdjacentChunks();
   void saveChunk(const char* path);
   void loadChunk(const char* path, ChunkGenerator* gen);
-  void setBlocks(Block** blocks);
+  void setBlocks(Block* blocks);
 
   glm::vec<3, int> getPosition() const { return _position; }
 
@@ -79,8 +80,7 @@ class Chunk : public virtual RefCounted {
   }
 
   Block* getBlockUnsafe(unsigned int index) {
-    if (_blocks != nullptr) return _blocks[index];
-    return nullptr;
+    return &(_blocks[index]);
   }
 
   void markChunkModified() { _chunkModified = true; }
@@ -92,7 +92,7 @@ class Chunk : public virtual RefCounted {
  private:
   static Material* _blockMaterial;
   Mesh* _mesh;
-  Block** _blocks;
+  Block* _blocks;
   std::mutex _blockLock;
   std::mutex _statusLock;
   std::mutex _unloadDelayLock;

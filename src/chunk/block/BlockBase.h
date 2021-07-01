@@ -32,21 +32,12 @@ class BlockBase : public virtual RefCounted {
     bool fullFace;
   };
 
-  BlockBase(uint32_t id, bool transparent, BlockFace* blockFaces);
-  virtual ~BlockBase();
-  uint32_t getID() const { return _id; }
-  static void loadBlocks(const char* blockDataPath);
-  static BlockBase* getBlock(uint32_t id);
-  static bool addBlock(BlockBase* block);
-  static void saveBlocks(const char* blockDataPath);
-  static void dropBlocks();
+  BlockBase(uint32_t id, bool transparent, BlockFace* blockFaces)
+      : _id(id), _transparent(transparent), _faces(blockFaces) {}
 
-  static void setDefaultBlock(BlockBase* block) {
-    std::lock_guard<std::recursive_mutex> lock(s_blockMapLock);
-    if (s_defaultBlock != nullptr) s_defaultBlock->drop();
-    block->grab();
-    s_defaultBlock = block;
-  }
+  virtual ~BlockBase() { delete[] _faces; }
+
+  uint32_t getID() const { return _id; }
 
   BlockFace* getBlockFace(Face f) const { return &_faces[(int)f]; }
 
@@ -55,10 +46,7 @@ class BlockBase : public virtual RefCounted {
   bool getTransparent() const { return _transparent; }
 
  private:
-  static std::recursive_mutex s_blockMapLock;
-  static std::unordered_map<uint32_t, BlockBase*>* s_blocks;
-  static BlockBase* s_defaultBlock;
   BlockFace* _faces;
-  uint32_t _id;
+  int32_t _id;
   bool _transparent;
 };

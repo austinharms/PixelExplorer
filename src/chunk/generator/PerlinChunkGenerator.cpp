@@ -23,8 +23,8 @@ PerlinChunkGenerator::PerlinChunkGenerator(int seed)
 
 PerlinChunkGenerator::~PerlinChunkGenerator() {}
 
-Block** PerlinChunkGenerator::genChunkBlocks(glm::vec<3, int> pos,
-                                             Block** blocks) {
+Block* PerlinChunkGenerator::genChunkBlocks(glm::vec<3, int> pos,
+                                             Block* blocks) {
   for (int i = 0; i < Chunk::LAYER_SIZE; ++i) {
     float x = (i % Chunk::CHUNK_SIZE) + (pos.x * Chunk::CHUNK_SIZE);
     float z = ((i / Chunk::CHUNK_SIZE) % Chunk::CHUNK_SIZE) +
@@ -35,22 +35,16 @@ Block** PerlinChunkGenerator::genChunkBlocks(glm::vec<3, int> pos,
     for (int j = 0; j < Chunk::CHUNK_SIZE; ++j) {
       int y = (pos.y * Chunk::CHUNK_SIZE) + j;
       if (y > pillarHeight + padHeight) {
-        blocks[j * Chunk::LAYER_SIZE + i] = nullptr;
+        blocks[j * Chunk::LAYER_SIZE + i] = Block(0);
       } else if (y == pillarHeight + padHeight) {
-        blocks[j * Chunk::LAYER_SIZE + i] = new Block(_topPaddingBlockId);
+        blocks[j * Chunk::LAYER_SIZE + i] = Block(_topPaddingBlockId);
       } else if (y > pillarHeight) {
-        blocks[j * Chunk::LAYER_SIZE + i] = new Block(_paddingBlockId);
+        blocks[j * Chunk::LAYER_SIZE + i] = Block(_paddingBlockId);
       } else {
-        blocks[j * Chunk::LAYER_SIZE + i] = new Block(_defaultBlockId);
+        blocks[j * Chunk::LAYER_SIZE + i] = Block(_defaultBlockId);
       }
     }
   }
-  // for (int i = 0; i < Chunk::BLOCK_COUNT; ++i) {
-  //  if (i % 2) {
-  //    blocks[i] = new Block(_defaultBlockId);
-  //  } else {
-  //    blocks[i] = nullptr;
-  //  }
-  //}
+
   return blocks;
 }

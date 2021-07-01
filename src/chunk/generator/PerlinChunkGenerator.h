@@ -2,7 +2,7 @@
 #include <cstdint>
 
 #include "ChunkGenerator.h"
-#include "../Block.h"
+#include "../block/Block.h"
 #include "FastNoiseLite.h"
 #include "RefCounted.h"
 #include "glm/vec3.hpp"
@@ -11,7 +11,7 @@ class PerlinChunkGenerator : public ChunkGenerator {
  public:
   PerlinChunkGenerator(int seed);
   ~PerlinChunkGenerator();
-  Block** genChunkBlocks(glm::vec<3, int> pos, Block** blocks);
+  Block* genChunkBlocks(glm::vec<3, int> pos, Block* blocks);
 
  private:
   FastNoiseLite _baseNoise;

@@ -52,7 +52,7 @@ Chunk::~Chunk() {
   _mesh->drop();
 }
 
-void Chunk::setBlocks(Block** blocks) {
+void Chunk::setBlocks(Block* blocks) {
   std::lock_guard<std::mutex> lock(_blockLock);
   deleteBlocks();
   _blocks = blocks;
@@ -90,15 +90,16 @@ void Chunk::updateMesh() {
       float x = (int)(i % CHUNK_SIZE);
       float y = (int)(i / LAYER_SIZE);
       float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
-      if (_blocks[i] == nullptr) continue;
+      if (_blocks[i] == 0) continue;
+      BlockBase* block = Blocks::getBlock((int32_t)_blocks[i]);
       if (z == 0) {
         if (!hasFrontChunk ||
             drawBlockFace(getAdjacentChunk(FRONT)->getBlockUnsafe(
                               i + LAYER_SIZE - CHUNK_SIZE),
                           BlockBase::FRONT))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT));
-      } else if (drawBlockFace(_blocks[i - CHUNK_SIZE], BlockBase::FRONT)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT));
+          addBlockFace(block->getBlockFace(BlockBase::FRONT));
+      } else if (drawBlockFace(&_blocks[i - CHUNK_SIZE], BlockBase::FRONT)) {
+        addBlockFace(block->getBlockFace(BlockBase::FRONT));
       }
 
       if (z == CHUNK_SIZE - 1) {
@@ -106,9 +107,9 @@ void Chunk::updateMesh() {
             drawBlockFace(getAdjacentChunk(BACK)->getBlockUnsafe(
                               i - LAYER_SIZE + CHUNK_SIZE),
                           BlockBase::BACK))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK));
-      } else if (drawBlockFace(_blocks[i + CHUNK_SIZE], BlockBase::BACK)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK));
+          addBlockFace(block->getBlockFace(BlockBase::BACK));
+      } else if (drawBlockFace(&_blocks[i + CHUNK_SIZE], BlockBase::BACK)) {
+        addBlockFace(block->getBlockFace(BlockBase::BACK));
       }
 
       if (x == 0) {
@@ -116,9 +117,9 @@ void Chunk::updateMesh() {
             drawBlockFace(
                 getAdjacentChunk(LEFT)->getBlockUnsafe(i + CHUNK_SIZE - 1),
                 BlockBase::LEFT))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT));
-      } else if (drawBlockFace(_blocks[i - 1], BlockBase::LEFT)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT));
+          addBlockFace(block->getBlockFace(BlockBase::LEFT));
+      } else if (drawBlockFace(&_blocks[i - 1], BlockBase::LEFT)) {
+        addBlockFace(block->getBlockFace(BlockBase::LEFT));
       }
 
       if (x == CHUNK_SIZE - 1) {
@@ -126,9 +127,9 @@ void Chunk::updateMesh() {
             drawBlockFace(
                 getAdjacentChunk(RIGHT)->getBlockUnsafe(i - CHUNK_SIZE + 1),
                 BlockBase::RIGHT))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT));
-      } else if (drawBlockFace(_blocks[i + 1], BlockBase::RIGHT)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT));
+          addBlockFace(block->getBlockFace(BlockBase::RIGHT));
+      } else if (drawBlockFace(&_blocks[i + 1], BlockBase::RIGHT)) {
+        addBlockFace(block->getBlockFace(BlockBase::RIGHT));
       }
 
       if (y == 0) {
@@ -136,18 +137,18 @@ void Chunk::updateMesh() {
             drawBlockFace(getAdjacentChunk(BOTTOM)->getBlockUnsafe(
                               i + BLOCK_COUNT - LAYER_SIZE),
                           BlockBase::BOTTOM))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM));
-      } else if (drawBlockFace(_blocks[i - LAYER_SIZE], BlockBase::BOTTOM)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM));
+          addBlockFace(block->getBlockFace(BlockBase::BOTTOM));
+      } else if (drawBlockFace(&_blocks[i - LAYER_SIZE], BlockBase::BOTTOM)) {
+        addBlockFace(block->getBlockFace(BlockBase::BOTTOM));
       }
 
       if (y == CHUNK_SIZE - 1) {
         if (!hasTopChunk || drawBlockFace(getAdjacentChunk(TOP)->getBlockUnsafe(
                                               i - BLOCK_COUNT + LAYER_SIZE),
                                           BlockBase::TOP))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP));
-      } else if (drawBlockFace(_blocks[i + LAYER_SIZE], BlockBase::TOP)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP));
+          addBlockFace(block->getBlockFace(BlockBase::TOP));
+      } else if (drawBlockFace(&_blocks[i + LAYER_SIZE], BlockBase::TOP)) {
+        addBlockFace(block->getBlockFace(BlockBase::TOP));
       }
     }
   }
@@ -170,12 +171,6 @@ void Chunk::updateMesh() {
         _mesh->setRawAttribVec2(uvOffset, vertexCount + v, face->uvs[v * 2],
                                 face->uvs[v * 2 + 1]);
         _mesh->setRawAttribVec2(repeatOffset, vertexCount + v, 1, 1);
-        //_mesh->setVertexPosition(vertexCount + v, face->vertices[v * 3] + x,
-        //                         face->vertices[v * 3 + 1] + y,
-        //                         face->vertices[v * 3 + 2] - z);
-        //_mesh->setVertexUV(vertexCount + v, face->uvs[v * 2],
-        //                   face->uvs[v * 2 + 1]);
-        //_mesh->setAttribVec2(2, vertexCount + v, 1, 1);
       }
 
       for (unsigned char in = 0; in < face->indexCount; ++in) {
@@ -189,15 +184,16 @@ void Chunk::updateMesh() {
       float x = (int)(i % CHUNK_SIZE);
       float y = (int)(i / LAYER_SIZE);
       float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
-      if (_blocks[i] == nullptr) continue;
+      if (_blocks[i] == 0) continue;
+      BlockBase* block = Blocks::getBlock((int32_t)_blocks[i]);
       if (z == 0) {
         if (!hasFrontChunk ||
             drawBlockFace(getAdjacentChunk(FRONT)->getBlockUnsafe(
                               i + LAYER_SIZE - CHUNK_SIZE),
                           BlockBase::FRONT))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT), x, y, z);
-      } else if (drawBlockFace(_blocks[i - CHUNK_SIZE], BlockBase::FRONT)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::FRONT), x, y, z);
+          addBlockFace(block->getBlockFace(BlockBase::FRONT), x, y, z);
+      } else if (drawBlockFace(&_blocks[i - CHUNK_SIZE], BlockBase::FRONT)) {
+        addBlockFace(block->getBlockFace(BlockBase::FRONT), x, y, z);
       }
 
       if (z == CHUNK_SIZE - 1) {
@@ -205,9 +201,9 @@ void Chunk::updateMesh() {
             drawBlockFace(getAdjacentChunk(BACK)->getBlockUnsafe(
                               i - LAYER_SIZE + CHUNK_SIZE),
                           BlockBase::BACK))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK), x, y, z);
-      } else if (drawBlockFace(_blocks[i + CHUNK_SIZE], BlockBase::BACK)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BACK), x, y, z);
+          addBlockFace(block->getBlockFace(BlockBase::BACK), x, y, z);
+      } else if (drawBlockFace(&_blocks[i + CHUNK_SIZE], BlockBase::BACK)) {
+        addBlockFace(block->getBlockFace(BlockBase::BACK), x, y, z);
       }
 
       if (x == 0) {
@@ -215,9 +211,9 @@ void Chunk::updateMesh() {
             drawBlockFace(
                 getAdjacentChunk(LEFT)->getBlockUnsafe(i + CHUNK_SIZE - 1),
                 BlockBase::LEFT))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT), x, y, z);
-      } else if (drawBlockFace(_blocks[i - 1], BlockBase::LEFT)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::LEFT), x, y, z);
+          addBlockFace(block->getBlockFace(BlockBase::LEFT), x, y, z);
+      } else if (drawBlockFace(&_blocks[i - 1], BlockBase::LEFT)) {
+        addBlockFace(block->getBlockFace(BlockBase::LEFT), x, y, z);
       }
 
       if (x == CHUNK_SIZE - 1) {
@@ -225,9 +221,9 @@ void Chunk::updateMesh() {
             drawBlockFace(
                 getAdjacentChunk(RIGHT)->getBlockUnsafe(i - CHUNK_SIZE + 1),
                 BlockBase::RIGHT))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT), x, y, z);
-      } else if (drawBlockFace(_blocks[i + 1], BlockBase::RIGHT)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::RIGHT), x, y, z);
+          addBlockFace(block->getBlockFace(BlockBase::RIGHT), x, y, z);
+      } else if (drawBlockFace(&_blocks[i + 1], BlockBase::RIGHT)) {
+        addBlockFace(block->getBlockFace(BlockBase::RIGHT), x, y, z);
       }
 
       if (y == 0) {
@@ -235,18 +231,18 @@ void Chunk::updateMesh() {
             drawBlockFace(getAdjacentChunk(BOTTOM)->getBlockUnsafe(
                               i + BLOCK_COUNT - LAYER_SIZE),
                           BlockBase::BOTTOM))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM), x, y, z);
-      } else if (drawBlockFace(_blocks[i - LAYER_SIZE], BlockBase::BOTTOM)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::BOTTOM), x, y, z);
+          addBlockFace(block->getBlockFace(BlockBase::BOTTOM), x, y, z);
+      } else if (drawBlockFace(&_blocks[i - LAYER_SIZE], BlockBase::BOTTOM)) {
+        addBlockFace(block->getBlockFace(BlockBase::BOTTOM), x, y, z);
       }
 
       if (y == CHUNK_SIZE - 1) {
         if (!hasTopChunk || drawBlockFace(getAdjacentChunk(TOP)->getBlockUnsafe(
                                               i - BLOCK_COUNT + LAYER_SIZE),
                                           BlockBase::TOP))
-          addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP), x, y, z);
-      } else if (drawBlockFace(_blocks[i + LAYER_SIZE], BlockBase::TOP)) {
-        addBlockFace(_blocks[i]->getBlockFace(BlockBase::TOP), x, y, z);
+          addBlockFace(block->getBlockFace(BlockBase::TOP), x, y, z);
+      } else if (drawBlockFace(&_blocks[i + LAYER_SIZE], BlockBase::TOP)) {
+        addBlockFace(block->getBlockFace(BlockBase::TOP), x, y, z);
       }
     }
   }
@@ -287,22 +283,16 @@ void Chunk::dropAdjacentChunks() {
 }
 
 void Chunk::saveChunk(const char* path) {
-   std::lock_guard<std::mutex> lock(_blockLock);
-   if (_blocksModified) {
-     _blocksModified = false;
+  std::lock_guard<std::mutex> lock(_blockLock);
+  if (_blocksModified) {
+    _blocksModified = false;
     FILE* file = nullptr;
     if (fopen_s(&file, path, "wb") == 0 && file != 0) {
       fwrite(&CHUNK_VERSION, 2, 1, file);
-      // uint32_t byteSize = BLOCK_COUNT * 4;  // 4 is the byte size of a block id
-      //fwrite(&byteSize, 4, 1, file);
-      uint32_t unsetValue = 0xffffffff;
+      uint32_t id;
       for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-        if (_blocks[i] != nullptr) {
-          uint32_t id = _blocks[i]->getID();
-          fwrite(&id, 4, 1, file);
-        } else {
-          fwrite(&unsetValue, 4, 1, file);
-        }
+        id = _blocks[i].getRawValue();
+        fwrite(&id, 4, 1, file);
       }
 
       fclose(file);
@@ -315,7 +305,7 @@ void Chunk::saveChunk(const char* path) {
 void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
   std::lock_guard<std::mutex> lock(_blockLock);
   deleteBlocks();
-  _blocks = (Block**)malloc(sizeof(Block*) * BLOCK_COUNT);
+  _blocks = new Block[BLOCK_COUNT];
   if (_blocks == nullptr) return;
   FILE* file = nullptr;
   if (fopen_s(&file, path, "rb") == 0 && file != 0) {
@@ -323,14 +313,11 @@ void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
     fread(&fileVersion, 2, 1, file);
     // add check for file version vs current version
 
-    uint32_t unsetValue = 0xffffffff;
     uint32_t id;
     for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
       fread(&id, 4, 1, file);
-      if (id == unsetValue) {
-        _blocks[i] = nullptr;
-      } else {
-        _blocks[i] = new Block(id);
+      if (id != 0) {
+        _blocks[i] = Block(id);
       }
     }
 
@@ -343,18 +330,13 @@ void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
 }
 
 bool Chunk::drawBlockFace(Block* block, BlockBase::Face face) {
-  if (block == nullptr) return true;
-  return !block->getFullBlockFace(face);
+  if (block == 0) return true;
+  return !Blocks::getBlock((int)block)->getFullBlockFace(face);
 }
 
 void Chunk::deleteBlocks() {
   if (_blocks != nullptr) {
-    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-      if (_blocks[i] != nullptr) delete _blocks[i];
-    }
-
-    free(_blocks);
+    delete[] _blocks;
+    _blocks = nullptr;
   }
-
-  _blocks = nullptr;
 }

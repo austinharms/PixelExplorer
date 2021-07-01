@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <condition_variable>
 #include <glm/vec3.hpp>
 #include <iostream>
@@ -9,14 +10,13 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <atomic>
 
 #include "Chunk.h"
-#include "generator/ChunkGenerator.h"
 #include "ChunkPositionQueue.h"
-#include "TimedChunkPositionQueue.h"
 #include "RefCounted.h"
 #include "Renderer.h"
+#include "TimedChunkPositionQueue.h"
+#include "generator/ChunkGenerator.h"
 
 class ChunkManager : public virtual RefCounted {
  public:
@@ -28,6 +28,11 @@ class ChunkManager : public virtual RefCounted {
   void saveAllChunks();
   void unloadAllChunks();
   void update();  // MUST be ran on main thread with openGL context
+  static glm::vec<3, int> vec3ToChunkSpace(glm::vec3 pos) {
+    return glm::vec<3, int>(pos.x / Chunk::CHUNK_SIZE,
+                            pos.y / Chunk::CHUNK_SIZE,
+                            pos.z / Chunk::CHUNK_SIZE);
+  }
 
  private:
   Renderer* _renderer;
@@ -95,9 +100,7 @@ class ChunkManager : public virtual RefCounted {
   void updateChunkCreation();
   void checkAndLoadChunk(glm::vec<3, int> pos);
 
-  void requestChunkCreation() {
-    ++_chunkCreationRequestCount;
-  }
+  void requestChunkCreation() { ++_chunkCreationRequestCount; }
 
   Chunk* getCreatedChunk() {
     std::lock_guard<std::mutex> lock(_createChunkLock);

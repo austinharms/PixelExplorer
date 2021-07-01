@@ -156,7 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\chunk\BlockBase.cpp" />
+    <ClCompile Include="src\chunk\block\Blocks.cpp" />
     <ClCompile Include="src\chunk\Chunk.cpp" />
     <ClCompile Include="src\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\chunk\ChunkPositionQueue.cpp" />
@@ -317,8 +317,9 @@
     <None Include="src\engine\vendor\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\chunk\Block.h" />
-    <ClInclude Include="src\chunk\BlockBase.h" />
+    <ClInclude Include="src\chunk\block\Block.h" />
+    <ClInclude Include="src\chunk\block\BlockBase.h" />
+    <ClInclude Include="src\chunk\block\Blocks.h" />
     <ClInclude Include="src\chunk\Chunk.h" />
     <ClInclude Include="src\chunk\generator\ChunkGenerator.h" />
     <ClInclude Include="src\chunk\ChunkManager.h" />

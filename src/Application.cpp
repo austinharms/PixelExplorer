@@ -14,9 +14,9 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "chunk/BlockBase.h"
-#include "chunk/Chunk.h"
+#include "chunk/block/Blocks.h"
 #include "chunk/ChunkManager.h"
+#include "chunk/Chunk.h"
 #include "glm/glm.hpp"
 #include "chunk/generator/PerlinChunkGenerator.h"
 #include "chunk/generator/FlatChunkGenerator.h"
@@ -51,25 +51,23 @@ int main(void) {
     blockMaterial->drop();
   }
 
-  BlockBase::loadBlocks("./res/blocks.dat");
-  BlockBase::setDefaultBlock(BlockBase::getBlock(0));
+  Blocks::loadBlocks("./res/blocks.dat");
+  Blocks::setDefaultBlock(Blocks::getBlock(1));
 
   //ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
-  ChunkGenerator* chunkGen = new FlatChunkGenerator(1, 0);
+  ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
   ChunkManager* chunkManager =
       new ChunkManager("./world/D0/", renderer, chunkGen, 6, 12, -1);
   chunkGen->drop();
 
   unsigned long long int nextUpdateTime = 0;
-  glm::vec<3, int> lastChunkPos(0.0f);
+  glm::vec<3, int> lastChunkPos(0);
   while (renderer->windowOpen()) {
-    glm::vec<3, int> playerChunkPos(0.0f);
-    playerChunkPos.x = (int)(player->getPosition().x / Chunk::CHUNK_SIZE);
-    playerChunkPos.y = (int)(player->getPosition().y / Chunk::CHUNK_SIZE);
-    playerChunkPos.z = (int)(player->getPosition().z / Chunk::CHUNK_SIZE);
+    glm::vec<3, int> playerChunkPos =
+        ChunkManager::vec3ToChunkSpace(player->getPosition());
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
-      chunkManager->loadChunksInRadius(playerChunkPos, 20);
+      chunkManager->loadChunksInRadius(playerChunkPos, 2);
       lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 2;
        std::cout << "Chunk Load Update: X:" << playerChunkPos.x
@@ -86,7 +84,7 @@ int main(void) {
   player->drop();
   renderer->drop();
   Chunk::setBlockMaterial(nullptr);
-  BlockBase::dropBlocks();
+  Blocks::dropBlocks();
   _CrtDumpMemoryLeaks();
   return 0;
 }

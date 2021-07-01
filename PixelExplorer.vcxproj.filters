@@ -51,9 +51,6 @@
     <ClCompile Include="src\chunk\Chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\BlockBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -70,6 +67,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\chunk\generator\FlatChunkGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chunk\block\Blocks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1372,7 +1372,7 @@
     <ClInclude Include="src\chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\BlockBase.h">
+    <ClInclude Include="src\chunk\block\BlockBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Player.h">
@@ -1384,7 +1384,7 @@
     <ClInclude Include="src\chunk\ChunkPositionQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\Block.h">
+    <ClInclude Include="src\chunk\block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\vendor\FastNoiseLite.h">
@@ -1400,6 +1400,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\generator\FlatChunkGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chunk\block\Blocks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
