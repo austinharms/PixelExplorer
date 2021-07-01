@@ -330,7 +330,7 @@ void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
 }
 
 bool Chunk::drawBlockFace(Block* block, BlockBase::Face face) {
-  if (block == 0) return true;
+  if (*block == 0) return true;
   return !Blocks::getBlock((int)block)->getFullBlockFace(face);
 }
 
