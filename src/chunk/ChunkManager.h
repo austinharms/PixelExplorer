@@ -37,7 +37,7 @@ class ChunkManager : public virtual RefCounted {
  private:
   Renderer* _renderer;
   ChunkGenerator* _generator;
-  std::string _savePath;
+  const char* _savePath;
   unsigned long long int _lastUnloadUpdate;
 
   // Threading
@@ -117,9 +117,4 @@ class ChunkManager : public virtual RefCounted {
   Chunk* getChunk(glm::vec<3, int> pos);
   Chunk::Status getChunkStatus(glm::vec<3, int> pos);
   Chunk::Status getChunkStatus(Chunk* chunk);
-
-  std::string posToString(glm::vec<3, int> pos) {
-    return std::to_string(pos.x) + "-" + std::to_string(pos.y) + "-" +
-           std::to_string(pos.z);
-  }
 };

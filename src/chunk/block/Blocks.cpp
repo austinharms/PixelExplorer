@@ -96,7 +96,7 @@ int32_t Blocks::addBlock(BlockBase* block) {
 }
 
 BlockBase* Blocks::getBlock(int32_t id) {
-  std::lock_guard<std::recursive_mutex> lock(Blocks::s_blocksLock);
+  //std::lock_guard<std::recursive_mutex> lock(Blocks::s_blocksLock);
   if (s_blocksArray != nullptr && id < s_blocksArray->size()) {
     BlockBase* block = (*s_blocksArray)[id];
     if (block != nullptr) return block;

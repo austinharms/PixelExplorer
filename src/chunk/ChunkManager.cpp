@@ -113,10 +113,10 @@ void ChunkManager::loadThreadPoolFunction() {
       _chunkMapLock.unlock_shared();
       chunk->setStatus(Chunk::UNLOADING);
       _chunkMapLock.lock();
-      _chunkMap.erase(posToString(pos));
+      _chunkMap.erase(Chunk::posToString(pos));
       _chunkMapLock.unlock();
       chunk->dropAdjacentChunks();
-      chunk->saveChunk((_savePath + posToString(pos)).c_str());
+      chunk->saveChunk(_savePath);
       if (!chunk->drop()) chunk->setStatus(Chunk::UNLOADED);
       _unloadQueue.removePosition(pos);
     } else if (!_loadQueue.isQueueEmpty()) {
@@ -138,10 +138,10 @@ void ChunkManager::loadThreadPoolFunction() {
 
       {
         std::lock_guard<std::shared_mutex> locker(_chunkMapLock);
-        _chunkMap.insert({posToString(pos), chunk});
+        _chunkMap.insert({Chunk::posToString(pos), chunk});
       }
 
-      chunk->loadChunk((_savePath + posToString(pos)).c_str(), _generator);
+      chunk->loadChunk(_savePath, _generator);
       Chunk* adjChunk = nullptr;
       if (chunk->getAdjacentChunk(Chunk::FRONT) == nullptr) {
         _chunkMapLock.lock_shared();
@@ -366,13 +366,14 @@ void ChunkManager::checkAndLoadChunk(glm::vec<3, int> pos) {
     _loadQueue.addPosition(pos);
     _loadAndUnloadCondition.notify_one();
   } else if (status == Chunk::LOADED) {
-    chunk->setUnloadTime((unsigned long long int)(clock() / CLOCKS_PER_SEC) + 5);
+    chunk->setUnloadTime((unsigned long long int)(clock() / CLOCKS_PER_SEC) +
+                         5);
   }
 }
 
 // Chunk Helpers
 Chunk* ChunkManager::getChunkPointer(glm::vec<3, int> pos) {
-  auto chunk = _chunkMap.find(posToString(pos));
+  auto chunk = _chunkMap.find(Chunk::posToString(pos));
   if (chunk != _chunkMap.end()) return chunk->second;
   return nullptr;
 }
@@ -412,8 +413,7 @@ void ChunkManager::unloadAllChunks() {
     // if (chunkPair.second != _chunkPlaceholderPointer)
     // chunkPair.second->drop();
     chunkPair.second->dropAdjacentChunks();
-    chunkPair.second->saveChunk(
-        (_savePath + posToString(chunkPair.second->getPosition())).c_str());
+    chunkPair.second->saveChunk(_savePath);
     chunkPair.second->drop();
   }
 

@@ -18,7 +18,7 @@ class PerlinChunkGenerator : public ChunkGenerator {
   FastNoiseLite _baseNoiseLayer;
   FastNoiseLite _paddingNoise;
   FastNoiseLite _tempatureNoise;
-  uint32_t _topPaddingBlockId = 3;
-  uint32_t _paddingBlockId = 2;
-  uint32_t _defaultBlockId = 1;
+  uint32_t _topPaddingBlockId = 4;
+  uint32_t _paddingBlockId = 3;
+  uint32_t _defaultBlockId = 2;
 };

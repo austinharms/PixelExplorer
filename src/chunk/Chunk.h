@@ -3,12 +3,12 @@
 #include <glm/vec3.hpp>
 #include <mutex>
 
-#include "block/Block.h"
-#include "block/BlockBase.h"
-#include "block/Blocks.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "RefCounted.h"
+#include "block/Block.h"
+#include "block/BlockBase.h"
+#include "block/Blocks.h"
 #include "generator/ChunkGenerator.h"
 
 class Chunk : public virtual RefCounted {
@@ -79,15 +79,20 @@ class Chunk : public virtual RefCounted {
     if (_blockMaterial != nullptr) _blockMaterial->grab();
   }
 
-  Block* getBlockUnsafe(unsigned int index) {
-    return &(_blocks[index]);
-  }
+  Block* getBlockUnsafe(unsigned int index) { return &(_blocks[index]); }
 
   void markChunkModified() { _chunkModified = true; }
+
   void markBlocksModified() { _blocksModified = true; }
 
   bool getChunkModified() const { return _chunkModified; }
+
   bool getBlocksModified() const { return _blocksModified; }
+
+  static std::string posToString(glm::vec<3, int> pos) {
+    return std::to_string(pos.x) + "-" + std::to_string(pos.y) + "-" +
+           std::to_string(pos.z);
+  }
 
  private:
   static Material* _blockMaterial;

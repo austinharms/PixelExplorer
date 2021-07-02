@@ -54,8 +54,8 @@ int main(void) {
   Blocks::loadBlocks("./res/blocks.dat");
   Blocks::setDefaultBlock(Blocks::getBlock(1));
 
-  //ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
-  ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
+  ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
+  //ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
   ChunkManager* chunkManager =
       new ChunkManager("./world/D0/", renderer, chunkGen, 12, 8, -1);
   chunkGen->drop();
@@ -67,7 +67,7 @@ int main(void) {
         ChunkManager::vec3ToChunkSpace(player->getPosition());
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
-      chunkManager->loadChunksInRadius(playerChunkPos, 6);
+      chunkManager->loadChunksInRadius(playerChunkPos, 5);
       lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 2;
        std::cout << "Chunk Load Update: X:" << playerChunkPos.x

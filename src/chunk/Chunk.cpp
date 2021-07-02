@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 
+#include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
@@ -61,6 +63,7 @@ void Chunk::setBlocks(Block* blocks) {
 }
 
 void Chunk::updateMesh() {
+  auto t1 = std::chrono::high_resolution_clock::now();
   std::lock_guard<std::recursive_mutex> adjLock(_adjacentLock);
   std::lock_guard<std::mutex> blockLock(_blockLock);
   _mesh->lockMeshEditing();
@@ -249,6 +252,9 @@ void Chunk::updateMesh() {
 
   _mesh->updateBuffers();
   _mesh->unlockMeshEditing();
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+  std::cout << "Chunk update took: " << ms_double.count() << "ms" << std::endl;
 }
 
 void Chunk::setChunkPosition(glm::vec<3, int> pos) {
@@ -282,12 +288,15 @@ void Chunk::dropAdjacentChunks() {
   _chunkModified = true;
 }
 
-void Chunk::saveChunk(const char* path) {
+void Chunk::saveChunk(const char* dir) {
   std::lock_guard<std::mutex> lock(_blockLock);
   if (_blocksModified) {
     _blocksModified = false;
     FILE* file = nullptr;
-    if (fopen_s(&file, path, "wb") == 0 && file != 0) {
+    std::string path = dir + posToString(_position / 100);
+    std::filesystem::create_directory(path);
+    path += "\\" + posToString(_position) + ".ch";
+    if (fopen_s(&file, path.c_str(), "wb") == 0 && file != 0) {
       fwrite(&CHUNK_VERSION, 2, 1, file);
       uint32_t id;
       for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
@@ -302,13 +311,15 @@ void Chunk::saveChunk(const char* path) {
   }
 }
 
-void Chunk::loadChunk(const char* path, ChunkGenerator* gen) {
+void Chunk::loadChunk(const char* dir, ChunkGenerator* gen) {
   std::lock_guard<std::mutex> lock(_blockLock);
   deleteBlocks();
   _blocks = new Block[BLOCK_COUNT];
   if (_blocks == nullptr) return;
   FILE* file = nullptr;
-  if (fopen_s(&file, path, "rb") == 0 && file != 0) {
+  std::string path =
+      dir + posToString(_position / 100) + "\\" + posToString(_position) + ".ch";
+  if (fopen_s(&file, path.c_str(), "rb") == 0 && file != 0) {
     unsigned short fileVersion;
     fread(&fileVersion, 2, 1, file);
     // add check for file version vs current version
