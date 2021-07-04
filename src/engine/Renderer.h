@@ -73,7 +73,7 @@ class Renderer : public virtual RefCounted {
   float _FOV;
   bool _renderInit;
   bool _cursorHidden;
-  void drawMesh(Mesh* mesh);
+  void drawMesh(Mesh* mesh, glm::mat4* vp);
   void updateWindowSize();
   void useMaterial(Material* m);
   void useShader(Shader* s);

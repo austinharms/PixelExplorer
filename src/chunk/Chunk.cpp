@@ -63,7 +63,7 @@ void Chunk::setBlocks(Block* blocks) {
 }
 
 void Chunk::updateMesh() {
-  auto t1 = std::chrono::high_resolution_clock::now();
+  // auto t1 = std::chrono::high_resolution_clock::now();
   std::lock_guard<std::recursive_mutex> adjLock(_adjacentLock);
   std::lock_guard<std::mutex> blockLock(_blockLock);
   _mesh->lockMeshEditing();
@@ -89,10 +89,19 @@ void Chunk::updateMesh() {
       indexCount += face->indexCount;
     };
 
+    short x = -1;
+    short y = 0;
+    short z = 0;
+
     for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-      float x = (int)(i % CHUNK_SIZE);
-      float y = (int)(i / LAYER_SIZE);
-      float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
+      if (++x == CHUNK_SIZE) {
+        x = 0;
+        if (++z == CHUNK_SIZE) {
+          z = 0;
+          ++y;
+        }
+      }
+
       if (_blocks[i] == 0) continue;
       BlockBase* block = Blocks::getBlock((int32_t)_blocks[i]);
       if (z == 0) {
@@ -183,10 +192,19 @@ void Chunk::updateMesh() {
       indexCount += face->indexCount;
     };
 
+    float x = -1;
+    float y = 0;
+    float z = 0;
+
     for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-      float x = (int)(i % CHUNK_SIZE);
-      float y = (int)(i / LAYER_SIZE);
-      float z = (int)((int)(i / CHUNK_SIZE) % CHUNK_SIZE);
+      if (++x == CHUNK_SIZE) {
+        x = 0;
+        if (++z == CHUNK_SIZE) {
+          z = 0;
+          ++y;
+        }
+      }
+
       if (_blocks[i] == 0) continue;
       BlockBase* block = Blocks::getBlock((int32_t)_blocks[i]);
       if (z == 0) {
@@ -252,9 +270,10 @@ void Chunk::updateMesh() {
 
   _mesh->updateBuffers();
   _mesh->unlockMeshEditing();
-  auto t2 = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-  std::cout << "Chunk update took: " << ms_double.count() << "ms" << std::endl;
+  // auto t2 = std::chrono::high_resolution_clock::now();
+  // std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+  // std::cout << "Chunk update took: " << ms_double.count() << "ms" <<
+  // std::endl;
 }
 
 void Chunk::setChunkPosition(glm::vec<3, int> pos) {
@@ -292,22 +311,32 @@ void Chunk::saveChunk(const char* dir) {
   std::lock_guard<std::mutex> lock(_blockLock);
   if (_blocksModified) {
     _blocksModified = false;
+    uint8_t* compressionBuffer = (uint8_t*)malloc(CHUNK_BYTE_SIZE);
+    int32_t compressedSize = compressChunk(compressionBuffer, CHUNK_BYTE_SIZE);
     FILE* file = nullptr;
     std::string path = dir + posToString(_position / 100);
     std::filesystem::create_directory(path);
     path += "\\" + posToString(_position) + ".ch";
     if (fopen_s(&file, path.c_str(), "wb") == 0 && file != 0) {
       fwrite(&CHUNK_VERSION, 2, 1, file);
-      uint32_t id;
-      for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-        id = _blocks[i].getRawValue();
-        fwrite(&id, 4, 1, file);
+      if (compressedSize > 0) {
+        uint8_t compressed = 1;
+        fwrite(&compressed, 1, 1, file);
+        fwrite(&compressedSize, 4, 1, file);
+        fwrite(compressionBuffer, compressedSize, 1, file);
+      } else {
+        uint8_t compressed = 0;
+        fwrite(&compressed, 1, 1, file);
+        fwrite((uint8_t*)_blocks, CHUNK_BYTE_SIZE, 1, file);
       }
 
       fclose(file);
     } else {
       std::cout << "Chunk Write Error" << std::endl;
+      _blocksModified = true;
     }
+
+    free(compressionBuffer);
   }
 }
 
@@ -317,27 +346,47 @@ void Chunk::loadChunk(const char* dir, ChunkGenerator* gen) {
   _blocks = new Block[BLOCK_COUNT];
   if (_blocks == nullptr) return;
   FILE* file = nullptr;
-  std::string path =
-      dir + posToString(_position / 100) + "\\" + posToString(_position) + ".ch";
+  std::string path = dir + posToString(_position / 100) + "\\" +
+                     posToString(_position) + ".ch";
   if (fopen_s(&file, path.c_str(), "rb") == 0 && file != 0) {
-    unsigned short fileVersion;
+    uint16_t fileVersion;
     fread(&fileVersion, 2, 1, file);
     // add check for file version vs current version
-
-    uint32_t id;
-    for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
-      fread(&id, 4, 1, file);
-      if (id != 0) {
-        _blocks[i] = Block(id);
+    uint8_t compressed;
+    fread(&compressed, 1, 1, file);
+    if (compressed == 1) {
+      uint32_t fileSize;
+      fread(&fileSize, 4, 1, file);
+      uint8_t* fileBuffer = (uint8_t*)malloc(fileSize);
+      fread(fileBuffer, fileSize, 1, file);
+      if (fileBuffer != nullptr &&
+          decompressChunk(fileBuffer, fileSize) == BLOCK_COUNT) {
+        free(fileBuffer);
+        _blocksModified = false;
+        fclose(file);
+        return;
       }
+
+      free(fileBuffer);
+    } else {
+      uint32_t id;
+      for (unsigned int i = 0; i < BLOCK_COUNT; ++i) {
+        fread(&id, 4, 1, file);
+        if (id != 0) {
+          _blocks[i] = Block(id);
+        }
+      }
+
+      _blocksModified = false;
+      fclose(file);
+      return;
     }
 
     fclose(file);
-    _blocksModified = false;
-  } else {
-    gen->genChunkBlocks(_position, _blocks);
-    _blocksModified = true;
   }
+
+  gen->genChunkBlocks(_position, _blocks);
+  _blocksModified = true;
 }
 
 bool Chunk::drawBlockFace(Block* block, BlockBase::Face face) {
@@ -350,4 +399,61 @@ void Chunk::deleteBlocks() {
     delete[] _blocks;
     _blocks = nullptr;
   }
+}
+
+int Chunk::compressChunk(std::uint8_t* output, const int outSize) {
+  if (output == nullptr || outSize < 6) return -1;
+  int bytesWritten = 0;
+  uint32_t lastValue = _blocks[0].getRawValue();
+  uint16_t valueCount = 1;
+
+  for (int i = 1; i < BLOCK_COUNT; ++i) {
+    if (_blocks[i].getRawValue() == lastValue && valueCount != 0xFFFF) {
+      ++valueCount;
+    } else {
+      // if over output size stop and error
+      if (bytesWritten + 6 > outSize) return -1;
+      output[bytesWritten++] = lastValue >> 24;
+      output[bytesWritten++] = lastValue >> 16;
+      output[bytesWritten++] = lastValue >> 8;
+      output[bytesWritten++] = lastValue;
+      output[bytesWritten++] = valueCount >> 8;
+      output[bytesWritten++] = valueCount;
+      lastValue = _blocks[i].getRawValue();
+      valueCount = 1;
+    }
+  }
+
+  // if over output size stop and error
+  if (bytesWritten + 6 > outSize) return -1;
+  output[bytesWritten++] = lastValue >> 24;
+  output[bytesWritten++] = lastValue >> 16;
+  output[bytesWritten++] = lastValue >> 8;
+  output[bytesWritten++] = lastValue;
+  output[bytesWritten++] = valueCount >> 8;
+  output[bytesWritten++] = valueCount;
+
+  return bytesWritten;
+}
+
+int Chunk::decompressChunk(const std::uint8_t* input, const int inSize) {
+  if (input == nullptr || inSize < 6 ||  inSize % 6 != 0) return -1;
+  int repeatPairs = inSize / 6;
+  int bytesRead = 0;
+  int currentIndex = 0;
+  uint32_t id;
+  uint16_t repeatCount;
+  for (int i = 0; i < repeatPairs; ++i) {
+    id = (input[bytesRead++] << 24) + (input[bytesRead++] << 16) +
+         (input[bytesRead++] << 8) + input[bytesRead++];
+    repeatCount = (input[bytesRead++] << 8) + input[bytesRead++];
+    if (currentIndex + repeatCount > BLOCK_COUNT) return -1;
+    if (id != 0) {
+      for (uint16_t j = 0; j < repeatCount; ++j) {
+        _blocks[currentIndex++] = Block(id);
+      }
+    }
+  }
+
+  return currentIndex;
 }

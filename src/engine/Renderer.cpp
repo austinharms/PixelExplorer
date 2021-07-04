@@ -138,9 +138,9 @@ void Renderer::render() {
     clock_t c = std::clock() / CLOCKS_PER_SEC;
     std::cout << "FPS: " << _avgFPS << " Time: " << c << "s" << std::endl;
   }
-
   _lastFrame = currentFrame;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glm::mat4 vp = _projection * _view;
 
   {
     std::lock_guard<std::mutex> locker(_meshListLock);
@@ -149,7 +149,7 @@ void Renderer::render() {
     while (iter != end) {
       Mesh* m = *iter;
       if (!m->getRendererDropFlag()) {
-        drawMesh(m);
+        drawMesh(m, &vp);
         ++iter;
       } else {
         iter = _meshes.erase(iter);
@@ -189,7 +189,7 @@ void Renderer::setCursorPosition(double x, double y) {
   glfwSetCursorPos(_window, x, y);
 }
 
-void Renderer::drawMesh(Mesh* mesh) {
+void Renderer::drawMesh(Mesh* mesh, glm::mat4* vp) {
   mesh->updateTransfrom(_deltaTime);
   if (!mesh->getMeshVisible()) return;
   if (mesh->hasMaterial()) {
@@ -199,7 +199,7 @@ void Renderer::drawMesh(Mesh* mesh) {
   }
 
   mesh->bind();
-  glm::mat4 mvp = _projection * _view * mesh->getTransform();
+  glm::mat4 mvp = *vp * mesh->getTransform();
   _boundShader->setUniformm4("u_MVP", mvp);
   if (mesh->hasMaterial()) useMaterial(mesh->getMaterial());
   unsigned int indexCount = mesh->getIndexCount();

@@ -24,15 +24,15 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
-  Renderer* renderer = new Renderer(800, 600, "Test");
+  Renderer* renderer = new Renderer(800, 600, "Pixel Explorer");
   if (!renderer->renderInit()) return -1;
 
   renderer->hideCursor(true);
   Player* player = new Player(renderer);
   // set default material and shader
   {
-    Shader* defaultShader = new Shader("./res/shaders/Basic.shader");
-    Texture* blockTextures = new Texture("./res/textures/default.png");
+    Shader* defaultShader = new Shader("res\\shaders\\Basic.shader");
+    Texture* blockTextures = new Texture("res\\textures\\default.png");
     Material* defaultMaterial = new Material(defaultShader, blockTextures);
     defaultShader->drop();
     renderer->setDefaultMaterial(defaultMaterial);
@@ -42,8 +42,8 @@ int main(void) {
 
   // create block material
   {
-    Shader* chunkShader = new Shader("./res/shaders/Chunk.shader");
-    Texture* blockTextures = new Texture("./res/textures/textures.png");
+    Shader* chunkShader = new Shader("res\\shaders\\Chunk.shader");
+    Texture* blockTextures = new Texture("res\\textures\\textures.png");
     Material* blockMaterial = new Material(chunkShader, blockTextures);
     chunkShader->drop();
     blockTextures->drop();
@@ -51,13 +51,13 @@ int main(void) {
     blockMaterial->drop();
   }
 
-  Blocks::loadBlocks("./res/blocks.dat");
+  Blocks::loadBlocks("res\\blocks.dat");
   Blocks::setDefaultBlock(Blocks::getBlock(1));
 
   ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
   //ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
   ChunkManager* chunkManager =
-      new ChunkManager("./world/D0/", renderer, chunkGen, 12, 8, -1);
+      new ChunkManager("world\\D0\\", renderer, chunkGen, 12, 6, -1);
   chunkGen->drop();
 
   unsigned long long int nextUpdateTime = 0;

@@ -13,10 +13,11 @@
 
 class Chunk : public virtual RefCounted {
  public:
-  const static short CHUNK_VERSION = 0;
+  const static uint16_t CHUNK_VERSION = 0;
   const static int CHUNK_SIZE = 25;
   const static int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   const static int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
+  const static int CHUNK_BYTE_SIZE = BLOCK_COUNT * sizeof(Block);
   enum Status {
     UNLOADED = -1,
     UNLOADING = 0,
@@ -111,4 +112,6 @@ class Chunk : public virtual RefCounted {
                                nullptr, nullptr, nullptr};
   bool drawBlockFace(Block* block, BlockBase::Face face);
   void deleteBlocks();
+  int compressChunk(std::uint8_t* output, const int outSize);
+  int decompressChunk(const std::uint8_t* input, const int inSize);
 };

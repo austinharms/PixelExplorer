@@ -10,7 +10,7 @@ class TimedChunkPositionQueue {
  public:
   TimedChunkPositionQueue();
   ~TimedChunkPositionQueue();
-  bool addPosition(glm::vec<3, int> pos, int timeoutDelay = 3);
+  bool addPosition(glm::vec<3, int> pos, int timeoutDelay = 4);
   bool getNextPosition(glm::vec<3, int>* pos);
   void removePosition(glm::vec<3, int> pos);
   int getQueueLength() const { return _length; }

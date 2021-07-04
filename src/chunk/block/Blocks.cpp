@@ -5,6 +5,7 @@
 std::vector<BlockBase*>* Blocks::s_blocksArray = nullptr;
 BlockBase* Blocks::s_defaultBlock = nullptr;
 std::recursive_mutex Blocks::s_blocksLock;
+int Blocks::s_blocksLength = 0;
 
 Blocks::Blocks() {}
 
@@ -80,11 +81,14 @@ void Blocks::addBlock(BlockBase* block, int32_t id) {
     }
   } else if (s_blocksArray->size() == id) {
     s_blocksArray->emplace_back(block);
+    ++s_blocksLength;
   } else {
     do {
       s_blocksArray->emplace_back(nullptr);
+      ++s_blocksLength;
     } while (s_blocksArray->size() < id);
     s_blocksArray->emplace_back(block);
+    ++s_blocksLength;
   }
 }
 
@@ -92,12 +96,13 @@ int32_t Blocks::addBlock(BlockBase* block) {
   std::lock_guard<std::recursive_mutex> lock(Blocks::s_blocksLock);
   block->grab();
   s_blocksArray->emplace_back(block);
+  ++s_blocksLength;
   return s_blocksArray->size() - 1;
 }
 
 BlockBase* Blocks::getBlock(int32_t id) {
   //std::lock_guard<std::recursive_mutex> lock(Blocks::s_blocksLock);
-  if (s_blocksArray != nullptr && id < s_blocksArray->size()) {
+  if (s_blocksArray != nullptr && id >= 0 && id < s_blocksLength) {
     BlockBase* block = (*s_blocksArray)[id];
     if (block != nullptr) return block;
   }
@@ -160,6 +165,8 @@ void Blocks::dropBlocks() {
     delete s_blocksArray;
     s_blocksArray = nullptr;
   }
+
+  s_blocksLength = 0;
 }
 
 void Blocks::setDefaultBlock(BlockBase* block) {

@@ -18,7 +18,7 @@ class Blocks {
  private:
   Blocks();
   ~Blocks();
-
+  static int s_blocksLength;
   static std::recursive_mutex s_blocksLock;
   static std::vector<BlockBase*>* s_blocksArray;
   static BlockBase* s_defaultBlock;
