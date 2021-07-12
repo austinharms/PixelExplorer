@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/vec3.hpp>
 #include <iostream>
+#include <thread>
 
 #include "Material.h"
 #include "Player.h"
@@ -56,6 +57,9 @@ int main(void) {
 
   ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
   //ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
+  //int threadCount = std::thread::hardware_concurrency();
+  //if (threadCount < 3) threadCount = 3;
+  //--threadCount;
   ChunkManager* chunkManager =
       new ChunkManager("world\\D0\\", renderer, chunkGen, 12, 6, -1);
   chunkGen->drop();
@@ -67,7 +71,8 @@ int main(void) {
         ChunkManager::vec3ToChunkSpace(player->getPosition());
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
-      chunkManager->loadChunksInRadius(playerChunkPos, 5);
+      //chunkManager->loadChunksInRadius(playerChunkPos, 0);
+      chunkManager->loadChunksInRadius(glm::vec3(0), 15);
       lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 2;
        std::cout << "Chunk Load Update: X:" << playerChunkPos.x

@@ -2,7 +2,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/mat4x4.hpp>
 #include <list>
 #include <mutex>
 
@@ -10,6 +9,8 @@
 #include "Mesh.h"
 #include "RefCounted.h"
 #include "Shader.h"
+#include "glm/mat4x4.hpp"
+#include "PointCull.h"
 
 class Renderer : public virtual RefCounted {
  public:
@@ -18,8 +19,8 @@ class Renderer : public virtual RefCounted {
   virtual ~Renderer();
   void setDefaultMaterial(Material* m);
   void addMesh(Mesh* mesh);
-  void removeMesh(unsigned int id); //better to set mesh drop flag
-  void removeMesh(Mesh* mesh); //better to set mesh drop flag
+  void removeMesh(unsigned int id);  // better to set mesh drop flag
+  void removeMesh(Mesh* mesh);       // better to set mesh drop flag
   bool windowOpen();
   void render();
   void hideCursor(bool hide);
@@ -73,7 +74,7 @@ class Renderer : public virtual RefCounted {
   float _FOV;
   bool _renderInit;
   bool _cursorHidden;
-  void drawMesh(Mesh* mesh, glm::mat4* vp);
+  void drawMesh(Mesh* mesh, glm::mat4& vp, PointCull* cull);
   void updateWindowSize();
   void useMaterial(Material* m);
   void useShader(Shader* s);

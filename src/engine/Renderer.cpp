@@ -1,8 +1,10 @@
 #include "Renderer.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/vec3.hpp>
 #include <iostream>
+
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/quaternion.hpp"
+#include "glm/vec3.hpp"
 
 bool Renderer::s_windowSizeChange = false;
 
@@ -141,6 +143,7 @@ void Renderer::render() {
   _lastFrame = currentFrame;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glm::mat4 vp = _projection * _view;
+  PointCull cull(_view);
 
   {
     std::lock_guard<std::mutex> locker(_meshListLock);
@@ -149,7 +152,7 @@ void Renderer::render() {
     while (iter != end) {
       Mesh* m = *iter;
       if (!m->getRendererDropFlag()) {
-        drawMesh(m, &vp);
+        drawMesh(m, vp, &cull);
         ++iter;
       } else {
         iter = _meshes.erase(iter);
@@ -189,9 +192,9 @@ void Renderer::setCursorPosition(double x, double y) {
   glfwSetCursorPos(_window, x, y);
 }
 
-void Renderer::drawMesh(Mesh* mesh, glm::mat4* vp) {
+void Renderer::drawMesh(Mesh* mesh, glm::mat4& vp, PointCull* cull) {
   mesh->updateTransfrom(_deltaTime);
-  if (!mesh->getMeshVisible()) return;
+  if (!mesh->getMeshVisible() || !cull->meshInView(mesh)) return;
   if (mesh->hasMaterial()) {
     useMaterial(mesh->getMaterial());
   } else {
@@ -199,7 +202,7 @@ void Renderer::drawMesh(Mesh* mesh, glm::mat4* vp) {
   }
 
   mesh->bind();
-  glm::mat4 mvp = *vp * mesh->getTransform();
+  glm::mat4 mvp = vp * mesh->getTransform();
   _boundShader->setUniformm4("u_MVP", mvp);
   if (mesh->hasMaterial()) useMaterial(mesh->getMaterial());
   unsigned int indexCount = mesh->getIndexCount();

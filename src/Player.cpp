@@ -2,12 +2,13 @@
 
 #include <GLFW/glfw3.h>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 Player::Player(Renderer* renderer)
-    : _renderer(renderer),
-      _position(0.0f),
-      _viewMatrix(1.0f) {
+    : _renderer(renderer), _position(0.0f, 0.0f, 20.0f), _viewMatrix(1.0f) {//, _rotation(0.0f) {
   _renderer->grab();
 }
 
@@ -23,6 +24,12 @@ void Player::update() {
       _mouseSpeed * _renderer->getDeltaTime() * float(windowWidth / 2 - xpos);
   _verticalAngle +=
       _mouseSpeed * _renderer->getDeltaTime() * float(windowHeight / 2 - ypos);
+  //_rotation.x += _mouseSpeed * _renderer->getDeltaTime() * float(windowWidth / 2 - xpos);
+  //if (_rotation.x >= 1) _rotation.x -= 2;
+  //if (_rotation.x < -1) _rotation.x += 2;
+  //_rotation.y += _mouseSpeed * _renderer->getDeltaTime() * float(windowHeight / 2 - ypos);
+  //if (_rotation.y >= 1) _rotation.y -= 2;
+  //if (_rotation.y < -1) _rotation.y += 2;
   glm::vec3 direction(cos(_verticalAngle) * sin(_horizontalAngle),
                       sin(_verticalAngle),
                       cos(_verticalAngle) * cos(_horizontalAngle));
@@ -44,7 +51,7 @@ void Player::update() {
   if (_renderer->getKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
     _position -= right * _renderer->getDeltaTime() * _moveSpeed;
   }
-
   _viewMatrix = glm::lookAt(_position, _position + direction, up);
   _renderer->setCameraTransform(_viewMatrix);
+  //std::cout << "Rot: " << _rotation.x << " " << _rotation.y << " " << _rotation.z << std::endl;
 }

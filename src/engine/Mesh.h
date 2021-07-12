@@ -8,6 +8,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 
 class Mesh : public virtual RefCounted {
  public:
@@ -70,6 +71,10 @@ class Mesh : public virtual RefCounted {
 
   bool getMeshVisible() const { return _meshVisible && !_meshEmpty; }
 
+  void setSize(glm::vec3 size) { _size = size; }
+
+  glm::vec3 getSize() const { return _size; }
+
  private:
   static unsigned int s_nextId;
   std::mutex _meshEditLock;
@@ -90,6 +95,7 @@ class Mesh : public virtual RefCounted {
   float* _currentVertices;
   unsigned int _id;
   int _attribStride;
+  glm::vec3 _size;
   bool _rendererDropFlag;
   bool _meshVisible;
   bool _meshEmpty;

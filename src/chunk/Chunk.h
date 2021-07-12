@@ -1,6 +1,5 @@
 #pragma once
 #include <atomic>
-#include <glm/vec3.hpp>
 #include <mutex>
 
 #include "Material.h"
@@ -10,11 +9,12 @@
 #include "block/BlockBase.h"
 #include "block/Blocks.h"
 #include "generator/ChunkGenerator.h"
+#include "glm/vec3.hpp"
 
 class Chunk : public virtual RefCounted {
  public:
   const static uint16_t CHUNK_VERSION = 0;
-  const static int CHUNK_SIZE = 25;
+  const static int CHUNK_SIZE = 20;
   const static int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   const static int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
   const static int CHUNK_BYTE_SIZE = BLOCK_COUNT * sizeof(Block);

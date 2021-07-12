@@ -25,7 +25,8 @@ Mesh::Mesh()
       _rendererDropFlag(false),
       _bufferOffsetMap(),
       _meshVisible(true),
-      _meshEmpty(true) {
+      _meshEmpty(true),
+      _size(1) {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();
@@ -56,7 +57,8 @@ Mesh::Mesh(VertexBufferAttrib* customAttribs[], unsigned short attribCount)
       _rendererDropFlag(false),
       _bufferOffsetMap(),
       _meshVisible(true),
-      _meshEmpty(true) {
+      _meshEmpty(true),
+      _size(1) {
   _vertexBuffer = new VertexBuffer();
   _indexBuffer = new IndexBuffer();
   _vertexArray = new VertexArray();

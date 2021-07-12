@@ -142,6 +142,10 @@ void ChunkManager::loadThreadPoolFunction() {
       }
 
       chunk->loadChunk(_savePath, _generator);
+      chunk->setUnloadTime(((unsigned long long int)clock() / CLOCKS_PER_SEC) +
+                           6);
+      chunk->setStatus(Chunk::LOADED);
+
       Chunk* adjChunk = nullptr;
       if (chunk->getAdjacentChunk(Chunk::FRONT) == nullptr) {
         _chunkMapLock.lock_shared();
@@ -150,6 +154,7 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::FRONT, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::BACK, chunk);
+          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -160,6 +165,7 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::BACK, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::FRONT, chunk);
+          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -170,6 +176,7 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::LEFT, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::RIGHT, chunk);
+          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -180,6 +187,7 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::RIGHT, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::LEFT, chunk);
+          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -190,6 +198,7 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::TOP, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::BOTTOM, chunk);
+          addUpdateChunkJob(adjChunk);
         }
       }
 
@@ -200,23 +209,13 @@ void ChunkManager::loadThreadPoolFunction() {
         if (adjChunk != nullptr) {
           chunk->setAdjacentChunk(Chunk::BOTTOM, adjChunk);
           adjChunk->setAdjacentChunk(Chunk::TOP, chunk);
+          addUpdateChunkJob(adjChunk);
         }
       }
 
       chunk->updateMesh();
-      chunk->setUnloadTime(((unsigned long long int)clock() / CLOCKS_PER_SEC) +
-                           10);
-
       _renderer->addMesh(chunk->getMesh());
-      chunk->setStatus(Chunk::LOADED);
       _loadQueue.removePosition(pos);
-      for (char i = 0; i < 6; ++i) {
-        adjChunk = chunk->getAdjacentChunk((Chunk::ChunkFace)i);
-        if (adjChunk != nullptr) {
-          adjChunk->markChunkModified();
-          addUpdateChunkJob(adjChunk);
-        }
-      }
     }
   }
 
@@ -277,27 +276,6 @@ void ChunkManager::jobThreadPoolFunction() {
           ++dist;
           size += 2;
         }
-
-        // for (int x = -radius; x <= radius; ++x) {
-        //  chunkPos.x = x;
-        //  for (int y = -radius; y <= radius; ++y) {
-        //    chunkPos.y = y;
-        //    for (int z = -radius; z <= radius; ++z) {
-        //      chunkPos.z = z;
-        //      _chunkMapLock.lock_shared();
-        //      Chunk* chunk = getChunkPointer(chunkPos + job->pos);
-        //      _chunkMapLock.unlock_shared();
-        //      Chunk::Status status = getChunkStatus(chunk);
-        //      if (status == Chunk::UNLOADED) {
-        //        _loadQueue.addPosition(chunkPos + job->pos);
-        //        _loadAndUnloadCondition.notify_one();
-        //      } else if (status == Chunk::LOADED) {
-        //        chunk->setUnloadTime(
-        //            (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 10);
-        //      }
-        //    }
-        //  }
-        //}
       } break;
 
       case Job::UPDATEUNLOADING: {

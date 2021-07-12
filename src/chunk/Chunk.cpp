@@ -5,12 +5,12 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/mat4x4.hpp>
 #include <iostream>
 #include <list>
 
 #include "VertexBufferAttrib.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/mat4x4.hpp"
 
 Material* Chunk::_blockMaterial = nullptr;
 
@@ -28,6 +28,7 @@ Chunk::Chunk(glm::vec<3, int> pos)
   _mesh->setTransform(glm::translate(
       glm::mat4(1.0f),
       glm::vec3(pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE)));
+  _mesh->setSize(glm::vec3(CHUNK_SIZE));
   _mesh->setMaterial(Chunk::_blockMaterial);
 }
 
@@ -42,6 +43,7 @@ Chunk::Chunk()
   VertexBufferAttrib* repeatAttrib = new VertexBufferAttrib(2, GL_FLOAT);
   _mesh = new Mesh(&repeatAttrib, 1);
   repeatAttrib->drop();
+  _mesh->setSize(glm::vec3(CHUNK_SIZE));
   _mesh->setMaterial(Chunk::_blockMaterial);
 }
 
@@ -437,7 +439,7 @@ int Chunk::compressChunk(std::uint8_t* output, const int outSize) {
 }
 
 int Chunk::decompressChunk(const std::uint8_t* input, const int inSize) {
-  if (input == nullptr || inSize < 6 ||  inSize % 6 != 0) return -1;
+  if (input == nullptr || inSize < 6 || inSize % 6 != 0) return -1;
   int repeatPairs = inSize / 6;
   int bytesRead = 0;
   int currentIndex = 0;
