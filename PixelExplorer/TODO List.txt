@@ -1,0 +1,11 @@
+Chunk Manager
+-add greedy meshing?
+-add lazzy loading/limit chunk load speed
+
+LIGHTING!
+-can use openGL lighting?
+-how will mob spawing work?
+
+Physics
+-Add Physics Engine
+	https://www.reactphysics3d.com/download.html
