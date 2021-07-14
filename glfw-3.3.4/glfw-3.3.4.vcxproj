@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{6c788eb3-83eb-4bd4-b612-dce878d08b1c}</ProjectGuid>
+    <RootNamespace>glfw334</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="CMakeSettings.json" />
+    <None Include="cmake_uninstall.cmake.in" />
+    <None Include="docs\footer.html" />
+    <None Include="docs\header.html" />
+    <None Include="docs\html\bug.html" />
+    <None Include="docs\html\build_8dox.html" />
+    <None Include="docs\html\build_guide.html" />
+    <None Include="docs\html\compat_8dox.html" />
+    <None Include="docs\html\compat_guide.html" />
+    <None Include="docs\html\compile_8dox.html" />
+    <None Include="docs\html\compile_guide.html" />
+    <None Include="docs\html\context_8dox.html" />
+    <None Include="docs\html\context_guide.html" />
+    <None Include="docs\html\deprecated.html" />
+    <None Include="docs\html\dir_2c0a40d2e39b973aef6f9287031dec98.html" />
+    <None Include="docs\html\dir_6a897dd5418cfdfa24c447df90bbe1e1.html" />
+    <None Include="docs\html\dir_e1497d575aebd7a6d42b1c9051c2e199.html" />
+    <None Include="docs\html\dir_eafb4756861696bfe395888f5fb3058c.html" />
+    <None Include="docs\html\files.html" />
+    <None Include="docs\html\glfw3native_8h.html" />
+    <None Include="docs\html\glfw3native_8h_source.html" />
+    <None Include="docs\html\glfw3_8h.html" />
+    <None Include="docs\html\glfw3_8h_source.html" />
+    <None Include="docs\html\group__buttons.html" />
+    <None Include="docs\html\group__context.html" />
+    <None Include="docs\html\group__errors.html" />
+    <None Include="docs\html\group__gamepad__axes.html" />
+    <None Include="docs\html\group__gamepad__buttons.html" />
+    <None Include="docs\html\group__hat__state.html" />
+    <None Include="docs\html\group__init.html" />
+    <None Include="docs\html\group__input.html" />
+    <None Include="docs\html\group__joysticks.html" />
+    <None Include="docs\html\group__keys.html" />
+    <None Include="docs\html\group__mods.html" />
+    <None Include="docs\html\group__monitor.html" />
+    <None Include="docs\html\group__native.html" />
+    <None Include="docs\html\group__shapes.html" />
+    <None Include="docs\html\group__vulkan.html" />
+    <None Include="docs\html\group__window.html" />
+    <None Include="docs\html\index.html" />
+    <None Include="docs\html\input_8dox.html" />
+    <None Include="docs\html\input_guide.html" />
+    <None Include="docs\html\internals_guide.html" />
+    <None Include="docs\html\internal_8dox.html" />
+    <None Include="docs\html\intro_8dox.html" />
+    <None Include="docs\html\intro_guide.html" />
+    <None Include="docs\html\main_8dox.html" />
+    <None Include="docs\html\modules.html" />
+    <None Include="docs\html\monitor_8dox.html" />
+    <None Include="docs\html\monitor_guide.html" />
+    <None Include="docs\html\moving_8dox.html" />
+    <None Include="docs\html\moving_guide.html" />
+    <None Include="docs\html\news.html" />
+    <None Include="docs\html\news_8dox.html" />
+    <None Include="docs\html\pages.html" />
+    <None Include="docs\html\quick_8dox.html" />
+    <None Include="docs\html\quick_guide.html" />
+    <None Include="docs\html\search\all_0.html" />
+    <None Include="docs\html\search\all_1.html" />
+    <None Include="docs\html\search\all_10.html" />
+    <None Include="docs\html\search\all_11.html" />
+    <None Include="docs\html\search\all_2.html" />
+    <None Include="docs\html\search\all_3.html" />
+    <None Include="docs\html\search\all_4.html" />
+    <None Include="docs\html\search\all_5.html" />
+    <None Include="docs\html\search\all_6.html" />
+    <None Include="docs\html\search\all_7.html" />
+    <None Include="docs\html\search\all_8.html" />
+    <None Include="docs\html\search\all_9.html" />
+    <None Include="docs\html\search\all_a.html" />
+    <None Include="docs\html\search\all_b.html" />
+    <None Include="docs\html\search\all_c.html" />
+    <None Include="docs\html\search\all_d.html" />
+    <None Include="docs\html\search\all_e.html" />
+    <None Include="docs\html\search\all_f.html" />
+    <None Include="docs\html\search\classes_0.html" />
+    <None Include="docs\html\search\defines_0.html" />
+    <None Include="docs\html\search\files_0.html" />
+    <None Include="docs\html\search\files_1.html" />
+    <None Include="docs\html\search\files_2.html" />
+    <None Include="docs\html\search\files_3.html" />
+    <None Include="docs\html\search\files_4.html" />
+    <None Include="docs\html\search\files_5.html" />
+    <None Include="docs\html\search\files_6.html" />
+    <None Include="docs\html\search\files_7.html" />
+    <None Include="docs\html\search\files_8.html" />
+    <None Include="docs\html\search\functions_0.html" />
+    <None Include="docs\html\search\groups_0.html" />
+    <None Include="docs\html\search\groups_1.html" />
+    <None Include="docs\html\search\groups_2.html" />
+    <None Include="docs\html\search\groups_3.html" />
+    <None Include="docs\html\search\groups_4.html" />
+    <None Include="docs\html\search\groups_5.html" />
+    <None Include="docs\html\search\groups_6.html" />
+    <None Include="docs\html\search\groups_7.html" />
+    <None Include="docs\html\search\groups_8.html" />
+    <None Include="docs\html\search\groups_9.html" />
+    <None Include="docs\html\search\groups_a.html" />
+    <None Include="docs\html\search\nomatches.html" />
+    <None Include="docs\html\search\pages_0.html" />
+    <None Include="docs\html\search\pages_1.html" />
+    <None Include="docs\html\search\pages_2.html" />
+    <None Include="docs\html\search\pages_3.html" />
+    <None Include="docs\html\search\pages_4.html" />
+    <None Include="docs\html\search\pages_5.html" />
+    <None Include="docs\html\search\pages_6.html" />
+    <None Include="docs\html\search\pages_7.html" />
+    <None Include="docs\html\search\pages_8.html" />
+    <None Include="docs\html\search\pages_9.html" />
+    <None Include="docs\html\search\pages_a.html" />
+    <None Include="docs\html\search\typedefs_0.html" />
+    <None Include="docs\html\search\variables_0.html" />
+    <None Include="docs\html\search\variables_1.html" />
+    <None Include="docs\html\search\variables_2.html" />
+    <None Include="docs\html\search\variables_3.html" />
+    <None Include="docs\html\search\variables_4.html" />
+    <None Include="docs\html\search\variables_5.html" />
+    <None Include="docs\html\search\variables_6.html" />
+    <None Include="docs\html\search\variables_7.html" />
+    <None Include="docs\html\structGLFWgamepadstate.html" />
+    <None Include="docs\html\structGLFWgammaramp.html" />
+    <None Include="docs\html\structGLFWimage.html" />
+    <None Include="docs\html\structGLFWvidmode.html" />
+    <None Include="docs\html\vulkan_8dox.html" />
+    <None Include="docs\html\vulkan_guide.html" />
+    <None Include="docs\html\window_8dox.html" />
+    <None Include="docs\html\window_guide.html" />
+    <None Include="LICENSE.md" />
+    <None Include="out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_C.bin" />
+    <None Include="out\build\x64-Release\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_C.bin" />
+    <None Include="out\build\x86-Debug\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_C.bin" />
+    <None Include="out\build\x86-Release\CMakeFiles\3.20.21032501-MSVC_2\CMakeDetermineCompilerABI_C.bin" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="deps\getopt.h" />
+    <ClInclude Include="deps\glad\gl.h" />
+    <ClInclude Include="deps\glad\khrplatform.h" />
+    <ClInclude Include="deps\glad\vk_platform.h" />
+    <ClInclude Include="deps\glad\vulkan.h" />
+    <ClInclude Include="deps\linmath.h" />
+    <ClInclude Include="deps\mingw\dinput.h" />
+    <ClInclude Include="deps\mingw\xinput.h" />
+    <ClInclude Include="deps\mingw\_mingw_dxhelper.h" />
+    <ClInclude Include="deps\nuklear.h" />
+    <ClInclude Include="deps\nuklear_glfw_gl2.h" />
+    <ClInclude Include="deps\stb_image_write.h" />
+    <ClInclude Include="deps\tinycthread.h" />
+    <ClInclude Include="deps\vs2008\stdint.h" />
+    <ClInclude Include="include\GLFW\glfw3.h" />
+    <ClInclude Include="include\GLFW\glfw3native.h" />
+    <ClInclude Include="out\build\x64-Debug\CMakeFiles\ShowIncludes\foo.h" />
+    <ClInclude Include="out\build\x64-Debug\src\glfw_config.h" />
+    <ClInclude Include="out\build\x64-Release\CMakeFiles\ShowIncludes\foo.h" />
+    <ClInclude Include="out\build\x64-Release\src\glfw_config.h" />
+    <ClInclude Include="out\build\x86-Debug\CMakeFiles\ShowIncludes\foo.h" />
+    <ClInclude Include="out\build\x86-Debug\src\glfw_config.h" />
+    <ClInclude Include="out\build\x86-Release\CMakeFiles\ShowIncludes\foo.h" />
+    <ClInclude Include="out\build\x86-Release\src\glfw_config.h" />
+    <ClInclude Include="src\cocoa_joystick.h" />
+    <ClInclude Include="src\cocoa_platform.h" />
+    <ClInclude Include="src\egl_context.h" />
+    <ClInclude Include="src\glx_context.h" />
+    <ClInclude Include="src\internal.h" />
+    <ClInclude Include="src\linux_joystick.h" />
+    <ClInclude Include="src\mappings.h" />
+    <ClInclude Include="src\nsgl_context.h" />
+    <ClInclude Include="src\null_joystick.h" />
+    <ClInclude Include="src\null_platform.h" />
+    <ClInclude Include="src\osmesa_context.h" />
+    <ClInclude Include="src\posix_thread.h" />
+    <ClInclude Include="src\posix_time.h" />
+    <ClInclude Include="src\wgl_context.h" />
+    <ClInclude Include="src\win32_joystick.h" />
+    <ClInclude Include="src\win32_platform.h" />
+    <ClInclude Include="src\wl_platform.h" />
+    <ClInclude Include="src\x11_platform.h" />
+    <ClInclude Include="src\xkb_unicode.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="deps\getopt.c" />
+    <ClCompile Include="deps\glad_gl.c" />
+    <ClCompile Include="deps\glad_vulkan.c" />
+    <ClCompile Include="deps\tinycthread.c" />
+    <ClCompile Include="examples\boing.c" />
+    <ClCompile Include="examples\gears.c" />
+    <ClCompile Include="examples\heightmap.c" />
+    <ClCompile Include="examples\offscreen.c" />
+    <ClCompile Include="examples\particles.c" />
+    <ClCompile Include="examples\sharing.c" />
+    <ClCompile Include="examples\simple.c" />
+    <ClCompile Include="examples\splitview.c" />
+    <ClCompile Include="examples\wave.c" />
+    <ClCompile Include="out\build\x64-Debug\CMakeFiles\3.20.21032501-MSVC_2\CompilerIdC\CMakeCCompilerId.c" />
+    <ClCompile Include="out\build\x64-Debug\CMakeFiles\ShowIncludes\main.c" />
+    <ClCompile Include="out\build\x64-Release\CMakeFiles\3.20.21032501-MSVC_2\CompilerIdC\CMakeCCompilerId.c" />
+    <ClCompile Include="out\build\x64-Release\CMakeFiles\ShowIncludes\main.c" />
+    <ClCompile Include="out\build\x86-Debug\CMakeFiles\3.20.21032501-MSVC_2\CompilerIdC\CMakeCCompilerId.c" />
+    <ClCompile Include="out\build\x86-Debug\CMakeFiles\ShowIncludes\main.c" />
+    <ClCompile Include="out\build\x86-Release\CMakeFiles\3.20.21032501-MSVC_2\CompilerIdC\CMakeCCompilerId.c" />
+    <ClCompile Include="out\build\x86-Release\CMakeFiles\ShowIncludes\main.c" />
+    <ClCompile Include="src\cocoa_time.c" />
+    <ClCompile Include="src\context.c" />
+    <ClCompile Include="src\egl_context.c" />
+    <ClCompile Include="src\glx_context.c" />
+    <ClCompile Include="src\init.c" />
+    <ClCompile Include="src\input.c" />
+    <ClCompile Include="src\linux_joystick.c" />
+    <ClCompile Include="src\monitor.c" />
+    <ClCompile Include="src\null_init.c" />
+    <ClCompile Include="src\null_joystick.c" />
+    <ClCompile Include="src\null_monitor.c" />
+    <ClCompile Include="src\null_window.c" />
+    <ClCompile Include="src\osmesa_context.c" />
+    <ClCompile Include="src\posix_thread.c" />
+    <ClCompile Include="src\posix_time.c" />
+    <ClCompile Include="src\vulkan.c" />
+    <ClCompile Include="src\wgl_context.c" />
+    <ClCompile Include="src\win32_init.c" />
+    <ClCompile Include="src\win32_joystick.c" />
+    <ClCompile Include="src\win32_monitor.c" />
+    <ClCompile Include="src\win32_thread.c" />
+    <ClCompile Include="src\win32_time.c" />
+    <ClCompile Include="src\win32_window.c" />
+    <ClCompile Include="src\window.c" />
+    <ClCompile Include="src\wl_init.c" />
+    <ClCompile Include="src\wl_monitor.c" />
+    <ClCompile Include="src\wl_window.c" />
+    <ClCompile Include="src\x11_init.c" />
+    <ClCompile Include="src\x11_monitor.c" />
+    <ClCompile Include="src\x11_window.c" />
+    <ClCompile Include="src\xkb_unicode.c" />
+    <ClCompile Include="tests\clipboard.c" />
+    <ClCompile Include="tests\cursor.c" />
+    <ClCompile Include="tests\empty.c" />
+    <ClCompile Include="tests\events.c" />
+    <ClCompile Include="tests\gamma.c" />
+    <ClCompile Include="tests\glfwinfo.c" />
+    <ClCompile Include="tests\icon.c" />
+    <ClCompile Include="tests\iconify.c" />
+    <ClCompile Include="tests\inputlag.c" />
+    <ClCompile Include="tests\joysticks.c" />
+    <ClCompile Include="tests\monitors.c" />
+    <ClCompile Include="tests\msaa.c" />
+    <ClCompile Include="tests\opacity.c" />
+    <ClCompile Include="tests\reopen.c" />
+    <ClCompile Include="tests\tearing.c" />
+    <ClCompile Include="tests\threads.c" />
+    <ClCompile Include="tests\timeout.c" />
+    <ClCompile Include="tests\title.c" />
+    <ClCompile Include="tests\triangle-vulkan.c" />
+    <ClCompile Include="tests\windows.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="examples\glfw.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\boing.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\gears.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\heightmap.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\offscreen.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\particles.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\sharing.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\simple.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\splitview.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\examples\CMakeFiles\wave.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\clipboard.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\cursor.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\empty.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\events.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\gamma.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\glfwinfo.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\icon.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\iconify.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\inputlag.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\joysticks.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\monitors.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\msaa.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\opacity.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\reopen.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\tearing.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\threads.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\timeout.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\title.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\triangle-vulkan.dir\manifest.rc" />
+    <ResourceCompile Include="out\build\x64-Debug\tests\CMakeFiles\windows.dir\manifest.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\boing.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\boing.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\gears.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\gears.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\heightmap.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\heightmap.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\offscreen.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\offscreen.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\particles.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\particles.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\sharing.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\sharing.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\simple.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\simple.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\splitview.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\splitview.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\wave.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\examples\CMakeFiles\wave.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\clipboard.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\clipboard.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\cursor.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\cursor.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\empty.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\empty.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\events.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\events.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\gamma.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\gamma.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\glfwinfo.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\glfwinfo.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\icon.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\icon.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\iconify.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\iconify.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\inputlag.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\inputlag.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\joysticks.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\joysticks.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\monitors.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\monitors.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\msaa.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\msaa.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\opacity.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\opacity.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\reopen.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\reopen.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\tearing.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\tearing.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\threads.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\threads.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\timeout.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\timeout.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\title.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\title.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\triangle-vulkan.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\triangle-vulkan.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\windows.dir\embed.manifest" />
+    <Manifest Include="out\build\x64-Debug\tests\CMakeFiles\windows.dir\intermediate.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\boing.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\gears.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\heightmap.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\offscreen.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\particles.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\sharing.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\simple.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\splitview.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\examples\wave.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\clipboard.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\cursor.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\empty.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\events.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\gamma.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\glfwinfo.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\icon.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\iconify.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\inputlag.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\joysticks.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\monitors.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\msaa.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\opacity.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\reopen.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\tearing.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\threads.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\timeout.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\title.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\triangle-vulkan.exe.manifest" />
+    <Manifest Include="out\build\x86-Release\tests\windows.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
