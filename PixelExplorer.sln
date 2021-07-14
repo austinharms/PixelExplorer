@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PixelExplorer", "PixelExplorer\PixelExplorer.vcxproj", "{EA7EC612-58BC-4925-B2A8-216871552871}"
 	ProjectSection(ProjectDependencies) = postProject
 		{664E6F0D-6784-4760-9565-D54F8EB1EDF4} = {664E6F0D-6784-4760-9565-D54F8EB1EDF4}
+		{6C788EB3-83EB-4BD4-B612-DCE878D08B1C} = {6C788EB3-83EB-4BD4-B612-DCE878D08B1C}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "glew\build\vc12\glew_static.vcxproj", "{664E6F0D-6784-4760-9565-D54F8EB1EDF4}"
