@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\austi\source\repos\PixelExplorer\glfw-3.3.4\CMakeFiles\4b4fc2c7c31e35f62b26721be38dfa4a\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3749B6CA-D4E4-35C4-A850-7D12639D03E1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
