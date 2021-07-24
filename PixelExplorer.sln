@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "glew\build\v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw", "glfw-3.3.4\src\glfw.vcxproj", "{9E6F706F-8A5F-3B6E-A589-CADD6842CD1C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reactphysics3d", "reactphysics3d\reactphysics3d.vcxproj", "{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -73,6 +75,22 @@ Global
 		{9E6F706F-8A5F-3B6E-A589-CADD6842CD1C}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
 		{9E6F706F-8A5F-3B6E-A589-CADD6842CD1C}.RelWithDebInfo|x86.ActiveCfg = RelWithDebInfo|Win32
 		{9E6F706F-8A5F-3B6E-A589-CADD6842CD1C}.RelWithDebInfo|x86.Build.0 = RelWithDebInfo|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Debug|x64.ActiveCfg = Debug|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Debug|x64.Build.0 = Debug|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Debug|x86.ActiveCfg = Debug|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Debug|x86.Build.0 = Debug|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.MinSizeRel|x86.ActiveCfg = MinSizeRel|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.MinSizeRel|x86.Build.0 = MinSizeRel|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x64.ActiveCfg = Release|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x64.Build.0 = Release|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x86.ActiveCfg = Release|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x86.Build.0 = Release|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.RelWithDebInfo|x86.ActiveCfg = RelWithDebInfo|Win32
+		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.RelWithDebInfo|x86.Build.0 = RelWithDebInfo|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
