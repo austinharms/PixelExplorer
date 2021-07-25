@@ -1,42 +1,98 @@
-// Libraries
-#include <reactphysics3d/reactphysics3d.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <stdlib.h>
 
+#include <fstream>
 #include <iostream>
 
-// ReactPhysics3D namespace
-using namespace reactphysics3d;
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+#include "Material.h"
+#include "PhysicsMesh.h"
+#include "Player.h"
+#include "Renderer.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "chunk/block/Blocks.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/vec3.hpp"
+#include "reactphysics3d/reactphysics3d.h"
+#define GLM_ENABLE_EXPERIMENTAL
 
-// Main function
-int main(int argc, char** argv) {
-  // First you need to create the PhysicsCommon object.
-  // This is a factory module that you can use to create physics
-  // world and other objects. It is also responsible for
-  // logging and memory management
-  PhysicsCommon physicsCommon;
+int main(void) {
+  Renderer* renderer = new Renderer(800, 600, "Pixel Explorer - Physics");
+  if (!renderer->renderInit()) return -1;
 
-  // Create a physics world
-  PhysicsWorld* world = physicsCommon.createPhysicsWorld();
+  renderer->hideCursor(true);
+  Player* player = new Player(renderer);
 
-  // Create a rigid body in the world
-  Vector3 position(0, 20, 0);
-  Quaternion orientation = Quaternion::identity();
-  Transform transform(position, orientation);
-  RigidBody* body = world->createRigidBody(transform);
-
-  const decimal timeStep = 1.0f / 60.0f;
-
-  // Step the simulation a few steps
-  for (int i = 0; i < 20; i++) {
-    world->update(timeStep);
-
-    // Get the updated position of the body
-    const Transform& transform = body->getTransform();
-    const Vector3& position = transform.getPosition();
-
-    // Display the position of the body
-    std::cout << "Body Position: (" << position.x << ", " << position.y << ", "
-              << position.z << ")" << std::endl;
+  // set default material and shader
+  {
+    Shader* defaultShader = new Shader("res\\shaders\\Basic.shader");
+    Texture* blockTextures = new Texture("res\\textures\\default.png");
+    Material* defaultMaterial = new Material(defaultShader, blockTextures);
+    defaultShader->drop();
+    renderer->setDefaultMaterial(defaultMaterial);
+    defaultMaterial->drop();
+    blockTextures->drop();
   }
 
+  Blocks::loadBlocks("res\\blocks.dat");
+
+  rp3d::PhysicsCommon physicsCommon;
+  rp3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld();
+
+  rp3d::Vector3 position(0, 0, 0);
+  rp3d::Quaternion orientation = rp3d::Quaternion::identity();
+  rp3d::Transform transform(position, orientation);
+  PhysicsMesh* phyMesh = new PhysicsMesh(world, transform);
+  BlockBase* b = Blocks::getBlock(2);
+  int inCount = 0;
+  int vtCount = 0;
+  for (int f = 0; f < 6; ++f) {
+    inCount += b->getBlockFace((BlockBase::Face)f)->indexCount;
+    vtCount += b->getBlockFace((BlockBase::Face)f)->vertexCount;
+  }
+
+  phyMesh->setIndexCount(inCount);
+  phyMesh->setVertexCount(vtCount);
+  inCount = 0;
+  vtCount = 0;
+  for (int f = 0; f < 6; ++f) {
+    for (int v = 0; v < b->getBlockFace((BlockBase::Face)f)->vertexCount; ++v) {
+      phyMesh->setVertexPosition(
+          vtCount++, b->getBlockFace((BlockBase::Face)f)->vertices[0 + (v * 3)],
+          b->getBlockFace((BlockBase::Face)f)->vertices[1 + (v * 3)],
+          b->getBlockFace((BlockBase::Face)f)->vertices[2 + (v * 3)]);
+    }
+
+    for (int i = 0; i < b->getBlockFace((BlockBase::Face)f)->indexCount; ++i) {
+      phyMesh->setIndex(inCount++,
+                        b->getBlockFace((BlockBase::Face)f)->indices[i]);
+    }
+  }
+  phyMesh->updateBuffers();
+  renderer->addMesh(phyMesh);
+  phyMesh->drop();
+
+  const float phyStep = 1.0 / 60.0;
+  float phyAccumulator = 0;
+  world->update(phyStep);
+  while (renderer->windowOpen()) {
+    player->update();
+    renderer->render();
+
+    phyAccumulator += renderer->getDeltaTime();
+    while (phyAccumulator >= phyStep) {
+      //world->update(phyStep);
+      phyAccumulator -= phyStep;
+    }
+  }
+
+  player->drop();
+  renderer->drop();
+  Blocks::dropBlocks();
+  _CrtDumpMemoryLeaks();
   return 0;
 }

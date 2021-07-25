@@ -72,7 +72,7 @@
     <ClCompile Include="src\engine\PointCull.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PhyTest.cpp">
+    <ClCompile Include="src\PhysicsMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application.cpp">
@@ -1412,6 +1412,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\PointCull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
