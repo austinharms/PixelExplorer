@@ -78,24 +78,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(LIB_DIR)\$(Configuration)\$(PlatformName)\</OutDir>
+    <OutDir>$(LIB_DIR)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(TargetName)\$(Configuration)\$(PlatformName)\</IntDir>
     <TargetName>glew32s</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(LIB_DIR)\$(Configuration)\$(PlatformName)\</OutDir>
+    <OutDir>$(LIB_DIR)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(TargetName)\$(Configuration)\$(PlatformName)\</IntDir>
     <TargetName>glew32s</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(LIB_DIR)\$(Configuration)\$(PlatformName)\</OutDir>
+    <OutDir>$(LIB_DIR)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(TargetName)\$(Configuration)\$(PlatformName)\</IntDir>
-    <TargetName>glew32sd</TargetName>
+    <TargetName>glew32s</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(LIB_DIR)\$(Configuration)\$(PlatformName)\</OutDir>
+    <OutDir>$(LIB_DIR)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(TargetName)\$(Configuration)\$(PlatformName)\</IntDir>
-    <TargetName>glew32sd</TargetName>
+    <TargetName>glew32s</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <OutDir>$(LIB_DIR)\$(Configuration)\$(PlatformName)\</OutDir>

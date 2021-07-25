@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\engine\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -73,6 +70,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\PointCull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhyTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
