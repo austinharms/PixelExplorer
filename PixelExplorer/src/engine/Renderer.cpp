@@ -137,7 +137,7 @@ void Renderer::render() {
     _avgFPS = _frameCount * 4;
     _frameCount = 0;
     _lastFPSFrame = currentFrame;
-    clock_t c = std::clock() / CLOCKS_PER_SEC;
+    clock_t c = clock() / CLOCKS_PER_SEC;
     std::cout << "FPS: " << _avgFPS << " Time: " << c << "s" << std::endl;
   }
   _lastFrame = currentFrame;
