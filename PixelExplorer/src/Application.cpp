@@ -22,6 +22,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/vec3.hpp"
+#include "reactphysics3d/reactphysics3d.h"
+#include "PhysicsCommonRef.h"
+#include "PhysicsWorldRef.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
@@ -55,13 +58,25 @@ int main(void) {
   Blocks::loadBlocks("res\\blocks.dat");
   Blocks::setDefaultBlock(Blocks::getBlock(1));
 
+  PhysicsCommonRef* physicsCommon = new PhysicsCommonRef();
+  PhysicsWorldRef* phyWorld = nullptr;
+  {
+    rp3d::PhysicsWorld::WorldSettings settings;
+    settings.defaultVelocitySolverNbIterations = 20;
+    settings.isSleepingEnabled = false;
+    settings.gravity = rp3d::Vector3(0, -9.81, 0);
+    phyWorld = physicsCommon->createPhysicsWorldRef(settings);
+  }
+
+  phyWorld->drop();
+
   ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
-  //ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
-  //int threadCount = std::thread::hardware_concurrency();
-  //if (threadCount < 3) threadCount = 3;
+  // ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
+  // int threadCount = std::thread::hardware_concurrency();
+  // if (threadCount < 3) threadCount = 3;
   //--threadCount;
   ChunkManager* chunkManager =
-      new ChunkManager("world\\D0\\", renderer, chunkGen, 12, 6, -1);
+      new ChunkManager("world\\D0\\", renderer, chunkGen, physicsCommon, 12, 6, -1);
   chunkGen->drop();
 
   unsigned long long int nextUpdateTime = 0;
@@ -71,11 +86,11 @@ int main(void) {
         ChunkManager::vec3ToChunkSpace(player->getPosition());
     if ((unsigned long long int)(clock() / CLOCKS_PER_SEC) >= nextUpdateTime ||
         playerChunkPos != lastChunkPos) {
-      //chunkManager->loadChunksInRadius(playerChunkPos, 0);
+      // chunkManager->loadChunksInRadius(playerChunkPos, 0);
       chunkManager->loadChunksInRadius(glm::vec3(0), 15);
       lastChunkPos = playerChunkPos;
       nextUpdateTime = (unsigned long long int)(clock() / CLOCKS_PER_SEC) + 2;
-       std::cout << "Chunk Load Update: X:" << playerChunkPos.x
+      std::cout << "Chunk Load Update: X:" << playerChunkPos.x
                 << " Y:" << playerChunkPos.y << " Z:" << playerChunkPos.z
                 << std::endl;
     }
@@ -86,6 +101,7 @@ int main(void) {
   }
 
   chunkManager->drop();
+  physicsCommon->drop();
   player->drop();
   renderer->drop();
   Chunk::setBlockMaterial(nullptr);

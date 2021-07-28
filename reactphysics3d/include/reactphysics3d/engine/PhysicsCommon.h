@@ -49,7 +49,7 @@ namespace reactphysics3d {
  */
 class PhysicsCommon {
 
-    private :
+    protected :
 
         // -------------------- Attributes -------------------- //
 

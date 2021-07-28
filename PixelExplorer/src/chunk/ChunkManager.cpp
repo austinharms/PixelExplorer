@@ -3,8 +3,9 @@
 //#define LOG_QUEUE_LENGTH
 
 ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
-                           ChunkGenerator* generator, int jobPoolSize,
-                           int loadPoolSize, int maxChunksPerFrame)
+                           ChunkGenerator* generator, PhysicsCommonRef* pc,
+                           int jobPoolSize, int loadPoolSize,
+                           int maxChunksPerFrame)
     : _runningThreadCount(0),
       _jobPoolSize(jobPoolSize),
       _jobQueueLength(0),

@@ -630,7 +630,9 @@
     <ClInclude Include="src\engine\VertexBuffer.h" />
     <ClInclude Include="src\engine\VertexBufferAttrib.h" />
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
+    <ClInclude Include="src\PhysicsCommonRef.h" />
     <ClInclude Include="src\PhysicsMesh.h" />
+    <ClInclude Include="src\PhysicsWorldRef.h" />
     <ClInclude Include="src\Player.h" />
   </ItemGroup>
   <ItemGroup>
