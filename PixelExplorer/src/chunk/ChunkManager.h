@@ -17,13 +17,13 @@
 #include "Renderer.h"
 #include "TimedChunkPositionQueue.h"
 #include "generator/ChunkGenerator.h"
-#include "../PhysicsCommonRef.h"
+#include "../physics/PhysicsWorldRef.h"
 #include "reactphysics3d/reactphysics3d.h"
 
 class ChunkManager : public virtual RefCounted {
  public:
   ChunkManager(const char* chunkPath, Renderer* renderer,
-               ChunkGenerator* generator, PhysicsCommonRef* pc, int jobPoolSize = 5,
+               ChunkGenerator* generator, PhysicsWorldRef* physicsWorld, int jobPoolSize = 5,
                int loadPoolSize = 6, int maxChunksPerFrame = 2);
   virtual ~ChunkManager();
   void loadChunksInRadius(glm::vec<3, int> pos, unsigned short radius);
@@ -40,7 +40,7 @@ class ChunkManager : public virtual RefCounted {
   Renderer* _renderer;
   ChunkGenerator* _generator;
   const char* _savePath;
-  PhysicsCommonRef* _physicsCommon;
+  PhysicsWorldRef* _physicsWorld;
   unsigned long long int _lastUnloadUpdate;
 
   // Threading

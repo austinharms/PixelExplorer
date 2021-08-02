@@ -179,7 +179,7 @@
     <ClCompile Include="src\engine\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="src\engine\VertexArray.cpp" />
     <ClCompile Include="src\engine\VertexBuffer.cpp" />
-    <ClCompile Include="src\PhysicsMesh.cpp" />
+    <ClCompile Include="src\physics\PhysicsMesh.cpp" />
     <ClCompile Include="src\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -630,9 +630,11 @@
     <ClInclude Include="src\engine\VertexBuffer.h" />
     <ClInclude Include="src\engine\VertexBufferAttrib.h" />
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
-    <ClInclude Include="src\PhysicsCommonRef.h" />
-    <ClInclude Include="src\PhysicsMesh.h" />
-    <ClInclude Include="src\PhysicsWorldRef.h" />
+    <ClInclude Include="src\physics\PhysicsCommonRef.fwd.h" />
+    <ClInclude Include="src\physics\PhysicsCommonRef.h" />
+    <ClInclude Include="src\physics\PhysicsMesh.h" />
+    <ClInclude Include="src\physics\PhysicsWorldRef.fwd.h" />
+    <ClInclude Include="src\physics\PhysicsWorldRef.h" />
     <ClInclude Include="src\Player.h" />
   </ItemGroup>
   <ItemGroup>

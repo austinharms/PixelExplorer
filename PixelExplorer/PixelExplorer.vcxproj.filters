@@ -72,7 +72,7 @@
     <ClCompile Include="src\engine\PointCull.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PhysicsMesh.cpp">
+    <ClCompile Include="src\physics\PhysicsMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application.cpp">
@@ -1414,13 +1414,19 @@
     <ClInclude Include="src\engine\PointCull.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PhysicsMesh.h">
+    <ClInclude Include="src\physics\PhysicsMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PhysicsCommonRef.h">
+    <ClInclude Include="src\physics\PhysicsCommonRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PhysicsWorldRef.h">
+    <ClInclude Include="src\physics\PhysicsWorldRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\PhysicsCommonRef.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\PhysicsWorldRef.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,9 +3,9 @@
 //#define LOG_QUEUE_LENGTH
 
 ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
-                           ChunkGenerator* generator, PhysicsCommonRef* pc,
-                           int jobPoolSize, int loadPoolSize,
-                           int maxChunksPerFrame)
+                           ChunkGenerator* generator,
+                           PhysicsWorldRef* physicsWorld, int jobPoolSize,
+                           int loadPoolSize, int maxChunksPerFrame)
     : _runningThreadCount(0),
       _jobPoolSize(jobPoolSize),
       _jobQueueLength(0),
@@ -20,9 +20,11 @@ ChunkManager::ChunkManager(const char* chunkPath, Renderer* renderer,
       _chunkCreationRequestCount(0),
       _lastUnloadUpdate(0),
       _savePath(chunkPath),
-      _generator(generator) {
+      _generator(generator),
+      _physicsWorld(physicsWorld) {
   _renderer->grab();
   _generator->grab();
+  _physicsWorld->grab();
   if (jobPoolSize < 1) jobPoolSize = 1;
   if (loadPoolSize < 1) loadPoolSize = 1;
   _threadPool.reserve(jobPoolSize + loadPoolSize);
@@ -49,6 +51,7 @@ ChunkManager::~ChunkManager() {
   unloadAllChunks();
   _renderer->drop();
   _generator->drop();
+  _physicsWorld->drop();
 
   while (!_jobQueue.empty()) {
     delete _jobQueue.front();

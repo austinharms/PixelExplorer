@@ -23,8 +23,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/vec3.hpp"
 #include "reactphysics3d/reactphysics3d.h"
-#include "PhysicsCommonRef.h"
-#include "PhysicsWorldRef.h"
+#include "physics/PhysicsCommonRef.h"
+#include "physics/PhysicsWorldRef.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
@@ -65,10 +65,8 @@ int main(void) {
     settings.defaultVelocitySolverNbIterations = 20;
     settings.isSleepingEnabled = false;
     settings.gravity = rp3d::Vector3(0, -9.81, 0);
-    phyWorld = physicsCommon->createPhysicsWorldRef(settings);
+    phyWorld = (PhysicsWorldRef*)physicsCommon->createPhysicsWorldRef(settings);
   }
-
-  phyWorld->drop();
 
   ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
   // ChunkGenerator* chunkGen = new FlatChunkGenerator(2, 0);
@@ -76,8 +74,9 @@ int main(void) {
   // if (threadCount < 3) threadCount = 3;
   //--threadCount;
   ChunkManager* chunkManager =
-      new ChunkManager("world\\D0\\", renderer, chunkGen, physicsCommon, 12, 6, -1);
+      new ChunkManager("world\\D0\\", renderer, chunkGen, phyWorld, 12, 6, -1);
   chunkGen->drop();
+  phyWorld->drop();
 
   unsigned long long int nextUpdateTime = 0;
   glm::vec<3, int> lastChunkPos(0);
