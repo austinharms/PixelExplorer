@@ -22,9 +22,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/vec3.hpp"
-#include "reactphysics3d/reactphysics3d.h"
 #include "physics/PhysicsCommonRef.h"
 #include "physics/PhysicsWorldRef.h"
+#include "reactphysics3d/reactphysics3d.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
@@ -65,7 +65,7 @@ int main(void) {
     settings.defaultVelocitySolverNbIterations = 20;
     settings.isSleepingEnabled = false;
     settings.gravity = rp3d::Vector3(0, -9.81, 0);
-    phyWorld = (PhysicsWorldRef*)physicsCommon->createPhysicsWorldRef(settings);
+    phyWorld = physicsCommon->createPhysicsWorldRef(settings);
   }
 
   ChunkGenerator* chunkGen = new PerlinChunkGenerator(458679840956);
@@ -76,10 +76,13 @@ int main(void) {
   ChunkManager* chunkManager =
       new ChunkManager("world\\D0\\", renderer, chunkGen, phyWorld, 12, 6, -1);
   chunkGen->drop();
-  phyWorld->drop();
 
   unsigned long long int nextUpdateTime = 0;
   glm::vec<3, int> lastChunkPos(0);
+
+  float phyAccumulator = 0.0f;
+  const float phyStep = 1.0f / 60.0f;
+
   while (renderer->windowOpen()) {
     glm::vec<3, int> playerChunkPos =
         ChunkManager::vec3ToChunkSpace(player->getPosition());
@@ -95,10 +98,18 @@ int main(void) {
     }
 
     chunkManager->update();
+
+    phyAccumulator += renderer->getDeltaTime();
+    while (phyAccumulator > phyStep) {
+      phyWorld->getPhysicsWorld()->update(phyStep);
+      phyAccumulator -= phyStep;
+    }
+
     player->update();
     renderer->render();
   }
 
+  phyWorld->drop();
   chunkManager->drop();
   physicsCommon->drop();
   player->drop();
