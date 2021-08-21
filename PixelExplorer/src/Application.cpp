@@ -8,22 +8,6 @@
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
-#include "Material.h"
-#include "Player.h"
-#include "Renderer.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "chunk/Chunk.h"
-#include "chunk/ChunkManager.h"
-#include "chunk/block/Blocks.h"
-#include "chunk/generator/ChunkGenerator.h"
-#include "chunk/generator/FlatChunkGenerator.h"
-#include "chunk/generator/PerlinChunkGenerator.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/vec3.hpp"
-#include "physics/PhysicsCommonRef.h"
-#include "physics/PhysicsWorldRef.h"
 #include "reactphysics3d/reactphysics3d.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
