@@ -25,7 +25,7 @@ class RefCounted {
   unsigned short getRefCount() const { return _refCount; }
 
  private:
-  std::atomic<unsigned short> _refCount;
+  std::atomic<unsigned long int> _refCount;
 };
 
 #endif  // !REFCOUNTED_H
