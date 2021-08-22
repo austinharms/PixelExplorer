@@ -37,17 +37,17 @@ class Renderer : public virtual RefCounted {
   bool getWindowOpen() const { return !glfwWindowShouldClose(_window); }
 
  private:
-  GLFWwindow* _window;
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
+  int _FPSLimit;
   glm::mat4 _projection;
   glm::mat4 _view;
-  int _FPSLimit;
+  GLFWwindow* _window;
   int _FPS;
   int _frameCounter;
+  float _deltaTime;
   double _lastFrame;
   double _FPSTimer;
-  float _deltaTime;
   bool _cursorHidden;
 
   void drawRenderable(Renderable* renderable);
