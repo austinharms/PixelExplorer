@@ -34,6 +34,8 @@ class Renderer : public virtual RefCounted {
 
   bool getCursorHidden() const { return _cursorHidden; }
 
+  bool getWindowOpen() const { return !glfwWindowShouldClose(_window); }
+
  private:
   GLFWwindow* _window;
   std::mutex _renderLock;  // locks for _renderableObjects list
@@ -43,7 +45,8 @@ class Renderer : public virtual RefCounted {
   int _FPSLimit;
   int _FPS;
   int _frameCounter;
-  float _FPSTimer;
+  double _lastFrame;
+  double _FPSTimer;
   float _deltaTime;
   bool _cursorHidden;
 

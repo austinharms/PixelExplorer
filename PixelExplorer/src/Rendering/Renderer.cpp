@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+#include <iostream>
+
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/vec3.hpp"
@@ -10,7 +12,8 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
     : _FPSLimit(FPSLimit),
       _projection(glm::perspective(
           glm::radians(40.0f), (float)width / (float)height, 0.1f, 1000.0f)),
-      _view(glm::mat4(1.0f)) {
+      _view(glm::mat4(1.0f)),
+      _FPS(0) {
   assert(glfwInit());
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -27,6 +30,8 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
   glCullFace(GL_BACK);
   glfwSwapInterval(_FPSLimit);
   // glfwSetFramebufferSizeCallback(_window, Renderer::windowResizeEvent);
+  _lastFrame = glfwGetTime();
+  _FPSTimer = _lastFrame;
 }
 
 void Renderer::addRenderable(Renderable* renderable) {}
@@ -34,14 +39,29 @@ void Renderer::addRenderable(Renderable* renderable) {}
 void Renderer::removeRenderable(unsigned short id) {}
 
 void Renderer::drawFrame() {
+  double currentFrame = glfwGetTime();
+  _deltaTime = currentFrame - _lastFrame;
+  _lastFrame = currentFrame;
+  if (currentFrame - _FPSTimer >= 0.250) {
+    _FPS = _frameCounter * 4;
+    _frameCounter = 0;
+    _FPSTimer = currentFrame;
+    std::cout << "FPS: " << _FPS << std::endl;
+  }
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   std::lock_guard<std::mutex> drawLock(_renderLock);
   for (Renderable* r : _renderableObjects) drawRenderable(r);
+  glfwSwapBuffers(_window);
+  glfwPollEvents();
+  ++_frameCounter;
 }
 
 void Renderer::drawRenderable(Renderable* renderable) {
   if (renderable->onPreRender(_deltaTime, nullptr, nullptr)) {
-    renderable->getMaterial(); //Should use Material
-    renderable->getTransform(); //Should calculate MVP and assign to shader in material
+    renderable->getMaterial();   // Should use Material
+    renderable->getTransform();  // Should calculate MVP and assign to shader in
+                                 // material
     renderable->onRender();
   }
 }

@@ -81,10 +81,10 @@
     <ClCompile Include="src\vendor\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Renderer.cpp">
+    <ClCompile Include="src\rendering\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Renderable.cpp">
+    <ClCompile Include="src\rendering\Renderable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1842,13 +1842,13 @@
     <ClInclude Include="src\physics\PhysicsWorldRef.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Renderer.h">
+    <ClInclude Include="src\rendering\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RefCounted.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Renderable.h">
+    <ClInclude Include="src\rendering\Renderable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\FastNoiseLite.h">
