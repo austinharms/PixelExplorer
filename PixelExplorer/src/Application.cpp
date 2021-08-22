@@ -9,11 +9,11 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "reactphysics3d/reactphysics3d.h"
+#include "Rendering/Renderer.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Pixel Explorer");
-  if (!renderer->renderInit()) return -1;
 
   renderer->hideCursor(true);
   Player* player = new Player(renderer);
