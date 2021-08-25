@@ -9,6 +9,8 @@
 #include <string>
 #include <unordered_map>
 
+const Shader* Shader::DEFAULT = Shader::loadDefaultShader();
+
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
   _renderId = createProgram(shaderFilepath);
 }
@@ -109,4 +111,10 @@ unsigned int Shader::createProgram(const std::string path) {
   glDeleteShader(fs);
 
   return program;
+}
+
+Shader* Shader::loadDefaultShader() {
+  Shader* defaultShader = new Shader("./res/shaders/Default.shader");
+  assert(defaultShader->isValid());
+  return defaultShader;
 }

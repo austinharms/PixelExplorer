@@ -18,7 +18,8 @@ class Shader : public virtual RefCounted {
   void setUniform1i(const char* name, int value);
   void setUniformm4(const char* name, glm::mat4 value);
   void setUniformv4(const char* name, glm::vec4 value);
-
+  bool isValid() const { return _renderId != 0; }
+  static const Shader* DEFAULT; 
  private:
   unsigned int _renderId;
   std::unordered_map<const char*, int> _uniforms;
@@ -26,5 +27,6 @@ class Shader : public virtual RefCounted {
   static unsigned int compileShader(unsigned int type,
                                     const std::string source);
   static unsigned int createProgram(const std::string path);
+  static Shader* loadDefaultShader();
 };
 #endif  // !SHADER_H

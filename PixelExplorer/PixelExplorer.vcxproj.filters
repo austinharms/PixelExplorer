@@ -447,6 +447,7 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="res\shaders\Default.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Renderer.h">

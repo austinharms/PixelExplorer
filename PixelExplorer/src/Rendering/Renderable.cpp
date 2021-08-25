@@ -1,3 +1,3 @@
 #include "Renderable.h"
 
-unsigned short Renderable::s_idCounter = 0;
+unsigned int Renderable::s_idCounter = 0;

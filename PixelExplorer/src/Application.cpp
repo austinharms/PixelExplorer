@@ -10,6 +10,7 @@
 #include "GLFW/glfw3.h"
 #include "reactphysics3d/reactphysics3d.h"
 #include "rendering/Renderer.h"
+#include "rendering/Shader.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
