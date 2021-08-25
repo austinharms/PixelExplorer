@@ -17,12 +17,17 @@ int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Pixel Explorer V2.0");
 
   renderer->setCursorHidden(false);
-  
+
   while (renderer->getWindowOpen()) {
     renderer->drawFrame();
   }
 
+  //ORDER IMPORTANT
+  Material::getDefault()->drop();
+  Shader::getDefault()->drop();
   renderer->drop();
+  //END OF ORDER IMPORTANT
+
   _CrtDumpMemoryLeaks();
   return 0;
 }

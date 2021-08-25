@@ -9,7 +9,7 @@
 #include <string>
 #include <unordered_map>
 
-const Shader* Shader::DEFAULT = Shader::loadDefaultShader();
+Shader* Shader::s_default = nullptr;
 
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
   _renderId = createProgram(shaderFilepath);
