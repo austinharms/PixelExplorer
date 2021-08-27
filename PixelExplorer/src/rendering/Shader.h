@@ -1,12 +1,12 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
 #include <string>
 #include <unordered_map>
 
 #include "RefCounted.h"
+#include "glm/mat4x4.hpp"
+#include "glm/vec4.hpp"
 
 class Shader : public virtual RefCounted {
  public:

@@ -3,6 +3,7 @@
 
 #include "Material.h"
 #include "RefCounted.h"
+#include "glm/mat4x4.hpp"
 
 class Renderable : public virtual RefCounted {
  public:
@@ -14,7 +15,9 @@ class Renderable : public virtual RefCounted {
     setMaterial(material);
   }
 
-  virtual ~Renderable() {}
+  virtual ~Renderable() {
+    if (_material != nullptr) _material->drop();
+  }
 
   bool getVisible() const { return _visible; }
 
@@ -25,7 +28,7 @@ class Renderable : public virtual RefCounted {
   void setRendererDropFlag(bool flag) { _dropFlag = flag; }
 
   void setMaterial(Material* material) {
-    if (material != nullptr) material->drop();
+    if (_material != nullptr) _material->drop();
     _material = material;
     _material->grab();
   }
@@ -35,14 +38,16 @@ class Renderable : public virtual RefCounted {
   virtual bool onPreRender(
       float deltaTime, float* cameraPos,
       float* cameraRotation) = 0;  // Should update and return mesh visibility
-  virtual void getTransform() = 0;
+  virtual glm::mat4 getTransform() = 0;
   virtual void onRender() = 0;
 
  private:
+  Material* _material;
   static unsigned int s_idCounter;
+  unsigned int _id;
+
+ protected:
   bool _visible;
   bool _dropFlag;
-  unsigned int _id;
-  Material* _material;
 };
 #endif  // !RENDERABLE_H

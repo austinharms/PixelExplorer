@@ -13,7 +13,10 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
       _projection(glm::perspective(
           glm::radians(40.0f), (float)width / (float)height, 0.1f, 1000.0f)),
       _view(glm::mat4(1.0f)),
-      _FPS(0) {
+      _FPS(0),
+      _frameCounter(0),
+      _cursorHidden(false),
+      _deltaTime(0) {
   assert(glfwInit());
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -34,9 +37,24 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
   _FPSTimer = _lastFrame;
 }
 
-void Renderer::addRenderable(Renderable* renderable) {}
+void Renderer::addRenderable(Renderable* renderable) {
+  std::lock_guard<std::mutex> locker(_renderLock);
+  renderable->grab();
+  _renderableObjects.emplace_back(renderable);
+}
 
-void Renderer::removeRenderable(unsigned short id) {}
+void Renderer::removeRenderable(unsigned int id) {
+  std::lock_guard<std::mutex> locker(_renderLock);
+  std::remove_if(_renderableObjects.begin(), _renderableObjects.end(),
+                 [&id](Renderable* renderable) {
+                   if (renderable->getId() == id) {
+                     renderable->drop();
+                     return true;
+                   }
+
+                   return false;
+                 });
+}
 
 void Renderer::drawFrame() {
   double currentFrame = glfwGetTime();
@@ -50,23 +68,62 @@ void Renderer::drawFrame() {
   }
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  std::lock_guard<std::mutex> drawLock(_renderLock);
-  for (Renderable* r : _renderableObjects) drawRenderable(r);
+
+  {
+    Material* currentMaterial = nullptr;
+    Shader* currentShader = nullptr;
+    std::lock_guard<std::mutex> drawLock(_renderLock);
+    std::list<Renderable*>::iterator iter = _renderableObjects.begin();
+    std::list<Renderable*>::iterator end = _renderableObjects.end();
+    glm::mat4 vp = _projection * _view;
+    while (iter != end) {
+      Renderable* renderable = *iter;
+      if (renderable->getRendererDropFlag()) {
+        iter = _renderableObjects.erase(iter);
+        renderable->drop();
+      } else {
+        if (renderable->onPreRender(_deltaTime, nullptr, nullptr)) {
+          Material* renderableMaterial = renderable->getMaterial();
+          if (renderableMaterial != currentMaterial) {
+            if (currentMaterial != nullptr) currentMaterial->drop();
+            renderableMaterial->grab();
+            currentMaterial = renderableMaterial;
+            Shader* renderableShader = renderableMaterial->getShader();
+            if (renderableShader != currentShader) {
+              if (currentShader != nullptr) {
+                currentShader->unbind();
+                currentShader->drop();
+              }
+
+              renderableShader->grab();
+              currentShader = renderableShader;
+              renderableShader->bind();
+            }
+            renderableMaterial->onPostBind();
+          }
+
+          currentShader->setUniformm4("u_MVP", vp * renderable->getTransform());
+          renderable->onRender();
+        }
+        ++iter;
+      }
+    }
+
+    if (currentShader != nullptr) {
+      currentShader->unbind();
+      currentShader->drop();
+    }
+
+    if (currentMaterial != nullptr) currentMaterial->drop();
+  }
+
   glfwSwapBuffers(_window);
   glfwPollEvents();
   ++_frameCounter;
 }
 
-void Renderer::drawRenderable(Renderable* renderable) {
-  if (renderable->onPreRender(_deltaTime, nullptr, nullptr)) {
-    renderable->getMaterial();   // Should use Material
-    renderable->getTransform();  // Should calculate MVP and assign to shader in
-                                 // material
-    renderable->onRender();
-  }
-}
-
 Renderer::~Renderer() {
+  std::lock_guard<std::mutex> locker(_renderLock);
   for (Renderable* r : _renderableObjects) r->drop();
   glfwTerminate();
 }

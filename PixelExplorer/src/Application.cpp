@@ -11,13 +11,16 @@
 #include "reactphysics3d/reactphysics3d.h"
 #include "rendering/Renderer.h"
 #include "rendering/Shader.h"
+#include "rendering/TestRenderable.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
   Renderer* renderer = new Renderer(800, 600, "Pixel Explorer V2.0");
 
   renderer->setCursorHidden(false);
-
+  TestRenderable* testObj = new TestRenderable(); 
+  renderer->addRenderable(testObj);
+  testObj->drop();
   while (renderer->getWindowOpen()) {
     renderer->drawFrame();
   }

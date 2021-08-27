@@ -15,7 +15,7 @@ class Renderer : public virtual RefCounted {
   Renderer(int width, int height, const char* title, int FPSLimit = 0);
   virtual ~Renderer();
   void addRenderable(Renderable* renderable);
-  void removeRenderable(unsigned short id);
+  void removeRenderable(unsigned int id);
   void drawFrame();
 
   void removeRenderable(Renderable* renderable) {
@@ -49,8 +49,6 @@ class Renderer : public virtual RefCounted {
   double _lastFrame;
   double _FPSTimer;
   bool _cursorHidden;
-
-  void drawRenderable(Renderable* renderable);
 
   static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
                                          GLenum severity, GLsizei length,

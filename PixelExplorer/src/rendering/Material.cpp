@@ -5,7 +5,5 @@ Material* Material::s_default = nullptr;
 
 Material* Material::loadDefaultMaterial()
 { 
-  Shader* shader = Shader::getDefault();
-  assert(shader->isValid());
-  return new Material(shader);
+  return new Material(Shader::getDefault());
 }

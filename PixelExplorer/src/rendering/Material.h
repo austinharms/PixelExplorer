@@ -15,6 +15,7 @@ class Material : public virtual RefCounted {
   }
 
   void setShader(Shader* s) {
+    assert(s->isValid());
     if (_shader != nullptr) _shader->drop();
     _shader = s;
     if (_shader == nullptr) return;
@@ -24,6 +25,8 @@ class Material : public virtual RefCounted {
   Shader* getShader() const { return _shader; }
 
   unsigned int getId() const { return _id; }
+
+  virtual void onPostBind(){} //Should be called after the attached shader is bound if it has not already been bound
 
   static Material* getDefault() {
     if (s_default == nullptr) s_default = loadDefaultMaterial();

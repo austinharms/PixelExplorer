@@ -1,13 +1,13 @@
 #include "Shader.h"
 
-#include <GL/glew.h>
-
 #include <fstream>
-#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
+
+#include "GL/glew.h"
+#include "glm/gtc/type_ptr.hpp"
 
 Shader* Shader::s_default = nullptr;
 
