@@ -24,6 +24,9 @@ TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _position
     0, 2, 1, 0, 3, 2, //Front
     4, 5, 6, 4, 6, 7, //Back
     0, 4, 7, 0, 7, 3, //Left
+    1, 6, 5, 1, 2, 6, //Right
+    3, 7, 6, 3, 6, 2, //Top
+    0, 5, 4, 0, 1, 5,  //Bottom
   };
 
   _visible = true;
@@ -39,7 +42,7 @@ TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _position
 
   glGenBuffers(1, &_indexBufferId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 18 * sizeof(unsigned short), indices,
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices,
                GL_STATIC_DRAW);
 }
 
@@ -51,15 +54,16 @@ TestRenderable::~TestRenderable() {
 
 bool TestRenderable::onPreRender(float deltaTime, float* cameraPos,
                                  float* cameraRotation) {
-  //_rotation.x += deltaTime;
-  _rotation.y += deltaTime;
+  _rotation.x += deltaTime;
+  //_rotation.y += deltaTime;
+  //_rotation.z += deltaTime;
   return _visible;
 }
 
 void TestRenderable::onRender() {
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-  glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, nullptr);
+  glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
