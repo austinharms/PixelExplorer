@@ -1,19 +1,29 @@
 #include "TestRenderable.h"
+#include "glm/gtx/transform.hpp"
 
-TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _transform(1.0f) {
+TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _position(0.0f, 0.0f, -10.0f), _rotation(0.0f) {
+  //_transform = glm::mat4(
+  //  1.0f, 0.0f, 0.0f, 0.0f,
+  //  0.0f, 1.0f, 0.0f, 0.0f,
+  //  0.0f, 0.0f, 1.0f, 0.0f,
+  //  0.0f, 0.0f,-10.0f, 1.0f
+  //  );
+
   float vertices[24] = {
-    0,0,0, //0
-    1,0,0, //1
-    1,1,0, //2
-    0,1,0, //3
-    0,0,1, //4
-    1,0,1, //5
-    1,1,1, //6
-    0,1,1  //7
+    -0.5f, -0.5f, -0.5f, //0
+     0.5f, -0.5f, -0.5f, //1
+     0.5f,  0.5f, -0.5f, //2
+    -0.5f,  0.5f, -0.5f, //3
+    -0.5f, -0.5f,  0.5f, //4
+     0.5f, -0.5f,  0.5f, //5
+     0.5f,  0.5f,  0.5f, //6
+    -0.5f,  0.5f,  0.5f  //7
   };
 
   unsigned short indices[36] = {
-    0,2,1, 0,3,2
+    0, 2, 1, 0, 3, 2, //Front
+    4, 5, 6, 4, 6, 7, //Back
+    0, 4, 7, 0, 7, 3, //Left
   };
 
   _visible = true;
@@ -29,7 +39,7 @@ TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _transfor
 
   glGenBuffers(1, &_indexBufferId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned short), indices,
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 18 * sizeof(unsigned short), indices,
                GL_STATIC_DRAW);
 }
 
@@ -41,13 +51,15 @@ TestRenderable::~TestRenderable() {
 
 bool TestRenderable::onPreRender(float deltaTime, float* cameraPos,
                                  float* cameraRotation) {
+  //_rotation.x += deltaTime;
+  _rotation.y += deltaTime;
   return _visible;
 }
 
 void TestRenderable::onRender() {
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+  glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, nullptr);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
