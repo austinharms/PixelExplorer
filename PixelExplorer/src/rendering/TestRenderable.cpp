@@ -55,7 +55,7 @@ TestRenderable::~TestRenderable() {
 bool TestRenderable::onPreRender(float deltaTime, float* cameraPos,
                                  float* cameraRotation) {
   _rotation.x += deltaTime;
-  //_rotation.y += deltaTime;
+  _rotation.y += deltaTime;
   //_rotation.z += deltaTime;
   return _visible;
 }
@@ -64,6 +64,4 @@ void TestRenderable::onRender() {
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

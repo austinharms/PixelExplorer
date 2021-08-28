@@ -36,12 +36,33 @@ class Renderer : public virtual RefCounted {
 
   bool getWindowOpen() const { return !glfwWindowShouldClose(_window); }
 
+  void setPosition(glm::vec3 position) {
+    std::lock_guard<std::mutex> drawLock(_renderLock);
+    _position = position;
+  }
+
+  glm::vec3 getPosition() const { return _position; }
+
+  void setRotation(glm::vec3 rotation) {
+    std::lock_guard<std::mutex> drawLock(_renderLock);
+    _rotation = rotation;
+  }
+
+  glm::vec3 getRotation() const { return _rotation; }
+
+  void setTransform(glm::vec3 position, glm::vec3 rotation) {
+    std::lock_guard<std::mutex> drawLock(_renderLock);
+    _position = position;
+    _rotation = rotation;
+  }
+
  private:
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
   int _FPSLimit;
   glm::mat4 _projection;
-  glm::mat4 _view;
+  glm::vec3 _position;
+  glm::vec3 _rotation;
   GLFWwindow* _window;
   int _FPS;
   int _frameCounter;
