@@ -1,17 +1,20 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
+#include <unordered_map>
+#include <cstdint>
+
 #include "GL/glew.h"
 #include "RefCounted.h"
-#include "block/Block.h"
+#include "block/ChunkBlock.h"
 #include "glm/mat4x4.hpp"
 #include "rendering/Renderable.h"
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
-  static const int CHUNK_SIZE = 25;
-  static const int LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
-  static const int BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
+  static const int32_t CHUNK_SIZE = 25;
+  static const int32_t LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
+  static const int32_t BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
 
   Chunk();           // MUST be called on main thread
   virtual ~Chunk();  // MUST be called on main thread
@@ -27,20 +30,21 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   glm::vec3 getPosition() const { return _position; }
 
  private:
-  enum class Face : char { TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK, FACECOUNT };
+  enum class Face : int8_t { TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK, FACECOUNT };
 
   void updateBuffers();  // MUST be called on main thread
 
   float* _vertexBuffer;
-  unsigned short* _buffers[(int)Face::FACECOUNT];
-  Block _blocks[BLOCK_COUNT];
+  unsigned short* _buffers[(int32_t)Face::FACECOUNT];
+  std::unordered_map<uint32_t, uint8_t*> _extendedBlockData;
+  ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
-  unsigned int _indexBuffers[(int)Face::FACECOUNT];
-  unsigned int _vertexArrayId;
-  unsigned int _vertexBufferId;
-  int _vertexCount;
-  unsigned short _indexCount[(int)Face::FACECOUNT];
-  unsigned short _currentIndexCount[(int)Face::FACECOUNT];
+  uint32_t _indexBuffers[(int32_t)Face::FACECOUNT];
+  uint32_t _vertexArrayId;
+  uint32_t _vertexBufferId;
+  int32_t _vertexCount;
+  uint16_t _indexCount[(int32_t)Face::FACECOUNT];
+  uint16_t _currentIndexCount[(int32_t)Face::FACECOUNT];
 
   glm::vec3 _position;
   glm::mat4 _transform;

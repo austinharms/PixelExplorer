@@ -1329,13 +1329,16 @@
     <ClInclude Include="src\chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\Block.h">
+    <ClInclude Include="src\chunk\block\ChunkBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\block\RawBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\block\BlockFace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chunk\block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

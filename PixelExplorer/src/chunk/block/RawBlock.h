@@ -4,7 +4,7 @@
 
 #include "RefCounted.h"
 #include "BlockFace.h"
-#include "Block.h"
+#include "ChunkBlock.h"
 
 class RawBlock : public virtual RefCounted {
  public:
@@ -16,7 +16,7 @@ class RawBlock : public virtual RefCounted {
     return (const BlockFace*)&_faces[(uint8_t)dir - 1];
   }
 
-  const BlockFace* getBlockFace(Block& block) const { 
+  const BlockFace* getBlockFace(ChunkBlock& block) const { 
     //do block rotation math here
     return (const BlockFace*)&_faces[0];
   }
@@ -24,6 +24,11 @@ class RawBlock : public virtual RefCounted {
   bool isSolid() const { return _solid; }
 
   uint32_t getId() const { return _id; }
+
+  static RawBlock* getBlock(uint32_t id) {
+    if (id >= s_blockCount) return nullptr;
+    return s_blocks[id];
+  }
 
  private:
   static RawBlock** s_blocks;
