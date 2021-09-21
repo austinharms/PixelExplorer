@@ -16,9 +16,10 @@ class RawBlock : public virtual RefCounted {
     return (const BlockFace*)&_faces[(uint8_t)dir - 1];
   }
 
-  const BlockFace* getBlockFace(ChunkBlock& block) const { 
+  const BlockFace* getBlockFace(ChunkBlock& block, FaceDirection dir) const { 
     //do block rotation math here
-    return (const BlockFace*)&_faces[0];
+    assert(dir != FaceDirection::NONE);
+    return (const BlockFace*)&_faces[(uint8_t)dir - 1];
   }
 
   bool isSolid() const { return _solid; }

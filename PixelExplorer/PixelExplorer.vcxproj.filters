@@ -1341,6 +1341,9 @@
     <ClInclude Include="src\chunk\block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\chunk\FaceDirection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\textures.png">

@@ -316,6 +316,7 @@
     <ClInclude Include="src\chunk\block\BlockFace.h" />
     <ClInclude Include="src\chunk\block\RawBlock.h" />
     <ClInclude Include="src\chunk\Chunk.h" />
+    <ClInclude Include="src\chunk\FaceDirection.h" />
     <ClInclude Include="src\RefCounted.h" />
     <ClInclude Include="src\rendering\Material.h" />
     <ClInclude Include="src\rendering\Renderable.h" />
