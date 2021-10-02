@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "RefCounted.h"
+#include "../FaceDirection.h"
 
 struct BlockFace : public virtual RefCounted {
  public:

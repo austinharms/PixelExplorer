@@ -2,9 +2,10 @@
 #define RAWBLOCK_H
 #include <cstdint>
 
-#include "RefCounted.h"
+#include "../FaceDirection.h"
 #include "BlockFace.h"
 #include "ChunkBlock.h"
+#include "RefCounted.h"
 
 class RawBlock : public virtual RefCounted {
  public:
@@ -16,8 +17,8 @@ class RawBlock : public virtual RefCounted {
     return (const BlockFace*)&_faces[(uint8_t)dir - 1];
   }
 
-  const BlockFace* getBlockFace(ChunkBlock& block, FaceDirection dir) const { 
-    //do block rotation math here
+  const BlockFace* getBlockFace(ChunkBlock& block, FaceDirection dir) const {
+    // do block rotation math here
     assert(dir != FaceDirection::NONE);
     return (const BlockFace*)&_faces[(uint8_t)dir - 1];
   }
@@ -34,8 +35,9 @@ class RawBlock : public virtual RefCounted {
  private:
   static RawBlock** s_blocks;
   static uint32_t s_blockCount;
-  BlockFace _faces[6];
   uint32_t _id;
+  BlockFace _faces[6];
+  const char* name;
   bool _solid;
 };
 #endif
