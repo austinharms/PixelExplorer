@@ -26,6 +26,7 @@ class RawBlock : public virtual RefCounted {
   bool isSolid() const { return _solid; }
 
   uint32_t getId() const { return _id; }
+  const char* getName() const { return (const char*)_name; }
 
   static RawBlock* getBlock(uint32_t id) {
     if (id >= s_blockCount) return nullptr;
@@ -36,8 +37,9 @@ class RawBlock : public virtual RefCounted {
   static RawBlock** s_blocks;
   static uint32_t s_blockCount;
   uint32_t _id;
-  BlockFace _faces[6];
-  const char* name;
   bool _solid;
+  bool _loaded;
+  BlockFace _faces[6];
+  const char* _name;
 };
 #endif

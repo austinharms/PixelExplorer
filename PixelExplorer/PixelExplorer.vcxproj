@@ -608,6 +608,7 @@
     <ClInclude Include="src\vendor\glm\vec4.hpp" />
     <ClInclude Include="src\vendor\glm\vector_relational.hpp" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
+    <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\default.png" />
