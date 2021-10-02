@@ -6,11 +6,12 @@
 #include "ChunkBlock.h"
 #include "RawBlock.h"
 #include "BlockFace.h"
+#include "BlockData.h"
 #include "../Chunk.h"
 
 class Block : public virtual RefCounted {
  public:
-  Block(Chunk* chunk, ChunkBlock* block = nullptr) {
+  Block(Chunk* chunk, ChunkBlock* block = nullptr, uint32_t index = 0) {
     chunk->grab();
     _parentChunk = chunk;
     _rawBlock = nullptr;
@@ -19,15 +20,16 @@ class Block : public virtual RefCounted {
     _extended = false;
     _checkExtended = false;
     if (block != nullptr)
-      setChunkBlock(block);
+      setChunkBlock(block, index);
   }
 
   virtual ~Block() {
     _parentChunk->drop();
   }
 
-  void setChunkBlock(ChunkBlock* block) {
+  void setChunkBlock(ChunkBlock* block, uint32_t index) {
     _chunkBlock = block;
+    _blockIndex = index;
     if (_rawBlock != nullptr) _rawBlock->drop();
     _rawBlock = RawBlock::getBlock(block->getID());
     _rawBlock->grab();
@@ -54,17 +56,18 @@ class Block : public virtual RefCounted {
     return _extended;
   }
 
-  const uint8_t* getExtendedData() {
+  BlockData* getExtendedData() {
     if (!isExtended()) return nullptr;
     if (_extendedData != nullptr) return _extendedData;
-    _parentChunk->get
+    _parentChunk->getBlockData(_blockIndex);
   }
 
  private:
   Chunk* _parentChunk;
   RawBlock* _rawBlock;
   ChunkBlock* _chunkBlock;
-  uint8_t* _extendedData;
+  uint32_t _blockIndex;
+  BlockData* _extendedData;
   bool _checkExtended;
   bool _extended;
 };

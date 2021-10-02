@@ -5,7 +5,7 @@ Chunk::Chunk() {
   _visible = true;
   _vertexBuffer = nullptr;
   _vertexCount = 0;
-  for (char i = 0; i < (char)Face::FACECOUNT; ++i) {
+  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
     _buffers[i] = nullptr;
     _indexCount[i] = 0;
     _currentIndexCount[i] = 0;
@@ -24,7 +24,7 @@ Chunk::Chunk() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  glGenBuffers((int)Face::FACECOUNT, _indexBuffers);
+  glGenBuffers((int)FaceDirection::FACECOUNT, _indexBuffers);
 }
 
 Chunk::~Chunk() {}
@@ -37,7 +37,7 @@ bool Chunk::onPreRender(float deltaTime, float* cameraPos,
 
 void Chunk::onRender() {
   glBindVertexArray(_vertexArrayId);
-  for (char i = 0; i < (char)Face::FACECOUNT; ++i) {
+  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
     if (_currentIndexCount[i] == 0) continue;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
     glDrawElements(GL_TRIANGLES, _currentIndexCount[i], GL_UNSIGNED_SHORT,
@@ -54,7 +54,7 @@ void Chunk::updateBuffers() {
     _vertexBuffer = nullptr;
   }
 
-  for (char i = 0; i < (char)Face::FACECOUNT; ++i) {
+  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
     if (_buffers[i] != nullptr) {
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,

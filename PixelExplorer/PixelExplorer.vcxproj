@@ -312,6 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\chunk\block\Block.h" />
+    <ClInclude Include="src\chunk\block\BlockData.h" />
     <ClInclude Include="src\chunk\block\ChunkBlock.h" />
     <ClInclude Include="src\chunk\block\BlockFace.h" />
     <ClInclude Include="src\chunk\block\RawBlock.h" />

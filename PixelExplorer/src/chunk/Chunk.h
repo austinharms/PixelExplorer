@@ -7,6 +7,7 @@
 #include "GL/glew.h"
 #include "RefCounted.h"
 #include "block/ChunkBlock.h"
+#include "block/BlockData.h"
 #include "FaceDirection.h"
 #include "glm/mat4x4.hpp"
 #include "rendering/Renderable.h"
@@ -30,12 +31,16 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   glm::vec3 getPosition() const { return _position; }
 
+  BlockData* getBlockData(uint32_t blockIndex) {
+    return &_extendedBlockData.at(blockIndex);
+  }
+
  private:
   void updateBuffers();  // MUST be called on main thread
 
   float* _vertexBuffer;
   unsigned short* _buffers[(int32_t)FaceDirection::FACECOUNT];
-  std::unordered_map<uint32_t, uint8_t*> _extendedBlockData;
+  std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
   uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
