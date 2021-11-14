@@ -1335,7 +1335,7 @@
     <ClInclude Include="src\chunk\block\ChunkBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\RawBlock.h">
+    <ClInclude Include="src\chunk\block\BaseBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\block\BlockFace.h">

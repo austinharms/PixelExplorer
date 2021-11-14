@@ -7,10 +7,10 @@
 #include "ChunkBlock.h"
 #include "RefCounted.h"
 
-class RawBlock : public virtual RefCounted {
+class BaseBlock : public virtual RefCounted {
  public:
-  RawBlock();
-  virtual ~RawBlock();
+  BaseBlock();
+  virtual ~BaseBlock();
 
   const BlockFace* getBlockFace(FaceDirection dir) const {
     assert(dir != FaceDirection::NONE);
@@ -28,13 +28,13 @@ class RawBlock : public virtual RefCounted {
   uint32_t getId() const { return _id; }
   const char* getName() const { return (const char*)_name; }
 
-  static RawBlock* getBlock(uint32_t id) {
+  static BaseBlock* getBlock(uint32_t id) {
     if (id >= s_blockCount) return nullptr;
     return s_blocks[id];
   }
 
  private:
-  static RawBlock** s_blocks;
+  static BaseBlock** s_blocks;
   static uint32_t s_blockCount;
   uint32_t _id;
   bool _solid;

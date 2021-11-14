@@ -4,7 +4,7 @@
 
 #include "RefCounted.h"
 #include "ChunkBlock.h"
-#include "RawBlock.h"
+#include "BaseBlock.h"
 #include "BlockFace.h"
 #include "BlockData.h"
 #include "../Chunk.h"
@@ -14,11 +14,12 @@ class Block : public virtual RefCounted {
   Block(Chunk* chunk, ChunkBlock* block = nullptr, uint32_t index = 0) {
     chunk->grab();
     _parentChunk = chunk;
-    _rawBlock = nullptr;
+    _baseBlock = nullptr;
     _chunkBlock = nullptr;
     _extendedData = nullptr;
     _extended = false;
     _checkExtended = false;
+    _blockIndex = index;
     if (block != nullptr)
       setChunkBlock(block, index);
   }
@@ -30,19 +31,19 @@ class Block : public virtual RefCounted {
   void setChunkBlock(ChunkBlock* block, uint32_t index) {
     _chunkBlock = block;
     _blockIndex = index;
-    if (_rawBlock != nullptr) _rawBlock->drop();
-    _rawBlock = RawBlock::getBlock(block->getID());
-    _rawBlock->grab();
+    if (_baseBlock != nullptr) _baseBlock->drop();
+    _baseBlock = BaseBlock::getBlock(block->getID());
+    _baseBlock->grab();
     _extendedData = nullptr;
     _checkExtended = false;
     _extended = false;
   }
 
   const BlockFace* getBlockFace(FaceDirection face) const {
-    return _rawBlock->getBlockFace(*_chunkBlock, face);
+    return _baseBlock->getBlockFace(*_chunkBlock, face);
   }
 
-  const bool isSolid() const { return _rawBlock->isSolid(); }
+  const bool isSolid() const { return _baseBlock->isSolid(); }
 
   const bool isFaceSolid(FaceDirection face) const {
     if (isSolid()) return true;
@@ -64,7 +65,7 @@ class Block : public virtual RefCounted {
 
  private:
   Chunk* _parentChunk;
-  RawBlock* _rawBlock;
+  BaseBlock* _baseBlock;
   ChunkBlock* _chunkBlock;
   uint32_t _blockIndex;
   BlockData* _extendedData;
