@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <fstream>
 #include <string>
-#include <vector>
+#include <set>
 #include <unordered_map>
 
 #include "../FaceDirection.h"
@@ -14,9 +14,11 @@
 
 class BaseBlock : public virtual RefCounted {
  public:
-  const static uint16_t VERSION = 1;
+  const static uint16_t MANIFEST_VERSION = 1;
+  const static uint16_t PACKAGE_VERSION = 1;
   virtual ~BaseBlock();
   static void LoadBlockManifest();
+  static void UnloadBlocks();
   static bool LoadPackage(std::string name, bool updateManifest = true);
 
   const BlockFace* getBlockFace(FaceDirection dir) const {
@@ -34,7 +36,7 @@ class BaseBlock : public virtual RefCounted {
 
   uint32_t getId() const { return _id; }
 
-  const char* getName() const { return (const char*)_name; }
+  const std::string getName() const { return _name; }
 
   static BaseBlock* getBlock(uint32_t id) {
     if (id >= s_blockCount) return nullptr;
@@ -47,12 +49,12 @@ class BaseBlock : public virtual RefCounted {
 
   static BaseBlock* s_blocks;
   static uint32_t s_blockCount;
-  static std::vector<std::string> s_packages;
+  static std::set<std::string> s_packages;
   static std::unordered_map<std::string, uint32_t> s_blockLookupTable;
   uint32_t _id;
   bool _solid;
   bool _loaded;
   BlockFace _faces[6];
-  const char* _name;
+  std::string _name;
 };
 #endif
