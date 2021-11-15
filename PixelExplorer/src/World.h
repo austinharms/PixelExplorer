@@ -1,22 +1,23 @@
 #ifndef WORLD_H
 #define WORLD_H
+#include <string>
 
 class World {
  public:
   static void LoadWorld();
 
-  static const char* AppAssetDir() { return _appAssetDir; }
+  static const std::string GetAppAssetDir() { return _appAssetDir; }
 
-  static const char* AssetDir() { return _assetDir; }
+  static const std::string GetAssetDir() { return _assetDir; }
 
-  static const char* WorldDir() { return _worldDir; }
+  static const std::string GetWorldDir() { return _worldDir; }
 
  private:
   World() {}
   ~World() {}
 
-  static const char* _appAssetDir;
-  static const char* _assetDir;
-  static const char* _worldDir;
+  static std::string _appAssetDir;
+  static std::string _assetDir;
+  static std::string _worldDir;
 };
 #endif
