@@ -8,7 +8,7 @@ std::set<std::string> BaseBlock::s_packages = std::set<std::string>();
 std::unordered_map<std::string, uint32_t> BaseBlock::s_blockLookupTable =
     std::unordered_map<std::string, uint32_t>();
 
-BaseBlock::BaseBlock() {}
+BaseBlock::BaseBlock() : RefCounted(false) {}
 
 BaseBlock::~BaseBlock() {}
 
