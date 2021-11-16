@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw", "glfw-3.3.4\src\glfw
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reactphysics3d", "reactphysics3d\reactphysics3d.vcxproj", "{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Package Creator", "Package Creator\Package Creator.vcxproj", "{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -72,6 +74,18 @@ Global
 		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x64.Build.0 = Release|x64
 		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x86.ActiveCfg = Release|Win32
 		{8A80F867-7C6E-3F94-8ADA-4BC6C2B5B346}.Release|x86.Build.0 = Release|Win32
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug|x64.ActiveCfg = Debug|x64
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug|x64.Build.0 = Debug|x64
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug|x86.ActiveCfg = Debug|Win32
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug|x86.Build.0 = Debug|Win32
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug-NoPhysics|x64.ActiveCfg = Debug|x64
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug-NoPhysics|x64.Build.0 = Debug|x64
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug-NoPhysics|x86.ActiveCfg = Debug|Win32
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Debug-NoPhysics|x86.Build.0 = Debug|Win32
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Release|x64.ActiveCfg = Release|x64
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Release|x64.Build.0 = Release|x64
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Release|x86.ActiveCfg = Release|Win32
+		{5F5D4AEE-BA66-482D-B28D-E6F6AF6875AA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

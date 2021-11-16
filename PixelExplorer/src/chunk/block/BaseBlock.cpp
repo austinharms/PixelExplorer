@@ -12,7 +12,7 @@ BaseBlock::BaseBlock() {}
 
 BaseBlock::~BaseBlock() {}
 
-void BaseBlock::UnloadBlocks() { 
+void BaseBlock::UnloadBlocks() {
   if (BaseBlock::s_blocks != nullptr) {
     for (uint32_t i = 0; i <= BaseBlock::s_blockCount; ++i)
       assert(BaseBlock::s_blocks[i].drop());
@@ -41,7 +41,7 @@ void BaseBlock::LoadBlockManifest() {
     manifest.read((char*)&version, sizeof(uint16_t));
     assert(version == BaseBlock::MANIFEST_VERSION);
 
-    //Load Block Mapping
+    // Load Block Mapping
     manifest.read((char*)&BaseBlock::s_blockCount,
                   sizeof(BaseBlock::s_blockCount));
     std::cout << "Loading " << BaseBlock::s_blockCount
@@ -61,13 +61,14 @@ void BaseBlock::LoadBlockManifest() {
       BaseBlock::s_blocks[blockId]._id = blockId;
       BaseBlock::s_blocks[blockId]._loaded = false;
     }
-    
-    //Load Packages
+
+    // Load Packages
     uint16_t packageCount;
     uint32_t startingBlockCount = BaseBlock::s_blockCount;
     manifest.read((char*)&packageCount, sizeof(uint16_t));
-    std::cout << "Loading " << packageCount << " Packages from Manifest" << std::endl;
-    assert(LoadPackage("default", false));
+    std::cout << "Loading " << packageCount << " Packages from Manifest"
+              << std::endl;
+    assert(LoadPackage("default"));
     for (uint16_t i = 0; i < packageCount; ++i) {
       uint8_t nameLength;
       manifest.read((char*)&nameLength, sizeof(uint8_t));
@@ -75,10 +76,10 @@ void BaseBlock::LoadBlockManifest() {
       manifest.read(name, nameLength);
       name[nameLength] = '\0';
       std::string packageName = std::string(name);
-      LoadPackage(packageName, false);
+      LoadPackage(packageName);
     }
 
-    //Check if we added any new blocks, if so update the manifest
+    // Check if we added any new blocks, if so update the manifest
     if (BaseBlock::s_blockCount != startingBlockCount) manifestChanged = true;
   }
 
@@ -130,11 +131,13 @@ void BaseBlock::UpdateManifest() {
   std::cout << "Updated Block Manifest" << std::endl;
 }
 
-bool BaseBlock::LoadPackage(std::string name, bool updateManifest) {
+bool BaseBlock::LoadPackage(std::string name) {
   // Dont load package if its already loaded
   if (!BaseBlock::s_packages.empty() &&
       BaseBlock::s_packages.find(name) != BaseBlock::s_packages.end())
     return true;
+
+  // Load Package File
   std::string path = World::GetAppAssetDir() + name + ".pxb";
   std::ifstream package(path.c_str(), std::ios::binary);
   if (!package || package.peek() == std::ifstream::traits_type::eof()) {
@@ -150,37 +153,107 @@ bool BaseBlock::LoadPackage(std::string name, bool updateManifest) {
     }
   }
 
+  // Get Package Version
   uint16_t version;
   package.read((char*)&version, sizeof(uint16_t));
   if (version != BaseBlock::PACKAGE_VERSION) {
     package.close();
-    std::cout << "Warrning, Failed to Load Block Package: " << name << ", Incorrect Package Version"
-              << std::endl;
+    std::cout << "Warrning, Failed to Load Block Package: " << name
+              << ", Incorrect Package Version" << std::endl;
     return false;
   }
 
+  // Load Package Blocks
   uint16_t blockCount;
-  package.read((char*)&version, sizeof(uint16_t));
+  package.read((char*)&blockCount, sizeof(uint16_t));
   for (uint16_t i = 0; i < blockCount; ++i) {
+    // Get Block Name and Id
     uint8_t nameLength;
     package.read((char*)&nameLength, sizeof(uint8_t));
-    char name[256];
-    package.read(name, nameLength);
-    name[nameLength] = '\0';
-    std::string blockName = std::string(name);
+    char blockNameChars[256];
+    package.read(blockNameChars, nameLength);
+    blockNameChars[nameLength] = '\0';
+    std::string blockName = name + "/" + std::string(blockNameChars);
     std::unordered_map<std::string, uint32_t>::const_iterator keyPos =
         BaseBlock::s_blockLookupTable.find(blockName);
-    if (keyPos == BaseBlock::s_blockLookupTable.end()) {
-    
+    bool newBlock = keyPos == BaseBlock::s_blockLookupTable.end();
+    if (newBlock) {
+      BaseBlock::s_blockLookupTable.insert(
+          {blockName, ++BaseBlock::s_blockCount});
+      std::cout << "New Block Added " << blockName
+                << " with id: " << BaseBlock::s_blockCount << std::endl;
     }
 
-    uint32_t id = keyPos->second;
+    uint32_t id;
+    if (!newBlock) id = keyPos->second;
+
+    // Load data to BaseBlock
+    if (!newBlock) BaseBlock::s_blocks[id]._loaded = true;
+    uint8_t solid;
+    package.read((char*)&solid, sizeof(uint8_t));
+    uint8_t faceCount;
+
+    // Load Block Faces
+    package.read((char*)&faceCount, sizeof(uint8_t));
+    assert(faceCount == 6);
+    for (uint8_t j = 0; j < faceCount; ++j) {
+      uint8_t faceInt;
+      package.read((char*)&faceInt, sizeof(uint8_t));
+      BlockFace* face = &BaseBlock::s_blocks[id]._faces[faceInt];
+      face->direction = (FaceDirection)faceInt;
+
+      uint8_t solid;
+      package.read((char*)&solid, sizeof(uint8_t));
+      face->solid == solid == 1;
+      uint8_t transparent;
+      package.read((char*)&transparent, sizeof(uint8_t));
+      face->transparent = transparent == 1;
+
+      uint8_t vertexCount;
+      package.read((char*)&vertexCount, sizeof(uint8_t));
+      face->vertexCount = vertexCount;
+      face->vertices = new float[((uint32_t)vertexCount) * 3];
+      face->uvs = new float[((uint32_t)vertexCount) * 2];
+      for (uint32_t vert = 0; vert < vertexCount; ++vert) {
+        for (uint8_t k = 0; k < 3; ++k) {
+          float point;
+          package.read((char*)&point, sizeof(float));
+          face->vertices[vert * 3 + k] = point;
+        }
+
+        for (uint8_t k = 0; k < 2; ++k) {
+          float point;
+          package.read((char*)&point, sizeof(float));
+          face->uvs[vert * 2 + k] = point;
+        }
+      }
+
+      uint8_t indexCount;
+      package.read((char*)&indexCount, sizeof(uint8_t));
+      face->indexCount = indexCount;
+      face->indices = new uint8_t[indexCount];
+      for (uint8_t indice = 0; indice < indexCount; ++indice) {
+        uint8_t index;
+        package.read((char*)&index, sizeof(float));
+        face->indices[indice] = index;
+      }
+    }
+
+    std::cout << "Loaded Block " << blockName << std::endl;
   }
 
+  uint8_t end;
+  package.read((char*)&end, sizeof(uint8_t));
   BaseBlock::s_packages.insert(name);
-  std::cout << "Loaded Block Package: " << name << " from " << path << std::endl;
+
+  if (end == 0) {
+    std::cout << "Loaded Block Package: " << name << " from " << path
+              << std::endl;
+  } else {
+    std::cout << "Warrning May Have Failed Loading Package " << name << " from "
+              << path << " No Trailing NULL" << std::endl;
+  }
 
   package.close();
-  if (updateManifest) UpdateManifest();
   return true;
 }

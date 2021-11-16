@@ -19,7 +19,6 @@ class BaseBlock : public virtual RefCounted {
   virtual ~BaseBlock();
   static void LoadBlockManifest();
   static void UnloadBlocks();
-  static bool LoadPackage(std::string name, bool updateManifest = true);
 
   const BlockFace* getBlockFace(FaceDirection dir) const {
     assert(dir != FaceDirection::NONE);
@@ -46,6 +45,7 @@ class BaseBlock : public virtual RefCounted {
  private:
   BaseBlock();
   static void UpdateManifest();
+  static bool LoadPackage(std::string name);
 
   static BaseBlock* s_blocks;
   static uint32_t s_blockCount;
