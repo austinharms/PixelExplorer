@@ -7,6 +7,26 @@
 
 struct BlockFace : public virtual RefCounted {
  public:
+   BlockFace() { 
+     indices = nullptr;
+     vertices = nullptr;
+     uvs = nullptr;
+     direction = FaceDirection::NONE;
+     solid = false;
+     transparent = false;
+     indexCount = 0;
+     vertexCount = 0;
+  }
+
+  ~BlockFace() { 
+    if (indices != nullptr)
+      delete[] indices;
+    if (vertices != nullptr)
+      delete[] vertices;
+    if (uvs != nullptr)
+      delete[] uvs;
+  }
+
   uint8_t* indices;
   float* vertices;
   float* uvs;

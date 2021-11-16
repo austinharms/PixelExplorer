@@ -14,7 +14,7 @@ BaseBlock::~BaseBlock() {}
 
 void BaseBlock::UnloadBlocks() {
   if (BaseBlock::s_blocks != nullptr) {
-    for (uint32_t i = 0; i <= BaseBlock::s_blockCount; ++i)
+    for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i)
       assert(BaseBlock::s_blocks[i].drop());
 
     delete[] BaseBlock::s_blocks;
@@ -80,7 +80,11 @@ void BaseBlock::LoadBlockManifest() {
     }
 
     // Check if we added any new blocks, if so update the manifest
-    if (BaseBlock::s_blockCount != startingBlockCount) manifestChanged = true;
+    if (BaseBlock::s_blockCount != startingBlockCount) {
+      manifestChanged = true;
+      // Change count back to not throw outof bounds when unloading blocks
+      BaseBlock::s_blockCount = startingBlockCount;
+    }
   }
 
   manifest.close();
@@ -102,8 +106,8 @@ void BaseBlock::UpdateManifest() {
                  sizeof(BaseBlock::MANIFEST_VERSION));
 
   // Write Block Count
-  manifest.write((const char*)&BaseBlock::s_blockCount,
-                 sizeof(BaseBlock::s_blockCount));
+  uint32_t count = BaseBlock::s_blockLookupTable.size();
+  manifest.write((const char*)&count, sizeof(uint32_t));
   // Write Block Loopup Table: id, name length, name
   for (std::pair<const std::string, uint32_t>& pair :
        BaseBlock::s_blockLookupTable) {
@@ -137,6 +141,8 @@ bool BaseBlock::LoadPackage(std::string name) {
       BaseBlock::s_packages.find(name) != BaseBlock::s_packages.end())
     return true;
 
+  std::cout << "Loading Block Package: " << name << std::endl;
+
   // Load Package File
   std::string path = World::GetAppAssetDir() + name + ".pxb";
   std::ifstream package(path.c_str(), std::ios::binary);
@@ -148,7 +154,7 @@ bool BaseBlock::LoadPackage(std::string name) {
     if (!package || package.peek() == std::ifstream::traits_type::eof()) {
       package.close();
       std::cout << "Warrning, Failed to Load Block Package: " << name
-                << std::endl;
+                << " Package not Found" << std::endl;
       return false;
     }
   }
@@ -177,14 +183,13 @@ bool BaseBlock::LoadPackage(std::string name) {
     std::unordered_map<std::string, uint32_t>::const_iterator keyPos =
         BaseBlock::s_blockLookupTable.find(blockName);
     bool newBlock = keyPos == BaseBlock::s_blockLookupTable.end();
+    uint32_t id;
     if (newBlock) {
-      BaseBlock::s_blockLookupTable.insert(
-          {blockName, ++BaseBlock::s_blockCount});
-      std::cout << "New Block Added " << blockName
-                << " with id: " << BaseBlock::s_blockCount << std::endl;
+      id = BaseBlock::s_blockCount++;
+      BaseBlock::s_blockLookupTable.insert({blockName, id});
+      std::cout << "New Block " << blockName << " id: " << id << std::endl;
     }
 
-    uint32_t id;
     if (!newBlock) id = keyPos->second;
 
     // Load data to BaseBlock
@@ -199,7 +204,13 @@ bool BaseBlock::LoadPackage(std::string name) {
     for (uint8_t j = 0; j < faceCount; ++j) {
       uint8_t faceInt;
       package.read((char*)&faceInt, sizeof(uint8_t));
-      BlockFace* face = &BaseBlock::s_blocks[id]._faces[faceInt];
+      BlockFace* face;
+      if (!newBlock) {
+        face = &BaseBlock::s_blocks[id]._faces[faceInt];
+      } else {
+        face = new BlockFace();
+      }
+
       face->direction = (FaceDirection)faceInt;
 
       uint8_t solid;
@@ -237,19 +248,19 @@ bool BaseBlock::LoadPackage(std::string name) {
         package.read((char*)&index, sizeof(float));
         face->indices[indice] = index;
       }
+
+      if (newBlock) delete face;
     }
 
-    std::cout << "Loaded Block " << blockName << std::endl;
+    if (!newBlock)
+      std::cout << "Loaded Block " << blockName << " id: " << id << std::endl;
   }
 
   uint8_t end;
   package.read((char*)&end, sizeof(uint8_t));
   BaseBlock::s_packages.insert(name);
 
-  if (end == 0) {
-    std::cout << "Loaded Block Package: " << name << " from " << path
-              << std::endl;
-  } else {
+  if (end != 0) {
     std::cout << "Warrning May Have Failed Loading Package " << name << " from "
               << path << " No Trailing NULL" << std::endl;
   }
