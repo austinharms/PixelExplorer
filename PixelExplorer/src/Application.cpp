@@ -32,6 +32,7 @@ int main(void) {
   Material::getDefault()->drop();
   Shader::getDefault()->drop();
   renderer->drop();
+  BaseBlock::UnloadBlocks();
   //END OF ORDER IMPORTANT
 
   _CrtDumpMemoryLeaks();

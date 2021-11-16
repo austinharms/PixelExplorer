@@ -5,7 +5,7 @@
 #include "RefCounted.h"
 #include "../FaceDirection.h"
 
-struct BlockFace : public virtual RefCounted {
+struct BlockFace {
  public:
    BlockFace() { 
      indices = nullptr;
