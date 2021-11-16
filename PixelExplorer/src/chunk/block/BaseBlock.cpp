@@ -46,7 +46,7 @@ void BaseBlock::LoadBlockManifest() {
                   sizeof(BaseBlock::s_blockCount));
     std::cout << "Loading " << BaseBlock::s_blockCount
               << " Blocks from Manifest" << std::endl;
-    BaseBlock::s_blocks = new BaseBlock[BaseBlock::s_blockCount + 1];
+    BaseBlock::s_blocks = new BaseBlock[BaseBlock::s_blockCount];
     for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
       uint32_t blockId;
       manifest.read((char*)&blockId, sizeof(uint32_t));
@@ -64,6 +64,7 @@ void BaseBlock::LoadBlockManifest() {
     
     //Load Packages
     uint16_t packageCount;
+    uint32_t startingBlockCount = BaseBlock::s_blockCount;
     manifest.read((char*)&packageCount, sizeof(uint16_t));
     std::cout << "Loading " << packageCount << " Packages from Manifest" << std::endl;
     assert(LoadPackage("default", false));
@@ -76,6 +77,9 @@ void BaseBlock::LoadBlockManifest() {
       std::string packageName = std::string(name);
       LoadPackage(packageName, false);
     }
+
+    //Check if we added any new blocks, if so update the manifest
+    if (BaseBlock::s_blockCount != startingBlockCount) manifestChanged = true;
   }
 
   manifest.close();
@@ -153,6 +157,24 @@ bool BaseBlock::LoadPackage(std::string name, bool updateManifest) {
     std::cout << "Warrning, Failed to Load Block Package: " << name << ", Incorrect Package Version"
               << std::endl;
     return false;
+  }
+
+  uint16_t blockCount;
+  package.read((char*)&version, sizeof(uint16_t));
+  for (uint16_t i = 0; i < blockCount; ++i) {
+    uint8_t nameLength;
+    package.read((char*)&nameLength, sizeof(uint8_t));
+    char name[256];
+    package.read(name, nameLength);
+    name[nameLength] = '\0';
+    std::string blockName = std::string(name);
+    std::unordered_map<std::string, uint32_t>::const_iterator keyPos =
+        BaseBlock::s_blockLookupTable.find(blockName);
+    if (keyPos == BaseBlock::s_blockLookupTable.end()) {
+    
+    }
+
+    uint32_t id = keyPos->second;
   }
 
   BaseBlock::s_packages.insert(name);
