@@ -11,6 +11,7 @@
 #include "FaceDirection.h"
 #include "glm/mat4x4.hpp"
 #include "rendering/Renderable.h"
+#include <mutex>
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
@@ -35,10 +36,13 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
     return &_extendedBlockData.at(blockIndex);
   }
 
+  void UpdateMesh();
+
  private:
   void updateBuffers();  // MUST be called on main thread
 
   float* _vertexBuffer;
+  std::mutex _meshBuffersLock;
   unsigned short* _buffers[(int32_t)FaceDirection::FACECOUNT];
   std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];

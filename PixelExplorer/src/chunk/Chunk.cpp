@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include <chunk/block/Block.h>
 
 Chunk::Chunk() {
   setPosition(glm::vec3(0));
@@ -49,27 +50,71 @@ void Chunk::onRender() {
   }
 }
 
-void Chunk::updateBuffers() {
+void Chunk::UpdateMesh() { 
+  std::lock_guard<std::mutex> lock(_meshBuffersLock);
+
+  //Clear Old Buffer Data
   if (_vertexBuffer != nullptr) {
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
-    glBufferData(GL_ARRAY_BUFFER, _vertexCount * 5 * sizeof(float),
-                 _vertexBuffer, GL_STATIC_DRAW);
     free(_vertexBuffer);
     _vertexBuffer = nullptr;
   }
 
+  _vertexCount = 0;
+
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
     if (_buffers[i] != nullptr) {
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                   _indexCount[i] * sizeof(unsigned short), _buffers[i],
-                   GL_STATIC_DRAW);
-      _currentIndexCount[i] = _indexCount[i];
-      _indexCount[i] = 0;
       free(_buffers[i]);
       _buffers[i] = nullptr;
     }
+
+    _indexCount[i] = 0;
   }
 
-  _buffersDirty = false;
+
+  uint8_t x = 0;
+  uint8_t y = 0;
+  uint8_t z = 0;
+  Block curBlock(this);
+
+  for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
+    //Front Faces
+    
+
+    if (++x == Chunk::CHUNK_SIZE) {
+      x = 0;
+      if (++z == Chunk::CHUNK_SIZE) {
+        z = 0;
+        ++y;
+      }
+    }
+  }
+
+}
+
+void Chunk::updateBuffers() {
+  if (_meshBuffersLock.try_lock()) {
+    if (_vertexBuffer != nullptr) {
+      glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
+      glBufferData(GL_ARRAY_BUFFER, _vertexCount * 5 * sizeof(float),
+                   _vertexBuffer, GL_STATIC_DRAW);
+      free(_vertexBuffer);
+      _vertexBuffer = nullptr;
+    }
+
+    for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
+      if (_buffers[i] != nullptr) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     _indexCount[i] * sizeof(unsigned short), _buffers[i],
+                     GL_STATIC_DRAW);
+        _currentIndexCount[i] = _indexCount[i];
+        _indexCount[i] = 0;
+        free(_buffers[i]);
+        _buffers[i] = nullptr;
+      }
+    }
+
+    _buffersDirty = false;
+    _meshBuffersLock.unlock();
+  }
 }
