@@ -43,6 +43,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
+  uint8_t _visibleFaces;
   uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _vertexArrayId;
   uint32_t _vertexBufferId;

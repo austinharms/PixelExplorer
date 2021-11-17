@@ -32,13 +32,17 @@ Chunk::~Chunk() {}
 bool Chunk::onPreRender(float deltaTime, float* cameraPos,
                         float* cameraRotation) {
   if (_buffersDirty) updateBuffers();
+  _visibleFaces = FaceDirectionFlag::ALL;
   return _visible;
 }
 
 void Chunk::onRender() {
   glBindVertexArray(_vertexArrayId);
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-    if (_currentIndexCount[i] == 0) continue;
+    if (!(_visibleFaces & FaceDirectionFlag::DirectionToFlag(i)) ||
+        !_currentIndexCount[i])
+      continue;
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
     glDrawElements(GL_TRIANGLES, _currentIndexCount[i], GL_UNSIGNED_SHORT,
                    nullptr);
