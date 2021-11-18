@@ -21,7 +21,6 @@ class TestRenderable : public virtual RefCounted, public virtual Renderable {
     t[3][1] = _position.y;
     t[3][2] = _position.z;
     return t;
-    ;
   }
 
  private:

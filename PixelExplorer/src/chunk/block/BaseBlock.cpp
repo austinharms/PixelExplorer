@@ -245,7 +245,7 @@ bool BaseBlock::LoadPackage(std::string name) {
       face->indices = new uint8_t[indexCount];
       for (uint8_t indice = 0; indice < indexCount; ++indice) {
         uint8_t index;
-        package.read((char*)&index, sizeof(float));
+        package.read((char*)&index, sizeof(uint8_t));
         face->indices[indice] = index;
       }
 

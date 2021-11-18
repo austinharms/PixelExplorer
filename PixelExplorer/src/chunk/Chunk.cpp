@@ -1,7 +1,10 @@
 #include "Chunk.h"
+
 #include <chunk/block/Block.h>
 
-Chunk::Chunk() {
+void* Chunk::s_emptyBuffer = malloc(1);
+
+Chunk::Chunk() : Renderable(Material::getDefault()) {
   setPosition(glm::vec3(0));
   _visible = true;
   _vertexBuffer = nullptr;
@@ -26,6 +29,10 @@ Chunk::Chunk() {
   glBindVertexArray(0);
 
   glGenBuffers((int)FaceDirection::FACECOUNT, _indexBuffers);
+
+  //for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
+  //  
+  //}
 }
 
 Chunk::~Chunk() {}
@@ -50,12 +57,13 @@ void Chunk::onRender() {
   }
 }
 
-void Chunk::UpdateMesh() { 
+void Chunk::updateMesh() {
   std::lock_guard<std::mutex> lock(_meshBuffersLock);
 
-  //Clear Old Buffer Data
+  // Clear Old Buffer Data
   if (_vertexBuffer != nullptr) {
-    free(_vertexBuffer);
+    if (_vertexBuffer != Chunk::s_emptyBuffer)
+      free(_vertexBuffer);
     _vertexBuffer = nullptr;
   }
 
@@ -63,32 +71,86 @@ void Chunk::UpdateMesh() {
 
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
     if (_buffers[i] != nullptr) {
-      free(_buffers[i]);
+      if (_buffers[i] != Chunk::s_emptyBuffer)
+        free(_buffers[i]);
       _buffers[i] = nullptr;
     }
 
     _indexCount[i] = 0;
   }
 
-
-  uint8_t x = 0;
-  uint8_t y = 0;
-  uint8_t z = 0;
+  // uint8_t x = 0;
+  // uint8_t y = 0;
+  // uint8_t z = 0;
   Block curBlock(this);
-
+  uint8_t faceNum;
   for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
-    //Front Faces
-    
+    curBlock.setChunkBlock(&_blocks[i], i);
+    // Front Faces
+    faceNum = (uint8_t)FaceDirection::FRONT;
+    const BlockFace* face = curBlock.getBlockFace(FaceDirection::FRONT);
+    _vertexCount += face->vertexCount;
+    _indexCount[faceNum] += face->indexCount;
 
-    if (++x == Chunk::CHUNK_SIZE) {
-      x = 0;
-      if (++z == Chunk::CHUNK_SIZE) {
-        z = 0;
-        ++y;
-      }
-    }
+    // if (++x == Chunk::CHUNK_SIZE) {
+    //  x = 0;
+    //  if (++z == Chunk::CHUNK_SIZE) {
+    //    z = 0;
+    //    ++y;
+    //  }
+    //}
   }
 
+  if (_vertexCount == 0) {
+    _vertexBuffer = (float*)Chunk::s_emptyBuffer;
+  } else {
+    _vertexBuffer = (float*)malloc(_vertexCount * 5 * sizeof(float));
+  }
+
+  _vertexCount = 0;
+
+  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
+    if (_indexCount[i] == 0) {
+      _buffers[i] = (uint16_t*)Chunk::s_emptyBuffer;
+    } else {
+      _buffers[i] = (uint16_t*)malloc(_indexCount[i] * sizeof(uint16_t));
+    }
+
+    _indexCount[i] = 0;
+  }
+
+  // x = 0;
+  // y = 0;
+  // z = 0;
+  for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
+    curBlock.setChunkBlock(&_blocks[i], i);
+    // Front Faces
+    faceNum = (uint8_t)FaceDirection::FRONT;
+    const BlockFace* face = curBlock.getBlockFace(FaceDirection::FRONT);
+    for (uint16_t j = 0; j < face->vertexCount; ++j) {
+      _vertexBuffer[_vertexCount * 5] = face->vertices[j * 3];
+      _vertexBuffer[_vertexCount * 5 + 1] = face->vertices[j * 3 + 1];
+      _vertexBuffer[_vertexCount * 5 + 2] = face->vertices[j * 3 + 2];
+      _vertexBuffer[_vertexCount * 5 + 3] = face->uvs[j * 2];
+      _vertexBuffer[_vertexCount * 5 + 4] = face->uvs[j * 2 + 1];
+      ++_vertexCount;
+    }
+
+    for (uint16_t j = 0; j < face->indexCount; ++j)
+      _buffers[faceNum][_indexCount[faceNum] + j] = (face->indices[j]) + _indexCount[faceNum];
+
+    _indexCount[faceNum] += face->indexCount;
+
+    // if (++x == Chunk::CHUNK_SIZE) {
+    //  x = 0;
+    //  if (++z == Chunk::CHUNK_SIZE) {
+    //    z = 0;
+    //    ++y;
+    //  }
+    //}
+  }
+
+  _buffersDirty = true;
 }
 
 void Chunk::updateBuffers() {
@@ -97,7 +159,8 @@ void Chunk::updateBuffers() {
       glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
       glBufferData(GL_ARRAY_BUFFER, _vertexCount * 5 * sizeof(float),
                    _vertexBuffer, GL_STATIC_DRAW);
-      free(_vertexBuffer);
+      if (_vertexBuffer != Chunk::s_emptyBuffer)
+        free(_vertexBuffer);
       _vertexBuffer = nullptr;
     }
 
@@ -109,7 +172,8 @@ void Chunk::updateBuffers() {
                      GL_STATIC_DRAW);
         _currentIndexCount[i] = _indexCount[i];
         _indexCount[i] = 0;
-        free(_buffers[i]);
+        if (_buffers[i] != Chunk::s_emptyBuffer)
+          free(_buffers[i]);
         _buffers[i] = nullptr;
       }
     }

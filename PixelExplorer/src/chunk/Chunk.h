@@ -1,17 +1,17 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include <unordered_map>
 #include <cstdint>
+#include <mutex>
+#include <unordered_map>
 
+#include "FaceDirection.h"
 #include "GL/glew.h"
 #include "RefCounted.h"
-#include "block/ChunkBlock.h"
 #include "block/BlockData.h"
-#include "FaceDirection.h"
+#include "block/ChunkBlock.h"
 #include "glm/mat4x4.hpp"
 #include "rendering/Renderable.h"
-#include <mutex>
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
@@ -23,6 +23,8 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   virtual ~Chunk();  // MUST be called on main thread
   bool onPreRender(float deltaTime, float* cameraPos, float* cameraRotation);
   void onRender();
+  void updateMesh();
+
   void setPosition(glm::vec3 position) {
     _position = position;
     _transform =
@@ -32,18 +34,24 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   glm::vec3 getPosition() const { return _position; }
 
+  glm::mat4 getTransform() { return _transform; }
+
   BlockData* getBlockData(uint32_t blockIndex) {
     return &_extendedBlockData.at(blockIndex);
   }
 
-  void UpdateMesh();
+  static void freeEmptyBuffer() {
+    if (s_emptyBuffer != nullptr) free(s_emptyBuffer);
+  }
 
  private:
+  static void* s_emptyBuffer;
+
   void updateBuffers();  // MUST be called on main thread
 
   float* _vertexBuffer;
   std::mutex _meshBuffersLock;
-  unsigned short* _buffers[(int32_t)FaceDirection::FACECOUNT];
+  uint16_t* _buffers[(int32_t)FaceDirection::FACECOUNT];
   std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;

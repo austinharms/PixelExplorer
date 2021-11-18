@@ -28,7 +28,7 @@ class BaseBlock : public virtual RefCounted {
   const BlockFace* getBlockFace(ChunkBlock& block, FaceDirection dir) const {
     // do block rotation math here
     assert(dir != FaceDirection::NONE);
-    return (const BlockFace*)&_faces[(uint8_t)dir - 1];
+    return (const BlockFace*)&_faces[(uint8_t)dir];
   }
 
   bool isSolid() const { return _solid; }

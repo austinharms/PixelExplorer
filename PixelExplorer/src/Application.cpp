@@ -14,6 +14,7 @@
 #include "rendering/TestRenderable.h"
 #include "World.h"
 #include "chunk/block/BaseBlock.h"
+#include "chunk/Chunk.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
@@ -21,9 +22,14 @@ int main(void) {
   renderer->setCursorHidden(false);
   World::LoadWorld();
   BaseBlock::LoadBlockManifest();
-  TestRenderable* testObj = new TestRenderable(); 
-  renderer->addRenderable(testObj);
-  testObj->drop();
+  //TestRenderable* testObj = new TestRenderable(); 
+  //renderer->addRenderable(testObj);
+  //testObj->drop();
+  Chunk* testChunk = new Chunk();
+  testChunk->updateMesh();
+  renderer->addRenderable(testChunk);
+  testChunk->drop();
+  testChunk = nullptr;
   while (renderer->getWindowOpen()) {
     renderer->drawFrame();
   }
@@ -34,7 +40,7 @@ int main(void) {
   renderer->drop();
   BaseBlock::UnloadBlocks();
   //END OF ORDER IMPORTANT
-
+  Chunk::freeEmptyBuffer();
   _CrtDumpMemoryLeaks();
   return 0;
 }
