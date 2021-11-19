@@ -51,7 +51,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   float* _vertexBuffer;
   std::mutex _meshBuffersLock;
-  uint16_t* _buffers[(int32_t)FaceDirection::FACECOUNT];
+  uint32_t* _buffers[(int32_t)FaceDirection::FACECOUNT];
   std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
@@ -60,8 +60,8 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   uint32_t _vertexArrayId;
   uint32_t _vertexBufferId;
   int32_t _vertexCount;
-  uint16_t _indexCount[(int32_t)FaceDirection::FACECOUNT];
-  uint16_t _currentIndexCount[(int32_t)FaceDirection::FACECOUNT];
+  uint32_t _indexCount[(int32_t)FaceDirection::FACECOUNT];
+  uint32_t _currentIndexCount[(int32_t)FaceDirection::FACECOUNT];
 
   glm::vec3 _position;
   glm::mat4 _transform;

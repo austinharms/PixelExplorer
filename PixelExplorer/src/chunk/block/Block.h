@@ -26,6 +26,7 @@ class Block : public virtual RefCounted {
 
   virtual ~Block() {
     _parentChunk->drop();
+    if (_baseBlock != nullptr) _baseBlock->drop();
   }
 
   void setChunkBlock(ChunkBlock* block, uint32_t index) {
