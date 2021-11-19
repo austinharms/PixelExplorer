@@ -22,9 +22,9 @@ int main(void) {
   renderer->setCursorHidden(false);
   World::LoadWorld();
   BaseBlock::LoadBlockManifest();
-  //TestRenderable* testObj = new TestRenderable(); 
-  //renderer->addRenderable(testObj);
-  //testObj->drop();
+  TestRenderable* testObj = new TestRenderable(); 
+  renderer->addRenderable(testObj);
+  testObj->drop();
   Chunk* testChunk = new Chunk();
   testChunk->updateMesh();
   renderer->addRenderable(testChunk);
