@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "chunk/block/Block.h"
-#include "glm/gtx/euler_angles.hpp"
 
 void* Chunk::s_emptyBuffer = malloc(1);
 
@@ -42,13 +41,6 @@ Chunk::~Chunk() {}
 
 bool Chunk::onPreRender(float deltaTime, float* cameraPos,
                         float* cameraRotation) {
-  //_rotation.x += deltaTime;
-  _rotation.y += deltaTime;
-  glm::mat4 t(glm::eulerAngleYXZ(_rotation.y, _rotation.x, _rotation.z));
-  t[3][0] = _position.x;
-  t[3][1] = _position.y;
-  t[3][2] = _position.z;
-  _transform = t;
   if (_buffersDirty) updateBuffers();
   _visibleFaces = FaceDirectionFlag::ALL;
   return _visible;
