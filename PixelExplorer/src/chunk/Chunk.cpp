@@ -92,6 +92,8 @@ void Chunk::updateMesh() {
   float z = 0;
   Block curBlock(this);
   uint8_t faceNum;
+  uint8_t visableFaces[Chunk::BLOCK_COUNT];
+  memset(visableFaces, FaceDirectionFlag::NONE, Chunk::BLOCK_COUNT);
   for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
     curBlock.setChunkBlock(&_blocks[i], i);
     // Front Faces
@@ -99,6 +101,37 @@ void Chunk::updateMesh() {
     const BlockFace* face = curBlock.getBlockFace(FaceDirection::FRONT);
     _vertexCount += face->vertexCount;
     _indexCount[faceNum] += face->indexCount;
+    visableFaces[i] |= FaceDirectionFlag::FRONT;
+
+    faceNum = (uint8_t)FaceDirection::BACK;
+    face = curBlock.getBlockFace(FaceDirection::BACK);
+    _vertexCount += face->vertexCount;
+    _indexCount[faceNum] += face->indexCount;
+    visableFaces[i] |= FaceDirectionFlag::BACK;
+
+    faceNum = (uint8_t)FaceDirection::LEFT;
+    face = curBlock.getBlockFace(FaceDirection::LEFT);
+    _vertexCount += face->vertexCount;
+    _indexCount[faceNum] += face->indexCount;
+    visableFaces[i] |= FaceDirectionFlag::LEFT;
+
+    faceNum = (uint8_t)FaceDirection::RIGHT;
+    face = curBlock.getBlockFace(FaceDirection::RIGHT);
+    _vertexCount += face->vertexCount;
+    _indexCount[faceNum] += face->indexCount;
+    visableFaces[i] |= FaceDirectionFlag::RIGHT;
+
+    faceNum = (uint8_t)FaceDirection::TOP;
+    face = curBlock.getBlockFace(FaceDirection::TOP);
+    _vertexCount += face->vertexCount;
+    _indexCount[faceNum] += face->indexCount;
+    visableFaces[i] |= FaceDirectionFlag::TOP;
+
+    faceNum = (uint8_t)FaceDirection::BOTTOM;
+    face = curBlock.getBlockFace(FaceDirection::BOTTOM);
+    _vertexCount += face->vertexCount;
+    _indexCount[faceNum] += face->indexCount;
+    visableFaces[i] |= FaceDirectionFlag::BOTTOM;
 
     // if (++x == Chunk::CHUNK_SIZE) {
     //  x = 0;
@@ -134,23 +167,27 @@ void Chunk::updateMesh() {
   for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
     curBlock.setChunkBlock(&_blocks[i], i);
     // Front Faces
-    faceNum = (uint8_t)FaceDirection::FRONT;
-    const BlockFace* face = curBlock.getBlockFace(FaceDirection::FRONT);
+    for (uint8_t faceNum = 0; faceNum < (uint8_t)FaceDirection::FACECOUNT; ++faceNum) {
+      if (!(visableFaces[i] & FaceDirectionFlag::DirectionToFlag(faceNum)))
+        continue;
 
-    for (uint32_t j = 0; j < face->indexCount; ++j)
-      _buffers[faceNum][_indexCount[faceNum] + j] =
-          (face->indices[j]) + _vertexCount;
+      const BlockFace* face = curBlock.getBlockFace((FaceDirection)faceNum);
 
-    for (uint16_t j = 0; j < face->vertexCount; ++j) {
-      _vertexBuffer[_vertexCount * 5] = face->vertices[j * 3] + x;
-      _vertexBuffer[_vertexCount * 5 + 1] = face->vertices[j * 3 + 1] + y;
-      _vertexBuffer[_vertexCount * 5 + 2] = face->vertices[j * 3 + 2] + z;
-      _vertexBuffer[_vertexCount * 5 + 3] = face->uvs[j * 2];
-      _vertexBuffer[_vertexCount * 5 + 4] = face->uvs[j * 2 + 1];
-      ++_vertexCount;
+      for (uint32_t j = 0; j < face->indexCount; ++j)
+        _buffers[faceNum][_indexCount[faceNum] + j] =
+            (face->indices[j]) + _vertexCount;
+
+      for (uint16_t j = 0; j < face->vertexCount; ++j) {
+        _vertexBuffer[_vertexCount * 5] = face->vertices[j * 3] + x;
+        _vertexBuffer[_vertexCount * 5 + 1] = face->vertices[j * 3 + 1] + y;
+        _vertexBuffer[_vertexCount * 5 + 2] = face->vertices[j * 3 + 2] + z;
+        _vertexBuffer[_vertexCount * 5 + 3] = face->uvs[j * 2];
+        _vertexBuffer[_vertexCount * 5 + 4] = face->uvs[j * 2 + 1];
+        ++_vertexCount;
+      }
+
+      _indexCount[faceNum] += face->indexCount;
     }
-
-    _indexCount[faceNum] += face->indexCount;
 
     if (++x == Chunk::CHUNK_SIZE) {
       x = 0;
