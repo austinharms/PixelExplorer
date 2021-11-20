@@ -23,9 +23,10 @@ int main(void) {
   World::LoadWorld();
   BaseBlock::LoadBlockManifest();
   TestRenderable* testObj = new TestRenderable(); 
-  renderer->addRenderable(testObj);
+  //renderer->addRenderable(testObj);
   testObj->drop();
   Chunk* testChunk = new Chunk();
+  testChunk->setPosition(glm::vec3(0, 0, -50));
   testChunk->updateMesh();
   renderer->addRenderable(testChunk);
   testChunk->drop();

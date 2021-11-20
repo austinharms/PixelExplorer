@@ -59,11 +59,12 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _vertexArrayId;
   uint32_t _vertexBufferId;
-  int32_t _vertexCount;
+  uint32_t _vertexCount;
   uint32_t _indexCount[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _currentIndexCount[(int32_t)FaceDirection::FACECOUNT];
 
   glm::vec3 _position;
+  glm::vec3 _rotation;
   glm::mat4 _transform;
 };
 
