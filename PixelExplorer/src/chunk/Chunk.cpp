@@ -50,7 +50,7 @@ bool Chunk::onPreRender(float deltaTime, float* cameraPos,
   t[3][2] = _position.z;
   _transform = t;
   if (_buffersDirty) updateBuffers();
-  _visibleFaces = FaceDirectionFlag::FRONT;
+  _visibleFaces = FaceDirectionFlag::ALL;
   return _visible;
 }
 
@@ -166,16 +166,16 @@ void Chunk::updateMesh() {
   z = 0;
   for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
     curBlock.setChunkBlock(&_blocks[i], i);
-    // Front Faces
-    for (uint8_t faceNum = 0; faceNum < (uint8_t)FaceDirection::FACECOUNT; ++faceNum) {
+    for (uint8_t faceNum = 0; faceNum < (uint8_t)FaceDirection::FACECOUNT;
+         ++faceNum) {
       if (!(visableFaces[i] & FaceDirectionFlag::DirectionToFlag(faceNum)))
         continue;
-
       const BlockFace* face = curBlock.getBlockFace((FaceDirection)faceNum);
 
-      for (uint32_t j = 0; j < face->indexCount; ++j)
+      for (uint32_t j = 0; j < face->indexCount; ++j) {
         _buffers[faceNum][_indexCount[faceNum] + j] =
             (face->indices[j]) + _vertexCount;
+      }
 
       for (uint16_t j = 0; j < face->vertexCount; ++j) {
         _vertexBuffer[_vertexCount * 5] = face->vertices[j * 3] + x;

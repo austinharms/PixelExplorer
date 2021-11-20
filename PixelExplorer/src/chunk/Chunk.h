@@ -15,7 +15,7 @@
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
-  static const int32_t CHUNK_SIZE = 25;
+  static const int32_t CHUNK_SIZE = 1;
   static const int32_t LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   static const int32_t BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
 
