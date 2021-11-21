@@ -33,12 +33,21 @@ class Block : public virtual RefCounted {
     _chunkBlock = block;
     _blockIndex = index;
     if (_baseBlock != nullptr) _baseBlock->drop();
-    _baseBlock = BaseBlock::getBlock(block->getID());
-    _baseBlock->grab();
+    uint32_t id = block->getID();
+    _empty = id == 0;
+    if (!_empty) {
+      _baseBlock = BaseBlock::getBlock(id);
+      _baseBlock->grab();
+    } else {
+      _baseBlock = nullptr;
+    }
+
     _extendedData = nullptr;
     _checkExtended = false;
     _extended = false;
   }
+
+  const uint32_t getId() const { return _chunkBlock->getID(); }
 
   const BlockFace* getBlockFace(FaceDirection face) const {
     return _baseBlock->getBlockFace(*_chunkBlock, face);
@@ -46,9 +55,20 @@ class Block : public virtual RefCounted {
 
   const bool isSolid() const { return _baseBlock->isSolid(); }
 
-  const bool isFaceSolid(FaceDirection face) const {
-    if (isSolid()) return true;
-    return getBlockFace(face)->solid;
+  const bool isEmpty() const { return _empty; }
+
+  const bool isFaceFull(FaceDirection face) const {
+    // Can slow down chunk mesh creation due to redundant chunk
+    //if (isSolid()) return true;
+
+    return getBlockFace(face)->full;
+  }
+
+  const bool isFaceTransparent(FaceDirection face) const {
+    // Can slow down chunk mesh creation due to redundant chunk
+    //if (isSolid()) return false;
+
+    return getBlockFace(face)->transparent;
   }
 
   const bool isExtended() { 
@@ -68,9 +88,10 @@ class Block : public virtual RefCounted {
   Chunk* _parentChunk;
   BaseBlock* _baseBlock;
   ChunkBlock* _chunkBlock;
-  uint32_t _blockIndex;
   BlockData* _extendedData;
+  uint32_t _blockIndex;
   bool _checkExtended;
   bool _extended;
+  bool _empty;
 };
 #endif

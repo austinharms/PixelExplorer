@@ -35,7 +35,7 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
   glCullFace(GL_BACK);
   glfwSwapInterval(_FPSLimit);
   // glfwSetFramebufferSizeCallback(_window, Renderer::windowResizeEvent);
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable Wireframe
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable Wireframe
   // glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
   _lastFrame = glfwGetTime();
   _FPSTimer = _lastFrame;

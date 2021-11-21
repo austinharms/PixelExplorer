@@ -26,7 +26,7 @@ class Material : public virtual RefCounted {
 
   unsigned int getId() const { return _id; }
 
-  virtual void onPostBind(){} //Should be called after the attached shader is bound if it has not already been bound
+  virtual void onPostBind(){} //Should be called after the attached shader is bound if the material has not already been bound
 
   static Material* getDefault() {
     if (s_default == nullptr) s_default = loadDefaultMaterial();

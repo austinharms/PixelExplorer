@@ -31,16 +31,16 @@ Chunk::Chunk() : Renderable(Material::getDefault()) {
   glBindVertexArray(0);
 
   glGenBuffers((int)FaceDirection::FACECOUNT, _indexBuffers);
-
-  // for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
-  //
-  //}
+  memset(_blocks, 1, Chunk::BLOCK_COUNT * sizeof(ChunkBlock));
+  memset(&_blocks[7612], 0, 4);
 }
 
 Chunk::~Chunk() {}
 
 bool Chunk::onPreRender(float deltaTime, float* cameraPos,
                         float* cameraRotation) {
+  _rotation.x += deltaTime;
+  setPosition(_position);
   if (_buffersDirty) updateBuffers();
   _visibleFaces = FaceDirectionFlag::ALL;
   return _visible;
@@ -83,57 +83,119 @@ void Chunk::updateMesh() {
   float y = 0;
   float z = 0;
   Block curBlock(this);
+  Block otherBlock(this);
   uint8_t faceNum;
   uint8_t visableFaces[Chunk::BLOCK_COUNT];
   memset(visableFaces, FaceDirectionFlag::NONE, Chunk::BLOCK_COUNT);
+
+  // Find How Big the Mesh Buffers Should Be And What Faces Are Visable
   for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
     curBlock.setChunkBlock(&_blocks[i], i);
-    // Front Faces
-    faceNum = (uint8_t)FaceDirection::FRONT;
-    const BlockFace* face = curBlock.getBlockFace(FaceDirection::FRONT);
-    _vertexCount += face->vertexCount;
-    _indexCount[faceNum] += face->indexCount;
-    visableFaces[i] |= FaceDirectionFlag::FRONT;
+    if (!curBlock.isEmpty()) {
+      if (z != 0)
+        otherBlock.setChunkBlock(&_blocks[i - Chunk::CHUNK_SIZE],
+                                 i - Chunk::CHUNK_SIZE);
 
-    faceNum = (uint8_t)FaceDirection::BACK;
-    face = curBlock.getBlockFace(FaceDirection::BACK);
-    _vertexCount += face->vertexCount;
-    _indexCount[faceNum] += face->indexCount;
-    visableFaces[i] |= FaceDirectionFlag::BACK;
+      if (z == 0 || otherBlock.isEmpty() ||
+          (!otherBlock.isSolid() &&
+           (!otherBlock.isFaceFull(FaceDirection::BACK) ||
+            otherBlock.isFaceTransparent(FaceDirection::BACK) &&
+                otherBlock.getId() != curBlock.getId()))) {
+        faceNum = (uint8_t)FaceDirection::FRONT;
+        const BlockFace* face = curBlock.getBlockFace(FaceDirection::FRONT);
+        _vertexCount += face->vertexCount;
+        _indexCount[faceNum] += face->indexCount;
+        visableFaces[i] |= FaceDirectionFlag::FRONT;
+      }
 
-    faceNum = (uint8_t)FaceDirection::LEFT;
-    face = curBlock.getBlockFace(FaceDirection::LEFT);
-    _vertexCount += face->vertexCount;
-    _indexCount[faceNum] += face->indexCount;
-    visableFaces[i] |= FaceDirectionFlag::LEFT;
+      if (z != Chunk::CHUNK_SIZE - 1)
+        otherBlock.setChunkBlock(&_blocks[i + Chunk::CHUNK_SIZE],
+                                 i + Chunk::CHUNK_SIZE);
 
-    faceNum = (uint8_t)FaceDirection::RIGHT;
-    face = curBlock.getBlockFace(FaceDirection::RIGHT);
-    _vertexCount += face->vertexCount;
-    _indexCount[faceNum] += face->indexCount;
-    visableFaces[i] |= FaceDirectionFlag::RIGHT;
+      if (z == Chunk::CHUNK_SIZE - 1 || otherBlock.isEmpty() ||
+          (!otherBlock.isSolid() &&
+           (!otherBlock.isFaceFull(FaceDirection::FRONT) ||
+            otherBlock.isFaceTransparent(FaceDirection::FRONT) &&
+                otherBlock.getId() != curBlock.getId()))) {
+        faceNum = (uint8_t)FaceDirection::BACK;
+        const BlockFace* face = curBlock.getBlockFace(FaceDirection::BACK);
+        _vertexCount += face->vertexCount;
+        _indexCount[faceNum] += face->indexCount;
+        visableFaces[i] |= FaceDirectionFlag::BACK;
+      }
 
-    faceNum = (uint8_t)FaceDirection::TOP;
-    face = curBlock.getBlockFace(FaceDirection::TOP);
-    _vertexCount += face->vertexCount;
-    _indexCount[faceNum] += face->indexCount;
-    visableFaces[i] |= FaceDirectionFlag::TOP;
+      if (x != 0) otherBlock.setChunkBlock(&_blocks[i - 1], i - 1);
 
-    faceNum = (uint8_t)FaceDirection::BOTTOM;
-    face = curBlock.getBlockFace(FaceDirection::BOTTOM);
-    _vertexCount += face->vertexCount;
-    _indexCount[faceNum] += face->indexCount;
-    visableFaces[i] |= FaceDirectionFlag::BOTTOM;
+      if (x == 0 || otherBlock.isEmpty() ||
+          (!otherBlock.isSolid() &&
+           (!otherBlock.isFaceFull(FaceDirection::RIGHT) ||
+            otherBlock.isFaceTransparent(FaceDirection::RIGHT) &&
+                otherBlock.getId() != curBlock.getId()))) {
+        faceNum = (uint8_t)FaceDirection::LEFT;
+        const BlockFace* face = curBlock.getBlockFace(FaceDirection::LEFT);
+        _vertexCount += face->vertexCount;
+        _indexCount[faceNum] += face->indexCount;
+        visableFaces[i] |= FaceDirectionFlag::LEFT;
+      }
 
-    // if (++x == Chunk::CHUNK_SIZE) {
-    //  x = 0;
-    //  if (++z == Chunk::CHUNK_SIZE) {
-    //    z = 0;
-    //    ++y;
-    //  }
-    //}
+      if (x != Chunk::CHUNK_SIZE - 1)
+        otherBlock.setChunkBlock(&_blocks[i + 1], i + 1);
+
+      if (x == Chunk::CHUNK_SIZE - 1 || otherBlock.isEmpty() ||
+          (!otherBlock.isSolid() &&
+           (!otherBlock.isFaceFull(FaceDirection::LEFT) ||
+            otherBlock.isFaceTransparent(FaceDirection::LEFT) &&
+                otherBlock.getId() != curBlock.getId()))) {
+        faceNum = (uint8_t)FaceDirection::RIGHT;
+        const BlockFace* face = curBlock.getBlockFace(FaceDirection::RIGHT);
+        _vertexCount += face->vertexCount;
+        _indexCount[faceNum] += face->indexCount;
+        visableFaces[i] |= FaceDirectionFlag::RIGHT;
+      }
+
+      if (y != Chunk::CHUNK_SIZE - 1)
+        otherBlock.setChunkBlock(&_blocks[i + Chunk::LAYER_SIZE],
+                                 i + Chunk::LAYER_SIZE);
+
+      if (y == Chunk::CHUNK_SIZE - 1 || otherBlock.isEmpty() ||
+          (!otherBlock.isSolid() &&
+           (!otherBlock.isFaceFull(FaceDirection::LEFT) ||
+            otherBlock.isFaceTransparent(FaceDirection::LEFT) &&
+                otherBlock.getId() != curBlock.getId()))) {
+        faceNum = (uint8_t)FaceDirection::TOP;
+        const BlockFace* face = curBlock.getBlockFace(FaceDirection::TOP);
+        _vertexCount += face->vertexCount;
+        _indexCount[faceNum] += face->indexCount;
+        visableFaces[i] |= FaceDirectionFlag::TOP;
+      }
+
+      if (y != 0)
+        otherBlock.setChunkBlock(&_blocks[i - Chunk::LAYER_SIZE],
+                                 i - Chunk::LAYER_SIZE);
+
+      if (y == 0 || otherBlock.isEmpty() ||
+          (!otherBlock.isSolid() &&
+           (!otherBlock.isFaceFull(FaceDirection::LEFT) ||
+            otherBlock.isFaceTransparent(FaceDirection::LEFT) &&
+                otherBlock.getId() != curBlock.getId()))) {
+        faceNum = (uint8_t)FaceDirection::BOTTOM;
+        const BlockFace* face = curBlock.getBlockFace(FaceDirection::BOTTOM);
+        _vertexCount += face->vertexCount;
+        _indexCount[faceNum] += face->indexCount;
+        visableFaces[i] |= FaceDirectionFlag::BOTTOM;
+      }
+    }
+
+    if (++x == Chunk::CHUNK_SIZE) {
+      x = 0;
+      if (++z == Chunk::CHUNK_SIZE) {
+        z = 0;
+        ++y;
+      }
+    }
   }
 
+  // Allocate Mesh Buffers
   if (_vertexCount == 0) {
     _vertexBuffer = (float*)Chunk::s_emptyBuffer;
   } else {
@@ -153,6 +215,7 @@ void Chunk::updateMesh() {
     _indexCount[i] = 0;
   }
 
+  // Create The Mesh
   x = 0;
   y = 0;
   z = 0;
@@ -160,25 +223,25 @@ void Chunk::updateMesh() {
     curBlock.setChunkBlock(&_blocks[i], i);
     for (uint8_t faceNum = 0; faceNum < (uint8_t)FaceDirection::FACECOUNT;
          ++faceNum) {
-      if (!(visableFaces[i] & FaceDirectionFlag::DirectionToFlag(faceNum)))
-        continue;
-      const BlockFace* face = curBlock.getBlockFace((FaceDirection)faceNum);
+      if (visableFaces[i] & FaceDirectionFlag::DirectionToFlag(faceNum)) {
+        const BlockFace* face = curBlock.getBlockFace((FaceDirection)faceNum);
 
-      for (uint32_t j = 0; j < face->indexCount; ++j) {
-        _buffers[faceNum][_indexCount[faceNum] + j] =
-            (face->indices[j]) + _vertexCount;
+        for (uint32_t j = 0; j < face->indexCount; ++j) {
+          _buffers[faceNum][_indexCount[faceNum] + j] =
+              (face->indices[j]) + _vertexCount;
+        }
+
+        for (uint16_t j = 0; j < face->vertexCount; ++j) {
+          _vertexBuffer[_vertexCount * 5] = face->vertices[j * 3] + x;
+          _vertexBuffer[_vertexCount * 5 + 1] = face->vertices[j * 3 + 1] + y;
+          _vertexBuffer[_vertexCount * 5 + 2] = face->vertices[j * 3 + 2] - z;
+          _vertexBuffer[_vertexCount * 5 + 3] = face->uvs[j * 2];
+          _vertexBuffer[_vertexCount * 5 + 4] = face->uvs[j * 2 + 1];
+          ++_vertexCount;
+        }
+
+        _indexCount[faceNum] += face->indexCount;
       }
-
-      for (uint16_t j = 0; j < face->vertexCount; ++j) {
-        _vertexBuffer[_vertexCount * 5] = face->vertices[j * 3] + x;
-        _vertexBuffer[_vertexCount * 5 + 1] = face->vertices[j * 3 + 1] + y;
-        _vertexBuffer[_vertexCount * 5 + 2] = face->vertices[j * 3 + 2] + z;
-        _vertexBuffer[_vertexCount * 5 + 3] = face->uvs[j * 2];
-        _vertexBuffer[_vertexCount * 5 + 4] = face->uvs[j * 2 + 1];
-        ++_vertexCount;
-      }
-
-      _indexCount[faceNum] += face->indexCount;
     }
 
     if (++x == Chunk::CHUNK_SIZE) {

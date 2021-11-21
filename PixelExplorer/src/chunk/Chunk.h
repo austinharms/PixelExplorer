@@ -28,7 +28,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   void setPosition(glm::vec3 position) {
     _position = position;
-    _transform = glm::eulerAngleYXZ(0,0,0);
+    _transform = glm::eulerAngleYXZ(_rotation.x, _rotation.y, _rotation.z);
     _transform[3][0] = _position.x;
     _transform[3][1] = _position.y;
     _transform[3][2] = _position.z;
@@ -66,6 +66,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   uint32_t _currentIndexCount[(int32_t)FaceDirection::FACECOUNT];
 
   glm::vec3 _position;
+  glm::vec3 _rotation;
   glm::mat4 _transform;
 };
 

@@ -12,7 +12,7 @@ struct BlockFace {
      vertices = nullptr;
      uvs = nullptr;
      direction = FaceDirection::NONE;
-     solid = false;
+     full = false;
      transparent = false;
      indexCount = 0;
      vertexCount = 0;
@@ -34,7 +34,7 @@ struct BlockFace {
   uint8_t vertexCount;
   uint8_t indexCount;
   bool transparent;
-  bool solid;
+  bool full;
 };
 
 #endif
