@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cassert>
 #include <fstream>
+#include "chunk/block/BaseBlock.h"
 
 std::string World::s_appAssetDir;
 std::string World::s_assetDir;
@@ -12,7 +13,7 @@ void World::LoadWorld() {
 	World::s_appAssetDir = std::string("C:\\Users\\austi\\source\\repos\\PixelExplorer\\PixelExplorer\\assets\\");
 	World::s_assetDir = std::string("C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\assets\\");
 	World::s_worldDir = std::string("C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\save-'test world'\\");
-	World::s_packages = std::set<std::string>();
+	World::s_packages.clear();
 	World::s_packages.insert(std::string("default"));
 
 	std::string manifestPath = World::s_worldDir + "world_manifest";
@@ -45,6 +46,17 @@ void World::LoadWorld() {
 			std::cout << "Warning may have failed loading World Manifest, No trailing NULL " << std::endl;
 		manifest.close();
 	}
+
+	BaseBlock::LoadBlockManifest();
+}
+
+void World::UnloadWorld()
+{
+	BaseBlock::UnloadBlocks();
+	World::s_packages.clear();
+	World::s_appAssetDir.clear();
+	World::s_assetDir.clear();
+	World::s_worldDir.clear();
 }
 
 void World::UpdateManifest() {

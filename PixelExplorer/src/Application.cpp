@@ -22,7 +22,6 @@ int main(void) {
   renderer->setPosition(glm::vec3(-12, -12, -75));
   renderer->setCursorHidden(false);
   World::LoadWorld();
-  BaseBlock::LoadBlockManifest();
   Chunk* testChunk = new Chunk();
   testChunk->setPosition(glm::vec3(0, 0, 0));
   testChunk->updateMesh();
@@ -37,7 +36,7 @@ int main(void) {
   Material::getDefault()->drop();
   Shader::getDefault()->drop();
   renderer->drop();
-  BaseBlock::UnloadBlocks();
+  World::UnloadWorld();
   //END OF ORDER IMPORTANT
   Chunk::freeEmptyBuffer();
   _CrtDumpMemoryLeaks();

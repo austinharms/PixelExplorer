@@ -7,6 +7,7 @@ class World {
 public:
 	static const uint16_t MANIFEST_VERSION = 1;
 	static void LoadWorld();
+	static void UnloadWorld();
 
 	static const std::string GetAppAssetDir() { return s_appAssetDir; }
 
