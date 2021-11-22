@@ -68,8 +68,8 @@ class Block : public virtual RefCounted {
   Chunk* _parentChunk;
   BaseBlock* _baseBlock;
   ChunkBlock* _chunkBlock;
-  uint32_t _blockIndex;
   BlockData* _extendedData;
+  uint32_t _blockIndex;
   bool _checkExtended;
   bool _extended;
 };
