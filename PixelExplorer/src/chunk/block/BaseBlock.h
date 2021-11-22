@@ -38,7 +38,7 @@ class BaseBlock : public virtual RefCounted {
   const std::string getName() const { return _name; }
 
   static BaseBlock* getBlock(uint32_t id) {
-    if (id >= s_blockCount) return nullptr;
+    if (id >= s_blockCount) return &s_blocks[0];
     return &s_blocks[id];
   }
 

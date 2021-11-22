@@ -12,6 +12,7 @@
 #include "block/ChunkBlock.h"
 #include "glm/mat4x4.hpp"
 #include "rendering/Renderable.h"
+#include "glm/gtx/euler_angles.hpp"
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
@@ -27,9 +28,10 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   void setPosition(glm::vec3 position) {
     _position = position;
-    _transform =
-        glm::mat4(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-                  1.0f, 0.0f, _position.x, _position.y, _position.z, 1.0f);
+    _transform = glm::eulerAngleYXZ(_rotation.x, _rotation.y, _rotation.z);
+    _transform[3][0] = _position.x;
+    _transform[3][1] = _position.y;
+    _transform[3][2] = _position.z;
   }
 
   glm::vec3 getPosition() const { return _position; }
@@ -59,11 +61,12 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _vertexArrayId;
   uint32_t _vertexBufferId;
-  int32_t _vertexCount;
+  uint32_t _vertexCount;
   uint32_t _indexCount[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _currentIndexCount[(int32_t)FaceDirection::FACECOUNT];
 
   glm::vec3 _position;
+  glm::vec3 _rotation;
   glm::mat4 _transform;
 };
 

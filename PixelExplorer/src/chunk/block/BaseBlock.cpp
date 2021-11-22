@@ -213,9 +213,9 @@ bool BaseBlock::LoadPackage(std::string name) {
 
       face->direction = (FaceDirection)faceInt;
 
-      uint8_t solid;
-      package.read((char*)&solid, sizeof(uint8_t));
-      face->solid == solid == 1;
+      uint8_t full;
+      package.read((char*)&full, sizeof(uint8_t));
+      face->full == full == 1;
       uint8_t transparent;
       package.read((char*)&transparent, sizeof(uint8_t));
       face->transparent = transparent == 1;

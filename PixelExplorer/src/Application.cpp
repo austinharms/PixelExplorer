@@ -18,14 +18,13 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
-  Renderer* renderer = new Renderer(800, 600, "Pixel Explorer V2.0");
+  Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0");
+  renderer->setPosition(glm::vec3(-12, -12, -75));
   renderer->setCursorHidden(false);
   World::LoadWorld();
   BaseBlock::LoadBlockManifest();
-  TestRenderable* testObj = new TestRenderable(); 
-  renderer->addRenderable(testObj);
-  testObj->drop();
   Chunk* testChunk = new Chunk();
+  testChunk->setPosition(glm::vec3(0, 0, 0));
   testChunk->updateMesh();
   renderer->addRenderable(testChunk);
   testChunk->drop();
