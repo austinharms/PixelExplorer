@@ -39,8 +39,6 @@ Chunk::~Chunk() {}
 
 bool Chunk::onPreRender(float deltaTime, float* cameraPos,
                         float* cameraRotation) {
-  _rotation.x += deltaTime;
-  setPosition(_position);
   if (_buffersDirty) updateBuffers();
   _visibleFaces = FaceDirectionFlag::ALL;
   return _visible;
