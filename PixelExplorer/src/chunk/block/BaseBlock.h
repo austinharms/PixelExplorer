@@ -45,11 +45,10 @@ class BaseBlock : public virtual RefCounted {
  private:
   BaseBlock();
   static void UpdateManifest();
-  static bool LoadPackage(std::string name);
+  static bool LoadPackage(std::string name, std::set<std::string>* loadedPackages = nullptr);
 
   static BaseBlock* s_blocks;
   static uint32_t s_blockCount;
-  static std::set<std::string> s_packages;
   static std::unordered_map<std::string, uint32_t> s_blockLookupTable;
   uint32_t _id;
   bool _solid;

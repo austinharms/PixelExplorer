@@ -18,7 +18,7 @@ void World::LoadWorld() {
 	std::string manifestPath = World::s_worldDir + "world_manifest";
 	std::ifstream manifest(manifestPath.c_str(), std::ios::binary);
 	if (!manifest || manifest.peek() == std::ifstream::traits_type::eof()) {
-		std::cout << "No Manifest Found, Creating Default Manifest" << std::endl;
+		std::cout << "No World Manifest Found, Creating Default Manifest" << std::endl;
 		manifest.close();
 		UpdateManifest();
 	}
@@ -29,7 +29,7 @@ void World::LoadWorld() {
 		assert(version == World::MANIFEST_VERSION);
 		uint16_t packageCount;
 		manifest.read((char*)&packageCount, sizeof(uint16_t));
-		std::cout << "Loading " << packageCount << " Packages from Manifest" << std::endl;
+		std::cout << "Loading " << packageCount << " Packages from World Manifest" << std::endl;
 		for (uint16_t i = 0; i < packageCount; ++i) {
 			uint8_t nameLength;
 			manifest.read((char*)&nameLength, sizeof(uint8_t));
@@ -42,7 +42,7 @@ void World::LoadWorld() {
 		char end;
 		manifest.read(&end, sizeof(char));
 		if (end != '\0')
-			std::cout << "Warning may have failed loading world manifest, No trailing NULL " << std::endl;
+			std::cout << "Warning may have failed loading World Manifest, No trailing NULL " << std::endl;
 		manifest.close();
 	}
 }
