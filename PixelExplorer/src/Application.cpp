@@ -21,22 +21,19 @@ int main(void) {
   Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0");
   renderer->setPosition(glm::vec3(-12, -12, -75));
   renderer->setCursorHidden(false);
+  World::SetRenderer(renderer);
   World::LoadWorld();
-  Chunk* testChunk = new Chunk();
-  testChunk->setPosition(glm::vec3(0, 0, 0));
-  testChunk->updateMesh();
-  renderer->addRenderable(testChunk);
-  testChunk->drop();
-  testChunk = nullptr;
+  World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(0, 0, 0));
   while (renderer->getWindowOpen()) {
     renderer->drawFrame();
   }
 
   //ORDER IMPORTANT
+  World::UnloadWorld();
+  World::SetRenderer(nullptr);
   Material::getDefault()->drop();
   Shader::getDefault()->drop();
   renderer->drop();
-  World::UnloadWorld();
   //END OF ORDER IMPORTANT
   Chunk::freeEmptyBuffer();
   _CrtDumpMemoryLeaks();

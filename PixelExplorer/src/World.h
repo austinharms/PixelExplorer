@@ -3,6 +3,9 @@
 #include <string>
 #include <set>
 
+#include "chunk/ChunkManager.h"
+#include "rendering/Renderer.h"
+
 class World {
 public:
 	static const uint16_t MANIFEST_VERSION = 1;
@@ -17,6 +20,16 @@ public:
 
 	static const std::set<std::string> GetPackages() { return s_packages; }
 
+	static ChunkManager* GetChunkManager() { return s_chunkManager; }
+
+	static void SetRenderer(Renderer* renderer) {
+		if (s_renderer != nullptr)
+			s_renderer->drop();
+		s_renderer = renderer;
+		if (s_renderer != nullptr)
+			s_renderer->grab();
+	}
+
 private:
 	World() {}
 	~World() {}
@@ -26,5 +39,7 @@ private:
 	static std::string s_assetDir;
 	static std::string s_worldDir;
 	static std::set<std::string> s_packages;
+	static ChunkManager* s_chunkManager;
+	static Renderer* s_renderer;
 };
 #endif

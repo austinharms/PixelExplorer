@@ -16,6 +16,15 @@
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
+     enum class Status : uint8_t {
+         CREATED = 0,
+         UNLOADED = 1,
+         LOADING = 2,
+         UNLOADING = 3,
+         LOADED = 4,
+         UPDATING = 5
+     };
+
   static const int32_t CHUNK_SIZE = 25;
   static const int32_t LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
   static const int32_t BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
@@ -42,6 +51,10 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
     return &_extendedBlockData.at(blockIndex);
   }
 
+  const Status getStatus() const { return _status; }
+
+  void setStatus(Status status) { _status = status; }
+
   static void freeEmptyBuffer() {
     if (s_emptyBuffer != nullptr) free(s_emptyBuffer);
   }
@@ -58,6 +71,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
   uint8_t _visibleFaces;
+  Status _status;
   uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _vertexArrayId;
   uint32_t _vertexBufferId;

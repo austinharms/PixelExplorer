@@ -8,11 +8,17 @@ std::string World::s_appAssetDir;
 std::string World::s_assetDir;
 std::string World::s_worldDir;
 std::set<std::string> World::s_packages;
+ChunkManager* World::s_chunkManager = nullptr;
+Renderer* World::s_renderer = nullptr;
 
 void World::LoadWorld() {
+	assert(World::s_renderer != nullptr);
 	World::s_appAssetDir = std::string("C:\\Users\\austi\\source\\repos\\PixelExplorer\\PixelExplorer\\assets\\");
 	World::s_assetDir = std::string("C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\assets\\");
 	World::s_worldDir = std::string("C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\save-'test world'\\");
+	if (World::s_chunkManager != nullptr)
+		World::s_chunkManager->drop();
+	World::s_chunkManager = new ChunkManager(World::s_renderer);
 	World::s_packages.clear();
 	World::s_packages.insert(std::string("default"));
 
@@ -57,6 +63,11 @@ void World::UnloadWorld()
 	World::s_appAssetDir.clear();
 	World::s_assetDir.clear();
 	World::s_worldDir.clear();
+	if (World::s_chunkManager != nullptr) {
+		World::s_chunkManager->UnloadChunks();
+		World::s_chunkManager->drop();
+		World::s_chunkManager = nullptr;
+	}
 }
 
 void World::UpdateManifest() {
