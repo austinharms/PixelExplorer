@@ -17,6 +17,7 @@ class Renderer : public virtual RefCounted {
   void addRenderable(Renderable* renderable);
   void removeRenderable(unsigned int id);
   void drawFrame();
+  bool getKeyPressed(int32_t key);
 
   void removeRenderable(Renderable* renderable) {
     removeRenderable(renderable->getId());

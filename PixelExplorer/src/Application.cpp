@@ -15,16 +15,32 @@
 #include "World.h"
 #include "chunk/block/BaseBlock.h"
 #include "chunk/Chunk.h"
-#define GLM_ENABLE_EXPERIMENTAL
 
 int main(void) {
   Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0");
-  renderer->setPosition(glm::vec3(-12, -12, -75));
   renderer->setCursorHidden(false);
   World::SetRenderer(renderer);
   World::LoadWorld();
   World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(0, 0, 0));
+  glm::vec3 camPos(-12, -12, -75);
+  float moveSpeed = 5;
+
   while (renderer->getWindowOpen()) {
+      if (renderer->getKeyPressed(GLFW_KEY_W)) {
+          camPos.z += renderer->getDeltaTime() * moveSpeed;
+      }
+      else if (renderer->getKeyPressed(GLFW_KEY_S)) {
+          camPos.z -= renderer->getDeltaTime() * moveSpeed;
+      }
+
+      if (renderer->getKeyPressed(GLFW_KEY_A)) {
+          camPos.x += renderer->getDeltaTime() * moveSpeed;
+      }
+      else if (renderer->getKeyPressed(GLFW_KEY_D)) {
+          camPos.x -= renderer->getDeltaTime() * moveSpeed;
+      }
+
+      renderer->setPosition(camPos);
     renderer->drawFrame();
   }
 

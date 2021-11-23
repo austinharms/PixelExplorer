@@ -12,14 +12,12 @@ ChunkManager* World::s_chunkManager = nullptr;
 Renderer* World::s_renderer = nullptr;
 
 void World::LoadWorld() {
+	UnloadWorld();
 	assert(World::s_renderer != nullptr);
 	World::s_appAssetDir = std::string("C:\\Users\\austi\\source\\repos\\PixelExplorer\\PixelExplorer\\assets\\");
 	World::s_assetDir = std::string("C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\assets\\");
 	World::s_worldDir = std::string("C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\save-'test world'\\");
-	if (World::s_chunkManager != nullptr)
-		World::s_chunkManager->drop();
 	World::s_chunkManager = new ChunkManager(World::s_renderer);
-	World::s_packages.clear();
 	World::s_packages.insert(std::string("default"));
 
 	std::string manifestPath = World::s_worldDir + "world_manifest";

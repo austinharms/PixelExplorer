@@ -134,6 +134,12 @@ void Renderer::drawFrame() {
   ++_frameCounter;
 }
 
+bool Renderer::getKeyPressed(int32_t key)
+{
+    return glfwGetKey(_window, key) == GLFW_PRESS;
+}
+
+
 Renderer::~Renderer() {
   std::lock_guard<std::mutex> locker(_renderLock);
   for (Renderable* r : _renderableObjects) r->drop();
