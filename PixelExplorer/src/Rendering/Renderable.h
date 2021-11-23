@@ -21,7 +21,7 @@ class Renderable : public virtual RefCounted {
 
   bool getVisible() const { return _visible; }
 
-  unsigned short getId() const { return _id; }
+  uint32_t getId() const { return _id; }
 
   bool getRendererDropFlag() const { return _dropFlag; }
 
@@ -43,8 +43,8 @@ class Renderable : public virtual RefCounted {
 
  private:
   Material* _material;
-  static unsigned int s_idCounter;
-  unsigned int _id;
+  static uint32_t s_idCounter;
+  uint32_t _id;
 
  protected:
   bool _visible;

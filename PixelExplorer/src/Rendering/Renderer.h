@@ -15,9 +15,11 @@ class Renderer : public virtual RefCounted {
   Renderer(int width, int height, const char* title, int FPSLimit = 0);
   virtual ~Renderer();
   void addRenderable(Renderable* renderable);
-  void removeRenderable(unsigned int id);
+  void removeRenderable(uint32_t id);
   void drawFrame();
   bool getKeyPressed(int32_t key);
+  void setFPSLimit(int32_t limit);
+  void setCursorHidden(bool hidden);
 
   void removeRenderable(Renderable* renderable) {
     removeRenderable(renderable->getId());
@@ -25,13 +27,9 @@ class Renderer : public virtual RefCounted {
 
   int getFPSLimit() const { return _FPSLimit; }
 
-  void setFPSLimit(int limit) { _FPSLimit = limit; }
-
   int getFPS() const { return _FPS; }
 
   float getDeltaTime() const { return _deltaTime; }
-
-  void setCursorHidden(bool hidden) { _cursorHidden = hidden; }
 
   bool getCursorHidden() const { return _cursorHidden; }
 
@@ -57,6 +55,14 @@ class Renderer : public virtual RefCounted {
     _rotation = rotation;
   }
 
+  double getCursorX() const { return _cursorX; }
+
+  double getCursorY() const { return _cursorY; }
+
+  double getCursorChangeX() const { return _cursorChangeX; }
+
+  double getCursorChangeY() const { return _cursorChangeY; }
+
  private:
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
@@ -70,6 +76,10 @@ class Renderer : public virtual RefCounted {
   float _deltaTime;
   double _lastFrame;
   double _FPSTimer;
+  double _cursorX;
+  double _cursorY;
+  double _cursorChangeX;
+  double _cursorChangeY;
   bool _cursorHidden;
 
   static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
