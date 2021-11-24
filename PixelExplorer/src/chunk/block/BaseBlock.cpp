@@ -146,11 +146,11 @@ bool BaseBlock::LoadPackage(std::string name, std::set<std::string>* loadedPacka
 	std::cout << "Loading Block Package: " << name << std::endl;
 
 	// Load Package File
-	std::string path = World::GetAppAssetDir() + name + ".pxb";
+	std::string path = World::GetAppAssetDir() + name + "/" + name + ".pxb";
 	std::ifstream package(path.c_str(), std::ios::binary);
 	if (!package || package.peek() == std::ifstream::traits_type::eof()) {
 		package.close();
-		path = World::GetAssetDir() + name + ".pxb";
+		path = World::GetAssetDir() + name + "/" + name + ".pxb";
 		package.open(path.c_str(), std::ios::binary);
 
 		if (!package || package.peek() == std::ifstream::traits_type::eof()) {
