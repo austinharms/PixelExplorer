@@ -8,16 +8,12 @@ BaseBlock* BaseBlock::s_blocks = nullptr;
 uint32_t BaseBlock::s_blockCount = 0;
 std::unordered_map<std::string, uint32_t> BaseBlock::s_blockLookupTable =
 std::unordered_map<std::string, uint32_t>();
-TexturedMaterial* BaseBlock::s_chunkMaterial = nullptr;
 
 BaseBlock::BaseBlock() : RefCounted(false) {}
 
 BaseBlock::~BaseBlock() {}
 
 void BaseBlock::UnloadBlocks() {
-	if (BaseBlock::s_chunkMaterial != nullptr)
-		BaseBlock::s_chunkMaterial->drop();
-	BaseBlock::s_chunkMaterial = nullptr;
 
 	if (BaseBlock::s_blocks != nullptr) {
 		for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i)
@@ -33,23 +29,6 @@ void BaseBlock::UnloadBlocks() {
 
 void BaseBlock::LoadBlockManifest() {
 	BaseBlock::UnloadBlocks();
-
-	uint8_t* _texture = (uint8_t*)malloc(4 * 25 * 25);
-	assert(_texture != nullptr);
-	memset(_texture, 0, 4 * 25 * 25);
-	for (int32_t i = 0; i < 25 * 25; ++i) {
-		_texture[i * 4 + 0] = (i == 0) * 255;
-		_texture[i * 4 + 1] = (i / 25) * 10;
-		_texture[i * 4 + 2] = (i % 25) * 10;
-		_texture[i * 4 + 3] = 255;
-	}
-
-	Shader* shader = new Shader(std::string("./res/shaders/Chunk.shader"));
-	BaseBlock::s_chunkMaterial = new TexturedMaterial(shader, _texture, 25, 25);
-	shader->drop();
-	shader = nullptr;
-	free(_texture);
-
 	bool manifestChanged = false;
 	std::string path = World::GetWorldDir() + "block_manifest";
 	std::ifstream manifest(path.c_str(), std::ios::binary);

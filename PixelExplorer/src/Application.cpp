@@ -69,7 +69,7 @@ int main(void) {
   Shader::getDefault()->drop();
   renderer->drop();
   // END OF ORDER IMPORTANT
-  Chunk::freeEmptyBuffer();
+  Chunk::FreeStaticMembers();
   _CrtDumpMemoryLeaks();
   return 0;
 }
