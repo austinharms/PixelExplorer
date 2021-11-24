@@ -14,6 +14,8 @@ public:
 
 	int32_t getHeight() const { return _height; }
 
+	void UpdateTexture(void* _texture, int32_t width, int32_t height);
+
 private:
 	void bindTexture();
 	void unbindTexture();
