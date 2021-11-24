@@ -13,6 +13,8 @@
 #include "glm/mat4x4.hpp"
 #include "rendering/Renderable.h"
 #include "glm/gtx/euler_angles.hpp"
+#include "rendering/TexturedMaterial.h"
+#include "rendering/Shader.h"
 
 class Chunk : public virtual RefCounted, public virtual Renderable {
  public:
@@ -55,12 +57,19 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   void setStatus(Status status) { _status = status; }
 
-  static void freeEmptyBuffer() {
+  static void FreeStaticMembers() {
     if (s_emptyBuffer != nullptr) free(s_emptyBuffer);
+    s_chunkMaterial->drop();
+    s_chunkMaterial = nullptr;
+  }
+
+  static void SetChunkMaterialShader(Shader* shader) {
+      s_chunkMaterial->setShader(shader);
   }
 
  private:
   static void* s_emptyBuffer;
+  static TexturedMaterial* s_chunkMaterial;
 
   void updateBuffers();  // MUST be called on main thread
 
