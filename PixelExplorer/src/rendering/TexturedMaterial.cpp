@@ -28,7 +28,7 @@ void TexturedMaterial::onPostBind() {
   if (_shader != nullptr) _shader->setUniform1i("u_Texture", 0);
 }
 
-void TexturedMaterial::UpdateTexture(void* texture, int32_t width, int32_t height) {
+void TexturedMaterial::updateTexture(void* texture, int32_t width, int32_t height) {
   _width = width;
   _height = height;
   glBindTexture(GL_TEXTURE_2D, _textureId);

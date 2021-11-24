@@ -43,8 +43,6 @@ class BaseBlock : public virtual RefCounted {
     return &s_blocks[id];
   }
 
-  static TexturedMaterial* GetMaterial() { return s_chunkMaterial; }
-
  private:
   BaseBlock();
   static void UpdateManifest();
@@ -53,7 +51,6 @@ class BaseBlock : public virtual RefCounted {
   static BaseBlock* s_blocks;
   static uint32_t s_blockCount;
   static std::unordered_map<std::string, uint32_t> s_blockLookupTable;
-  static TexturedMaterial* s_chunkMaterial;
   uint32_t _id;
   bool _solid;
   bool _loaded;

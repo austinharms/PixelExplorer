@@ -67,6 +67,11 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
       s_chunkMaterial->setShader(shader);
   }
 
+  static void SetChunkMaterialTexture(void* texture, int32_t width,
+    int32_t height) {
+    s_chunkMaterial->updateTexture(texture, width, height);
+  }
+
  private:
   static void* s_emptyBuffer;
   static TexturedMaterial* s_chunkMaterial;
