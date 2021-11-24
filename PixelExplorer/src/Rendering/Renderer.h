@@ -91,14 +91,14 @@ class Renderer : public virtual RefCounted {
 
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
-  int _FPSLimit;
   glm::mat4 _projection;
   glm::vec3 _position;
   glm::vec3 _forward;
   glm::vec2 _rotation;
   GLFWwindow* _window;
-  int _FPS;
-  int _frameCounter;
+  uint32_t _FPSLimit;
+  uint32_t _FPS;
+  uint32_t _frameCounter;
   float _deltaTime;
   double _lastFrame;
   double _FPSTimer;

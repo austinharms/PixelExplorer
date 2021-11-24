@@ -64,6 +64,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   void updateBuffers();  // MUST be called on main thread
 
+  Chunk* _adjacentChunks[(int32_t)FaceDirection::FACECOUNT];
   float* _vertexBuffer;
   std::mutex _meshBuffersLock;
   uint32_t* _buffers[(int32_t)FaceDirection::FACECOUNT];
