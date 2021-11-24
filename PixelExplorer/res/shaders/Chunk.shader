@@ -8,6 +8,7 @@ uniform mat4 u_MVP;
 
 void main() {
   gl_Position = u_MVP * vec4(position, 1.0);
+  v_TexCoord = texCoord;
 };
 
 #shader fragment
@@ -17,8 +18,6 @@ layout(location = 0) out vec4 color;
 in vec2 v_TexCoord;
 uniform sampler2D u_Texture;
 
-void main() { 
-  vec4 texColor;
-  texColor = texture2D(u_Texture, v_TexCoord);
-  color = texColor;
+void main() {
+  color = texture2D(u_Texture, v_TexCoord);
 };
