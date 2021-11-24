@@ -237,6 +237,7 @@
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\TestRenderable.cpp" />
+    <ClCompile Include="src\rendering\TexturedMaterial.cpp" />
     <ClCompile Include="src\vendor\glm\detail\glm.cpp" />
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="src\World.cpp" />
@@ -396,6 +397,7 @@
     <ClInclude Include="src\rendering\Renderer.h" />
     <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\rendering\TestRenderable.h" />
+    <ClInclude Include="src\rendering\TexturedMaterial.h" />
     <ClInclude Include="src\vendor\FastNoiseLite.h" />
     <ClInclude Include="src\vendor\glm\common.hpp" />
     <ClInclude Include="src\vendor\glm\detail\compute_common.hpp" />

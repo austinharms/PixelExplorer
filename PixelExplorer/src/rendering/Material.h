@@ -37,7 +37,9 @@ class Material : public virtual RefCounted {
   static unsigned int s_idCounter;
   static Material* s_default;
   unsigned int _id;
-  Shader* _shader;
   static Material* loadDefaultMaterial();
+
+protected:
+  Shader* _shader;
 };
 #endif  // !RENDER_MATERIAL_H
