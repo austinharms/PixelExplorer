@@ -18,13 +18,16 @@
 
 int main(void) {
   Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0");
-  renderer->setCursorHidden(false);
+  renderer->setCursorHidden(true);
   World::SetRenderer(renderer);
   World::LoadWorld();
-  World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(0, 0, 0));
+  for (uint8_t x = 0; x < 10; ++x)
+    for (uint8_t y = 0; y < 10; ++y)
+      for (uint8_t z = 0; z < 10; ++z)
+        World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(x, y, z));
   glm::vec3 camPos(12, 12, 75);
-  glm::vec3 camRot(0,0,0);
-  float moveSpeed = 5;
+  glm::vec3 camRot(0, 0, 0);
+  float moveSpeed = 50;
 
   while (renderer->getWindowOpen()) {
     if (renderer->getKeyPressed(GLFW_KEY_W)) {
@@ -34,9 +37,13 @@ int main(void) {
     }
 
     if (renderer->getKeyPressed(GLFW_KEY_A)) {
-      camPos -= renderer->getDeltaTime() * glm::cross(renderer->getForward(), glm::vec3(0,1,0)) * moveSpeed;
+      camPos -= renderer->getDeltaTime() *
+                glm::cross(renderer->getForward(), glm::vec3(0, 1, 0)) *
+                moveSpeed;
     } else if (renderer->getKeyPressed(GLFW_KEY_D)) {
-      camPos += renderer->getDeltaTime() * glm::cross(renderer->getForward(), glm::vec3(0,1,0)) * moveSpeed;
+      camPos += renderer->getDeltaTime() *
+                glm::cross(renderer->getForward(), glm::vec3(0, 1, 0)) *
+                moveSpeed;
     }
 
     if (renderer->getKeyPressed(GLFW_KEY_SPACE)) {
@@ -47,6 +54,9 @@ int main(void) {
 
     camRot.x += 0.001f * renderer->getCursorChangeY();
     camRot.y += 0.001f * renderer->getCursorChangeX();
+
+    if (renderer->getKeyPressed(GLFW_KEY_ESCAPE))
+      renderer->setCursorHidden(false);
 
     renderer->setTransform(camPos, camRot);
     renderer->drawFrame();
