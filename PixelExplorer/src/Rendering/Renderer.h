@@ -42,18 +42,41 @@ class Renderer : public virtual RefCounted {
 
   glm::vec3 getPosition() const { return _position; }
 
+  void setRotation(glm::vec2 rotation) {
+    std::lock_guard<std::mutex> drawLock(_renderLock);
+    _rotation = rotation;
+    updateForwardVector();
+  }
+
   void setRotation(glm::vec3 rotation) {
     std::lock_guard<std::mutex> drawLock(_renderLock);
     _rotation = rotation;
+    updateForwardVector();
   }
 
-  glm::vec3 getRotation() const { return _rotation; }
+  glm::vec2 getRotation() const { return _rotation; }
+
+  glm::vec2 getRotationVec3() const { return glm::vec3(_rotation, 0); }
 
   void setTransform(glm::vec3 position, glm::vec3 rotation) {
     std::lock_guard<std::mutex> drawLock(_renderLock);
     _position = position;
-    _rotation = rotation;
+    if ((glm::vec2)rotation != _rotation) {
+      updateForwardVector();
+      _rotation = rotation;
+    }
   }
+
+  void setTransform(glm::vec3 position, glm::vec2 rotation) {
+    std::lock_guard<std::mutex> drawLock(_renderLock);
+    _position = position;
+    if (rotation != _rotation) {
+      updateForwardVector();
+      _rotation = rotation;
+    }
+  }
+
+  glm::vec3 getForward() const { return _forward; }
 
   double getCursorX() const { return _cursorX; }
 
@@ -64,12 +87,15 @@ class Renderer : public virtual RefCounted {
   double getCursorChangeY() const { return _cursorChangeY; }
 
  private:
+  void updateForwardVector();
+
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
   int _FPSLimit;
   glm::mat4 _projection;
   glm::vec3 _position;
-  glm::vec3 _rotation;
+  glm::vec3 _forward;
+  glm::vec2 _rotation;
   GLFWwindow* _window;
   int _FPS;
   int _frameCounter;
