@@ -32,7 +32,7 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
   glCullFace(GL_BACK);
 
   // glfwSetFramebufferSizeCallback(_window, Renderer::windowResizeEvent);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
   // glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
 
   setFPSLimit(FPSLimit);

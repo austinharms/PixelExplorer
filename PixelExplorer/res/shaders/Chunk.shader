@@ -15,15 +15,10 @@ void main() {
 
 layout(location = 0) out vec4 color;
 in vec2 v_TexCoord;
-uniform bool u_UseTexture;
 uniform sampler2D u_Texture;
-uniform vec4 u_Color;
 
 void main() { 
   vec4 texColor;
-  if (u_UseTexture) {
-    texColor = texture(u_Texture, v_TexCoord);
-  }
-  texColor *= u_Color;
+  texColor = texture2D(u_Texture, v_TexCoord);
   color = texColor;
 };

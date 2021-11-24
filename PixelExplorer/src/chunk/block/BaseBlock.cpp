@@ -1,5 +1,7 @@
 #include "BaseBlock.h"
 
+#include "rendering/Shader.h"
+
 #include <iostream>
 
 BaseBlock* BaseBlock::s_blocks = nullptr;
@@ -32,10 +34,20 @@ void BaseBlock::UnloadBlocks() {
 void BaseBlock::LoadBlockManifest() {
 	BaseBlock::UnloadBlocks();
 
-	void* _texture = malloc(8 * 4 * 25 * 25);
+	uint8_t* _texture = (uint8_t*)malloc(4 * 25 * 25);
 	assert(_texture != nullptr);
-	memset(_texture, 0, 8 * 4 * 25 * 25);
-	BaseBlock::s_chunkMaterial = new TexturedMaterial(Shader::getDefault(), _texture, 25, 25);
+	memset(_texture, 0, 4 * 25 * 25);
+	for (int32_t i = 0; i < 25 * 25; ++i) {
+		_texture[i * 4 + 0] = (i == 0) * 255;
+		_texture[i * 4 + 1] = (i / 25) * 10;
+		_texture[i * 4 + 2] = (i % 25) * 10;
+		_texture[i * 4 + 3] = 255;
+	}
+
+	Shader* shader = new Shader(std::string("./res/shaders/Chunk.shader"));
+	BaseBlock::s_chunkMaterial = new TexturedMaterial(shader, _texture, 25, 25);
+	shader->drop();
+	shader = nullptr;
 	free(_texture);
 
 	bool manifestChanged = false;
