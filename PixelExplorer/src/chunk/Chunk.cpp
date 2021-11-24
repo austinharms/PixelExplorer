@@ -6,7 +6,7 @@
 
 void* Chunk::s_emptyBuffer = malloc(1);
 
-Chunk::Chunk() : Renderable(Material::getDefault()) {
+Chunk::Chunk() : Renderable(BaseBlock::GetMaterial()) {
 	setPosition(glm::vec3(0));
 	_status = Status::CREATED;
 	_visible = true;
