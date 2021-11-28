@@ -2,8 +2,8 @@
 #define RAWBLOCK_H
 #include <cstdint>
 #include <fstream>
-#include <string>
 #include <set>
+#include <string>
 #include <unordered_map>
 
 #include "../FaceDirection.h"
@@ -46,7 +46,8 @@ class BaseBlock : public virtual RefCounted {
  private:
   BaseBlock();
   static void UpdateManifest();
-  static bool LoadPackage(std::string name, std::set<std::string>* loadedPackages = nullptr);
+  static bool LoadPackage(const Package& package, std::set<std::string>* loadedPackages = nullptr);
+  static void CreateTextureAtlas();
 
   static BaseBlock* s_blocks;
   static uint32_t s_blockCount;

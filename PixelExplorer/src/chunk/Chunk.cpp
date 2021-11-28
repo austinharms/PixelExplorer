@@ -5,9 +5,9 @@
 #include "chunk/block/Block.h"
 
 void* Chunk::s_emptyBuffer = malloc(1);
-TexturedMaterial* Chunk::s_chunkMaterial = new TexturedMaterial(Shader::getDefault(), nullptr, 0, 0);
+TexturedMaterial* Chunk::s_chunkMaterial = nullptr;
 
-Chunk::Chunk() : Renderable(Chunk::s_chunkMaterial) {
+Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
 	setPosition(glm::vec3(0));
 	_status = Status::CREATED;
 	_visible = true;
