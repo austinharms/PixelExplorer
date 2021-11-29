@@ -85,6 +85,36 @@ void BaseBlock::LoadBlockManifest() {
     std::cout << "Block Manifest Changed, Reloading Manifest" << std::endl;
     LoadBlockManifest();
   } else {
+    for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
+      if (!BaseBlock::s_blocks[i]._loaded) {
+        BaseBlock::s_blocks[i]._solid = BaseBlock::s_blocks[0]._solid;
+        memcpy(&BaseBlock::s_blocks[i]._faces, &BaseBlock::s_blocks[0]._faces,
+               sizeof(BaseBlock::s_blocks[0]._faces));
+        for (uint8_t j = 0; j < (uint8_t)FaceDirection::FACECOUNT; ++j) {
+          BaseBlock::s_blocks[i]._faces[j].vertices =
+              new float[BaseBlock::s_blocks[i]._faces[j].vertexCount * 3];
+          BaseBlock::s_blocks[i]._faces[j].uvs =
+              new float[BaseBlock::s_blocks[i]._faces[j].vertexCount * 2];
+          BaseBlock::s_blocks[i]._faces[j].indices =
+              new uint8_t[BaseBlock::s_blocks[i]._faces[j].indexCount];
+          memcpy(
+              &BaseBlock::s_blocks[i]._faces[j].vertices,
+              &BaseBlock::s_blocks[0]._faces[j].vertices,
+              BaseBlock::s_blocks[i]._faces[j].vertexCount * 3 * sizeof(float));
+          memcpy(
+              &BaseBlock::s_blocks[i]._faces[j].uvs,
+              &BaseBlock::s_blocks[0]._faces[j].uvs,
+              BaseBlock::s_blocks[i]._faces[j].vertexCount * 2 * sizeof(float));
+          memcpy(
+              &BaseBlock::s_blocks[i]._faces[j].indices,
+              &BaseBlock::s_blocks[0]._faces[j].indices,
+              BaseBlock::s_blocks[i]._faces[j].indexCount * sizeof(uint8_t));
+        }
+
+        BaseBlock::s_blocks[i]._loaded = true;
+      }
+    }
+
     CreateTextureAtlas();
   }
 }
@@ -240,7 +270,8 @@ bool BaseBlock::LoadPackage(const Package& pkg,
   loadedPackages->insert(pkg.getName());
 
   if (end != 0) {
-    std::cout << "Warrning May Have Failed Loading Package, No Trailing NULL" << std::endl;
+    std::cout << "Warrning May Have Failed Loading Package, No Trailing NULL"
+              << std::endl;
   }
 
   package.close();
@@ -248,9 +279,15 @@ bool BaseBlock::LoadPackage(const Package& pkg,
 }
 
 void BaseBlock::CreateTextureAtlas() {
-  //int32_t width;
-  //int32_t height;
-  //int32_t channelCount;
-  //uint8_t* img = stbi_load(filename, &width, &height, &channelCount, 4);
-  //stbi_image_free(img);
+  uint32_t textureCount = 0;
+  uint8_t* foundTextures = new uint8_t[BaseBlock::s_blockCount];
+  for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
+    
+  }
+    
+    int32_t width;
+  int32_t height;
+  int32_t channelCount;
+  uint8_t* img = stbi_load(filename, &width, &height, &channelCount, 4);
+  stbi_image_free(img);
 }
