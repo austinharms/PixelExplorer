@@ -21,6 +21,13 @@ class World {
 
   static const std::set<Package> GetPackages() { return s_packages; }
 
+  static const Package* GetPackage(std::string name) {
+      std::set<Package>::iterator it;
+      for (it = s_packages.begin(); it != s_packages.end(); ++it)
+          if ((*it).getName() == name) return &*it;
+      return nullptr;
+  }
+
   static ChunkManager* GetChunkManager() { return s_chunkManager; }
 
   static void SetRenderer(Renderer* renderer) {

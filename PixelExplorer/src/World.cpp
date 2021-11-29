@@ -64,12 +64,12 @@ void World::LoadWorld() {
   for (const Package& package : World::s_packages) {
     std::string path = World::s_appAssetDir + package.getName();
     if (dirExists(path.c_str())) {
-      package.setPath(path + "/");
+      package.setPath(path + "\\");
     }
     else {
       path = World::s_assetDir + package.getName();
       if (dirExists(path.c_str())) {
-        package.setPath(path + "/");
+        package.setPath(path + "\\");
       } else {
         std::cout << "Failed to Find Package " << package.getName()
                   << std::endl;
@@ -81,6 +81,11 @@ void World::LoadWorld() {
   }
 
   BaseBlock::LoadBlockManifest();
+  Shader* chunkShader = new Shader("./res/shaders/Chunk.shader");
+  assert(chunkShader->isValid());
+  Chunk::SetChunkMaterialShader(chunkShader);
+  chunkShader->drop();
+  chunkShader = nullptr;
 }
 
 void World::UnloadWorld() {
