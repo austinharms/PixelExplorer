@@ -282,9 +282,10 @@ bool BaseBlock::LoadPackage(const Package& pkg,
 }
 
 void BaseBlock::CreateTextureAtlas() {
+	std::cout << "Creating Texture Atlas" << std::endl;
 	uint32_t textureCount = 0;
 	uint8_t* foundTextures = new uint8_t[BaseBlock::s_blockCount];
-	std::string sides[7] = { std::string(""),std::string("_top"), std::string("_bottom"), std::string("_lef"), std::string("_right"), std::string("_front"), std::string("_back") };
+	std::string sides[7] = { std::string(""),std::string("_top"), std::string("_bottom"), std::string("_left"), std::string("_right"), std::string("_front"), std::string("_back") };
 	uint8_t sideFlags[7] = { 0b00000001,0b00000010,0b00000100,0b00001000,0b00010000,0b00100000,0b01000000 };
 	memset(foundTextures, 0, BaseBlock::s_blockCount);
 	for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
@@ -314,11 +315,16 @@ void BaseBlock::CreateTextureAtlas() {
 		assert(i == 0 && textureCount >= 1 || i > 0);
 	}
 
+	uint16_t x = 0;
+	uint16_t y = 0;
 	uint32_t loadedTextures = 0;
 	uint16_t atlasSize = ceil(sqrt(textureCount));
-	uint8_t* textureAtlas = (uint8_t*)malloc((uint64_t)atlasSize * 25 * 25 * 4);
+	uint32_t atlasPixelSize = 25 * atlasSize;
+	uint32_t atlasByteWidth = 25 * atlasSize * 4;
+	uint64_t atlasByteSize = (uint64_t)atlasPixelSize * atlasPixelSize * 4;
+	uint8_t* textureAtlas = (uint8_t*)malloc(atlasByteSize);
 	assert(textureAtlas != nullptr);
-	memset(textureAtlas, 255, (uint64_t)atlasSize * 25 * 25 * 4);
+	memset(textureAtlas, 255, atlasByteSize);
 
 	for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
 		if (foundTextures[i] & 0b10000000) {
@@ -339,14 +345,29 @@ void BaseBlock::CreateTextureAtlas() {
 					img = stbi_load((texturePath + sides[j] + ".png").c_str(), &width, &height, &channelCount, 4);
 					if (width == 25 && height == 25 && img != nullptr) {
 						++loadedTextures;
+						for (uint32_t copyHeight = 0; copyHeight < 25; ++copyHeight)
+							memcpy(textureAtlas + (x * 25 * 4) + (atlasByteWidth * y * 25) + (atlasByteWidth * copyHeight), img + ((24 - copyHeight) * 25 * 4), 25 * 4);
+						++x;
+						if (x >= atlasSize) {
+							x = 0;
+							++y;
+						}
+					}
+					else
+					{
+						std::cout << "Warrning failed to load block texture " << texturePath << sides[j] << ".png" << std::endl;
 					}
 					stbi_image_free(img);
 				}
 			}
 		}
+		else {
+			std::cout << "Warrning failed to find texture for block " << BaseBlock::s_blocks[i]._name << std::endl;
+		}
 	}
 
-	Chunk::SetChunkMaterialTexture(textureAtlas, atlasSize * 25, atlasSize * 25);
+	std::cout << "Found " << textureCount << " Textures, Loaded " << loadedTextures << std::endl;
+	Chunk::SetChunkMaterialTexture(textureAtlas, atlasPixelSize, atlasPixelSize);
 	free(textureAtlas);
 	delete[] foundTextures;
 }
