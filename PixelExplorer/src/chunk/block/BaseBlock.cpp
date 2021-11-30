@@ -61,7 +61,7 @@ void BaseBlock::LoadBlockManifest() {
 			name[nameLength] = '\0';
 			std::string blockName = std::string(name);
 			BaseBlock::s_blockLookupTable.insert({ blockName, blockId });
-			BaseBlock::s_blocks[blockId]._name = blockName;
+			BaseBlock::s_blocks[blockId]._name = name;
 			BaseBlock::s_blocks[blockId]._id = blockId;
 			BaseBlock::s_blocks[blockId]._loaded = false;
 		}
@@ -285,9 +285,10 @@ void BaseBlock::CreateTextureAtlas() {
 	std::cout << "Creating Texture Atlas" << std::endl;
 	uint32_t textureCount = 0;
 	uint8_t* foundTextures = new uint8_t[BaseBlock::s_blockCount];
-	std::string sides[7] = { std::string(""),std::string("_top"), std::string("_bottom"), std::string("_left"), std::string("_right"), std::string("_front"), std::string("_back") };
+	std::string sides[7] = { std::string(""),std::string("_front"), std::string("_back"), std::string("_left"), std::string("_right"), std::string("_top"), std::string("_bottom") };
 	uint8_t sideFlags[7] = { 0b00000001,0b00000010,0b00000100,0b00001000,0b00010000,0b00100000,0b01000000 };
 	memset(foundTextures, 0, BaseBlock::s_blockCount);
+	BaseBlock* b = &BaseBlock::s_blocks[1];
 	for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
 		size_t splitIndex = BaseBlock::s_blocks[i]._name.find("/");
 		std::string packageName = BaseBlock::s_blocks[i]._name.substr(0, splitIndex);
@@ -325,6 +326,7 @@ void BaseBlock::CreateTextureAtlas() {
 	uint8_t* textureAtlas = (uint8_t*)malloc(atlasByteSize);
 	assert(textureAtlas != nullptr);
 	memset(textureAtlas, 255, atlasByteSize);
+	float tileSize = (1.0f / atlasPixelSize) * 25;
 
 	for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
 		if (foundTextures[i] & 0b10000000) {
@@ -339,14 +341,27 @@ void BaseBlock::CreateTextureAtlas() {
 			int32_t height;
 			int32_t channelCount;
 			uint8_t* img = nullptr;
+			uint16_t defaultX = 0;
+			uint16_t defaultY = 0;
 
 			for (uint8_t j = 0; j < 7; ++j) {
+				uint16_t currentX = defaultX;
+				uint16_t currentY = defaultY;
 				if (foundTextures[i] & sideFlags[j]) {
 					img = stbi_load((texturePath + sides[j] + ".png").c_str(), &width, &height, &channelCount, 4);
 					if (width == 25 && height == 25 && img != nullptr) {
 						++loadedTextures;
 						for (uint32_t copyHeight = 0; copyHeight < 25; ++copyHeight)
 							memcpy(textureAtlas + (x * 25 * 4) + (atlasByteWidth * y * 25) + (atlasByteWidth * copyHeight), img + ((24 - copyHeight) * 25 * 4), 25 * 4);
+
+						if (j == 0) {
+							defaultX = x;
+							defaultY = y;
+						}
+
+						currentX = x;
+						currentY = y;
+
 						++x;
 						if (x >= atlasSize) {
 							x = 0;
@@ -359,10 +374,24 @@ void BaseBlock::CreateTextureAtlas() {
 					}
 					stbi_image_free(img);
 				}
+
+				if (j != 0) {
+					BlockFace* face = &BaseBlock::s_blocks[i]._faces[j - 1];
+					for (uint8_t k = 0; k < face->vertexCount; ++k) {
+						face->uvs[k * 2] = (currentX * tileSize) + (tileSize * face->uvs[k * 2]);
+						face->uvs[k * 2 + 1] = (currentY * tileSize) + (tileSize * face->uvs[k * 2 + 1]);
+					}
+				}
 			}
 		}
 		else {
 			std::cout << "Warrning failed to find texture for block " << BaseBlock::s_blocks[i]._name << std::endl;
+
+			for (uint8_t j = 0; j < 6; ++j) {
+				BlockFace* face = &BaseBlock::s_blocks[i]._faces[j];
+				for (uint8_t k = 0; k < face->vertexCount * 2; ++k)
+					face->uvs[k] = tileSize * face->uvs[k];
+			}
 		}
 	}
 
