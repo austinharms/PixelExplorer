@@ -33,6 +33,10 @@ void World::LoadWorld() {
   if (!manifest || manifest.peek() == std::ifstream::traits_type::eof()) {
     std::cout << "No World Manifest Found, Creating Default Manifest"
               << std::endl;
+    World::s_packages.insert(
+        Package(std::string("debug"), World::MANIFEST_VERSION));
+    World::s_packages.insert(
+        Package(std::string("px"), World::MANIFEST_VERSION));
     manifest.close();
     UpdateManifest();
   } else {
@@ -65,8 +69,7 @@ void World::LoadWorld() {
     std::string path = World::s_appAssetDir + package.getName();
     if (dirExists(path.c_str())) {
       package.setPath(path + "\\");
-    }
-    else {
+    } else {
       path = World::s_assetDir + package.getName();
       if (dirExists(path.c_str())) {
         package.setPath(path + "\\");
@@ -77,7 +80,8 @@ void World::LoadWorld() {
       }
     }
 
-    std::cout << "Found Package " << package.getName() << " at " << path << std::endl;
+    std::cout << "Found Package " << package.getName() << " at " << path
+              << std::endl;
   }
 
   BaseBlock::LoadBlockManifest();
