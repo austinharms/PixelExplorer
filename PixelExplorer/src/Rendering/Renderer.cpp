@@ -55,6 +55,7 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
 	glfwSetWindowFocusCallback(_window, Renderer::s_windowFocus);
 	Renderer::s_renderers.emplace(_window, this);
 	glfwRequestWindowAttention(_window);
+	_windowActive = true;
 }
 
 void Renderer::addRenderable(Renderable* renderable) {
@@ -173,9 +174,9 @@ void Renderer::setFPSLimit(int32_t limit) {
 }
 
 void Renderer::setCursorHidden(bool hidden) {
+	_cursorHiddenTarget = hidden;
 	if (_windowActive) {
-		_cursorHiddenTarget = hidden;
-		_cursorHidden = _cursorHidden;
+		_cursorHidden = _cursorHiddenTarget;
 		if (_cursorHidden) {
 			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		}
@@ -223,7 +224,6 @@ void Renderer::windowResize(int width, int height)
 }
 
 void Renderer::windowFocus(bool focused) {
-	std::cout << "Focus Changed: " << focused << std::endl;
 	_windowActive = focused;
 	if (_windowActive) {
 		setCursorHidden(_cursorHiddenTarget);
