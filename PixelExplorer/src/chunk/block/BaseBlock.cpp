@@ -70,8 +70,9 @@ void BaseBlock::LoadBlockManifest() {
 	std::set<std::string> loadedPackages;
 	// Load Packages
 	uint32_t startingBlockCount = BaseBlock::s_blockCount;
-	for (const Package& package : World::GetPackages())
+	for (const Package& package : World::GetPackages()) {
 		LoadPackage(package, &loadedPackages);
+	}
 
 	// Check if we added any new blocks, if so update the manifest
 	if (BaseBlock::s_blockCount != startingBlockCount) {
@@ -90,27 +91,18 @@ void BaseBlock::LoadBlockManifest() {
 		for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
 			if (!BaseBlock::s_blocks[i]._loaded) {
 				BaseBlock::s_blocks[i]._solid = BaseBlock::s_blocks[0]._solid;
-				memcpy(&BaseBlock::s_blocks[i]._faces, &BaseBlock::s_blocks[0]._faces,
-					sizeof(BaseBlock::s_blocks[0]._faces));
 				for (uint8_t j = 0; j < (uint8_t)FaceDirection::FACECOUNT; ++j) {
-					BaseBlock::s_blocks[i]._faces[j].vertices =
-						new float[BaseBlock::s_blocks[i]._faces[j].vertexCount * 3];
-					BaseBlock::s_blocks[i]._faces[j].uvs =
-						new float[BaseBlock::s_blocks[i]._faces[j].vertexCount * 2];
-					BaseBlock::s_blocks[i]._faces[j].indices =
-						new uint8_t[BaseBlock::s_blocks[i]._faces[j].indexCount];
-					memcpy(
-						&BaseBlock::s_blocks[i]._faces[j].vertices,
-						&BaseBlock::s_blocks[0]._faces[j].vertices,
-						BaseBlock::s_blocks[i]._faces[j].vertexCount * 3 * sizeof(float));
-					memcpy(
-						&BaseBlock::s_blocks[i]._faces[j].uvs,
-						&BaseBlock::s_blocks[0]._faces[j].uvs,
-						BaseBlock::s_blocks[i]._faces[j].vertexCount * 2 * sizeof(float));
-					memcpy(
-						&BaseBlock::s_blocks[i]._faces[j].indices,
-						&BaseBlock::s_blocks[0]._faces[j].indices,
-						BaseBlock::s_blocks[i]._faces[j].indexCount * sizeof(uint8_t));
+					s_blocks[i]._faces[j].direction = s_blocks[0]._faces[j].direction;
+					s_blocks[i]._faces[j].full = s_blocks[0]._faces[j].full;
+					s_blocks[i]._faces[j].indexCount = s_blocks[0]._faces[j].indexCount;
+					s_blocks[i]._faces[j].transparent = s_blocks[0]._faces[j].transparent;
+					s_blocks[i]._faces[j].vertexCount = s_blocks[0]._faces[j].vertexCount;
+					s_blocks[i]._faces[j].vertices = new float[s_blocks[i]._faces[j].vertexCount * 3];
+					s_blocks[i]._faces[j].uvs = new float[s_blocks[i]._faces[j].vertexCount * 2];
+					s_blocks[i]._faces[j].indices = new uint8_t[s_blocks[i]._faces[j].indexCount];
+					memcpy(s_blocks[i]._faces[j].indices, s_blocks[0]._faces[j].indices, s_blocks[i]._faces[j].indexCount * sizeof(uint8_t));
+					memcpy(s_blocks[i]._faces[j].vertices, s_blocks[0]._faces[j].vertices, s_blocks[i]._faces[j].vertexCount * 3 * sizeof(float));
+					memcpy(s_blocks[i]._faces[j].uvs, s_blocks[0]._faces[j].uvs, s_blocks[i]._faces[j].vertexCount * 2 * sizeof(float));
 				}
 
 				BaseBlock::s_blocks[i]._loaded = true;
