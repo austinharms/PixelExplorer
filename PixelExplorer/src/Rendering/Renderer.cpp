@@ -48,6 +48,9 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
   _cursorChangeX = 0;
   _cursorChangeY = 0;
   updateForwardVector();
+  glfwSetWindowFocusCallback(_window, [](GLFWwindow* window, int focused) { _windowActive = 0;
+    });
+  glfwRequestWindowAttention(_window);
 }
 
 void Renderer::addRenderable(Renderable* renderable) {
@@ -79,12 +82,25 @@ void Renderer::drawFrame() {
     _FPSTimer = currentFrame;
     std::cout << "FPS: " << _FPS << std::endl;
   }
+  _windowActive = glfwGetWindowAttrib(_window, GLFW_FOCUSED);
+  if (_windowActive) {
+    if (_cursorStatus != _cursorHidden)
+      setCursorHidden(_cursorStatus);
 
-  _cursorChangeX = _cursorX;
-  _cursorChangeY = _cursorY;
-  glfwGetCursorPos(_window, &_cursorX, &_cursorY);
-  _cursorChangeX = _cursorX - _cursorChangeX;
-  _cursorChangeY = _cursorY - _cursorChangeY;
+    if (_cursorHidden) {
+      glfwGetCursorPos(_window, &_cursorChangeX, &_cursorChangeY);
+      glfwSetCursorPos(_window, 0, 0);
+    } else {
+      _cursorChangeX = _cursorX;
+      _cursorChangeY = _cursorY;
+      glfwGetCursorPos(_window, &_cursorX, &_cursorY);
+      _cursorChangeX = _cursorX - _cursorChangeX;
+      _cursorChangeY = _cursorY - _cursorChangeY;
+    }
+  } else if (_cursorHidden) {
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    _cursorHidden = false;
+  }
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -158,11 +174,18 @@ void Renderer::setFPSLimit(int32_t limit) {
 
 void Renderer::setCursorHidden(bool hidden) {
   _cursorHidden = hidden;
+  _cursorStatus = _cursorHidden;
   if (_cursorHidden) {
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   } else {
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   }
+
+  glfwSetCursorPos(_window, 0, 0);
+  _cursorChangeX = 0;
+  _cursorChangeY = 0;
+  _cursorX = 0;
+  _cursorY = 0;
 }
 
 Renderer::~Renderer() {
@@ -185,6 +208,10 @@ void Renderer::updateForwardVector() {
   _forward.x = 2 * (x * z + w * y);
   _forward.y = 2 * (y * z - w * x);
   _forward.z = 1 - 2 * (x * x + y * y);
+}
+
+void Renderer::windowFocus(GLFWwindow* window, int focused) {
+
 }
 
 void GLAPIENTRY Renderer::GLErrorCallback(GLenum source, GLenum type, GLuint id,

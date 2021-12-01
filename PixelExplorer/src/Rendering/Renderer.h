@@ -88,6 +88,7 @@ class Renderer : public virtual RefCounted {
 
  private:
   void updateForwardVector();
+  void windowFocus(GLFWwindow* window, int focused);
 
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
@@ -107,6 +108,8 @@ class Renderer : public virtual RefCounted {
   double _cursorChangeX;
   double _cursorChangeY;
   bool _cursorHidden;
+  bool _cursorStatus;
+  bool _windowActive;
 
   static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
                                          GLenum severity, GLsizei length,
