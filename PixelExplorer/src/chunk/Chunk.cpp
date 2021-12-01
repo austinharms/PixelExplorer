@@ -33,8 +33,8 @@ Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
 	glBindVertexArray(0);
 
 	glGenBuffers((int)FaceDirection::FACECOUNT, _indexBuffers);
-	memset(_blocks, 1, Chunk::BLOCK_COUNT * sizeof(ChunkBlock));
-	memset(&_blocks[7612], 0, 4);
+	memset(_blocks, 0, Chunk::BLOCK_COUNT * sizeof(ChunkBlock));
+	_blocks[7612].setId(1);
 }
 
 Chunk::~Chunk() {}

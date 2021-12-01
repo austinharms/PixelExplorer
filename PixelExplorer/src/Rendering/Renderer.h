@@ -13,7 +13,7 @@
 
 class Renderer : public virtual RefCounted {
 public:
-	Renderer(int width, int height, const char* title, int FPSLimit = 0);
+	Renderer(int32_t width, int32_t height, const char* title, float FOV, uint32_t FPSLimit = 0);
 	virtual ~Renderer();
 	void addRenderable(Renderable* renderable);
 	void removeRenderable(uint32_t id);
@@ -99,6 +99,7 @@ private:
 	void windowResize(int width, int height);
 	void windowFocus(bool focused);
 	void updateForwardVector();
+	void updatePrjectionMatrix();
 
 	std::mutex _renderLock;  // locks for _renderableObjects list
 	std::list<Renderable*> _renderableObjects;
@@ -111,6 +112,7 @@ private:
 	uint32_t _FPS;
 	uint32_t _frameCounter;
 	float _deltaTime;
+	float _FOV;
 	double _lastFrame;
 	double _FPSTimer;
 	double _cursorX;

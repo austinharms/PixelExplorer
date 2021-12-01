@@ -17,7 +17,7 @@
 #include "rendering/TestRenderable.h"
 
 int main(void) {
-  Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0");
+  Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0", 60);
   renderer->setCursorHidden(true);
   World::SetRenderer(renderer);
   World::LoadWorld();

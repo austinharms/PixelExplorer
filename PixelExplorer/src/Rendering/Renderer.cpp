@@ -10,39 +10,16 @@
 
 std::unordered_map<GLFWwindow*, Renderer*> Renderer::s_renderers;
 
-Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
-	: _projection(glm::perspective(
-		glm::radians(40.0f), (float)width / (float)height, 0.1f, 1000.0f)),
-	_position(0),
-	_rotation(0),
-	_forward(0),
-	_screenWidth(width),
-	_screenHeight(height) {
-	assert(glfwInit());
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	_window = glfwCreateWindow(width, height, title, NULL, NULL);
-	assert(_window);
-	glfwMakeContextCurrent(_window);
-	assert(glewInit() == GLEW_OK);
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(Renderer::GLErrorCallback, 0);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glFrontFace(GL_CCW);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
-	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
-
-	setFPSLimit(FPSLimit);
-	setCursorHidden(false);
-
-	_lastFrame = glfwGetTime();
-	_FPSTimer = _lastFrame;
+Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV, uint32_t FPSLimit) {
+	//Init Renderer Members
+	_position = glm::vec3(0);
+	_rotation = glm::vec3(0);
+	_forward = glm::vec3(0);
+	_screenHeight = height;
+	_screenWidth = width;
+	_FOV = FOV;
+	_lastFrame = 0;
+	_FPSTimer = 0;
 	_FPS = 0;
 	_frameCounter = 0;
 	_deltaTime = 0;
@@ -50,12 +27,40 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
 	_cursorY = 0;
 	_cursorChangeX = 0;
 	_cursorChangeY = 0;
+	_windowActive = true;
+	updatePrjectionMatrix();
 	updateForwardVector();
+
+	//Init GLFW/Render Window
+	assert(glfwInit());
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	_window = glfwCreateWindow(width, height, title, NULL, NULL);
+	assert(_window);
+	glfwMakeContextCurrent(_window);
 	glfwSetWindowFocusCallback(_window, Renderer::s_windowFocus);
 	glfwSetFramebufferSizeCallback(_window, Renderer::s_windowResize);
-	Renderer::s_renderers.emplace(_window, this);
 	glfwRequestWindowAttention(_window);
-	_windowActive = true;
+	
+	//Need to do this after GLFW init as they depend on it
+	setFPSLimit(FPSLimit);
+	setCursorHidden(false);
+
+	//Init OpenGL
+	assert(glewInit() == GLEW_OK);
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(Renderer::GLErrorCallback, 0);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
+
+	//Add Renderer Instance to List
+	Renderer::s_renderers.emplace(_window, this);
 }
 
 void Renderer::addRenderable(Renderable* renderable) {
@@ -215,12 +220,17 @@ void Renderer::updateForwardVector() {
 	_forward.z = 1 - 2 * (x * x + y * y);
 }
 
+void Renderer::updatePrjectionMatrix()
+{
+	_projection = glm::perspective(glm::radians(_FOV), (float)_screenWidth / (float)_screenHeight, 0.1f, 1000.0f);
+}
+
 void Renderer::windowResize(int width, int height)
 {
 	std::cout << "Window Size Changed: " << width << " " << height << std::endl;
-	_projection = glm::perspective(glm::radians(40.0f), (float)width / (float)height, 0.1f, 1000.0f);
 	_screenWidth = width;
 	_screenHeight = height;
+	updatePrjectionMatrix();
 }
 
 void Renderer::windowFocus(bool focused) {
