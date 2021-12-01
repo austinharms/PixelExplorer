@@ -35,7 +35,6 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	// glfwSetFramebufferSizeCallback(_window, Renderer::windowResizeEvent);
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
 
@@ -53,6 +52,7 @@ Renderer::Renderer(int width, int height, const char* title, int FPSLimit)
 	_cursorChangeY = 0;
 	updateForwardVector();
 	glfwSetWindowFocusCallback(_window, Renderer::s_windowFocus);
+	glfwSetFramebufferSizeCallback(_window, Renderer::s_windowResize);
 	Renderer::s_renderers.emplace(_window, this);
 	glfwRequestWindowAttention(_window);
 	_windowActive = true;
