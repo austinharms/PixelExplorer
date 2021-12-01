@@ -70,6 +70,7 @@ int main(void) {
   renderer->drop();
   // END OF ORDER IMPORTANT
   Chunk::FreeStaticMembers();
+  glfwTerminate();
   _CrtDumpMemoryLeaks();
   return 0;
 }
