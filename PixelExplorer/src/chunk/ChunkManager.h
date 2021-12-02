@@ -17,6 +17,7 @@ public:
 	~ChunkManager();
 	void UnloadChunks();
 	void LoadChunk(glm::vec<3, int32_t> pos);
+	Chunk* GetChunk(glm::vec<3, int32_t> pos);
 
 private:
 	Renderer* _renderer;
