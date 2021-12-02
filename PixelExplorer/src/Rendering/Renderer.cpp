@@ -41,7 +41,7 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV, 
 	glfwSetWindowFocusCallback(_window, Renderer::s_windowFocus);
 	glfwSetFramebufferSizeCallback(_window, Renderer::s_windowResize);
 	glfwRequestWindowAttention(_window);
-	
+
 	//Need to do this after GLFW init as they depend on it
 	setFPSLimit(FPSLimit);
 	setCursorHidden(false);
@@ -67,6 +67,16 @@ void Renderer::addRenderable(Renderable* renderable) {
 	std::lock_guard<std::mutex> locker(_renderLock);
 	renderable->grab();
 	_renderableObjects.emplace_back(renderable);
+	_renderableObjects.sort([](const Renderable& r1, const Renderable& r2) {
+		if (r1.getMaterial()->getShader()->getGLID() > r2.getMaterial()->getShader()->getGLID()) {
+			return true;
+		}
+		else if (r1.getMaterial()->getShader()->getGLID() == r2.getMaterial()->getShader()->getGLID()) {
+			return r1.getMaterial()->getId() > r2.getMaterial()->getId();
+		}
+
+		return false;
+		});
 }
 
 void Renderer::removeRenderable(uint32_t id) {
