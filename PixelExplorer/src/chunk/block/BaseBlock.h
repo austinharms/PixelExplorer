@@ -23,7 +23,7 @@ class BaseBlock : public virtual RefCounted {
 
   const BlockFace* getBlockFace(FaceDirection dir) const {
     assert(dir != FaceDirection::NONE);
-    return (const BlockFace*)&_faces[(uint8_t)dir - 1];
+    return (const BlockFace*)&_faces[(uint8_t)dir];
   }
 
   const BlockFace* getBlockFace(ChunkBlock& block, FaceDirection dir) const {

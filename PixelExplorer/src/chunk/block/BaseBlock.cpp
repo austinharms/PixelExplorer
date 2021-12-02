@@ -280,7 +280,6 @@ void BaseBlock::CreateTextureAtlas() {
 	std::string sides[7] = { std::string(""),std::string("_front"), std::string("_back"), std::string("_left"), std::string("_right"), std::string("_top"), std::string("_bottom") };
 	uint8_t sideFlags[7] = { 0b00000001,0b00000010,0b00000100,0b00001000,0b00010000,0b00100000,0b01000000 };
 	memset(foundTextures, 0, BaseBlock::s_blockCount);
-	BaseBlock* b = &BaseBlock::s_blocks[1];
 	for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i) {
 		size_t splitIndex = BaseBlock::s_blocks[i]._name.find("/");
 		std::string packageName = BaseBlock::s_blocks[i]._name.substr(0, splitIndex);

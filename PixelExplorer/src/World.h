@@ -1,7 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
-#include <set>
 #include <string>
+#include <vector>
 
 #include "chunk/ChunkManager.h"
 #include "rendering/Renderer.h"
@@ -19,10 +19,10 @@ class World {
 
   static const std::string GetWorldDir() { return s_worldDir; }
 
-  static const std::set<Package> GetPackages() { return s_packages; }
+  static const std::vector<Package> GetPackages() { return s_packages; }
 
   static const Package* GetPackage(std::string name) {
-      std::set<Package>::iterator it;
+      std::vector<Package>::iterator it;
       for (it = s_packages.begin(); it != s_packages.end(); ++it)
           if ((*it).getName() == name) return &*it;
       return nullptr;
@@ -45,7 +45,7 @@ class World {
   static std::string s_appAssetDir;
   static std::string s_assetDir;
   static std::string s_worldDir;
-  static std::set<Package> s_packages;
+  static std::vector<Package> s_packages;
   static ChunkManager* s_chunkManager;
   static Renderer* s_renderer;
 };

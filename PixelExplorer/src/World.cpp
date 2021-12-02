@@ -9,7 +9,7 @@
 std::string World::s_appAssetDir;
 std::string World::s_assetDir;
 std::string World::s_worldDir;
-std::set<Package> World::s_packages;
+std::vector<Package> World::s_packages;
 ChunkManager* World::s_chunkManager = nullptr;
 Renderer* World::s_renderer = nullptr;
 
@@ -25,17 +25,16 @@ void World::LoadWorld() {
       "C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\save-'test "
       "world'\\");
   World::s_chunkManager = new ChunkManager(World::s_renderer);
-  World::s_packages.insert(
-      Package(std::string("default"), World::MANIFEST_VERSION));
+  World::s_packages.push_back(Package(std::string("default"), World::MANIFEST_VERSION));
 
   std::string manifestPath = World::s_worldDir + "world_manifest";
   std::ifstream manifest(manifestPath.c_str(), std::ios::binary);
   if (!manifest || manifest.peek() == std::ifstream::traits_type::eof()) {
     std::cout << "No World Manifest Found, Creating Default Manifest"
               << std::endl;
-    World::s_packages.insert(
+    World::s_packages.push_back(
         Package(std::string("debug"), World::MANIFEST_VERSION));
-    World::s_packages.insert(
+    World::s_packages.push_back(
         Package(std::string("px"), World::MANIFEST_VERSION));
     manifest.close();
     UpdateManifest();
@@ -53,7 +52,7 @@ void World::LoadWorld() {
       char name[256];
       manifest.read(name, nameLength);
       name[nameLength] = '\0';
-      World::s_packages.insert(Package(std::string(name), version));
+      World::s_packages.push_back(Package(std::string(name), version));
     }
 
     char end;
