@@ -34,5 +34,10 @@ void ChunkManager::LoadChunk(const glm::vec<3, int32_t> pos) {
 
 Chunk* ChunkManager::GetChunk(glm::vec<3, int32_t> pos)
 {
-	return nullptr;
+	try {
+		return _chunks.at(pos);
+	}
+	catch(...) {
+		return nullptr;
+	}
 }
