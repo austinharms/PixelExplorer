@@ -5,6 +5,7 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "ChunkManager.h"
 #include "FaceDirection.h"
 #include "GL/glew.h"
 #include "RefCounted.h"
@@ -36,6 +37,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   bool onPreRender(float deltaTime, float* cameraPos, float* cameraRotation);
   void onRender();
   void updateMesh();
+  void updateAdjacentChunks(ChunkManager* mgr);
 
   void setPosition(glm::vec3 position) {
     _position = position;
@@ -92,6 +94,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
+  bool _chunkModified;
   uint8_t _visibleFaces;
   Status _status;
   uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
@@ -101,7 +104,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   uint32_t _indexCount[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _currentIndexCount[(int32_t)FaceDirection::FACECOUNT];
 
-  glm::vec3 _position;
+  glm::vec<3, int32_t> _position;
   glm::mat4 _transform;
 };
 

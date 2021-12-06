@@ -20,6 +20,7 @@ enum class FaceDirection : uint8_t {
 #define FACEDIRECTIONFLAG_H
 
 #include <cstdint>
+#include "glm/vec3.hpp"
 
 class FaceDirectionFlag {
  public:
@@ -38,6 +39,28 @@ class FaceDirectionFlag {
         return FRONT;
       case FaceDirection::BACK:
         return BACK;
+      case FaceDirection::LEFT:
+        return LEFT;
+      case FaceDirection::RIGHT:
+        return RIGHT;
+      case FaceDirection::TOP:
+        return TOP;
+      case FaceDirection::BOTTOM:
+        return BOTTOM;
+      case FaceDirection::FACECOUNT:
+      case FaceDirection::NONE:
+      default:
+        return NONE;
+        break;
+    }
+  }
+
+   static const glm::vec3 DirectionToVector(FaceDirection dir) {
+    switch (dir) {
+      case FaceDirection::FRONT:
+        return glm::vec3(0,0,1);
+      case FaceDirection::BACK:
+        return glm::vec3(0, 0, -1);
       case FaceDirection::LEFT:
         return LEFT;
       case FaceDirection::RIGHT:
