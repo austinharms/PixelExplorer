@@ -259,15 +259,32 @@ void Chunk::updateMesh() {
 }
 
 void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
-  Chunk* ch = mgr->GetChunk(_position - glm::vec<3, int32_t>(-1, 0, 0));
+  Chunk* ch =
+      mgr->GetChunk(_position - FaceDirectionFlag::DirectionToInt32Vector(
+                                    FaceDirection::LEFT));
   if (ch != nullptr) {
-    std::lock_guard<std::mutex> lock(_meshBuffersLock);
-    if (_adjacentChunks[(uint8_t)FaceDirection::LEFT] == nullptr) {
-      ch->grab();
-      _adjacentChunks[(uint8_t)FaceDirection::LEFT] = ch;
+    ch->grab();
+    {
+      std::lock_guard<std::mutex> lock(_meshBuffersLock);
+      if (_adjacentChunks[(uint8_t)FaceDirection::LEFT] == nullptr) {
+        ch->grab();
+        _adjacentChunks[(uint8_t)FaceDirection::LEFT] = ch;
+      }
+
+      assert(ch == _adjacentChunks[(uint8_t)FaceDirection::LEFT]);
     }
 
-    assert(ch == _adjacentChunks[(uint8_t)FaceDirection::LEFT]);
+    {
+      std::lock_guard<std::mutex> lock(ch->_meshBuffersLock);
+      if (ch->_adjacentChunks[(uint8_t)FaceDirection::RIGHT] == nullptr) {
+        grab();
+        ch->_adjacentChunks[(uint8_t)FaceDirection::RIGHT] = this;
+      }
+
+      assert(ch->_adjacentChunks[(uint8_t)FaceDirection::RIGHT] == this);
+    }
+
+    ch->drop();
   }
 }
 

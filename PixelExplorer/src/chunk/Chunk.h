@@ -5,7 +5,8 @@
 #include <mutex>
 #include <unordered_map>
 
-#include "ChunkManager.h"
+#include "Chunk.fwd.h"
+#include "ChunkManager.fwd.h"
 #include "FaceDirection.h"
 #include "GL/glew.h"
 #include "RefCounted.h"

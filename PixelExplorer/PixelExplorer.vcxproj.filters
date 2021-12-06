@@ -1371,6 +1371,12 @@
     <ClInclude Include="src\Package.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\chunk\Chunk.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chunk\ChunkManager.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\textures.png">
