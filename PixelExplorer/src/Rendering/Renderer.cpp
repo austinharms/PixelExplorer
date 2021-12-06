@@ -67,12 +67,12 @@ void Renderer::addRenderable(Renderable* renderable) {
 	std::lock_guard<std::mutex> locker(_renderLock);
 	renderable->grab();
 	_renderableObjects.emplace_back(renderable);
-	_renderableObjects.sort([](const Renderable& r1, const Renderable& r2) {
-		if (r1.getMaterial()->getShader()->getGLID() > r2.getMaterial()->getShader()->getGLID()) {
+	_renderableObjects.sort([](const Renderable* r1, const Renderable* r2) {
+		if (r1->getMaterial()->getShader()->getGLID() > r2->getMaterial()->getShader()->getGLID()) {
 			return true;
 		}
-		else if (r1.getMaterial()->getShader()->getGLID() == r2.getMaterial()->getShader()->getGLID()) {
-			return r1.getMaterial()->getId() > r2.getMaterial()->getId();
+		else if (r1->getMaterial()->getShader()->getGLID() == r2->getMaterial()->getShader()->getGLID()) {
+			return r1->getMaterial()->getId() > r2->getMaterial()->getId();
 		}
 
 		return false;
