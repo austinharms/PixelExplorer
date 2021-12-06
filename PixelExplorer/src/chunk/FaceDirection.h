@@ -20,6 +20,7 @@ enum class FaceDirection : uint8_t {
 #define FACEDIRECTIONFLAG_H
 
 #include <cstdint>
+
 #include "glm/vec3.hpp"
 
 class FaceDirectionFlag {
@@ -55,24 +56,46 @@ class FaceDirectionFlag {
     }
   }
 
-   static const glm::vec3 DirectionToVector(FaceDirection dir) {
+  static const glm::vec3 DirectionToVector(FaceDirection dir) {
     switch (dir) {
       case FaceDirection::FRONT:
-        return glm::vec3(0,0,1);
+        return glm::vec3(0, 0, 1);
       case FaceDirection::BACK:
         return glm::vec3(0, 0, -1);
       case FaceDirection::LEFT:
-        return LEFT;
+        return glm::vec3(-1, 0, 0);
       case FaceDirection::RIGHT:
-        return RIGHT;
+        return glm::vec3(1, 0, 0);
       case FaceDirection::TOP:
-        return TOP;
+        return glm::vec3(0, 1, 0);
       case FaceDirection::BOTTOM:
-        return BOTTOM;
+        return glm::vec3(0, -1, 0);
       case FaceDirection::FACECOUNT:
       case FaceDirection::NONE:
       default:
-        return NONE;
+        return glm::vec3(0, 0, 0);
+        break;
+    }
+  }
+
+  static const glm::vec<3, int32_t> DirectionToInt32Vector(FaceDirection dir) {
+    switch (dir) {
+      case FaceDirection::FRONT:
+        return glm::vec<3, int32_t>(0, 0, 1);
+      case FaceDirection::BACK:
+        return glm::vec<3, int32_t>(0, 0, -1);
+      case FaceDirection::LEFT:
+        return glm::vec<3, int32_t>(-1, 0, 0);
+      case FaceDirection::RIGHT:
+        return glm::vec<3, int32_t>(1, 0, 0);
+      case FaceDirection::TOP:
+        return glm::vec<3, int32_t>(0, 1, 0);
+      case FaceDirection::BOTTOM:
+        return glm::vec<3, int32_t>(0, -1, 0);
+      case FaceDirection::FACECOUNT:
+      case FaceDirection::NONE:
+      default:
+        return glm::vec<3, int32_t>(0, 0, 0);
         break;
     }
   }
