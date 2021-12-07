@@ -20,6 +20,7 @@ class ChunkManager : public virtual RefCounted {
   void UnloadChunks();
   void LoadChunk(glm::vec<3, int32_t> pos);
   Chunk* GetChunk(glm::vec<3, int32_t> pos);
+  void UpdateLoadedChunks();
 
  private:
   Renderer* _renderer;
