@@ -31,6 +31,7 @@ void ChunkManager::LoadChunk(const glm::vec<3, int32_t> pos) {
 	newChunk->setStatus(Chunk::Status::LOADED);
 	newChunk->updateAdjacentChunks(this);
 	newChunk->updateMesh();
+	UpdateLoadedChunks();
 }
 
 Chunk* ChunkManager::GetChunk(glm::vec<3, int32_t> pos) {

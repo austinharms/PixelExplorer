@@ -11,14 +11,15 @@ uint32_t BaseBlock::s_blockCount = 0;
 std::unordered_map<std::string, uint32_t> BaseBlock::s_blockLookupTable =
 std::unordered_map<std::string, uint32_t>();
 
-BaseBlock::BaseBlock() : RefCounted(false) {}
+//BaseBlock::BaseBlock() : RefCounted(false) {}
+BaseBlock::BaseBlock() {}
 
 BaseBlock::~BaseBlock() {}
 
 void BaseBlock::UnloadBlocks() {
 	if (BaseBlock::s_blocks != nullptr) {
-		for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i)
-			assert(BaseBlock::s_blocks[i].drop());
+		//for (uint32_t i = 0; i < BaseBlock::s_blockCount; ++i)
+		//	assert(BaseBlock::s_blocks[i].drop());
 
 		delete[] BaseBlock::s_blocks;
 		BaseBlock::s_blocks = nullptr;

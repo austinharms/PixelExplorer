@@ -13,7 +13,7 @@
 #include "World.h"
 #include "rendering/TexturedMaterial.h"
 
-class BaseBlock : public virtual RefCounted {
+class BaseBlock {// : public virtual RefCounted {
  public:
   const static uint16_t MANIFEST_VERSION = 1;
   const static uint16_t PACKAGE_VERSION = 1;

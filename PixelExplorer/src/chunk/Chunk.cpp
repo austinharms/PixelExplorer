@@ -64,7 +64,7 @@ void Chunk::onRender() {
 }
 
 void Chunk::updateMesh() {
-	//if (!_chunkModified) return;
+	if (!_chunkModified) return;
 	std::lock_guard<std::mutex> lock(_meshBuffersLock);
 	_chunkModified = false;
 

@@ -26,18 +26,18 @@ class Block : public virtual RefCounted {
 
   virtual ~Block() {
     _parentChunk->drop();
-    if (_baseBlock != nullptr) _baseBlock->drop();
+    //if (_baseBlock != nullptr) _baseBlock->drop();
   }
 
   void setChunkBlock(ChunkBlock* block, uint32_t index) {
       _chunkBlock = block;
       _blockIndex = index;
-      if (_baseBlock != nullptr) _baseBlock->drop();
+      //if (_baseBlock != nullptr) _baseBlock->drop();
       uint32_t id = block->getID();
       _empty = id == 0;
       if (!_empty) {
           _baseBlock = BaseBlock::getBlock(id);
-          _baseBlock->grab();
+          //_baseBlock->grab();
       }
       else {
           _baseBlock = nullptr;
@@ -57,12 +57,12 @@ class Block : public virtual RefCounted {
 
       _chunkBlock = block;
       _blockIndex = index;
-      if (_baseBlock != nullptr) _baseBlock->drop();
+      //if (_baseBlock != nullptr) _baseBlock->drop();
       uint32_t id = block->getID();
       _empty = id == 0;
       if (!_empty) {
           _baseBlock = BaseBlock::getBlock(id);
-          _baseBlock->grab();
+          //_baseBlock->grab();
       }
       else {
           _baseBlock = nullptr;
