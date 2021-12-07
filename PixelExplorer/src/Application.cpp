@@ -25,6 +25,7 @@ int main(void) {
     for (uint8_t y = 0; y < 3; ++y)
       for (uint8_t z = 0; z < 3; ++z)
         World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(x, y, z));
+  World::GetChunkManager()->UpdateLoadedChunks();
   //World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(0,0,0));
   glm::vec3 camPos(12, 12, 75);
   glm::vec3 camRot(0, 0, 0);

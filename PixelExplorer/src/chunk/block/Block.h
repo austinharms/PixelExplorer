@@ -30,21 +30,47 @@ class Block : public virtual RefCounted {
   }
 
   void setChunkBlock(ChunkBlock* block, uint32_t index) {
-    _chunkBlock = block;
-    _blockIndex = index;
-    if (_baseBlock != nullptr) _baseBlock->drop();
-    uint32_t id = block->getID();
-    _empty = id == 0;
-    if (!_empty) {
-      _baseBlock = BaseBlock::getBlock(id);
-      _baseBlock->grab();
-    } else {
-      _baseBlock = nullptr;
-    }
+      _chunkBlock = block;
+      _blockIndex = index;
+      if (_baseBlock != nullptr) _baseBlock->drop();
+      uint32_t id = block->getID();
+      _empty = id == 0;
+      if (!_empty) {
+          _baseBlock = BaseBlock::getBlock(id);
+          _baseBlock->grab();
+      }
+      else {
+          _baseBlock = nullptr;
+      }
 
-    _extendedData = nullptr;
-    _checkExtended = false;
-    _extended = false;
+      _extendedData = nullptr;
+      _checkExtended = false;
+      _extended = false;
+  }
+
+  void setChunkBlock(ChunkBlock* block, uint32_t index, Chunk* chunk) {
+      if (_parentChunk != chunk) {
+          _parentChunk->drop();
+          chunk->grab();
+          _parentChunk = chunk;
+      }
+
+      _chunkBlock = block;
+      _blockIndex = index;
+      if (_baseBlock != nullptr) _baseBlock->drop();
+      uint32_t id = block->getID();
+      _empty = id == 0;
+      if (!_empty) {
+          _baseBlock = BaseBlock::getBlock(id);
+          _baseBlock->grab();
+      }
+      else {
+          _baseBlock = nullptr;
+      }
+
+      _extendedData = nullptr;
+      _checkExtended = false;
+      _extended = false;
   }
 
   const uint32_t getId() const { return _chunkBlock->getID(); }
