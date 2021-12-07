@@ -103,7 +103,7 @@ void Chunk::updateMesh() {
 					i - Chunk::CHUNK_SIZE, this);
 			}
 			else if (_adjacentChunks[(uint8_t)FaceDirection::FRONT] != nullptr) {
-				otherBlock.setChunkBlock(&_adjacentChunks[(uint8_t)FaceDirection::FRONT]->_blocks[i + Chunk::LAYER_SIZE - 1], i + Chunk::LAYER_SIZE - 1, _adjacentChunks[(uint8_t)FaceDirection::FRONT]);
+				otherBlock.setChunkBlock(&_adjacentChunks[(uint8_t)FaceDirection::FRONT]->_blocks[i + Chunk::LAYER_SIZE - Chunk::CHUNK_SIZE], i + Chunk::LAYER_SIZE - Chunk::CHUNK_SIZE, _adjacentChunks[(uint8_t)FaceDirection::FRONT]);
 			}
 
 			if (z == 0 && _adjacentChunks[(uint8_t)FaceDirection::FRONT] == nullptr || otherBlock.isEmpty() ||
@@ -176,14 +176,18 @@ void Chunk::updateMesh() {
 				visableFaces[i] |= FaceDirectionFlag::RIGHT;
 			}
 
-			if (y != Chunk::CHUNK_SIZE - 1)
+			if (y != Chunk::CHUNK_SIZE - 1) {
 				otherBlock.setChunkBlock(&_blocks[i + Chunk::LAYER_SIZE],
 					i + Chunk::LAYER_SIZE, this);
+			}
+			else if (_adjacentChunks[(uint8_t)FaceDirection::TOP] != nullptr) {
+				otherBlock.setChunkBlock(&_adjacentChunks[(uint8_t)FaceDirection::TOP]->_blocks[i - Chunk::BLOCK_COUNT + Chunk::LAYER_SIZE], i - Chunk::BLOCK_COUNT + Chunk::LAYER_SIZE, _adjacentChunks[(uint8_t)FaceDirection::TOP]);
+			}
 
-			if (y == Chunk::CHUNK_SIZE - 1 || otherBlock.isEmpty() ||
+			if (y == Chunk::CHUNK_SIZE - 1 && _adjacentChunks[(uint8_t)FaceDirection::TOP] == nullptr || otherBlock.isEmpty() ||
 				(!otherBlock.isSolid() &&
-					(!otherBlock.isFaceFull(FaceDirection::LEFT) ||
-						otherBlock.isFaceTransparent(FaceDirection::LEFT) &&
+					(!otherBlock.isFaceFull(FaceDirection::BOTTOM) ||
+						otherBlock.isFaceTransparent(FaceDirection::BOTTOM) &&
 						otherBlock.getId() != curBlock.getId()))) {
 				faceNum = (uint8_t)FaceDirection::TOP;
 				const BlockFace* face = curBlock.getBlockFace(FaceDirection::TOP);
@@ -192,14 +196,18 @@ void Chunk::updateMesh() {
 				visableFaces[i] |= FaceDirectionFlag::TOP;
 			}
 
-			if (y != 0)
+			if (y != 0) {
 				otherBlock.setChunkBlock(&_blocks[i - Chunk::LAYER_SIZE],
 					i - Chunk::LAYER_SIZE, this);
+			}
+			else if (_adjacentChunks[(uint8_t)FaceDirection::BOTTOM] != nullptr) {
+				otherBlock.setChunkBlock(&_adjacentChunks[(uint8_t)FaceDirection::BOTTOM]->_blocks[i + Chunk::BLOCK_COUNT - Chunk::LAYER_SIZE], i + Chunk::BLOCK_COUNT - Chunk::LAYER_SIZE, _adjacentChunks[(uint8_t)FaceDirection::BOTTOM]);
+			}
 
-			if (y == 0 || otherBlock.isEmpty() ||
+			if (y == 0 && _adjacentChunks[(uint8_t)FaceDirection::BOTTOM] == nullptr || otherBlock.isEmpty() ||
 				(!otherBlock.isSolid() &&
-					(!otherBlock.isFaceFull(FaceDirection::LEFT) ||
-						otherBlock.isFaceTransparent(FaceDirection::LEFT) &&
+					(!otherBlock.isFaceFull(FaceDirection::TOP) ||
+						otherBlock.isFaceTransparent(FaceDirection::TOP) &&
 						otherBlock.getId() != curBlock.getId()))) {
 				faceNum = (uint8_t)FaceDirection::BOTTOM;
 				const BlockFace* face = curBlock.getBlockFace(FaceDirection::BOTTOM);
