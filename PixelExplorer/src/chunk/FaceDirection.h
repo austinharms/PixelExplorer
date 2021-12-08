@@ -56,6 +56,32 @@ class FaceDirectionFlag {
     }
   }
 
+  static const FaceDirection GetOppositeDirection(FaceDirection dir) {
+    switch (dir) {
+      case FaceDirection::FRONT:
+        return FaceDirection::BACK;
+      case FaceDirection::BACK:
+        return FaceDirection::FRONT;
+      case FaceDirection::LEFT:
+        return FaceDirection::RIGHT;
+      case FaceDirection::RIGHT:
+        return FaceDirection::LEFT;
+      case FaceDirection::TOP:
+        return FaceDirection::BOTTOM;
+      case FaceDirection::BOTTOM:
+        return FaceDirection::TOP;
+      case FaceDirection::FACECOUNT:
+      case FaceDirection::NONE:
+      default:
+        return FaceDirection::NONE;
+        break;
+    }
+  }
+
+  static const FaceDirection GetOppositeDirection(uint8_t dir) {
+    return GetOppositeDirection((FaceDirection)dir);
+  }
+
   static const glm::vec3 DirectionToVector(FaceDirection dir) {
     switch (dir) {
       case FaceDirection::FRONT:

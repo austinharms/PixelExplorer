@@ -528,28 +528,34 @@ void Chunk::unloadChunk() {
       _indexCount[i] = 0;
     }
   }
-
-  Chunk* tempPtr = nullptr;
-  {
-    std::lock_guard<std::mutex> lock(_meshBuffersLock);
-    if (_adjacentChunks[(uint8_t)FaceDirection::FRONT] != nullptr) {
-      tempPtr = _adjacentChunks[(uint8_t)FaceDirection::FRONT];
-      _adjacentChunks[(uint8_t)FaceDirection::FRONT] = nullptr;
-    }
-  }
-
-  if (tempPtr != nullptr) {
-    std::lock_guard<std::mutex> lock(tempPtr->_meshBuffersLock);
-    if (tempPtr->_adjacentChunks[(uint8_t)FaceDirection::BACK] != nullptr) {
-      _adjacentChunks[(uint8_t)FaceDirection::BACK] = nullptr;
-      drop();
+  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
+    Chunk* tempPtr = nullptr;
+    {
+      std::lock_guard<std::mutex> lock(_meshBuffersLock);
+      if (_adjacentChunks[i] != nullptr) {
+        tempPtr = _adjacentChunks[i];
+        _adjacentChunks[i] = nullptr;
+      }
     }
 
-    tempPtr->drop();
+    if (tempPtr != nullptr) {
+      std::lock_guard<std::mutex> lock(tempPtr->_meshBuffersLock);
+      if (tempPtr->_adjacentChunks[(
+              uint8_t)FaceDirectionFlag::GetOppositeDirection(i)] != nullptr) {
+        _adjacentChunks[(uint8_t)FaceDirectionFlag::GetOppositeDirection(i)] =
+            nullptr;
+        drop();
+      }
+
+      tempPtr->drop();
+    }
   }
 
   _status = Status::UNLOADED;
-  drop();
+  if (!drop() && getRefCount() > 2) {
+    std::cout << "May have failed unloading chunk at " << _position.x << ", "
+              << _position.y << ", " << _position.z << std::endl;
+  }
 }
 
 void Chunk::updateBuffers() {
