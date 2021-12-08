@@ -39,6 +39,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   void onRender();
   void updateMesh();
   void updateAdjacentChunks(ChunkManager* mgr);
+  void unloadChunk();
 
   void setPosition(glm::vec3 position) {
     _position = position;
