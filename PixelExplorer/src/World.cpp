@@ -92,16 +92,17 @@ void World::LoadWorld() {
 }
 
 void World::UnloadWorld() {
-  BaseBlock::UnloadBlocks();
-  World::s_packages.clear();
-  World::s_appAssetDir.clear();
-  World::s_assetDir.clear();
-  World::s_worldDir.clear();
   if (World::s_chunkManager != nullptr) {
     World::s_chunkManager->UnloadChunks();
     World::s_chunkManager->drop();
     World::s_chunkManager = nullptr;
   }
+
+  BaseBlock::UnloadBlocks();
+  World::s_packages.clear();
+  World::s_appAssetDir.clear();
+  World::s_assetDir.clear();
+  World::s_worldDir.clear();
 }
 
 void World::UpdateManifest() {

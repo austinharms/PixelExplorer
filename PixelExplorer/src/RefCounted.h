@@ -30,7 +30,7 @@ class RefCounted {
     }
   }
 
-  unsigned short getRefCount() const { return _refCount; }
+  unsigned short getRefCount() const { return _refCount & s_countMask; }
 
  private:
   static const uint32_t s_countMask = 0b01111111111111111111111111111111;
