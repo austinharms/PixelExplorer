@@ -18,6 +18,7 @@ Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
     _buffers[i] = nullptr;
     _indexCount[i] = 0;
     _currentIndexCount[i] = 0;
+    _adjacentChunks[i] = nullptr;
   }
 
   _buffersDirty = false;
@@ -528,6 +529,7 @@ void Chunk::unloadChunk() {
       _indexCount[i] = 0;
     }
   }
+
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
     Chunk* tempPtr = nullptr;
     {
@@ -539,12 +541,15 @@ void Chunk::unloadChunk() {
     }
 
     if (tempPtr != nullptr) {
-      std::lock_guard<std::mutex> lock(tempPtr->_meshBuffersLock);
-      if (tempPtr->_adjacentChunks[(
-              uint8_t)FaceDirectionFlag::GetOppositeDirection(i)] != nullptr) {
-        _adjacentChunks[(uint8_t)FaceDirectionFlag::GetOppositeDirection(i)] =
-            nullptr;
-        drop();
+      {
+        std::lock_guard<std::mutex> lock(tempPtr->_meshBuffersLock);
+        if (tempPtr->_adjacentChunks[(
+                uint8_t)FaceDirectionFlag::GetOppositeDirection(i)] !=
+            nullptr) {
+          tempPtr->_adjacentChunks[(
+              uint8_t)FaceDirectionFlag::GetOppositeDirection(i)] = nullptr;
+          drop();
+        }
       }
 
       tempPtr->drop();
