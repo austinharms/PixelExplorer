@@ -11,7 +11,6 @@
 #include "World.h"
 #include "chunk/Chunk.h"
 #include "chunk/block/BaseBlock.h"
-#include "reactphysics3d/reactphysics3d.h"
 #include "rendering/Renderer.h"
 #include "rendering/Shader.h"
 #include "rendering/TestRenderable.h"

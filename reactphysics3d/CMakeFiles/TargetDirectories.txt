@@ -1,5 +1,0 @@
-C:/Users/austi/source/repos/PixelExplorer/reactphysics3d/CMakeFiles/reactphysics3d.dir
-C:/Users/austi/source/repos/PixelExplorer/reactphysics3d/CMakeFiles/INSTALL.dir
-C:/Users/austi/source/repos/PixelExplorer/reactphysics3d/CMakeFiles/RUN_TESTS.dir
-C:/Users/austi/source/repos/PixelExplorer/reactphysics3d/CMakeFiles/ALL_BUILD.dir
-C:/Users/austi/source/repos/PixelExplorer/reactphysics3d/CMakeFiles/ZERO_CHECK.dir
