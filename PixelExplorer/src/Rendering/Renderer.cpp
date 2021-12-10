@@ -32,11 +32,29 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV, 
 	updateForwardVector();
 
 	//Init GLFW/Render Window
+#ifdef DEBUG
 	assert(glfwInit());
+#else
+	if (!glfwInit()) {
+		const char* error;
+		std::cout << "Failed to initialize GLFW, Error Code: " << glfwGetError(&error) << ", Error Msg: " << error << std::endl;
+		exit(-1);
+	}
+#endif // DEBUG
+
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	_window = glfwCreateWindow(width, height, title, NULL, NULL);
+#ifdef DEBUG
 	assert(_window);
+#else
+	if (!_window) {
+		const char* error;
+		std::cout << "Failed to create Window, Error Code: " << glfwGetError(&error) << ", Error Msg: " << error << std::endl;
+		exit(-1);
+	}
+#endif // DEBUG
 	glfwMakeContextCurrent(_window);
 	glfwSetWindowFocusCallback(_window, Renderer::s_windowFocus);
 	glfwSetFramebufferSizeCallback(_window, Renderer::s_windowResize);
@@ -47,7 +65,17 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV, 
 	setCursorHidden(false);
 
 	//Init OpenGL
+#ifdef DEBUG
 	assert(glewInit() == GLEW_OK);
+#else
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+	{
+		/* Problem: glewInit failed, something is seriously wrong. */
+		std::cout << "Failed to initialize GLEW, Error Code: " << (uint32_t)err << ", Error Msg: " << glewGetErrorString(err) << std::endl;
+		exit(-1);
+	}
+#endif // DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(Renderer::GLErrorCallback, 0);
 	glEnable(GL_DEPTH_TEST);
