@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetcommon\ClassicMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecontactmod\SnippetVehicleContactMod.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecontactmod\SnippetVehicleContactModRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicle4WCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleFilterShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleNoDriveCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleSceneQuery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleTankCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleTireFriction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleConcurrency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleCreate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleFilterShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleSceneQuery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleTireFriction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetvehiclecommon\SnippetVehicleWheelQueryResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{FE78E3A6-C971-3623-8B12-CEE00C1EE7BB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{270D40E8-4319-3C87-B410-9BFEEFA58483}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

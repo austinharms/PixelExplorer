@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="checked|x64">
+      <Configuration>checked</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|x64">
+      <Configuration>profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{78E13122-4E87-3B60-B897-FB1A468CA860}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>SnippetContactReportCCD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">SnippetContactReportCCD.dir\debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">SnippetContactReportCCD_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='checked|x64'">SnippetContactReportCCD.dir\checked\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='checked|x64'">SnippetContactReportCCD_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='checked|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='checked|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='checked|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">SnippetContactReportCCD.dir\profile\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|x64'">SnippetContactReportCCD_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='profile|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='profile|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">SnippetContactReportCCD.dir\release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release|x64'">SnippetContactReportCCD_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXExtensions_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysX_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXVehicle_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXCharacterKinematic_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXCooking_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXCommon_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\SnippetUtils_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\SnippetRender_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\debug\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/debug/SnippetContactReportCCD_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/debug/SnippetContactReportCCD_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="checked"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"checked\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXExtensions_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysX_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXVehicle_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXCharacterKinematic_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXCooking_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXCommon_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\SnippetUtils_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\SnippetRender_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\checked\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/checked/SnippetContactReportCCD_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/checked/SnippetContactReportCCD_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_PROFILE=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="profile"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_PROFILE=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"profile\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXExtensions_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysX_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXVehicle_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXCharacterKinematic_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXCooking_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXCommon_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\SnippetUtils_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\SnippetRender_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\profile\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/profile/SnippetContactReportCCD_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/profile/SnippetContactReportCCD_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_SUPPORT_PVD=0;CMAKE_INTDIR="release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PHYSX_STATIC_LIB;PX_SUPPORT_PVD=0;CMAKE_INTDIR=\"release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\physxextensions\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXExtensions_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysX_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXVehicle_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXCharacterKinematic_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXCooking_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXCommon_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\SnippetUtils_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\SnippetRender_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXPvdSDK_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_64.vc142.mt\release\PhysXFoundation_static_64.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/release/SnippetContactReportCCD_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_64.vc142.mt/release/SnippetContactReportCCD_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='checked|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='checked|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='checked|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetcommon\ClassicMain.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetcommon\SnippetPrint.h" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetcommon\SnippetPVD.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetcontactreportccd\SnippetContactReportCCD.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\snippets\snippetcontactreportccd\SnippetContactReportCCDRender.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\ZERO_CHECK.vcxproj">
+      <Project>{D5407FED-9F05-3183-A2E1-01F3AD3678E0}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysX.vcxproj">
+      <Project>{F2BFD854-81CA-3C8E-90E4-FC38300693DF}</Project>
+      <Name>PhysX</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXCharacterKinematic.vcxproj">
+      <Project>{3927F599-A596-3EBF-835E-766613D5FA19}</Project>
+      <Name>PhysXCharacterKinematic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXCommon.vcxproj">
+      <Project>{53A3A3AB-C367-3E3F-BC1D-5D8846A6C020}</Project>
+      <Name>PhysXCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXCooking.vcxproj">
+      <Project>{DF3AE37F-3ADB-3AB4-A7FD-6B0D141B35EB}</Project>
+      <Name>PhysXCooking</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
+      <Project>{84D8E58E-3ACC-343B-8D9F-19D20C84CFC6}</Project>
+      <Name>PhysXExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXFoundation.vcxproj">
+      <Project>{D917BD1D-B816-36E9-8D2B-C04353FE511E}</Project>
+      <Name>PhysXFoundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXPvdSDK.vcxproj">
+      <Project>{2C32EF16-0A74-30D7-AF53-AB2ECF0147BA}</Project>
+      <Name>PhysXPvdSDK</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXVehicle.vcxproj">
+      <Project>{038DD3C8-02B6-39C0-B440-9C99DD20A261}</Project>
+      <Name>PhysXVehicle</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_snippets_bin\SnippetRender.vcxproj">
+      <Project>{F32FA667-10D2-3B17-AEA0-5BEC775D704E}</Project>
+      <Name>SnippetRender</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_snippets_bin\SnippetUtils.vcxproj">
+      <Project>{7916A091-FD45-335C-8821-88D43CFE021C}</Project>
+      <Name>SnippetUtils</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

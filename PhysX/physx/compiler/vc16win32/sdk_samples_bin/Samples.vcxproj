@@ -1,0 +1,483 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="checked|Win32">
+      <Configuration>checked</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|Win32">
+      <Configuration>profile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{73F57088-EE5E-383C-8F1F-5FFD0DDE82E1}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>Samples</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Samples.dir\debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Samples_32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">Samples.dir\checked\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">Samples_32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Samples.dir\profile\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Samples_32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Samples.dir\release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Samples_32</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996;4245;4512;4996;4244;4100;4456;4189;4505;4389</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\SampleBase_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\SamplePlatform_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\SampleFramework_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\SampleRenderer_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\SamplesToolkit_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXVehicle_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXCharacterKinematic_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXCooking_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXFoundation_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\SamplesToolkit_static_32.lib;Winmm.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\debug\PhysXFoundation_static_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/debug/Samples_32.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/debug/Samples_32.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996;4245;4512;4996;4244;4100;4456;4189;4505;4389</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="checked"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"checked\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\SampleBase_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\SamplePlatform_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\SampleFramework_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\SampleRenderer_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\SamplesToolkit_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXVehicle_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXCharacterKinematic_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXCooking_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXFoundation_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\SamplesToolkit_static_32.lib;Winmm.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\checked\PhysXFoundation_static_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/checked/Samples_32.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/checked/Samples_32.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996;4245;4512;4996;4244;4100;4456;4189;4505;4389</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_PROFILE=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="profile"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_PROFILE=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"profile\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\SampleBase_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\SamplePlatform_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\SampleFramework_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\SampleRenderer_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\SamplesToolkit_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXVehicle_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXCharacterKinematic_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXCooking_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXFoundation_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\SamplesToolkit_static_32.lib;Winmm.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\profile\PhysXFoundation_static_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/profile/Samples_32.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/profile/Samples_32.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996;4245;4512;4996;4244;4100;4456;4189;4505;4389</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_SUPPORT_PVD=0;CMAKE_INTDIR="release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;DISABLE_CUDA_PHYSX;PX_PHYSX_STATIC_LIB;_HAS_EXCEPTIONS=0;PX_SUPPORT_PVD=0;CMAKE_INTDIR=\"release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebase;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\framework\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\renderer\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\sampleframework\platform\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\common\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\contact;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\common;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\convex;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\distance;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\gjk;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\intersection;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\mesh;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\hf;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\geomutils\src\pcm;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\PhysXVehicle\src;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\pxtoolkit\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\..\pxshared\include;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\SampleBase_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\SamplePlatform_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\SampleFramework_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\SampleRenderer_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\SamplesToolkit_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXVehicle_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXCharacterKinematic_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXCooking_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXFoundation_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\SamplesToolkit_static_32.lib;Winmm.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXExtensions_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysX_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXPvdSDK_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXCommon_static_32.lib;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\bin\win.x86_32.vc142.mt\release\PhysXFoundation_static_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/release/Samples_32.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/bin/win.x86_32.vc142.mt/release/Samples_32.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/samples/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32/sdk_samples_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config-version.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplesToolkit.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplesToolkit.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/samples/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32/sdk_samples_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config-version.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplesToolkit.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplesToolkit.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/samples/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32/sdk_samples_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config-version.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplesToolkit.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplesToolkit.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/samples/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win32/sdk_samples_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\ConfigureFileMT.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config-version.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\targa\targa-config.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\SamplesToolkit.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleBase.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleFramework.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplePlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SampleRenderer.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\Samples.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\windows\SamplesToolkit.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release|Win32'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridges.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridges.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridgesCCT.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridgesInputEventIds.h" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridgesSettings.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\Planet.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\Planet.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravity.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravity.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravity_CCT.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityBuilder.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityCameraController.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityCameraController.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityFilterShader.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityInputEventIds.h" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplehelloworld\SampleHelloWorld.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplehelloworld\SampleHelloWorld.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\ChunkLoader.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\ChunkLoader.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\MeshBuilder.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\MeshBuilder.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorld.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorld.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorldCCT.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorldInputEventIds.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPole.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPole.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleBuilder.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleCameraController.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleCameraController.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleCCT.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleDynamics.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleFilterShader.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleInputEventIds.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\Crab.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\Crab.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SampleSubmarine.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SampleSubmarine.h" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SampleSubmarineInputEventIds.h" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SubmarineCameraController.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicleDebugRender.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicleInputEventIds.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicleTerrain.cpp" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_CameraController.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_CameraController.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_ControlInputs.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_ControlInputs.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_GameLogic.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_GameLogic.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_SceneQuery.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_SceneQuery.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleController.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleController.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleCooking.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleCooking.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleManager.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleManager.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_WheelQueryResults.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_WheelQueryResults.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\KinematicPlatform.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\KinematicPlatform.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTActor.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTActor.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTCameraController.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTCameraController.h" />
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTJump.cpp" />
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTJump.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\ZERO_CHECK.vcxproj">
+      <Project>{EBF5F5F7-3481-392C-93F7-9D07A606C990}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysX.vcxproj">
+      <Project>{6908C021-D84A-393C-B6BD-7314E5DA923F}</Project>
+      <Name>PhysX</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXCharacterKinematic.vcxproj">
+      <Project>{E19EE955-F0EB-3786-89AB-29022590244F}</Project>
+      <Name>PhysXCharacterKinematic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXCommon.vcxproj">
+      <Project>{AF8448B0-237D-34F0-A57F-8755971B16BB}</Project>
+      <Name>PhysXCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXCooking.vcxproj">
+      <Project>{69C0116E-4847-3BB8-93B8-25C56A674905}</Project>
+      <Name>PhysXCooking</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXExtensions.vcxproj">
+      <Project>{55D48817-F149-3011-81B8-85921C10E664}</Project>
+      <Name>PhysXExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXFoundation.vcxproj">
+      <Project>{A378DC6A-E7E0-3A15-B205-20D0C1CEDF14}</Project>
+      <Name>PhysXFoundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXPvdSDK.vcxproj">
+      <Project>{7185401A-4856-382A-8297-97C72D1A38BE}</Project>
+      <Name>PhysXPvdSDK</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_source_bin\PhysXVehicle.vcxproj">
+      <Project>{18321BDA-4B5C-3935-B71C-5709CB65ED07}</Project>
+      <Name>PhysXVehicle</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\SampleBase.vcxproj">
+      <Project>{8BF9E068-A5EF-3C66-8C09-2ABAEAF8DF31}</Project>
+      <Name>SampleBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\SampleFramework.vcxproj">
+      <Project>{D63D1422-0C67-3C6B-95A8-CA34EEA74489}</Project>
+      <Name>SampleFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\SamplePlatform.vcxproj">
+      <Project>{8E04B4FD-C517-355E-B6E2-780188E94D59}</Project>
+      <Name>SamplePlatform</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\SampleRenderer.vcxproj">
+      <Project>{25A6D4BE-B8D4-3475-B195-6B4967851F2B}</Project>
+      <Name>SampleRenderer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win32\sdk_samples_bin\SampleToolkit.vcxproj">
+      <Project>{45BD87D7-6B5C-3AE4-8DCA-6E79C938CF77}</Project>
+      <Name>SampleToolkit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

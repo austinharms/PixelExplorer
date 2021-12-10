@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="checked|x64">
+      <Configuration>checked</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|x64">
+      <Configuration>profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{38D52447-E586-3772-BCBE-3ACD85115444}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='checked|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\template\PxIncludeTemplate.h;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SimulationController.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='checked|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='checked|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\template\PxIncludeTemplate.h;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SimulationController.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='checked|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\template\PxIncludeTemplate.h;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SimulationController.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release|x64'">Building Custom Rule C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/public -BC:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64 --check-stamp-file C:/Users/austi/source/repos/PixelExplorer/PhysX/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\SetOutputPaths.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\externals\cmakemodules\template\PxIncludeTemplate.h;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\SimulationController.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\CMakeLists.txt;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\FastXml.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevel.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysX.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCommon.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXCooking.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXTask.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SceneQuery.cmake;C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\ZERO_CHECK.vcxproj">
+      <Project>{D5407FED-9F05-3183-A2E1-01F3AD3678E0}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\FastXml.vcxproj">
+      <Project>{A95E34F8-28AF-3F65-BC90-278EBA335608}</Project>
+      <Name>FastXml</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\LowLevel.vcxproj">
+      <Project>{9185AC6B-7613-3588-8B01-3859E3CD2787}</Project>
+      <Name>LowLevel</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\LowLevelAABB.vcxproj">
+      <Project>{C5DCC36B-EB19-31A1-80AE-1934DB8C62E0}</Project>
+      <Name>LowLevelAABB</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\LowLevelDynamics.vcxproj">
+      <Project>{6C21B011-E70F-3C94-866A-6AC3A30DBCD8}</Project>
+      <Name>LowLevelDynamics</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysX.vcxproj">
+      <Project>{F2BFD854-81CA-3C8E-90E4-FC38300693DF}</Project>
+      <Name>PhysX</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXCharacterKinematic.vcxproj">
+      <Project>{3927F599-A596-3EBF-835E-766613D5FA19}</Project>
+      <Name>PhysXCharacterKinematic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXCommon.vcxproj">
+      <Project>{53A3A3AB-C367-3E3F-BC1D-5D8846A6C020}</Project>
+      <Name>PhysXCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXCooking.vcxproj">
+      <Project>{DF3AE37F-3ADB-3AB4-A7FD-6B0D141B35EB}</Project>
+      <Name>PhysXCooking</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
+      <Project>{84D8E58E-3ACC-343B-8D9F-19D20C84CFC6}</Project>
+      <Name>PhysXExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXFoundation.vcxproj">
+      <Project>{D917BD1D-B816-36E9-8D2B-C04353FE511E}</Project>
+      <Name>PhysXFoundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXPvdSDK.vcxproj">
+      <Project>{2C32EF16-0A74-30D7-AF53-AB2ECF0147BA}</Project>
+      <Name>PhysXPvdSDK</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXTask.vcxproj">
+      <Project>{A4678EDE-9335-3948-A0D7-D67FDECAE282}</Project>
+      <Name>PhysXTask</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXVehicle.vcxproj">
+      <Project>{038DD3C8-02B6-39C0-B440-9C99DD20A261}</Project>
+      <Name>PhysXVehicle</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.vcxproj">
+      <Project>{C641A462-9D15-3F7F-A519-FAD64F86F331}</Project>
+      <Name>SceneQuery</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\compiler\vc16win64\sdk_source_bin\SimulationController.vcxproj">
+      <Project>{513257AF-22BF-3467-AE18-0BC531BBF669}</Project>
+      <Name>SimulationController</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridges.cpp">
+      <Filter>SampleBridges</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridgesCCT.cpp">
+      <Filter>SampleBridges</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\Planet.cpp">
+      <Filter>SampleCustomGravity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravity.cpp">
+      <Filter>SampleCustomGravity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravity_CCT.cpp">
+      <Filter>SampleCustomGravity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityBuilder.cpp">
+      <Filter>SampleCustomGravity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityCameraController.cpp">
+      <Filter>SampleCustomGravity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityFilterShader.cpp">
+      <Filter>SampleCustomGravity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplehelloworld\SampleHelloWorld.cpp">
+      <Filter>SampleHelloWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\ChunkLoader.cpp">
+      <Filter>SampleLargeWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\MeshBuilder.cpp">
+      <Filter>SampleLargeWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorld.cpp">
+      <Filter>SampleLargeWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorldCCT.cpp">
+      <Filter>SampleLargeWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPole.cpp">
+      <Filter>SampleNorthPole</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleBuilder.cpp">
+      <Filter>SampleNorthPole</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleCameraController.cpp">
+      <Filter>SampleNorthPole</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleCCT.cpp">
+      <Filter>SampleNorthPole</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleDynamics.cpp">
+      <Filter>SampleNorthPole</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleFilterShader.cpp">
+      <Filter>SampleNorthPole</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\Crab.cpp">
+      <Filter>SampleSubmarine</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SampleSubmarine.cpp">
+      <Filter>SampleSubmarine</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicleDebugRender.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicleTerrain.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_CameraController.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_ControlInputs.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_GameLogic.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_SceneQuery.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleController.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleCooking.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleManager.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_WheelQueryResults.cpp">
+      <Filter>SampleVehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\KinematicPlatform.cpp">
+      <Filter>CCTShared</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTActor.cpp">
+      <Filter>CCTShared</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTCameraController.cpp">
+      <Filter>CCTShared</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTJump.cpp">
+      <Filter>CCTShared</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridges.h">
+      <Filter>SampleBridges</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridgesInputEventIds.h">
+      <Filter>SampleBridges</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplebridges\SampleBridgesSettings.h">
+      <Filter>SampleBridges</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\Planet.h">
+      <Filter>SampleCustomGravity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravity.h">
+      <Filter>SampleCustomGravity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityCameraController.h">
+      <Filter>SampleCustomGravity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecustomgravity\SampleCustomGravityInputEventIds.h">
+      <Filter>SampleCustomGravity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplehelloworld\SampleHelloWorld.h">
+      <Filter>SampleHelloWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\ChunkLoader.h">
+      <Filter>SampleLargeWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\MeshBuilder.h">
+      <Filter>SampleLargeWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorld.h">
+      <Filter>SampleLargeWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplelargeworld\SampleLargeWorldInputEventIds.h">
+      <Filter>SampleLargeWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPole.h">
+      <Filter>SampleNorthPole</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleCameraController.h">
+      <Filter>SampleNorthPole</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplenorthpole\SampleNorthPoleInputEventIds.h">
+      <Filter>SampleNorthPole</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\Crab.h">
+      <Filter>SampleSubmarine</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SampleSubmarine.h">
+      <Filter>SampleSubmarine</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SampleSubmarineInputEventIds.h">
+      <Filter>SampleSubmarine</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplesubmarine\SubmarineCameraController.h">
+      <Filter>SampleSubmarine</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicleInputEventIds.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_CameraController.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_ControlInputs.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_GameLogic.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_SceneQuery.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleController.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleCooking.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_VehicleManager.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplevehicle\SampleVehicle_WheelQueryResults.h">
+      <Filter>SampleVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\KinematicPlatform.h">
+      <Filter>CCTShared</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTActor.h">
+      <Filter>CCTShared</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTCameraController.h">
+      <Filter>CCTShared</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\samplecctsharedcode\SampleCCTJump.h">
+      <Filter>CCTShared</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\austi\source\repos\PixelExplorer\PhysX\physx\samples\compiler\cmake\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CCTShared">
+      <UniqueIdentifier>{40466636-BF09-366B-A5E3-044336ACDD8A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleBridges">
+      <UniqueIdentifier>{57140E65-79BD-38E0-AC0D-04F558435419}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleCustomGravity">
+      <UniqueIdentifier>{48BC5FCB-8EB7-39EF-922F-0FC1D74AF88E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleHelloWorld">
+      <UniqueIdentifier>{867AEEF1-7E8E-3304-B31C-ADDAD58DE98D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleLargeWorld">
+      <UniqueIdentifier>{B158740F-1F4A-38B4-B0D9-17070B44AFC3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleNorthPole">
+      <UniqueIdentifier>{A520FB14-3528-3D8F-9D79-8FE32D3D47A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleSubmarine">
+      <UniqueIdentifier>{E52D9C53-BBF3-3908-8B91-440718020C9E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleVehicle">
+      <UniqueIdentifier>{9096E442-6200-319A-94C5-2FB6441A2220}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
