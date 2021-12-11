@@ -14,8 +14,11 @@
 #include "rendering/Renderer.h"
 #include "rendering/Shader.h"
 #include "rendering/TestRenderable.h"
+#include "physics/PhysicsManager.h"
+
 
 int main(void) {
+  PhysicsManager::Init();
   Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0", 60);
   renderer->setCursorHidden(true);
   World::SetRenderer(renderer);
@@ -70,6 +73,7 @@ int main(void) {
   Shader::getDefault()->drop();
   renderer->drop();
   // END OF ORDER IMPORTANT
+  PhysicsManager::Destroy();
   Chunk::FreeStaticMembers();
   glfwTerminate();
   _CrtDumpMemoryLeaks();
