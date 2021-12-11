@@ -1,6 +1,6 @@
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <stdlib.h>
+//#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
+//#include <stdlib.h>
 
 #include <fstream>
 #include <iostream>
@@ -76,6 +76,6 @@ int main(void) {
   PhysicsManager::Destroy();
   Chunk::FreeStaticMembers();
   glfwTerminate();
-  _CrtDumpMemoryLeaks();
+  //_CrtDumpMemoryLeaks();
   return 0;
 }

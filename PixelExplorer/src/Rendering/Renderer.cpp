@@ -36,7 +36,7 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV, 
 	assert(glfwInit());
 #else
 	if (!glfwInit()) {
-		const char* error;
+		const char* error = nullptr;
 		std::cout << "Failed to initialize GLFW, Error Code: " << glfwGetError(&error) << ", Error Msg: " << error << std::endl;
 		exit(-1);
 	}
@@ -50,7 +50,7 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV, 
 	assert(_window);
 #else
 	if (!_window) {
-		const char* error;
+		const char* error = nullptr;
 		std::cout << "Failed to create Window, Error Code: " << glfwGetError(&error) << ", Error Msg: " << error << std::endl;
 		exit(-1);
 	}
