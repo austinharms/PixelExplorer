@@ -95,16 +95,16 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EA7EC612-58BC-4925-B2A8-216871552871}.checked|x64.ActiveCfg = Debug|x64
-		{EA7EC612-58BC-4925-B2A8-216871552871}.checked|x64.Build.0 = Debug|x64
+		{EA7EC612-58BC-4925-B2A8-216871552871}.checked|x64.ActiveCfg = checked|x64
+		{EA7EC612-58BC-4925-B2A8-216871552871}.checked|x64.Build.0 = checked|x64
 		{EA7EC612-58BC-4925-B2A8-216871552871}.checked|x86.ActiveCfg = Debug|Win32
 		{EA7EC612-58BC-4925-B2A8-216871552871}.checked|x86.Build.0 = Debug|Win32
 		{EA7EC612-58BC-4925-B2A8-216871552871}.Debug|x64.ActiveCfg = Debug|x64
 		{EA7EC612-58BC-4925-B2A8-216871552871}.Debug|x64.Build.0 = Debug|x64
 		{EA7EC612-58BC-4925-B2A8-216871552871}.Debug|x86.ActiveCfg = Debug|Win32
 		{EA7EC612-58BC-4925-B2A8-216871552871}.Debug|x86.Build.0 = Debug|Win32
-		{EA7EC612-58BC-4925-B2A8-216871552871}.profile|x64.ActiveCfg = Release|x64
-		{EA7EC612-58BC-4925-B2A8-216871552871}.profile|x64.Build.0 = Release|x64
+		{EA7EC612-58BC-4925-B2A8-216871552871}.profile|x64.ActiveCfg = profile|x64
+		{EA7EC612-58BC-4925-B2A8-216871552871}.profile|x64.Build.0 = profile|x64
 		{EA7EC612-58BC-4925-B2A8-216871552871}.profile|x86.ActiveCfg = Release|Win32
 		{EA7EC612-58BC-4925-B2A8-216871552871}.profile|x86.Build.0 = Release|Win32
 		{EA7EC612-58BC-4925-B2A8-216871552871}.Release|x64.ActiveCfg = Release|x64
