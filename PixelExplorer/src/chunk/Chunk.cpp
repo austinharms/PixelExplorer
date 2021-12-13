@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "chunk/block/Block.h"
+#include "physics/PhysicsManager.h"
 
 void* Chunk::s_emptyBuffer = malloc(1);
 TexturedMaterial* Chunk::s_chunkMaterial = nullptr;
@@ -327,6 +328,37 @@ void Chunk::updateMesh() {
       }
     }
   }
+
+  //Create PhysX Mesh
+//  physx::PxCookingParams cookParams(*PhysicsManager::GetScale());
+//  cookParams.meshPreprocessParams |=
+//      physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+//  // disable edge precompute, edges are set for each triangle, slows contact
+//  // generation
+//  cookParams.meshPreprocessParams |=
+//      physx::PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+//  // lower hierarchy for internal mesh
+//  //cookParams.meshCookingHint = physx::PxMeshCookingHint::eCOOKING_PERFORMANCE;
+//
+//  theCooking->setParams(params);
+//
+//  PxTriangleMeshDesc meshDesc;
+//  meshDesc.points.count = nbVerts;
+//  meshDesc.points.stride = sizeof(PxVec3);
+//  meshDesc.points.data = verts;
+//
+//  meshDesc.triangles.count = triCount;
+//  meshDesc.triangles.stride = 3 * sizeof(PxU32);
+//  meshDesc.triangles.data = indices32;
+//
+//#ifdef _DEBUG
+//  // mesh should be validated before cooked without the mesh cleaning
+//  bool res = theCooking->validateTriangleMesh(meshDesc);
+//  PX_ASSERT(res);
+//#endif
+//
+//  PxTriangleMesh* aTriangleMesh = theCooking->createTriangleMesh(
+//      meshDesc, thePhysics->getPhysicsInsertionCallback());
 
   _buffersDirty = true;
 }

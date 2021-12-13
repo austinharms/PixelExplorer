@@ -23,9 +23,9 @@ int main(void) {
   renderer->setCursorHidden(true);
   World::SetRenderer(renderer);
   World::LoadWorld();
-  for (uint8_t x = 0; x < 10; ++x)
-    for (uint8_t y = 0; y < 10; ++y)
-      for (uint8_t z = 0; z < 10; ++z)
+  for (uint8_t x = 0; x < 5; ++x)
+    for (uint8_t y = 0; y < 5; ++y)
+      for (uint8_t z = 0; z < 5; ++z)
         World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(x, y, z));
   World::GetChunkManager()->UpdateLoadedChunks();
   //World::GetChunkManager()->LoadChunk(glm::vec<3, int32_t>(0,0,0));

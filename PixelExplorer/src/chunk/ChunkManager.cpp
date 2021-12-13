@@ -1,10 +1,12 @@
 #include "ChunkManager.h"
 
 #include <iostream>
+#include "physics/PhysicsManager.h"
 
 ChunkManager::ChunkManager(Renderer* renderer) {
   _renderer = renderer;
   renderer->grab();
+  _scene = PhysicsManager::CreateScene();
 }
 
 ChunkManager::~ChunkManager() {

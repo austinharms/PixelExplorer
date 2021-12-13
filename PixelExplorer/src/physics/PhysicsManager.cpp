@@ -1,6 +1,7 @@
 #include "PhysicsManager.h"
 
 #include <iostream>
+#include <cassert>
 using namespace physx;
 PxDefaultAllocator* PhysicsManager::s_allocator = nullptr;
 PhysicsManager* PhysicsManager::s_physicsManager = nullptr;
@@ -14,8 +15,8 @@ bool PhysicsManager::s_init = false;
 
 bool PhysicsManager::Init() {
   if (!s_init) {
-    s_scale.length = 25;
-    s_scale.speed = 981;
+    //s_scale.length = 25;
+    //s_scale.speed = 9.81f;
     s_allocator = new PxDefaultAllocator();
     s_physicsManager = new PhysicsManager();
     s_foundation =
@@ -164,4 +165,15 @@ void PhysicsManager::reportError(PxErrorCode::Enum code, const char* message,
       }
     }
   }
+}
+
+physx::PxScene* PhysicsManager::CreateScene() { 
+  PxScene* scene = nullptr;
+  PxSceneDesc desc(s_scale);
+  desc.gravity = PxVec3(0, -9.81f, 0);
+  desc.cpuDispatcher = PxDefaultCpuDispatcherCreate(0);
+  desc.filterShader = PxDefaultSimulationFilterShader;
+  scene = s_physics->createScene(desc);
+  assert(scene);
+  return scene;
 }

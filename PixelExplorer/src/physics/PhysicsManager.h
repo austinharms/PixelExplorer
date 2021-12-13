@@ -11,6 +11,10 @@ class PhysicsManager : public physx::PxErrorCallback {
 
   virtual void reportError(physx::PxErrorCode::Enum code, const char* message,
                            const char* file, int line);
+  static physx::PxTolerancesScale* GetScale() { return &s_scale; }
+  static physx::PxCooking* GetCooking() { return s_cooking; }
+  static physx::PxScene* CreateScene();
+  static bool GetInitialized() { return s_init; }
 
  private:
   static physx::PxDefaultAllocator* s_allocator;
