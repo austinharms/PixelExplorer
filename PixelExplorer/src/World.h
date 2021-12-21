@@ -36,6 +36,11 @@ class World {
     if (s_renderer != nullptr) s_renderer->grab();
   }
 
+  static void StepPhysics(float time = 0.05f) {
+    s_chunkManager->getScene()->simulate(time);
+    s_chunkManager->getScene()->fetchResults(true);
+  }
+
  private:
   World() {}
   ~World() {}

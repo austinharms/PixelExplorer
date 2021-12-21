@@ -18,10 +18,10 @@ class ChunkManager : public virtual RefCounted {
  public:
   ChunkManager(Renderer* renderer);
   ~ChunkManager();
-  void UnloadChunks();
-  void LoadChunk(glm::vec<3, int32_t> pos);
-  Chunk* GetChunk(glm::vec<3, int32_t> pos);
-  physx::PxScene* GetScene() { return _scene; }
+  void unloadChunks();
+  void loadChunk(glm::vec<3, int32_t> pos);
+  Chunk* getChunk(glm::vec<3, int32_t> pos);
+  physx::PxScene* getScene() { return _scene; }
   void UpdateLoadedChunks();
 
  private:

@@ -10,11 +10,11 @@ ChunkManager::ChunkManager(Renderer* renderer) {
 }
 
 ChunkManager::~ChunkManager() {
-  UnloadChunks();
+  unloadChunks();
   _renderer->drop();
 }
 
-void ChunkManager::UnloadChunks() {
+void ChunkManager::unloadChunks() {
   for (std::pair<const glm::vec<3, int32_t>, Chunk*>& pair : _chunks) {
     pair.second->setStatus(Chunk::Status::UNLOADED);
     pair.second->setRendererDropFlag(true);
@@ -25,18 +25,19 @@ void ChunkManager::UnloadChunks() {
   _chunks.clear();
 }
 
-void ChunkManager::LoadChunk(const glm::vec<3, int32_t> pos) {
+void ChunkManager::loadChunk(const glm::vec<3, int32_t> pos) {
   Chunk* newChunk = new Chunk();
   _chunks.insert({pos, newChunk});
   _renderer->addRenderable(newChunk);
   newChunk->setStatus(Chunk::Status::LOADING);
   newChunk->setPosition(pos);
+  newChunk->setChunkManager(this);
   newChunk->setStatus(Chunk::Status::LOADED);
-  newChunk->updateAdjacentChunks(this);
+  newChunk->updateAdjacentChunks();
   //newChunk->updateMesh();
 }
 
-Chunk* ChunkManager::GetChunk(glm::vec<3, int32_t> pos) {
+Chunk* ChunkManager::getChunk(glm::vec<3, int32_t> pos) {
   try {
     return _chunks.at(pos);
   } catch (...) {

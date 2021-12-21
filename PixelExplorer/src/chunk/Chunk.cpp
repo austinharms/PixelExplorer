@@ -13,10 +13,11 @@ Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
   _status = Status::CREATED;
   _visible = true;
   _vertexBuffer = nullptr;
+  _indexBuffer = nullptr;
+  _physxActor = nullptr;
   _vertexCount = 0;
   _chunkModified = false;
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-    _buffers[i] = nullptr;
     _indexCount[i] = 0;
     _currentIndexCount[i] = 0;
     _adjacentChunks[i] = nullptr;
@@ -35,7 +36,7 @@ Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  glGenBuffers((int)FaceDirection::FACECOUNT, _indexBuffers);
+  glGenBuffers((int)FaceDirection::FACECOUNT, _indexBufferIds);
   memset(_blocks, 0, Chunk::BLOCK_COUNT * sizeof(ChunkBlock));
   for (int32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) _blocks[i].setId(1);
   _chunkModified = true;
@@ -46,17 +47,14 @@ Chunk::~Chunk() {
   if (_vertexBuffer != nullptr) {
     if (_vertexBuffer != Chunk::s_emptyBuffer) free(_vertexBuffer);
     _vertexBuffer = nullptr;
+    _vertexCount = 0;
   }
 
-  _vertexCount = 0;
-
-  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-    if (_buffers[i] != nullptr) {
-      if (_buffers[i] != Chunk::s_emptyBuffer) free(_buffers[i]);
-      _buffers[i] = nullptr;
-    }
-
-    _indexCount[i] = 0;
+  if (_indexBuffer != nullptr) {
+    if (_indexBuffer != Chunk::s_emptyBuffer) free(_indexBuffer);
+    _indexBuffer = nullptr;
+    memset(_indexCount, 0,
+           sizeof(uint32_t) * (int32_t)FaceDirection::FACECOUNT);
   }
 }
 
@@ -75,7 +73,7 @@ void Chunk::onRender() {
         !_currentIndexCount[i])
       continue;
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferIds[i]);
     glDrawElements(GL_TRIANGLES, _currentIndexCount[i], GL_UNSIGNED_INT,
                    nullptr);
   }
@@ -94,14 +92,12 @@ void Chunk::updateMesh() {
 
   _vertexCount = 0;
 
-  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-    if (_buffers[i] != nullptr) {
-      if (_buffers[i] != Chunk::s_emptyBuffer) free(_buffers[i]);
-      _buffers[i] = nullptr;
-    }
-
-    _indexCount[i] = 0;
+  if (_indexBuffer != nullptr) {
+    free(_indexBuffer);
+    _indexBuffer = nullptr;
   }
+
+  memset(_indexCount, 0, sizeof(uint32_t) * (int32_t)FaceDirection::FACECOUNT);
 
   float x = 0;
   float y = 0;
@@ -280,14 +276,20 @@ void Chunk::updateMesh() {
   }
 
   _vertexCount = 0;
+  uint32_t totalIndexCount = 0;
+  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i)
+    totalIndexCount += _indexCount[i];
+  if (totalIndexCount == 0) {
+    _indexBuffer = (uint32_t*)Chunk::s_emptyBuffer;
+  } else {
+    _indexBuffer = (uint32_t*)malloc(totalIndexCount * sizeof(uint32_t));
+  }
 
+  totalIndexCount = 0;
+  uint32_t* buffers[(uint8_t)FaceDirection::FACECOUNT];
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-    if (_indexCount[i] == 0) {
-      _buffers[i] = (uint32_t*)Chunk::s_emptyBuffer;
-    } else {
-      _buffers[i] = (uint32_t*)malloc(_indexCount[i] * sizeof(uint32_t));
-    }
-
+    buffers[i] = _indexBuffer + totalIndexCount;
+    totalIndexCount += _indexCount[i];
     _indexCount[i] = 0;
   }
 
@@ -303,7 +305,7 @@ void Chunk::updateMesh() {
         const BlockFace* face = curBlock.getBlockFace((FaceDirection)faceNum);
 
         for (uint32_t j = 0; j < face->indexCount; ++j) {
-          _buffers[faceNum][_indexCount[faceNum] + j] =
+          buffers[faceNum][_indexCount[faceNum] + j] =
               (face->indices[j]) + _vertexCount;
         }
 
@@ -329,44 +331,53 @@ void Chunk::updateMesh() {
     }
   }
 
-  //Create PhysX Mesh
-//  physx::PxCookingParams cookParams(*PhysicsManager::GetScale());
-//  cookParams.meshPreprocessParams |=
-//      physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
-//  // disable edge precompute, edges are set for each triangle, slows contact
-//  // generation
-//  cookParams.meshPreprocessParams |=
-//      physx::PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
-//  // lower hierarchy for internal mesh
-//  //cookParams.meshCookingHint = physx::PxMeshCookingHint::eCOOKING_PERFORMANCE;
-//
-//  theCooking->setParams(params);
-//
-//  PxTriangleMeshDesc meshDesc;
-//  meshDesc.points.count = nbVerts;
-//  meshDesc.points.stride = sizeof(PxVec3);
-//  meshDesc.points.data = verts;
-//
-//  meshDesc.triangles.count = triCount;
-//  meshDesc.triangles.stride = 3 * sizeof(PxU32);
-//  meshDesc.triangles.data = indices32;
-//
-//#ifdef _DEBUG
-//  // mesh should be validated before cooked without the mesh cleaning
-//  bool res = theCooking->validateTriangleMesh(meshDesc);
-//  PX_ASSERT(res);
-//#endif
-//
-//  PxTriangleMesh* aTriangleMesh = theCooking->createTriangleMesh(
-//      meshDesc, thePhysics->getPhysicsInsertionCallback());
+  float vertices[24] = {
+      -0.5f, -0.5f, -0.5f,  // 0
+      0.5f,  -0.5f, -0.5f,  // 1
+      0.5f,  0.5f,  -0.5f,  // 2
+      -0.5f, 0.5f,  -0.5f,  // 3
+      -0.5f, -0.5f, 0.5f,   // 4
+      0.5f,  -0.5f, 0.5f,   // 5
+      0.5f,  0.5f,  0.5f,   // 6
+      -0.5f, 0.5f,  0.5f    // 7
+  };
 
+  uint32_t indices[36] = {
+      0, 2, 1, 0, 3, 2,  // Front
+      4, 5, 6, 4, 6, 7,  // Back
+      0, 4, 7, 0, 7, 3,  // Left
+      1, 6, 5, 1, 2, 6,  // Right
+      3, 7, 6, 3, 6, 2,  // Top
+      0, 5, 4, 0, 1, 5,  // Bottom
+  };
+
+  // Create PhysX Mesh
+  physx::PxTriangleMeshDesc meshDesc;
+  meshDesc.points.count = 24 / 3;
+  meshDesc.points.stride = sizeof(float) * 3;
+  meshDesc.points.data = vertices;
+
+  meshDesc.triangles.count = 36 / 3;
+  meshDesc.triangles.stride = sizeof(uint32_t) * 3;
+  meshDesc.triangles.data = indices;
+  if (_physxActor != nullptr) {
+    _mgr->getScene()->removeActor(*((physx::PxRigidStatic*)_physxActor), false);
+    _physxActor = nullptr;
+  }
+
+  physx::PxTriangleMesh* mesh = PhysicsManager::CreatePxMesh(meshDesc);
+  physx::PxMeshScale scale(physx::PxVec3(1));
+  physx::PxTriangleMeshGeometry geom(mesh, scale);
+  _physxActor = PhysicsManager::CreatePxStaticActor(
+      physx::PxTransform(_position.x, _position.y, _position.z), geom);
+  _mgr->getScene()->addActor(*(physx::PxRigidStatic*)_physxActor);
   _buffersDirty = true;
 }
 
-void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
+void Chunk::updateAdjacentChunks() {
   Chunk* ch =
-      mgr->GetChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
-                                    FaceDirection::LEFT));
+      _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
+                                     FaceDirection::LEFT));
   if (ch != nullptr) {
     ch->grab();
     {
@@ -394,8 +405,8 @@ void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
     ch->drop();
   }
 
-  ch = mgr->GetChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
-                                     FaceDirection::RIGHT));
+  ch = _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
+                                      FaceDirection::RIGHT));
   if (ch != nullptr) {
     ch->grab();
     {
@@ -423,8 +434,8 @@ void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
     ch->drop();
   }
 
-  ch = mgr->GetChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
-                                     FaceDirection::TOP));
+  ch = _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
+                                      FaceDirection::TOP));
   if (ch != nullptr) {
     ch->grab();
     {
@@ -452,8 +463,8 @@ void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
     ch->drop();
   }
 
-  ch = mgr->GetChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
-                                     FaceDirection::BOTTOM));
+  ch = _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
+                                      FaceDirection::BOTTOM));
   if (ch != nullptr) {
     ch->grab();
     {
@@ -481,8 +492,8 @@ void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
     ch->drop();
   }
 
-  ch = mgr->GetChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
-                                     FaceDirection::FRONT));
+  ch = _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
+                                      FaceDirection::FRONT));
   if (ch != nullptr) {
     ch->grab();
     {
@@ -510,8 +521,8 @@ void Chunk::updateAdjacentChunks(ChunkManager* mgr) {
     ch->drop();
   }
 
-  ch = mgr->GetChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
-                                     FaceDirection::BACK));
+  ch = _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
+                                      FaceDirection::BACK));
   if (ch != nullptr) {
     ch->grab();
     {
@@ -552,14 +563,13 @@ void Chunk::unloadChunk() {
 
     _vertexCount = 0;
 
-    for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-      if (_buffers[i] != nullptr) {
-        if (_buffers[i] != Chunk::s_emptyBuffer) free(_buffers[i]);
-        _buffers[i] = nullptr;
-      }
-
-      _indexCount[i] = 0;
+    if (_indexBuffer != nullptr) {
+      if (_indexBuffer != Chunk::s_emptyBuffer) free(_indexBuffer);
+      _indexBuffer = nullptr;
     }
+
+    memset(_indexCount, 0,
+           sizeof(uint32_t) * (int32_t)FaceDirection::FACECOUNT);
   }
 
   for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
@@ -595,6 +605,12 @@ void Chunk::unloadChunk() {
   }
 }
 
+void Chunk::setChunkManager(ChunkManager* mgr) {
+  if (mgr != nullptr) mgr->grab();
+  if (_mgr != nullptr) _mgr->drop();
+  _mgr = mgr;
+}
+
 void Chunk::updateBuffers() {
   if (_meshBuffersLock.try_lock()) {
     if (_vertexBuffer != nullptr) {
@@ -605,16 +621,19 @@ void Chunk::updateBuffers() {
       _vertexBuffer = nullptr;
     }
 
-    for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
-      if (_buffers[i] != nullptr) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffers[i]);
+    if (_indexBuffer != nullptr) {
+      uint32_t bufferOffset = 0;
+      for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferIds[i]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexCount[i] * sizeof(uint32_t),
-                     _buffers[i], GL_STATIC_DRAW);
+                     _indexBuffer + bufferOffset, GL_STATIC_DRAW);
         _currentIndexCount[i] = _indexCount[i];
+        bufferOffset += _indexCount[i];
         _indexCount[i] = 0;
-        if (_buffers[i] != Chunk::s_emptyBuffer) free(_buffers[i]);
-        _buffers[i] = nullptr;
       }
+
+      if (_indexBuffer != Chunk::s_emptyBuffer) free(_indexBuffer);
+      _indexBuffer = nullptr;
     }
 
     _buffersDirty = false;

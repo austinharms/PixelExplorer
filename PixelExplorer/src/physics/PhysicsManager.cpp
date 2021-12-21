@@ -1,7 +1,7 @@
 #include "PhysicsManager.h"
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 using namespace physx;
 PxDefaultAllocator* PhysicsManager::s_allocator = nullptr;
 PhysicsManager* PhysicsManager::s_physicsManager = nullptr;
@@ -10,13 +10,14 @@ PxPvd* PhysicsManager::s_pvd = nullptr;
 PxPvdTransport* PhysicsManager::s_pvdTransport = nullptr;
 PxPhysics* PhysicsManager::s_physics = nullptr;
 PxCooking* PhysicsManager::s_cooking = nullptr;
+PxMaterial* PhysicsManager::s_defaultMaterial = nullptr;
 PxTolerancesScale PhysicsManager::s_scale;
 bool PhysicsManager::s_init = false;
 
 bool PhysicsManager::Init() {
   if (!s_init) {
-    //s_scale.length = 25;
-    //s_scale.speed = 9.81f;
+    // s_scale.length = 25;
+    // s_scale.speed = 9.81f;
     s_allocator = new PxDefaultAllocator();
     s_physicsManager = new PhysicsManager();
     s_foundation =
@@ -31,9 +32,10 @@ bool PhysicsManager::Init() {
     }
 
     s_pvd = PxCreatePvd(*s_foundation);
-    s_pvdTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+    s_pvdTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
     s_pvd->connect(*s_pvdTransport, PxPvdInstrumentationFlag::eALL);
-    s_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *s_foundation, PxTolerancesScale(), true, s_pvd);
+    s_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *s_foundation,
+                                PxTolerancesScale(), true, s_pvd);
     if (!s_physics) {
       s_pvd->release();
       s_pvd = nullptr;
@@ -48,7 +50,8 @@ bool PhysicsManager::Init() {
       return false;
     }
 
-    s_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *s_foundation, PxCookingParams(s_scale));
+    s_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *s_foundation,
+                                PxCookingParams(s_scale));
     if (!s_cooking) {
       s_physics->release();
       s_physics = nullptr;
@@ -64,6 +67,12 @@ bool PhysicsManager::Init() {
       s_physicsManager = nullptr;
       return false;
     }
+
+    PxCookingParams params(s_scale);
+    params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+    params.meshPreprocessParams |=
+        PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+    s_cooking->setParams(params);
 
     if (!PxInitExtensions(*s_physics, s_pvd)) {
       s_cooking->release();
@@ -83,13 +92,15 @@ bool PhysicsManager::Init() {
       return false;
     }
 
+    s_defaultMaterial = s_physics->createMaterial(1, 1, 1);
+
     s_init = true;
   }
 
   return true;
 }
 
-void PhysicsManager::Destroy() { 
+void PhysicsManager::Destroy() {
   if (s_init) {
     s_cooking->release();
     s_cooking = nullptr;
@@ -167,7 +178,7 @@ void PhysicsManager::reportError(PxErrorCode::Enum code, const char* message,
   }
 }
 
-physx::PxScene* PhysicsManager::CreateScene() { 
+physx::PxScene* PhysicsManager::CreateScene() {
   PxScene* scene = nullptr;
   PxSceneDesc desc(s_scale);
   desc.gravity = PxVec3(0, -9.81f, 0);

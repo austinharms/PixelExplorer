@@ -38,7 +38,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   bool onPreRender(float deltaTime, float* cameraPos, float* cameraRotation);
   void onRender();
   void updateMesh();
-  void updateAdjacentChunks(ChunkManager* mgr);
+  void updateAdjacentChunks();
   void unloadChunk();
 
   void setPosition(glm::vec3 position) {
@@ -60,6 +60,8 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
   const Status getStatus() const { return _status; }
 
   void setStatus(Status status) { _status = status; }
+
+  void setChunkManager(ChunkManager* mgr);
 
   static void FreeStaticMembers() {
     if (s_emptyBuffer != nullptr) free(s_emptyBuffer);
@@ -89,17 +91,19 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   void updateBuffers();  // MUST be called on main thread
 
+  void* _physxActor;
+  ChunkManager* _mgr;
   Chunk* _adjacentChunks[(int32_t)FaceDirection::FACECOUNT];
   float* _vertexBuffer;
+  uint32_t* _indexBuffer;
   std::mutex _meshBuffersLock;
-  uint32_t* _buffers[(int32_t)FaceDirection::FACECOUNT];
   std::unordered_map<uint32_t, BlockData> _extendedBlockData;
   ChunkBlock _blocks[BLOCK_COUNT];
   bool _buffersDirty;
   bool _chunkModified;
   uint8_t _visibleFaces;
   Status _status;
-  uint32_t _indexBuffers[(int32_t)FaceDirection::FACECOUNT];
+  uint32_t _indexBufferIds[(int32_t)FaceDirection::FACECOUNT];
   uint32_t _vertexArrayId;
   uint32_t _vertexBufferId;
   uint32_t _vertexCount;

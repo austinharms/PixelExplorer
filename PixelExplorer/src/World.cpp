@@ -93,7 +93,7 @@ void World::LoadWorld() {
 
 void World::UnloadWorld() {
   if (World::s_chunkManager != nullptr) {
-    World::s_chunkManager->UnloadChunks();
+    World::s_chunkManager->unloadChunks();
     World::s_chunkManager->drop();
     World::s_chunkManager = nullptr;
   }
