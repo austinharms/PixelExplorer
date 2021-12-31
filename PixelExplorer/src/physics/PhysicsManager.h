@@ -19,7 +19,6 @@ class PhysicsManager : public physx::PxErrorCallback {
   static bool GetInitialized() { return s_init; }
   static physx::PxTriangleMesh* CreatePxMesh(physx::PxTriangleMeshDesc& desc) {
     if (!s_init) return nullptr;
-    assert(s_cooking->validateTriangleMesh(desc));
     return s_cooking->createTriangleMesh(
         desc, s_physics->getPhysicsInsertionCallback());
   }

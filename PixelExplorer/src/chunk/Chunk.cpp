@@ -331,35 +331,15 @@ void Chunk::updateMesh() {
     }
   }
 
-  float vertices[24] = {
-      -0.5f, -0.5f, -0.5f,  // 0
-      0.5f,  -0.5f, -0.5f,  // 1
-      0.5f,  0.5f,  -0.5f,  // 2
-      -0.5f, 0.5f,  -0.5f,  // 3
-      -0.5f, -0.5f, 0.5f,   // 4
-      0.5f,  -0.5f, 0.5f,   // 5
-      0.5f,  0.5f,  0.5f,   // 6
-      -0.5f, 0.5f,  0.5f    // 7
-  };
-
-  uint32_t indices[36] = {
-      0, 2, 1, 0, 3, 2,  // Front
-      4, 5, 6, 4, 6, 7,  // Back
-      0, 4, 7, 0, 7, 3,  // Left
-      1, 6, 5, 1, 2, 6,  // Right
-      3, 7, 6, 3, 6, 2,  // Top
-      0, 5, 4, 0, 1, 5,  // Bottom
-  };
-
   // Create PhysX Mesh
   physx::PxTriangleMeshDesc meshDesc;
-  meshDesc.points.count = 24 / 3;
-  meshDesc.points.stride = sizeof(float) * 3;
-  meshDesc.points.data = vertices;
+  meshDesc.points.count = _vertexCount;
+  meshDesc.points.stride = sizeof(float) * 5;
+  meshDesc.points.data = _vertexBuffer;
 
-  meshDesc.triangles.count = 36 / 3;
+  meshDesc.triangles.count = totalIndexCount / 3;
   meshDesc.triangles.stride = sizeof(uint32_t) * 3;
-  meshDesc.triangles.data = indices;
+  meshDesc.triangles.data = _indexBuffer;
   if (_physxActor != nullptr) {
     _mgr->getScene()->removeActor(*((physx::PxRigidStatic*)_physxActor), false);
     _physxActor = nullptr;
@@ -369,7 +349,10 @@ void Chunk::updateMesh() {
   physx::PxMeshScale scale(physx::PxVec3(1));
   physx::PxTriangleMeshGeometry geom(mesh, scale);
   _physxActor = PhysicsManager::CreatePxStaticActor(
-      physx::PxTransform(_position.x, _position.y, _position.z), geom);
+      physx::PxTransform(_position.x * Chunk::CHUNK_SIZE,
+                         _position.y * Chunk::CHUNK_SIZE,
+                         _position.z * Chunk::CHUNK_SIZE),
+      geom);
   _mgr->getScene()->addActor(*(physx::PxRigidStatic*)_physxActor);
   _buffersDirty = true;
 }
