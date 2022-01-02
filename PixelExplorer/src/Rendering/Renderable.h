@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "RefCounted.h"
 #include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 
 class Renderable : public virtual RefCounted {
  public:
@@ -35,9 +36,9 @@ class Renderable : public virtual RefCounted {
 
   Material* getMaterial() const { return _material; }
 
-  virtual bool onPreRender(
-      float deltaTime, float* cameraPos,
-      float* cameraRotation) = 0;  // Should update and return mesh visibility
+  // Should update and return mesh visibility
+  virtual bool onPreRender(float deltaTime, glm::vec3& cameraPos,
+                           glm::vec3& cameraRotation) = 0;
   virtual glm::mat4 getTransform() = 0;
   virtual void onRender() = 0;
 

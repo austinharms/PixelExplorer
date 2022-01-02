@@ -58,8 +58,8 @@ Chunk::~Chunk() {
   }
 }
 
-bool Chunk::onPreRender(float deltaTime, float* cameraPos,
-                        float* cameraRotation) {
+bool Chunk::onPreRender(float deltaTime, glm::vec3& cameraPos,
+                        glm::vec3& cameraRotation) {
   if (_status < Status::LOADED) return false;
   if (_buffersDirty) updateBuffers();
   _visibleFaces = FaceDirectionFlag::ALL;
@@ -341,7 +341,7 @@ void Chunk::updateMesh() {
   meshDesc.triangles.stride = sizeof(uint32_t) * 3;
   meshDesc.triangles.data = _indexBuffer;
   if (_physxActor != nullptr) {
-    _mgr->getScene()->removeActor(*((physx::PxRigidStatic*)_physxActor), false);
+    _mgr->getScene()->removeActor(*_physxActor, false);
     _physxActor = nullptr;
   }
 
@@ -353,7 +353,7 @@ void Chunk::updateMesh() {
                          _position.y * Chunk::CHUNK_SIZE,
                          _position.z * Chunk::CHUNK_SIZE),
       geom);
-  _mgr->getScene()->addActor(*(physx::PxRigidStatic*)_physxActor);
+  _mgr->getScene()->addActor(*_physxActor);
   _buffersDirty = true;
 }
 

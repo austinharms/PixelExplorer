@@ -9,6 +9,7 @@
 #include "ChunkManager.fwd.h"
 #include "FaceDirection.h"
 #include "GL/glew.h"
+#include "PxRigidStatic.h"
 #include "RefCounted.h"
 #include "block/BlockData.h"
 #include "block/ChunkBlock.h"
@@ -35,7 +36,8 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   Chunk();           // MUST be called on main thread
   virtual ~Chunk();  // MUST be called on main thread
-  bool onPreRender(float deltaTime, float* cameraPos, float* cameraRotation);
+  bool onPreRender(float deltaTime, glm::vec3& cameraPos,
+                   glm::vec3& cameraRotation);
   void onRender();
   void updateMesh();
   void updateAdjacentChunks();
@@ -91,7 +93,7 @@ class Chunk : public virtual RefCounted, public virtual Renderable {
 
   void updateBuffers();  // MUST be called on main thread
 
-  void* _physxActor;
+  physx::PxRigidStatic* _physxActor;
   ChunkManager* _mgr;
   Chunk* _adjacentChunks[(int32_t)FaceDirection::FACECOUNT];
   float* _vertexBuffer;

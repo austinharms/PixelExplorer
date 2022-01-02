@@ -45,7 +45,7 @@ public:
 
 	void setRotation(glm::vec2 rotation) {
 		std::lock_guard<std::mutex> drawLock(_renderLock);
-		_rotation = rotation;
+		_rotation = glm::vec3(rotation, 0);
 		updateForwardVector();
 	}
 
@@ -57,12 +57,12 @@ public:
 
 	glm::vec2 getRotation() const { return _rotation; }
 
-	glm::vec2 getRotationVec3() const { return glm::vec3(_rotation, 0); }
+	glm::vec2 getRotationVec3() const { return _rotation; }
 
 	void setTransform(glm::vec3 position, glm::vec3 rotation) {
 		std::lock_guard<std::mutex> drawLock(_renderLock);
 		_position = position;
-		if ((glm::vec2)rotation != _rotation) {
+		if (rotation != _rotation) {
 			updateForwardVector();
 			_rotation = rotation;
 		}
@@ -71,9 +71,9 @@ public:
 	void setTransform(glm::vec3 position, glm::vec2 rotation) {
 		std::lock_guard<std::mutex> drawLock(_renderLock);
 		_position = position;
-		if (rotation != _rotation) {
+    if (rotation != (glm::vec2)_rotation) {
 			updateForwardVector();
-			_rotation = rotation;
+			_rotation = glm::vec3(rotation, 0);
 		}
 	}
 
@@ -106,7 +106,7 @@ private:
 	glm::mat4 _projection;
 	glm::vec3 _position;
 	glm::vec3 _forward;
-	glm::vec2 _rotation;
+	glm::vec3 _rotation;
 	GLFWwindow* _window;
 	uint32_t _FPSLimit;
 	uint32_t _FPS;
