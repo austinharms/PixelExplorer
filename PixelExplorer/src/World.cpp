@@ -10,8 +10,13 @@ std::string World::s_appAssetDir;
 std::string World::s_assetDir;
 std::string World::s_worldDir;
 std::vector<Package> World::s_packages;
+volatile bool World::s_physXActive = false;
+volatile bool World::s_physXPause = false;
 ChunkManager* World::s_chunkManager = nullptr;
 Renderer* World::s_renderer = nullptr;
+std::thread* World::s_physXThread = nullptr;
+std::atomic<float> World::s_physXAccumulator = 0;
+const float World::s_physXTimeStep = 0.01;
 
 void World::LoadWorld() {
   UnloadWorld();
@@ -25,7 +30,8 @@ void World::LoadWorld() {
       "C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\save-'test "
       "world'\\");
   World::s_chunkManager = new ChunkManager(World::s_renderer);
-  World::s_packages.push_back(Package(std::string("default"), World::MANIFEST_VERSION));
+  World::s_packages.push_back(
+      Package(std::string("default"), World::MANIFEST_VERSION));
 
   std::string manifestPath = World::s_worldDir + "world_manifest";
   std::ifstream manifest(manifestPath.c_str(), std::ios::binary);
@@ -37,7 +43,7 @@ void World::LoadWorld() {
     World::s_packages.push_back(
         Package(std::string("px"), World::MANIFEST_VERSION));
     manifest.close();
-    UpdateManifest();
+    updateManifest();
   } else {
     uint16_t version;
     manifest.read((char*)&version, sizeof(uint16_t));
@@ -89,9 +95,23 @@ void World::LoadWorld() {
   Chunk::SetChunkMaterialShader(chunkShader);
   chunkShader->drop();
   chunkShader = nullptr;
+
+  if (World::s_physXThread != nullptr)
+    std::cout << "Warning old PhysX thread not cleaned up" << std::endl;
+
+  World::s_physXPause = false;
+  World::s_physXActive = true;
+  World::s_physXThread = new std::thread(&World::physXUpdateLoop);
 }
 
 void World::UnloadWorld() {
+  World::s_physXPause = true;
+  World::s_physXActive = false;
+  if (World::s_physXThread != nullptr) {
+    World::s_physXThread->join();
+    World::s_physXThread = nullptr;
+  }
+
   if (World::s_chunkManager != nullptr) {
     World::s_chunkManager->unloadChunks();
     World::s_chunkManager->drop();
@@ -105,7 +125,7 @@ void World::UnloadWorld() {
   World::s_worldDir.clear();
 }
 
-void World::UpdateManifest() {
+void World::updateManifest() {
   std::string manifestPath = World::s_worldDir + "world_manifest";
   std::ofstream manifest(manifestPath.c_str(), std::ios::binary);
   manifest.write((const char*)&World::MANIFEST_VERSION, sizeof(uint16_t));
@@ -126,4 +146,17 @@ void World::UpdateManifest() {
 bool World::dirExists(const char* path) {
   struct stat info;
   return stat(path, &info) == 0 && (info.st_mode & S_IFDIR);
+}
+
+void World::physXUpdateLoop() {
+  while (World::s_physXActive) {
+    if (!World::s_physXPause) {
+      if (World::s_physXAccumulator >= World::s_physXTimeStep) {
+        World::s_physXAccumulator =
+            World::s_physXAccumulator - World::s_physXTimeStep;
+        s_chunkManager->getScene()->simulate(World::s_physXTimeStep);
+        s_chunkManager->getScene()->fetchResults(true);
+      }
+    }
+  }
 }

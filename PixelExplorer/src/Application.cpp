@@ -63,7 +63,7 @@ int main(void) {
 
     renderer->setTransform(camPos, camRot);
     renderer->drawFrame();
-    World::StepPhysics();
+    World::AddSimulationTime(renderer->getDeltaTime());
   }
 
   // ORDER IMPORTANT
