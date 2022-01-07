@@ -11,7 +11,10 @@
 class World {
  public:
   static const uint16_t MANIFEST_VERSION = 1;
+
+  // Should ONLY be called on the MAIN thread
   static void LoadWorld();
+  // Should ONLY be called on the MAIN thread
   static void UnloadWorld();
 
   static void SetPhysicsPaused(bool paused) { s_physXPause = paused; }
@@ -45,11 +48,6 @@ class World {
     if (!s_physXPause && s_physXActive)
       s_physXAccumulator = s_physXAccumulator + time;
   }
-
-  // static void StepPhysics(float time = 0.05f) {
-  //  s_chunkManager->getScene()->simulate(time);
-  //  s_chunkManager->getScene()->fetchResults(true);
-  //}
 
  private:
   World() {}

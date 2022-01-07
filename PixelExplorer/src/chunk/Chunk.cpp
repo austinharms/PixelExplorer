@@ -44,6 +44,11 @@ Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
 }
 
 Chunk::~Chunk() {
+  if (_physxActor != nullptr) {
+    _mgr->getScene()->removeActor(*_physxActor, false);
+    _physxActor = nullptr;
+  }
+
   if (_vertexBuffer != nullptr) {
     if (_vertexBuffer != Chunk::s_emptyBuffer) free(_vertexBuffer);
     _vertexBuffer = nullptr;
@@ -342,6 +347,7 @@ void Chunk::updateMesh() {
   meshDesc.triangles.data = _indexBuffer;
   if (_physxActor != nullptr) {
     _mgr->getScene()->removeActor(*_physxActor, false);
+    _physxActor->release();
     _physxActor = nullptr;
   }
 
@@ -353,6 +359,7 @@ void Chunk::updateMesh() {
                          _position.y * Chunk::CHUNK_SIZE,
                          _position.z * Chunk::CHUNK_SIZE),
       geom);
+  mesh->release();
   _mgr->getScene()->addActor(*_physxActor);
   _buffersDirty = true;
 }
@@ -579,6 +586,16 @@ void Chunk::unloadChunk() {
 
       tempPtr->drop();
     }
+  }
+
+  if (_physxActor != nullptr) {
+    _mgr->getScene()->removeActor(*_physxActor, false);
+    _physxActor = nullptr;
+  }
+
+  if (_mgr != nullptr) {
+    _mgr->drop();
+    _mgr = nullptr;
   }
 
   _status = Status::UNLOADED;

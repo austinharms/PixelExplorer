@@ -11,6 +11,8 @@ ChunkManager::ChunkManager(Renderer* renderer) {
 
 ChunkManager::~ChunkManager() {
   unloadChunks();
+  _scene->release();
+  _scene = nullptr;
   _renderer->drop();
 }
 

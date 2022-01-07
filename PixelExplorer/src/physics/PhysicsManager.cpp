@@ -22,7 +22,6 @@ bool PhysicsManager::Init() {
     s_physicsManager = new PhysicsManager();
     s_foundation =
         PxCreateFoundation(PX_PHYSICS_VERSION, *s_allocator, *s_physicsManager);
-
     if (!s_foundation) {
       delete s_allocator;
       s_allocator = nullptr;
@@ -102,6 +101,9 @@ bool PhysicsManager::Init() {
 
 void PhysicsManager::Destroy() {
   if (s_init) {
+    PxCloseExtensions();
+    s_defaultMaterial->release();
+    s_defaultMaterial = nullptr;
     s_cooking->release();
     s_cooking = nullptr;
     s_physics->release();

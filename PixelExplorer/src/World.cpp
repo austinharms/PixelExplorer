@@ -109,10 +109,12 @@ void World::UnloadWorld() {
   World::s_physXActive = false;
   if (World::s_physXThread != nullptr) {
     World::s_physXThread->join();
+    delete World::s_physXThread;
     World::s_physXThread = nullptr;
   }
 
   if (World::s_chunkManager != nullptr) {
+    // Call here to ensure it is done on the main thread
     World::s_chunkManager->unloadChunks();
     World::s_chunkManager->drop();
     World::s_chunkManager = nullptr;
