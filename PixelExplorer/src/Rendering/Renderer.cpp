@@ -96,18 +96,37 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
 void Renderer::addRenderable(Renderable* renderable) {
   std::lock_guard<std::mutex> locker(_renderLock);
   renderable->grab();
-  _renderableObjects.emplace_back(renderable);
-  _renderableObjects.sort([](const Renderable* r1, const Renderable* r2) {
-    if (r1->getMaterial()->getShader()->getGLID() >
-        r2->getMaterial()->getShader()->getGLID()) {
-      return true;
-    } else if (r1->getMaterial()->getShader()->getGLID() ==
-               r2->getMaterial()->getShader()->getGLID()) {
-      return r1->getMaterial()->getId() > r2->getMaterial()->getId();
+  if (_renderableObjects.begin() == _renderableObjects.end()) {
+    _renderableObjects.emplace_back(renderable);
+  } else {
+    uint32_t newShaderId = renderable->getMaterial()->getShader()->getGLID();
+    uint32_t newMaterialId = renderable->getMaterial()->getId();
+    for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
+         it != _renderableObjects.end(); ++it) {
+      Renderable* other = *it;
+      uint32_t otherShaderId = other->getMaterial()->getShader()->getGLID();
+      if (newShaderId < otherShaderId) {
+        _renderableObjects.insert(it, renderable);
+        break;
+      } else if (newShaderId == otherShaderId) {
+        if (newMaterialId <= other->getMaterial()->getId()) {
+          _renderableObjects.insert(it, renderable);
+          break;
+        }
+      }
     }
+  }
 
-    return false;
-  });
+  //std::cout << "Added Renderable, Material: "
+  //          << renderable->getMaterial()->getId()
+  //          << ", Shader: " << renderable->getMaterial()->getShader()->getGLID()
+  //          << std::endl;
+  //for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
+  //     it != _renderableObjects.end(); ++it) {
+  //  std::cout << "Renderable, Material: " << (*it)->getMaterial()->getId()
+  //            << ", Shader: " << (*it)->getMaterial()->getShader()->getGLID()
+  //            << std::endl;
+  //}
 }
 
 void Renderer::removeRenderable(uint32_t id) {
