@@ -480,7 +480,10 @@
     <ClInclude Include="src\chunk\ChunkManager.h" />
     <ClInclude Include="src\chunk\FaceDirection.h" />
     <ClInclude Include="src\Package.h" />
-    <ClInclude Include="src\package\SubPackageId.h" />
+    <ClInclude Include="src\package\Package.h" />
+    <ClInclude Include="src\package\subPackage\SubPackage.h" />
+    <ClInclude Include="src\package\subPackage\SubPackageId.h" />
+    <ClInclude Include="src\package\subPackage\SubPackageLoader.h" />
     <ClInclude Include="src\physics\PhysicsManager.h" />
     <ClInclude Include="src\RefCounted.h" />
     <ClInclude Include="src\rendering\Material.h" />
