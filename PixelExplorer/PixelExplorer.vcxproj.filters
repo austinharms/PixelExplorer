@@ -1383,16 +1383,19 @@
     <ClInclude Include="src\physics\PhysicsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\package\subPackage\SubPackageId.h">
+    <ClInclude Include="src\package\modules\PackageModuleId.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\package\Package.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\package\subPackage\SubPackageLoader.h">
+    <ClInclude Include="src\package\modules\PackageModuleLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\package\subPackage\SubPackage.h">
+    <ClInclude Include="src\package\modules\PackageModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\package\PackageLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
