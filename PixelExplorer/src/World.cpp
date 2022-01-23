@@ -145,11 +145,6 @@ void World::updateManifest() {
   manifest.close();
 }
 
-bool World::dirExists(const char* path) {
-  struct stat info;
-  return stat(path, &info) == 0 && (info.st_mode & S_IFDIR);
-}
-
 void World::physXUpdateLoop() {
   while (World::s_physXActive) {
     if (!World::s_physXPause) {

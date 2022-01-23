@@ -34,14 +34,19 @@ class Package : public virtual RefCounted {
 
   PackageModule* GetModule(uint16_t id) const { return nullptr; }
 
+  uint8_t GetLoadPriority() const { return _loadPriority; }
+
  protected:
   std::unordered_map<uint16_t, PackageModule*> _modules;
 
  private:
   Package() {}
-
+  std::string _name;
+  std::string _description;
+  std::string _path;
   bool _modulesLoaded;
   bool _propertiesLoaded;
+  uint8_t _loadPriority;
   uint8_t _packageVersion[3];
   uint8_t _minAppVersion[3];
   uint8_t _maxAppVersion[3];
