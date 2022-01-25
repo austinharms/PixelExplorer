@@ -317,6 +317,7 @@
     <ClCompile Include="src\chunk\block\BaseBlock.cpp" />
     <ClCompile Include="SRC\CHUNK\Chunk.cpp" />
     <ClCompile Include="src\chunk\ChunkManager.cpp" />
+    <ClCompile Include="src\package\PackageLoader.cpp" />
     <ClCompile Include="src\physics\PhysicsManager.cpp" />
     <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\Renderable.cpp" />
@@ -480,6 +481,7 @@
     <ClInclude Include="src\chunk\ChunkManager.h" />
     <ClInclude Include="src\chunk\FaceDirection.h" />
     <ClInclude Include="src\FileUtilities.h" />
+    <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Package.h" />
     <ClInclude Include="src\package\Package.h" />
     <ClInclude Include="src\package\PackageLoader.h" />

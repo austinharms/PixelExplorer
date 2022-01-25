@@ -57,6 +57,9 @@
     <ClCompile Include="src\physics\PhysicsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\package\PackageLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Chunk.shader" />
@@ -1399,6 +1402,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\FileUtilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
