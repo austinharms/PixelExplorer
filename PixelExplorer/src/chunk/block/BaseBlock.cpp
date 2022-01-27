@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "Package.h"
 #include "rendering/Shader.h"
 #include "stb_image/stb_image.h"
 

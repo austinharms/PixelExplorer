@@ -4,12 +4,12 @@
 #include <fstream>
 #include <iostream>
 
+#include "FileUtilities.h"
+#include "Logger.h"
 #include "chunk/block/BaseBlock.h"
 
-std::string World::s_appAssetDir;
-std::string World::s_assetDir;
-std::string World::s_worldDir;
-std::vector<Package> World::s_packages;
+std::string World::s_worldDir = "";
+std::vector<Package*> World::s_packages;
 volatile bool World::s_physXActive = false;
 volatile bool World::s_physXPause = false;
 ChunkManager* World::s_chunkManager = nullptr;
@@ -20,29 +20,37 @@ const float World::s_physXTimeStep = 0.01;
 
 void World::LoadWorld() {
   UnloadWorld();
+  s_worldDir = FileUtilities::GetResourceDirectory() + "/worlds/test-world/";
+#ifdef DEBUG
   assert(World::s_renderer != nullptr);
-  World::s_appAssetDir = std::string(
-      "C:"
-      "\\Users\\austi\\source\\repos\\PixelExplorer\\PixelExplorer\\assets\\");
-  World::s_assetDir = std::string(
-      "C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\assets\\");
-  World::s_worldDir = std::string(
-      "C:\\Users\\austi\\AppData\\Local\\PixelExplorer\\0.0.0\\save-'test "
-      "world'\\");
-  World::s_chunkManager = new ChunkManager(World::s_renderer);
-  World::s_packages.push_back(
-      Package(std::string("default"), World::MANIFEST_VERSION));
+#else
+  Logger::Error("World Renderer Not Set");
+  abort();
+#endif  // DEBUG
 
-  std::string manifestPath = World::s_worldDir + "world_manifest";
+  World::s_chunkManager = new ChunkManager(World::s_renderer);
+  Package* defaultPackage = PackageLoader::LoadPackageByName("default");
+#ifdef DEBUG
+  assert(defaultPackage != nullptr && defaultPackage->GetLoaded());
+#else
+  Logger::Error("Failed to Load Required default Package");
+  abort();
+#endif  // DEBUG
+
+  World::s_packages.push_back(defaultPackage);
+  std::string manifestPath = World::s_worldDir + "world.manifest";
   std::ifstream manifest(manifestPath.c_str(), std::ios::binary);
   if (!manifest || manifest.peek() == std::ifstream::traits_type::eof()) {
-    std::cout << "No World Manifest Found, Creating Default Manifest"
-              << std::endl;
-    World::s_packages.push_back(
-        Package(std::string("debug"), World::MANIFEST_VERSION));
-    World::s_packages.push_back(
-        Package(std::string("px"), World::MANIFEST_VERSION));
     manifest.close();
+
+    Logger::Warn("No World Manifest Found, Creating Default Manifest");
+    Package* pxPackage = PackageLoader::LoadPackageByName("px");
+    if (pxPackage != nullptr) {
+      World::s_packages.push_back(pxPackage);
+    } else {
+      Logger::Warn("Failed to Load px Package When Creating Default Manifest");
+    }
+
     updateManifest();
   } else {
     uint16_t version;
@@ -58,46 +66,31 @@ void World::LoadWorld() {
       char name[256];
       manifest.read(name, nameLength);
       name[nameLength] = '\0';
-      World::s_packages.push_back(Package(std::string(name), version));
+      Package* pkg = PackageLoader::LoadPackageByName(std::string(name));
+      if (pkg != nullptr) World::s_packages.push_back(pkg);
     }
 
     char end;
     manifest.read(&end, sizeof(char));
     if (end != '\0')
-      std::cout
-          << "Warning may have failed loading World Manifest, No trailing NULL "
-          << std::endl;
+      Logger::Warn("May Have Failed Loading World Manifest, No trailing NULL");
     manifest.close();
-  }
-
-  for (const Package& package : World::s_packages) {
-    std::string path = World::s_appAssetDir + package.getName();
-    if (dirExists(path.c_str())) {
-      package.setPath(path + "\\");
-    } else {
-      path = World::s_assetDir + package.getName();
-      if (dirExists(path.c_str())) {
-        package.setPath(path + "\\");
-      } else {
-        std::cout << "Failed to Find Package " << package.getName()
-                  << std::endl;
-        continue;
-      }
-    }
-
-    std::cout << "Found Package " << package.getName() << " at " << path
-              << std::endl;
   }
 
   BaseBlock::LoadBlockManifest();
   Shader* chunkShader = new Shader("./res/shaders/Chunk.shader");
+#ifdef DEBUG
   assert(chunkShader->isValid());
+#else
+  Logger::Error("Failed to Load Chunk Shader");
+  abort();
+#endif  // DEBUG
   Chunk::SetChunkMaterialShader(chunkShader);
   chunkShader->drop();
   chunkShader = nullptr;
 
   if (World::s_physXThread != nullptr)
-    std::cout << "Warning old PhysX thread not cleaned up" << std::endl;
+    Logger::Warn("Old PhysX Thread Not Cleaned Up");
 
   World::s_physXPause = false;
   World::s_physXActive = true;
@@ -121,9 +114,10 @@ void World::UnloadWorld() {
   }
 
   BaseBlock::UnloadBlocks();
+  for (Package* package : World::s_packages)
+    package->drop();
+
   World::s_packages.clear();
-  World::s_appAssetDir.clear();
-  World::s_assetDir.clear();
   World::s_worldDir.clear();
 }
 
@@ -133,10 +127,10 @@ void World::updateManifest() {
   manifest.write((const char*)&World::MANIFEST_VERSION, sizeof(uint16_t));
   uint16_t packageCount = World::s_packages.size();
   manifest.write((const char*)&packageCount, sizeof(packageCount));
-  for (const Package& package : World::s_packages) {
-    uint8_t length = package.getName().length();
+  for (const Package* package : World::s_packages) {
+    uint8_t length = package->GetName().length();
     manifest.write((const char*)&length, 1);
-    manifest.write(package.getName().c_str(), length);
+    manifest.write(package->GetName().c_str(), length);
   }
 
   // Write null to end for check when reading

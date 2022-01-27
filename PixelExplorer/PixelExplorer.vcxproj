@@ -482,7 +482,6 @@
     <ClInclude Include="src\chunk\FaceDirection.h" />
     <ClInclude Include="src\FileUtilities.h" />
     <ClInclude Include="src\Logger.h" />
-    <ClInclude Include="src\Package.h" />
     <ClInclude Include="src\package\Package.h" />
     <ClInclude Include="src\package\PackageLoader.h" />
     <ClInclude Include="src\package\modules\PackageModule.h" />

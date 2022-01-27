@@ -36,11 +36,28 @@ class Package : public virtual RefCounted {
 
   uint8_t GetLoadPriority() const { return _loadPriority; }
 
+  const std::string GetPath() const { return _path; }
+
+  const std::string GetName() const { return _name; }
+
+  bool GetLoaded() const { return _propertiesLoaded && _modulesLoaded; }
+
  protected:
   std::unordered_map<uint16_t, PackageModule*> _modules;
 
  private:
-  Package() {}
+  Package()
+      : _name(""),
+        _description(""),
+        _path(""),
+        _modulesLoaded(false),
+        _propertiesLoaded(false),
+        _loadPriority(0) {
+    memset(_packageVersion, 0, sizeof(uint8_t) * 3);
+    memset(_minAppVersion, 0, sizeof(uint8_t) * 3);
+    memset(_maxAppVersion, 0, sizeof(uint8_t) * 3);
+  }
+
   std::string _name;
   std::string _description;
   std::string _path;

@@ -4,7 +4,8 @@
 #include <thread>
 #include <vector>
 
-#include "Package.h"
+#include "package/Package.h"
+#include "package/PackageLoader.h"
 #include "chunk/ChunkManager.h"
 #include "rendering/Renderer.h"
 
@@ -21,18 +22,14 @@ class World {
 
   static bool GetPhysicsPaused() { return s_physXPause; }
 
-  static const std::string GetAppAssetDir() { return s_appAssetDir; }
-
-  static const std::string GetAssetDir() { return s_assetDir; }
-
   static const std::string GetWorldDir() { return s_worldDir; }
 
-  static const std::vector<Package> GetPackages() { return s_packages; }
+  static const std::vector<Package*> GetPackages() { return s_packages; }
 
   static const Package* GetPackage(std::string name) {
-    std::vector<Package>::iterator it;
+    std::vector<Package*>::iterator it;
     for (it = s_packages.begin(); it != s_packages.end(); ++it)
-      if ((*it).getName() == name) return &*it;
+      if ((*it)->GetName() == name) return *it;
     return nullptr;
   }
 
@@ -53,14 +50,11 @@ class World {
   World() {}
   ~World() {}
   static void updateManifest();
-  static bool dirExists(const char* path);
   static void physXUpdateLoop();
+  static std::string s_worldDir;
   static volatile bool s_physXActive;
   static volatile bool s_physXPause;
-  static std::string s_appAssetDir;
-  static std::string s_assetDir;
-  static std::string s_worldDir;
-  static std::vector<Package> s_packages;
+  static std::vector<Package*> s_packages;
   static ChunkManager* s_chunkManager;
   static Renderer* s_renderer;
   static std::thread* s_physXThread;
