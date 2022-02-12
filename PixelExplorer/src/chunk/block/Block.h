@@ -36,7 +36,7 @@ class Block : public virtual RefCounted {
       uint32_t id = block->getID();
       _empty = id == 0;
       if (!_empty) {
-          _baseBlock = BaseBlock::getBlock(id);
+          _baseBlock = BaseBlock::GetBlock(id);
           //_baseBlock->grab();
       }
       else {
@@ -61,7 +61,7 @@ class Block : public virtual RefCounted {
       uint32_t id = block->getID();
       _empty = id == 0;
       if (!_empty) {
-          _baseBlock = BaseBlock::getBlock(id);
+          _baseBlock = BaseBlock::GetBlock(id);
           //_baseBlock->grab();
       }
       else {

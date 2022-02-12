@@ -16,7 +16,4 @@ class PackageModuleId {
   PackageModuleId() {}
   ~PackageModuleId() {}
 };
-
-uint16_t PackageModuleId::s_counter = 0;
-
 #endif  // !SUBPACKAGEID_H

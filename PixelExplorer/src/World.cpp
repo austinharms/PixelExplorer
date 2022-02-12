@@ -24,20 +24,25 @@ void World::LoadWorld() {
 #ifdef DEBUG
   assert(World::s_renderer != nullptr);
 #else
-  Logger::Error("World Renderer Not Set");
-  abort();
+  if (World::s_renderer == nullptr) {
+    Logger::Error("World Renderer Not Set");
+    abort();
+  }
 #endif  // DEBUG
 
   World::s_chunkManager = new ChunkManager(World::s_renderer);
+  BaseBlock::StartBlockLoading();
   Package* defaultPackage = PackageLoader::LoadPackageByName("default");
 #ifdef DEBUG
   assert(defaultPackage != nullptr && defaultPackage->GetLoaded());
 #else
-  Logger::Error("Failed to Load Required default Package");
-  abort();
+  if (defaultPackage == nullptr || !defaultPackage->GetLoaded()) {
+    Logger::Error("Failed to Load Required \"default\" Package");
+    abort();
+  }
 #endif  // DEBUG
 
-  World::s_packages.push_back(defaultPackage);
+  World::s_packages.emplace_back(defaultPackage);
   std::string manifestPath = World::s_worldDir + "world.manifest";
   std::ifstream manifest(manifestPath.c_str(), std::ios::binary);
   if (!manifest || manifest.peek() == std::ifstream::traits_type::eof()) {
@@ -77,13 +82,15 @@ void World::LoadWorld() {
     manifest.close();
   }
 
-  BaseBlock::LoadBlockManifest();
+  BaseBlock::FinalizeBlockLoading();
   Shader* chunkShader = new Shader("./res/shaders/Chunk.shader");
 #ifdef DEBUG
   assert(chunkShader->isValid());
 #else
-  Logger::Error("Failed to Load Chunk Shader");
-  abort();
+  if (!chunkShader->isValid()) {
+    Logger::Error("Failed to Load Chunk Shader");
+    abort();
+  }
 #endif  // DEBUG
   Chunk::SetChunkMaterialShader(chunkShader);
   chunkShader->drop();
@@ -114,8 +121,7 @@ void World::UnloadWorld() {
   }
 
   BaseBlock::UnloadBlocks();
-  for (Package* package : World::s_packages)
-    package->drop();
+  for (Package* package : World::s_packages) package->drop();
 
   World::s_packages.clear();
   World::s_worldDir.clear();

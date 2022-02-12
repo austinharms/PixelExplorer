@@ -1,12 +1,14 @@
 #ifndef FILEUTILITIES_H
 #define FILEUTILITIES_H
+#include <cassert>
+#include <filesystem>
 #include <string>
 
 // Used for getting paths on windows
 #include <Shlobj.h>
 #include <windows.h>
 
-#include <cassert>
+#include "Logger.h"
 
 class FileUtilities {
  public:
@@ -41,7 +43,8 @@ class FileUtilities {
     GetModuleFileName(NULL, buffer, MAX_PATH);
     std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
     std::wstring wpath = std::wstring(buffer).substr(0, pos);
-    return std::string(wpath.begin(), wpath.end());
+    std::string fullPath = std::string(wpath.begin(), wpath.end()) + "\\";
+    return fullPath;
   };
 
   static std::string getResDir() {
@@ -56,14 +59,19 @@ class FileUtilities {
 
     std::wstring wpath = std::wstring(path);
     CoTaskMemFree(path);
-    return std::string(wpath.begin(), wpath.end());
+    std::string fullPath =
+        std::string(wpath.begin(), wpath.end()) + "\\PX\\0.0.0\\";
+    if (!DirectoryExists(fullPath)) {
+      if (!std::filesystem::create_directories(fullPath)) {
+        Logger::Warn("Failed to create Resource Directory");
+      }
+    }
+
+    return fullPath;
   };
 
   FileUtilities() {}
 
   ~FileUtilities() {}
 };
-
-std::string FileUtilities::_exeDir = FileUtilities::getExeDir();
-std::string FileUtilities::_resDir = FileUtilities::getResDir();
 #endif  // !FILEUTILITIES_H

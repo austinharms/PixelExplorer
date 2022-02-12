@@ -13,13 +13,20 @@
 #include "World.h"
 #include "rendering/TexturedMaterial.h"
 
-class BaseBlock {// : public virtual RefCounted {
+class BaseBlock {  // : public virtual RefCounted {
  public:
   const static uint16_t MANIFEST_VERSION = 1;
-  const static uint16_t PACKAGE_VERSION = 1;
   virtual ~BaseBlock();
-  static void LoadBlockManifest();
+  static void StartBlockLoading();
+  static void FinalizeBlockLoading();
+  static void RegisterBlocks(const std::string* blockNames, uint8_t blockCount);
+  static void LoadBlock(BaseBlock& block);
   static void UnloadBlocks();
+  static uint32_t GetBlockID(const std::string blockName);
+  static BaseBlock* GetBlock(uint32_t id) {
+    if (id >= s_blockCount) return &s_blocks[0];
+    return &s_blocks[id];
+  }
 
   const BlockFace* getBlockFace(FaceDirection dir) const {
     assert(dir != FaceDirection::NONE);
@@ -38,24 +45,23 @@ class BaseBlock {// : public virtual RefCounted {
 
   const std::string getName() const { return _name; }
 
-  static BaseBlock* getBlock(uint32_t id) {
-    if (id >= s_blockCount) return &s_blocks[0];
-    return &s_blocks[id];
-  }
-
  private:
-  BaseBlock();
-  static void UpdateManifest();
-  static bool LoadPackage(const Package& package, std::set<std::string>* loadedPackages = nullptr);
+  static void SaveManifest();
   static void CreateTextureAtlas();
 
   static BaseBlock* s_blocks;
   static uint32_t s_blockCount;
   static std::unordered_map<std::string, uint32_t> s_blockLookupTable;
+  static bool s_loadingBlocks;
+
+  BaseBlock(const BaseBlock& block);
+  BaseBlock();
+  BaseBlock& operator=(const BaseBlock& block);
+
   uint32_t _id;
   bool _solid;
-  bool _loaded;
-  BlockFace _faces[6];
+  bool _loaded = 0;
+  BlockFace _faces[(uint32_t)FaceDirection::FACECOUNT];
   std::string _name;
 };
 #endif
