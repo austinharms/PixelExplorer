@@ -3,12 +3,11 @@
 #include <string>
 
 int main() {
-  std::cout << "Creating Package, Enter Package Name:" << std::endl;
-  std::string name;
-  std::cin >> name;
-
-  std::ofstream package((std::string("./") + name + ".pxb").c_str(),
-                        std::ios::binary);
+  //std::cout << "Creating Package, Enter Package Name:" << std::endl;
+  //std::string name;
+  //std::cin >> name;
+  char end = 0;
+  std::ofstream package("./blocks.module", std::ios::binary);
 
   uint16_t version = 1;
   package.write((const char*)&version, sizeof(uint16_t));
@@ -22,32 +21,25 @@ int main() {
     std::string name;
     std::cout << "Enter Name:" << std::endl;
     std::cin >> name;
-    uint8_t nameLength = name.length();
-    package.write((const char*)&nameLength, sizeof(uint8_t));
-    package.write(name.c_str(), nameLength);
+    package.write(name.c_str(), name.length() * sizeof(char));
+    package.write(&end, sizeof(char));
+  }
+
+  for (uint16_t block = 0; block < blockCount; ++block) {
     uint8_t solid = 1;
     package.write((const char*)&solid, sizeof(uint8_t));
-    uint8_t faceCount = 6;
-    package.write((const char*)&faceCount, sizeof(uint8_t));
 
     // Front Face
     {
       float vertices[12] = {
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
+          -0.5f, -0.5f, 0.5f, 0.5f,  -0.5f, 0.5f,
+          0.5f,  0.5f,  0.5f, -0.5f, 0.5f,  0.5f,
 
       };
 
-      float uvs[12] = {
-        0,0,
-        1,0,
-        1,1,
-        0,1
-      };
+      float uvs[12] = {0, 0, 1, 0, 1, 1, 0, 1};
 
-      uint8_t indices[6] = { 0, 1, 2, 0, 2, 3 };
+      uint8_t indices[6] = {0, 1, 2, 0, 2, 3};
 
       uint8_t face = 0;
       package.write((const char*)&face, sizeof(uint8_t));
@@ -57,23 +49,11 @@ int main() {
       package.write((const char*)&faceTransparent, sizeof(uint8_t));
       uint8_t vertexCount = 4;
       package.write((const char*)&vertexCount, sizeof(uint8_t));
-      for (uint8_t vertex = 0; vertex < vertexCount; ++vertex) {
-        for (uint8_t i = 0; i < 3; ++i) {
-          float vert = vertices[vertex * 3 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-
-        for (uint8_t i = 0; i < 2; ++i) {
-          float vert = uvs[vertex * 2 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-      }
+      package.write((const char*)&vertices, sizeof(float) * vertexCount * 3);
+      package.write((const char*)&uvs, sizeof(float) * vertexCount * 2);
       uint8_t indexCount = 6;
       package.write((const char*)&indexCount, sizeof(uint8_t));
-      for (uint8_t index = 0; index < indexCount; ++index) {
-        uint8_t ind = indices[index];
-        package.write((const char*)&ind, sizeof(uint8_t));
-      }
+      package.write((const char*)&indices, sizeof(uint8_t) * indexCount);
     }
 
     // Back Face
@@ -84,14 +64,9 @@ int main() {
 
       };
 
-      float uvs[12] = {
-          1, 0,
-          0, 0,
-          0, 1,
-          1, 1
-      };
+      float uvs[12] = {1, 0, 0, 0, 0, 1, 1, 1};
 
-      uint8_t indices[6] = { 0, 3, 1, 1, 3, 2 };
+      uint8_t indices[6] = {0, 3, 1, 1, 3, 2};
 
       uint8_t face = 1;
       package.write((const char*)&face, sizeof(uint8_t));
@@ -101,43 +76,22 @@ int main() {
       package.write((const char*)&faceTransparent, sizeof(uint8_t));
       uint8_t vertexCount = 4;
       package.write((const char*)&vertexCount, sizeof(uint8_t));
-      for (uint8_t vertex = 0; vertex < vertexCount; ++vertex) {
-        for (uint8_t i = 0; i < 3; ++i) {
-          float vert = vertices[vertex * 3 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-
-        for (uint8_t i = 0; i < 2; ++i) {
-          float vert = uvs[vertex * 2 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-      }
+      package.write((const char*)&vertices, sizeof(float) * vertexCount * 3);
+      package.write((const char*)&uvs, sizeof(float) * vertexCount * 2);
       uint8_t indexCount = 6;
       package.write((const char*)&indexCount, sizeof(uint8_t));
-      for (uint8_t index = 0; index < indexCount; ++index) {
-        uint8_t ind = indices[index];
-        package.write((const char*)&ind, sizeof(uint8_t));
-      }
+      package.write((const char*)&indices, sizeof(uint8_t) * indexCount);
     }
-
 
     // Left Face
     {
       float vertices[12] = {
-        -0.5, -0.5, -0.5,
-        -0.5, -0.5,  0.5,
-        -0.5,  0.5,  0.5,
-        -0.5,  0.5, -0.5,
+          -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5,
       };
 
-      float uvs[12] = {
-        0,0,
-        1,0,
-        1,1,
-        0,1
-      };
+      float uvs[12] = {0, 0, 1, 0, 1, 1, 0, 1};
 
-      uint8_t indices[6] = { 0, 1, 2, 0, 2, 3 };
+      uint8_t indices[6] = {0, 1, 2, 0, 2, 3};
 
       uint8_t face = 2;
       package.write((const char*)&face, sizeof(uint8_t));
@@ -147,42 +101,22 @@ int main() {
       package.write((const char*)&faceTransparent, sizeof(uint8_t));
       uint8_t vertexCount = 4;
       package.write((const char*)&vertexCount, sizeof(uint8_t));
-      for (uint8_t vertex = 0; vertex < vertexCount; ++vertex) {
-        for (uint8_t i = 0; i < 3; ++i) {
-          float vert = vertices[vertex * 3 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-
-        for (uint8_t i = 0; i < 2; ++i) {
-          float vert = uvs[vertex * 2 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-      }
+      package.write((const char*)&vertices, sizeof(float) * vertexCount * 3);
+      package.write((const char*)&uvs, sizeof(float) * vertexCount * 2);
       uint8_t indexCount = 6;
       package.write((const char*)&indexCount, sizeof(uint8_t));
-      for (uint8_t index = 0; index < indexCount; ++index) {
-        uint8_t ind = indices[index];
-        package.write((const char*)&ind, sizeof(uint8_t));
-      }
+      package.write((const char*)&indices, sizeof(uint8_t) * indexCount);
     }
 
     // Right Face
     {
       float vertices[12] = {
-         0.5, -0.5, -0.5,
-         0.5, -0.5,  0.5,
-         0.5,  0.5,  0.5,
-         0.5,  0.5, -0.5,
+          0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5,
       };
 
-      float uvs[12] = {
-        1,0,
-        0,0,
-        0,1,
-        1,1
-      };
+      float uvs[12] = {1, 0, 0, 0, 0, 1, 1, 1};
 
-      uint8_t indices[6] = { 0, 3, 1, 1, 3, 2 };
+      uint8_t indices[6] = {0, 3, 1, 1, 3, 2};
 
       uint8_t face = 3;
       package.write((const char*)&face, sizeof(uint8_t));
@@ -192,40 +126,20 @@ int main() {
       package.write((const char*)&faceTransparent, sizeof(uint8_t));
       uint8_t vertexCount = 4;
       package.write((const char*)&vertexCount, sizeof(uint8_t));
-      for (uint8_t vertex = 0; vertex < vertexCount; ++vertex) {
-        for (uint8_t i = 0; i < 3; ++i) {
-          float vert = vertices[vertex * 3 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-
-        for (uint8_t i = 0; i < 2; ++i) {
-          float vert = uvs[vertex * 2 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-      }
+      package.write((const char*)&vertices, sizeof(float) * vertexCount * 3);
+      package.write((const char*)&uvs, sizeof(float) * vertexCount * 2);
       uint8_t indexCount = 6;
       package.write((const char*)&indexCount, sizeof(uint8_t));
-      for (uint8_t index = 0; index < indexCount; ++index) {
-        uint8_t ind = indices[index];
-        package.write((const char*)&ind, sizeof(uint8_t));
-      }
+      package.write((const char*)&indices, sizeof(uint8_t) * indexCount);
     }
 
     // Top Face
     {
       float vertices[12] = {
-        -0.5,  0.5, -0.5,
-         0.5,  0.5, -0.5,
-         0.5,  0.5,  0.5,
-        -0.5,  0.5,  0.5,
+          -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5,
       };
 
-      float uvs[12] = {
-        0,1,
-        1,1,
-        1,0,
-        0,0
-      };
+      float uvs[12] = {0, 1, 1, 1, 1, 0, 0, 0};
 
       uint8_t indices[6] = {0, 3, 1, 1, 3, 2};
 
@@ -237,40 +151,20 @@ int main() {
       package.write((const char*)&faceTransparent, sizeof(uint8_t));
       uint8_t vertexCount = 4;
       package.write((const char*)&vertexCount, sizeof(uint8_t));
-      for (uint8_t vertex = 0; vertex < vertexCount; ++vertex) {
-        for (uint8_t i = 0; i < 3; ++i) {
-          float vert = vertices[vertex * 3 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-
-        for (uint8_t i = 0; i < 2; ++i) {
-          float vert = uvs[vertex * 2 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-      }
+      package.write((const char*)&vertices, sizeof(float) * vertexCount * 3);
+      package.write((const char*)&uvs, sizeof(float) * vertexCount * 2);
       uint8_t indexCount = 6;
       package.write((const char*)&indexCount, sizeof(uint8_t));
-      for (uint8_t index = 0; index < indexCount; ++index) {
-        uint8_t ind = indices[index];
-        package.write((const char*)&ind, sizeof(uint8_t));
-      }
+      package.write((const char*)&indices, sizeof(uint8_t) * indexCount);
     }
 
     // Bottom Face
     {
       float vertices[12] = {
-        -0.5, -0.5, -0.5,
-         0.5, -0.5, -0.5,
-         0.5, -0.5,  0.5,
-        -0.5, -0.5,  0.5,
+          -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5,
       };
 
-      float uvs[12] = {
-        0,0,
-        1,0,
-        1,1,
-        0,1
-      };
+      float uvs[12] = {0, 0, 1, 0, 1, 1, 0, 1};
 
       uint8_t indices[6] = {0, 1, 2, 0, 2, 3};
 
@@ -282,28 +176,15 @@ int main() {
       package.write((const char*)&faceTransparent, sizeof(uint8_t));
       uint8_t vertexCount = 4;
       package.write((const char*)&vertexCount, sizeof(uint8_t));
-      for (uint8_t vertex = 0; vertex < vertexCount; ++vertex) {
-        for (uint8_t i = 0; i < 3; ++i) {
-          float vert = vertices[vertex * 3 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-
-        for (uint8_t i = 0; i < 2; ++i) {
-          float vert = uvs[vertex * 2 + i];
-          package.write((const char*)&vert, sizeof(float));
-        }
-      }
+      package.write((const char*)&vertices, sizeof(float) * vertexCount * 3);
+      package.write((const char*)&uvs, sizeof(float) * vertexCount * 2);
       uint8_t indexCount = 6;
       package.write((const char*)&indexCount, sizeof(uint8_t));
-      for (uint8_t index = 0; index < indexCount; ++index) {
-        uint8_t ind = indices[index];
-        package.write((const char*)&ind, sizeof(uint8_t));
-      }
+      package.write((const char*)&indices, sizeof(uint8_t) * indexCount);
     }
   }
 
-  char end = '\0';
-  package.write(&end, 1);
+  package.write(&end, sizeof(char));
   package.close();
-  std::cout << "Created Package" << std::endl;
+  std::cout << "Created Block Module" << std::endl;
 }

@@ -56,9 +56,9 @@ struct BlockFace {
     return *this;
   }
 
-  uint8_t* indices = nullptr;
-  float* vertices = nullptr;
-  float* uvs = nullptr;
+  uint8_t* indices;
+  float* vertices;
+  float* uvs;
   FaceDirection direction;
   uint8_t vertexCount;
   uint8_t indexCount;

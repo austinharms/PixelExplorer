@@ -40,7 +40,50 @@ class BlockLoader : public PackageModuleLoader {
           for (uint16_t i = 0; i < blockCount; ++i) {
             BaseBlock b;
             b._name = blockNames[i];
-            b._
+            uint8_t solid;
+            blockFile.read((char*)&solid, sizeof(uint8_t));
+            b._solid = solid != 0;
+            for (uint8_t j = 0; j < (uint8_t)FaceDirection::FACECOUNT; ++j) {
+              uint8_t faceDir;
+              blockFile.read((char*)&faceDir, sizeof(uint8_t));
+              uint8_t full;
+              blockFile.read((char*)&full, sizeof(uint8_t));
+              b._faces[faceDir].full = full != 0;
+              uint8_t transparent;
+              blockFile.read((char*)&transparent, sizeof(uint8_t));
+              b._faces[faceDir].transparent = transparent != 0;
+              uint8_t vertexCount;
+              blockFile.read((char*)&vertexCount, sizeof(uint8_t));
+              b._faces[faceDir].vertexCount = vertexCount;
+              b._faces[faceDir].vertices = new float[vertexCount * 3];
+              blockFile.read((char*)(b._faces[faceDir].vertices),
+                             sizeof(float) * vertexCount * 3);
+              b._faces[faceDir].uvs = new float[vertexCount * 2];
+              blockFile.read((char*)(b._faces[faceDir].uvs),
+                             sizeof(float) * vertexCount * 2);
+              uint8_t indexCount;
+              blockFile.read((char*)&indexCount, sizeof(uint8_t));
+              b._faces[faceDir].indexCount = indexCount;
+              b._faces[faceDir].indices = new uint8_t[indexCount];
+              blockFile.read((char*)(b._faces[faceDir].indices),
+                             sizeof(uint8_t) * indexCount);
+            }
+
+            b._name = blockNames[i];
+            BaseBlock::LoadBlock(b);
+          }
+
+          delete[] blockNames;
+          char end;
+          blockFile.read(&end, sizeof(char));
+          if (end != 0) {
+            Logger::Warn("May have failed loading block module from: \"" +
+                         packagePath +
+                         "/blocks.module\", File did not end with NULL");
+          } else {
+            Logger::Info("Loaded block module: \"" + packagePath +
+                         "/blocks.module\", Loaded " +
+                         std::to_string(blockCount) + " blocks");
           }
 
           blockFile.close();
