@@ -485,6 +485,7 @@
     <ClInclude Include="src\FileUtilities.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\package\modules\BlockModuleLoader.h" />
+    <ClInclude Include="src\package\modules\DummyModule.h" />
     <ClInclude Include="src\package\Package.h" />
     <ClInclude Include="src\package\PackageLoader.h" />
     <ClInclude Include="src\package\modules\PackageModule.h" />

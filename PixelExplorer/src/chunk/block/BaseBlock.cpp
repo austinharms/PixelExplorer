@@ -181,7 +181,37 @@ void BaseBlock::RegisterBlocks(const std::string* blockNames,
     return;
   }
 
+  uint32_t startingBlockCount = s_blockCount;
+
   for (uint8_t i = 0; i < blockCount; ++i) {
+    auto it = s_blockLookupTable.find(blockNames[i]);
+    if (it == s_blockLookupTable.end()) {
+      s_blockLookupTable.insert({blockNames[i], s_blockCount++});
+      Logger::Debug("Registered Block \"" + blockNames[i] + "\" with ID: " + std::to_string(s_blockCount - 1));
+    }
+  }
+
+  if (s_blockCount != startingBlockCount) {
+    BaseBlock* oldBlocks = s_blocks;
+    s_blocks = new BaseBlock[s_blockCount];
+    memcpy(s_blocks, oldBlocks, sizeof(BaseBlock) * startingBlockCount);
+    delete[] oldBlocks;
+    for (uint32_t i = 0; i < s_blockCount - startingBlockCount; ++i) {
+      for (auto it = s_blockLookupTable.begin(); it != s_blockLookupTable.end();
+           ++it) {
+        if ((*it).second == i + startingBlockCount) {
+          break;
+          s_blocks[i + startingBlockCount]._name = blockNames[i];
+        }
+      }
+
+      s_blocks[i + startingBlockCount]._id = i + startingBlockCount;
+      s_blocks[i + startingBlockCount]._loaded = false;
+    }
+
+    Logger::Debug("Resized Block Array, Expanded by " +
+                  std::to_string(s_blockCount - startingBlockCount) +
+                  " New Size: " + std::to_string(s_blockCount));
   }
 }
 
@@ -191,11 +221,20 @@ void BaseBlock::LoadBlock(BaseBlock& block) {
     return;
   }
 
-  if (block._loaded)
-    Logger::Warn("Block " + std::to_string(block._id) + "(" + block._name +
+  auto it = s_blockLookupTable.find(block._name);
+  if (it == s_blockLookupTable.end()) {
+    Logger::Error("Failed to load block \"" + block._name +
+                  "\" failed to find block id");
+    return;  
+  }
+
+  uint32_t id = (*it).second;
+  if (s_blocks[id]._loaded)
+    Logger::Warn("Block " + std::to_string(id) + "(" + block._name +
                  ") already loaded, Overwriting existing block");
-  s_blocks[block._id] = block;
-  s_blocks[block._id]._loaded = true;
+  s_blocks[id] = block;
+  s_blocks[id]._id = id;
+  s_blocks[id]._loaded = true;
 }
 
 void BaseBlock::SaveManifest() {

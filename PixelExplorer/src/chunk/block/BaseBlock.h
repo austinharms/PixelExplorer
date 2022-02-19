@@ -14,6 +14,7 @@
 #include "rendering/TexturedMaterial.h"
 
 class BaseBlock {  // : public virtual RefCounted {
+  friend class BlockLoader;
  public:
   const static uint16_t MANIFEST_VERSION = 1;
   virtual ~BaseBlock();

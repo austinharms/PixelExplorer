@@ -7,6 +7,7 @@
 #include "FileUtilities.h"
 #include "Logger.h"
 #include "chunk/block/BaseBlock.h"
+#include "package/modules/BlockModuleLoader.h"
 
 std::string World::s_worldDir = "";
 std::vector<Package*> World::s_packages;
@@ -31,6 +32,10 @@ void World::LoadWorld() {
 #endif  // DEBUG
 
   World::s_chunkManager = new ChunkManager(World::s_renderer);
+
+  // Load Internal Module Loaders
+  BlockLoader::Register();
+
   BaseBlock::StartBlockLoading();
   Package* defaultPackage = PackageLoader::LoadPackageByName("default");
 #ifdef DEBUG
@@ -124,6 +129,7 @@ void World::UnloadWorld() {
   for (Package* package : World::s_packages) package->drop();
 
   World::s_packages.clear();
+  PackageLoader::UnregisterModuleLoaders();
   World::s_worldDir.clear();
 }
 
