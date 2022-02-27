@@ -134,7 +134,7 @@ void World::UnloadWorld() {
 }
 
 void World::updateManifest() {
-  std::string manifestPath = World::s_worldDir + "world_manifest";
+  std::string manifestPath = World::s_worldDir + "world.manifest";
   std::ofstream manifest(manifestPath.c_str(), std::ios::binary);
   manifest.write((const char*)&World::MANIFEST_VERSION, sizeof(uint16_t));
   uint16_t packageCount = World::s_packages.size();
