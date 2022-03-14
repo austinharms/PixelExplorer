@@ -314,12 +314,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\chunk\block\BaseBlock.cpp" />
+    <ClCompile Include="src\chunk\block-old\BaseBlock.cpp" />
+    <ClCompile Include="src\chunk\block\Block.cpp" />
+    <ClCompile Include="src\chunk\block\BlockDefinition.cpp" />
+    <ClCompile Include="src\chunk\block\BlockShape.cpp" />
     <ClCompile Include="SRC\CHUNK\Chunk.cpp" />
     <ClCompile Include="src\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\FileUtilities.cpp" />
-    <ClCompile Include="src\package\modules\PackageModuleId.cpp" />
-    <ClCompile Include="src\package\PackageLoader.cpp" />
     <ClCompile Include="src\physics\PhysicsManager.cpp" />
     <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\Renderable.cpp" />
@@ -472,11 +473,13 @@
     <None Include="src\vendor\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\chunk\block-old\Block.h" />
+    <ClInclude Include="src\chunk\block-old\BlockData.h" />
+    <ClInclude Include="src\chunk\block-old\ChunkBlock.h" />
+    <ClInclude Include="src\chunk\block-old\BlockFace.h" />
+    <ClInclude Include="src\chunk\block-old\BaseBlock.h" />
     <ClInclude Include="src\chunk\block\Block.h" />
-    <ClInclude Include="src\chunk\block\BlockData.h" />
-    <ClInclude Include="src\chunk\block\ChunkBlock.h" />
-    <ClInclude Include="src\chunk\block\BlockFace.h" />
-    <ClInclude Include="src\chunk\block\BaseBlock.h" />
+    <ClInclude Include="src\chunk\block\BlockShape.h" />
     <ClInclude Include="src\chunk\Chunk.fwd.h" />
     <ClInclude Include="src\chunk\Chunk.h" />
     <ClInclude Include="src\chunk\ChunkManager.fwd.h" />
@@ -484,13 +487,6 @@
     <ClInclude Include="src\chunk\FaceDirection.h" />
     <ClInclude Include="src\FileUtilities.h" />
     <ClInclude Include="src\Logger.h" />
-    <ClInclude Include="src\package\modules\BlockModuleLoader.h" />
-    <ClInclude Include="src\package\modules\DummyModule.h" />
-    <ClInclude Include="src\package\Package.h" />
-    <ClInclude Include="src\package\PackageLoader.h" />
-    <ClInclude Include="src\package\modules\PackageModule.h" />
-    <ClInclude Include="src\package\modules\PackageModuleId.h" />
-    <ClInclude Include="src\package\modules\PackageModuleLoader.h" />
     <ClInclude Include="src\physics\PhysicsManager.h" />
     <ClInclude Include="src\RefCounted.h" />
     <ClInclude Include="src\rendering\Material.h" />

@@ -45,7 +45,7 @@
     <ClCompile Include="src\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\block\BaseBlock.cpp">
+    <ClCompile Include="src\chunk\block-old\BaseBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\chunk\ChunkManager.cpp">
@@ -57,13 +57,16 @@
     <ClCompile Include="src\physics\PhysicsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\package\PackageLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\package\modules\PackageModuleId.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileUtilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chunk\block\Block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chunk\block\BlockDefinition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chunk\block\BlockShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1353,22 +1356,22 @@
     <ClInclude Include="src\chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\ChunkBlock.h">
+    <ClInclude Include="src\chunk\block-old\ChunkBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\BaseBlock.h">
+    <ClInclude Include="src\chunk\block-old\BaseBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\BlockFace.h">
+    <ClInclude Include="src\chunk\block-old\BlockFace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\Block.h">
+    <ClInclude Include="src\chunk\block-old\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\FaceDirection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\BlockData.h">
+    <ClInclude Include="src\chunk\block-old\BlockData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\World.h">
@@ -1389,31 +1392,16 @@
     <ClInclude Include="src\physics\PhysicsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\package\modules\PackageModuleId.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\package\Package.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\package\modules\PackageModuleLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\package\modules\PackageModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\package\PackageLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\FileUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\package\modules\BlockModuleLoader.h">
+    <ClInclude Include="src\chunk\block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\package\modules\DummyModule.h">
+    <ClInclude Include="src\chunk\block\BlockShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
