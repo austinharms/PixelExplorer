@@ -315,7 +315,6 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\chunk\block-old\BaseBlock.cpp" />
-    <ClCompile Include="src\chunk\block\Block.cpp" />
     <ClCompile Include="src\chunk\block\BlockDefinition.cpp" />
     <ClCompile Include="src\chunk\block\BlockShape.cpp" />
     <ClCompile Include="SRC\CHUNK\Chunk.cpp" />
@@ -479,6 +478,7 @@
     <ClInclude Include="src\chunk\block-old\BlockFace.h" />
     <ClInclude Include="src\chunk\block-old\BaseBlock.h" />
     <ClInclude Include="src\chunk\block\Block.h" />
+    <ClInclude Include="src\chunk\block\BlockDefinition.h" />
     <ClInclude Include="src\chunk\block\BlockShape.h" />
     <ClInclude Include="src\chunk\Chunk.fwd.h" />
     <ClInclude Include="src\chunk\Chunk.h" />
@@ -782,8 +782,8 @@
     <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\textures\default.png" />
-    <Image Include="res\textures\textures.png" />
+    <Image Include="assets\textures\default.png" />
+    <Image Include="assets\textures\textures.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
