@@ -11,20 +11,16 @@
 #include "Renderable.h"
 #include "glm/mat4x4.hpp"
 
-class Renderer : public virtual RefCounted {
+class Renderer : public RefCounted {
 public:
 	Renderer(int32_t width, int32_t height, const char* title, float FOV, uint32_t FPSLimit = 0);
 	virtual ~Renderer();
 	void addRenderable(Renderable* renderable);
-	void removeRenderable(uint32_t id);
 	void drawFrame();
 	bool getKeyPressed(int32_t key);
 	void setFPSLimit(int32_t limit);
 	void setCursorHidden(bool hidden);
-
-	void removeRenderable(Renderable* renderable) {
-		removeRenderable(renderable->getId());
-	}
+	void RemoveRenderable(Renderable* renderable);
 
 	int getFPSLimit() const { return _FPSLimit; }
 
