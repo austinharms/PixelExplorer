@@ -170,6 +170,7 @@ BlockShape* BlockShape::CreateDefaultShape() {
     block->RenderVertices[0][(i * 5) + 4] = uvs[(i * 2) + 1];
   }
 
+  Logger::Debug("Created DEFAULT Block Shape");
   return block;
 }
 
@@ -191,17 +192,21 @@ inline bool BlockShape::GetShapesLoaded() { return s_shapesLoaded; }
 
 void BlockShape::LoadShapes() {
   if (s_shapesLoaded) return;
+  Logger::Info("Loading Block Shapes");
   s_defaultShape = CreateDefaultShape();
   s_shapesLoaded = true;
+  Logger::Info("Done Loading Block Shapes");
 }
 
 void BlockShape::UnloadShapes() {
   if (!s_shapesLoaded) return;
+  Logger::Info("Unloading Block Shapes");
   s_shapesLoaded = false;
   s_defaultShape->drop();
   s_defaultShape = nullptr;
   for (auto shape : s_blockShapes) shape.second->drop();
   s_blockShapes.clear();
+  Logger::Info("Done Unloading Block Shapes");
 }
 
 inline BlockShape* BlockShape::GetDefaultShape() { return s_defaultShape; }

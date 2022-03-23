@@ -1,4 +1,5 @@
 #include "BlockDefinition.h"
+#include "Logger.h"
 
 std::unordered_map<uint16_t, BlockDefinition*>
     BlockDefinition::s_blockDefinitions;
@@ -12,23 +13,28 @@ BlockDefinition* BlockDefinition::CreateDefaultDefinition() {
   blockDef->_id = 0;
   blockDef->_shape = BlockShape::GetDefaultShape();
   memset(blockDef->_UVOffset, 0, sizeof(blockDef->_UVOffset));
+  Logger::Debug("Created DEFAULT Block Definition");
   return blockDef;
 }
 
 void BlockDefinition::LoadDefinitions() {
   if (s_definitionsLoaded) return;
   BlockShape::LoadShapes();
+  Logger::Info("Loading Block Definitions");
   s_defaultDefinition = CreateDefaultDefinition();
   s_definitionsLoaded = true;
+  Logger::Info("Done Loading Block Definitions");
 }
 
 void BlockDefinition::UnloadDefinitions() {
   if (!s_definitionsLoaded) return;
+  Logger::Info("Unloading Block Definitions");
   s_definitionsLoaded = false;
   s_defaultDefinition->drop();
   s_defaultDefinition = nullptr;
   for (auto def : s_blockDefinitions) def.second->drop();
   s_blockDefinitions.clear();
+  Logger::Info("Done Unloading Block Definitions");
   BlockShape::UnloadShapes();
 }
 
