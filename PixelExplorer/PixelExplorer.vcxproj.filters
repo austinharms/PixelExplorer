@@ -75,6 +75,9 @@
     <ClCompile Include="src\chunk\block\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\chunk\ChunkRenderMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Chunk.shader" />
@@ -1417,6 +1420,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Direction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chunk\ChunkRenderMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

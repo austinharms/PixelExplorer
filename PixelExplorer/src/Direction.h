@@ -13,6 +13,7 @@ struct Direction {
   static const Direction TOP;
   static const Direction BOTTOM;
   static const Direction ALL;
+  static const uint8_t DIRECTION_COUNT = 6;
 
   operator uint8_t() const;
   bool operator==(const Direction& d) const;
