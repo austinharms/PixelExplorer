@@ -10,6 +10,7 @@
 #include "PxRigidStatic.h"
 #include "RefCounted.h"
 #include "ChunkRenderMesh.h"
+#include "block/Block.h"
 
 class Chunk : public RefCounted {
  public:
@@ -38,12 +39,12 @@ class Chunk : public RefCounted {
   ChunkRenderMesh* GetRenderMesh() const;
 
  private:
-  physx::PxRigidStatic* _physxActor;
   ChunkManager* _mgr;
   Chunk* _adjacentChunks[Direction::DIRECTION_COUNT];
+  physx::PxRigidStatic* _physxActor;
   ChunkRenderMesh* _renderMesh;
+  std::mutex _blockMutex;
   Block _blocks[BLOCK_COUNT];
   glm::vec<3, int32_t> _position;
-  std::mutex _blockMutex;
 };
 #endif  // !CHUNK_H
