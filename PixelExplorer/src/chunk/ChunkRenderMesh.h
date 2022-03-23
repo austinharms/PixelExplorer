@@ -27,6 +27,7 @@ class ChunkRenderMesh : public Renderable {
   void SetDropFlag();
   void UpdateBuffers(DataBuffer<float>* verts, DataBuffer<uint32_t>* indices);
   bool GetError() const;
+  void SetActive(bool active);
 
  private:
   static Material* s_material;

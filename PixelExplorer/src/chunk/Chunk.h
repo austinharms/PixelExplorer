@@ -46,5 +46,6 @@ class Chunk : public RefCounted {
   std::mutex _blockMutex;
   Block _blocks[BLOCK_COUNT];
   glm::vec<3, int32_t> _position;
+  Status _status;
 };
 #endif  // !CHUNK_H

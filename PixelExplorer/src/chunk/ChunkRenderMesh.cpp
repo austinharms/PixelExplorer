@@ -126,6 +126,8 @@ inline void ChunkRenderMesh::UpdateBuffers(DataBuffer<float>* verts,
 
 inline bool ChunkRenderMesh::GetError() const { return _error; }
 
+inline void ChunkRenderMesh::SetActive(bool active) { _active = active; }
+
 void ChunkRenderMesh::UpdateBuffers() {
   if (!_dirty || _error) return;
   _bufferMutex.lock();

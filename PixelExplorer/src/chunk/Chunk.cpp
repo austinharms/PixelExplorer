@@ -1,10 +1,31 @@
 #include "Chunk.h"
 
+#include "ChunkManager.h"
+#include "Logger.h"
+
 Chunk::Chunk(ChunkRenderMesh* renderMesh) {
-  
+  if (renderMesh == nullptr)
+    Logger::Fatal("Failed to Create Chunk, renderMesh was nullptr");
+  _mgr = nullptr;
+  memset(_adjacentChunks, 0, sizeof(_adjacentChunks));
+  _physxActor = nullptr;
+  renderMesh->grab();
+  _renderMesh = renderMesh;
+  memset(_blocks, 0, sizeof(_blocks));
+  SetPosition(glm::vec3(0));
+  _renderMesh->SetActive(true);
+  _status = Chunk::Status::CREATED;
 }
 
-Chunk::~Chunk() {}
+Chunk::~Chunk() {
+  _status = Chunk::Status::UNLOADED;
+  if (_mgr != nullptr) _mgr->drop();
+  // TODO drop _adjacentChunks
+  // TODO drop _physxActor
+  _renderMesh->SetActive(false);
+  if (_renderMesh->getRefCount() == 2) _renderMesh->SetDropFlag();
+  _renderMesh->drop();
+}
 
 void Chunk::UpdateMesh() {}
 
@@ -12,15 +33,22 @@ void Chunk::UpdateAdjacents() {}
 
 void Chunk::Unload() {}
 
-void Chunk::SetPosition(glm::vec3 position) {}
+inline void Chunk::SetPosition(glm::vec3 position) {
+  _position = position;
+  _renderMesh->SetPosition(_position * CHUNK_SIZE);
+}
 
-glm::vec3 Chunk::GetPosition() const { return glm::vec3(); }
+inline glm::vec3 Chunk::GetPosition() const { return _position; }
 
-const Chunk::Status Chunk::GetStatus() const { return Status(); }
+inline const Chunk::Status Chunk::GetStatus() const { return _status; }
 
-void Chunk::SetManager(ChunkManager* mgr) {}
+inline void Chunk::SetManager(ChunkManager* mgr) {
+  if (_mgr != nullptr) _mgr->drop();
+  _mgr = mgr;
+  if (_mgr != nullptr) _mgr->grab();
+}
 
-ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
+inline ChunkRenderMesh* Chunk::GetRenderMesh() const { return _renderMesh; }
 
 #pragma region OldChunkCode
 //#include "Chunk.h"
@@ -30,10 +58,10 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //#include "chunk/block/Block.h"
 //#include "physics/PhysicsManager.h"
 //
-//void* Chunk::s_emptyBuffer = malloc(1);
-//TexturedMaterial* Chunk::s_chunkMaterial = nullptr;
+// void* Chunk::s_emptyBuffer = malloc(1);
+// TexturedMaterial* Chunk::s_chunkMaterial = nullptr;
 //
-//Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
+// Chunk::Chunk() : Renderable(Chunk::GetChunkMaterial()) {
 //  setPosition(glm::vec3(0));
 //  _status = Status::CREATED;
 //  _visible = true;
@@ -68,7 +96,7 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  _blocks[0] = 0;
 //}
 //
-//Chunk::~Chunk() {
+// Chunk::~Chunk() {
 //  if (_physxActor != nullptr) {
 //    _mgr->getScene()->removeActor(*_physxActor, false);
 //    _physxActor = nullptr;
@@ -88,7 +116,7 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  }
 //}
 //
-//bool Chunk::onPreRender(float deltaTime, glm::vec3& cameraPos,
+// bool Chunk::onPreRender(float deltaTime, glm::vec3& cameraPos,
 //                        glm::vec3& cameraRotation) {
 //  if (_status < Status::LOADED) return false;
 //  if (_buffersDirty) updateBuffers();
@@ -96,7 +124,7 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  return _visible;
 //}
 //
-//void Chunk::onRender() {
+// void Chunk::onRender() {
 //  glBindVertexArray(_vertexArrayId);
 //  for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
 //    if (!(_visibleFaces & FaceDirectionFlag::DirectionToFlag(i)) ||
@@ -109,7 +137,7 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  }
 //}
 //
-//void Chunk::updateMesh() {
+// void Chunk::updateMesh() {
 //  if (!_chunkModified) return;
 //  std::lock_guard<std::mutex> lock(_meshBuffersLock);
 //  _chunkModified = false;
@@ -127,7 +155,8 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //    _indexBuffer = nullptr;
 //  }
 //
-//  memset(_indexCount, 0, sizeof(uint32_t) * (int32_t)FaceDirection::FACECOUNT);
+//  memset(_indexCount, 0, sizeof(uint32_t) *
+//  (int32_t)FaceDirection::FACECOUNT);
 //
 //  float x = 0;
 //  float y = 0;
@@ -153,7 +182,8 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //            _adjacentChunks[(uint8_t)FaceDirection::FRONT]);
 //      }
 //
-//      if (z == 0 && _adjacentChunks[(uint8_t)FaceDirection::FRONT] == nullptr ||
+//      if (z == 0 && _adjacentChunks[(uint8_t)FaceDirection::FRONT] == nullptr
+//      ||
 //          otherBlock.isEmpty() ||
 //          (!otherBlock.isSolid() &&
 //           (!otherBlock.isFaceFull(FaceDirection::BACK) ||
@@ -200,7 +230,8 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //                                 _adjacentChunks[(uint8_t)FaceDirection::LEFT]);
 //      }
 //
-//      if (x == 0 && _adjacentChunks[(uint8_t)FaceDirection::LEFT] == nullptr ||
+//      if (x == 0 && _adjacentChunks[(uint8_t)FaceDirection::LEFT] == nullptr
+//      ||
 //          otherBlock.isEmpty() ||
 //          (!otherBlock.isSolid() &&
 //           (!otherBlock.isFaceFull(FaceDirection::RIGHT) ||
@@ -302,7 +333,8 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //    _vertexBuffer = (float*)Chunk::s_emptyBuffer;
 //  } else {
 //    uint64_t count = (uint64_t)_vertexCount * 5 * sizeof(float);
-//    _vertexBuffer = (float*)malloc((uint64_t)_vertexCount * 5 * sizeof(float));
+//    _vertexBuffer = (float*)malloc((uint64_t)_vertexCount * 5 *
+//    sizeof(float));
 //  }
 //
 //  _vertexCount = 0;
@@ -389,7 +421,7 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  _buffersDirty = true;
 //}
 //
-//void Chunk::updateAdjacentChunks() {
+// void Chunk::updateAdjacentChunks() {
 //  Chunk* ch =
 //      _mgr->getChunk(_position + FaceDirectionFlag::DirectionToInt32Vector(
 //                                     FaceDirection::LEFT));
@@ -566,7 +598,7 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  }
 //}
 //
-//void Chunk::unloadChunk() {
+// void Chunk::unloadChunk() {
 //  grab();
 //  _status = Status::UNLOADING;
 //  {
@@ -630,13 +662,13 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //  }
 //}
 //
-//void Chunk::setChunkManager(ChunkManager* mgr) {
+// void Chunk::setChunkManager(ChunkManager* mgr) {
 //  if (mgr != nullptr) mgr->grab();
 //  if (_mgr != nullptr) _mgr->drop();
 //  _mgr = mgr;
 //}
 //
-//void Chunk::updateBuffers() {
+// void Chunk::updateBuffers() {
 //  if (_meshBuffersLock.try_lock()) {
 //    if (_vertexBuffer != nullptr) {
 //      glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
@@ -650,7 +682,8 @@ ChunkRenderMesh* Chunk::GetRenderMesh() const { return nullptr; }
 //      uint32_t bufferOffset = 0;
 //      for (char i = 0; i < (char)FaceDirection::FACECOUNT; ++i) {
 //        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferIds[i]);
-//        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexCount[i] * sizeof(uint32_t),
+//        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexCount[i] *
+//        sizeof(uint32_t),
 //                     _indexBuffer + bufferOffset, GL_STATIC_DRAW);
 //        _currentIndexCount[i] = _indexCount[i];
 //        bufferOffset += _indexCount[i];
