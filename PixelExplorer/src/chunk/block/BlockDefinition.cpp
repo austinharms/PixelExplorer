@@ -1,10 +1,11 @@
 #include "BlockDefinition.h"
 
-std::unordered_map<uint16_t, BlockDefinition*> BlockDefinition::s_blockDefinitions;
+std::unordered_map<uint16_t, BlockDefinition*>
+    BlockDefinition::s_blockDefinitions;
 bool BlockDefinition::s_definitionsLoaded = false;
 BlockDefinition* BlockDefinition::s_defaultDefinition = nullptr;
 
-BlockDefinition::BlockDefinition(std::string name) : Name(name) {}
+inline BlockDefinition::BlockDefinition(std::string name) : Name(name) {}
 
 BlockDefinition* BlockDefinition::CreateDefaultDefinition() {
   BlockDefinition* blockDef = new BlockDefinition("DEFAULT");
@@ -38,10 +39,18 @@ const BlockDefinition* BlockDefinition::GetDefinitionById(uint16_t id) {
   return found->second;
 }
 
-bool BlockDefinition::GetDefinitionsLoaded() { return s_definitionsLoaded; }
+inline bool BlockDefinition::GetDefinitionsLoaded() {
+  return s_definitionsLoaded;
+}
 
-const BlockDefinition* BlockDefinition::GetDefaultDefinition() {
+inline const BlockDefinition* BlockDefinition::GetDefaultDefinition() {
   return s_defaultDefinition;
 }
 
-BlockDefinition::~BlockDefinition() {}
+inline BlockDefinition::~BlockDefinition() {}
+
+inline const BlockShape* BlockDefinition::GetBaseShape() const { return _shape; }
+
+inline const float* BlockDefinition::GetUVOffsets() const { return _UVOffset; }
+
+inline const uint16_t BlockDefinition::GetId() const { return _id; }

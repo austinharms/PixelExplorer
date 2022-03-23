@@ -18,9 +18,9 @@ class BlockDefinition : public RefCounted {
   const std::string Name;
 
   virtual ~BlockDefinition();
-  inline const BlockShape* GetBaseShape() const { return _shape; }
-  inline const float* GetUVOffsets() const { return _UVOffset; }
-  inline const uint16_t GetId() const { return _id; }
+  const BlockShape* GetBaseShape() const;
+  const float* GetUVOffsets() const;
+  const uint16_t GetId() const;
 
  private:
   static std::unordered_map<uint16_t, BlockDefinition*> s_blockDefinitions;
