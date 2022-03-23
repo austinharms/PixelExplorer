@@ -315,6 +315,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\chunk\block-old\BaseBlock.cpp" />
+    <ClCompile Include="src\chunk\block\Block.cpp" />
     <ClCompile Include="src\chunk\block\BlockDefinition.cpp" />
     <ClCompile Include="src\chunk\block\BlockShape.cpp" />
     <ClCompile Include="SRC\CHUNK\Chunk.cpp" />
