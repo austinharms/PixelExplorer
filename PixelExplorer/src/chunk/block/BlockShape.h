@@ -28,7 +28,6 @@ struct BlockShape : public RefCounted {
   uint8_t PhysicsIndexCount[FACE_COUNT];
   uint8_t RenderVertexCount[FACE_COUNT];
   uint8_t PhysicsVertexCount[FACE_COUNT];
-  float* RenderUVS[FACE_COUNT];
   bool TransparentFace[FACE_COUNT];
   const std::string Name;
 
@@ -41,7 +40,6 @@ struct BlockShape : public RefCounted {
 
   static BlockShape* CreateDefaultShape();
 
-  bool _sharedShapeData;
   BlockShape(std::string name);
 };
 #endif
