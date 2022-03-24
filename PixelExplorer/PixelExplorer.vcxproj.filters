@@ -42,9 +42,6 @@
     <ClCompile Include="src\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\block-old\BaseBlock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\chunk\ChunkManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,6 +73,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\chunk\ChunkRenderMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\physics\PhysicsBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1365,22 +1365,7 @@
     <ClInclude Include="src\chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block-old\ChunkBlock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\chunk\block-old\BaseBlock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\chunk\block-old\BlockFace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\chunk\block-old\Block.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\chunk\FaceDirection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\chunk\block-old\BlockData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\World.h">
@@ -1423,6 +1408,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\ChunkRenderMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\PhysicsBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
