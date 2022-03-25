@@ -57,9 +57,6 @@
     <ClCompile Include="src\chunk\block\BlockShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Direction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1433,6 +1430,9 @@
     </ClInclude>
     <ClInclude Include="src\physics\StaticPhysicsObject.fwd.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataBuffer.inl">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

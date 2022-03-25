@@ -1,4 +1,5 @@
 #include "DataBuffer.h"
+
 template <typename T>
 bool DataBuffer<T>::IsReadOnly() {
   return _readOnlyCounter > 0;

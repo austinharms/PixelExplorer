@@ -320,7 +320,9 @@
     <ClCompile Include="SRC\CHUNK\Chunk.cpp" />
     <ClCompile Include="src\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\chunk\ChunkRenderMesh.cpp" />
-    <ClCompile Include="src\DataBuffer.cpp" />
+    <ClInclude Include="src\DataBuffer.inl">
+      <FileType>Document</FileType>
+    </ClInclude>
     <ClCompile Include="src\Direction.cpp" />
     <ClCompile Include="src\FileUtilities.cpp" />
     <ClCompile Include="src\Game.cpp" />

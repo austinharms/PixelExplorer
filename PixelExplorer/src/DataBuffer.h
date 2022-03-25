@@ -1,5 +1,6 @@
 #ifndef DATABUFFER_H
 #define DATABUFFER_H
+#include <stdint.h>
 
 #include "RefCounted.h"
 
@@ -18,5 +19,7 @@ class DataBuffer : public RefCounted {
  private:
   uint8_t _readOnlyCounter;
 };
+
+#include "DataBuffer.inl"
 
 #endif  // !DATABUFFER_H
