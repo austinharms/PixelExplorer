@@ -1,35 +1,34 @@
 #include "TestRenderable.h"
+
 #include "glm/gtx/transform.hpp"
 
-TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _position(0.0f, 0.0f, -10.0f), _rotation(0.0f) {
-  //_transform = glm::mat4(
-  //  1.0f, 0.0f, 0.0f, 0.0f,
-  //  0.0f, 1.0f, 0.0f, 0.0f,
-  //  0.0f, 0.0f, 1.0f, 0.0f,
-  //  0.0f, 0.0f,-10.0f, 1.0f
-  //  );
+TestRenderable::TestRenderable() {
+  _material = Material::getDefault();
+  _material->grab();
+  _position = glm::vec3(0);
+  _rotation = glm::vec3(0);
+  _drop = false;
 
   float vertices[24] = {
-    -0.5f, -0.5f, -0.5f, //0
-     0.5f, -0.5f, -0.5f, //1
-     0.5f,  0.5f, -0.5f, //2
-    -0.5f,  0.5f, -0.5f, //3
-    -0.5f, -0.5f,  0.5f, //4
-     0.5f, -0.5f,  0.5f, //5
-     0.5f,  0.5f,  0.5f, //6
-    -0.5f,  0.5f,  0.5f  //7
+      -0.5f, -0.5f, -0.5f,  // 0
+      0.5f,  -0.5f, -0.5f,  // 1
+      0.5f,  0.5f,  -0.5f,  // 2
+      -0.5f, 0.5f,  -0.5f,  // 3
+      -0.5f, -0.5f, 0.5f,   // 4
+      0.5f,  -0.5f, 0.5f,   // 5
+      0.5f,  0.5f,  0.5f,   // 6
+      -0.5f, 0.5f,  0.5f    // 7
   };
 
   unsigned short indices[36] = {
-    0, 2, 1, 0, 3, 2, //Front
-    4, 5, 6, 4, 6, 7, //Back
-    0, 4, 7, 0, 7, 3, //Left
-    1, 6, 5, 1, 2, 6, //Right
-    3, 7, 6, 3, 6, 2, //Top
-    0, 5, 4, 0, 1, 5,  //Bottom
+      0, 2, 1, 0, 3, 2,  // Front
+      4, 5, 6, 4, 6, 7,  // Back
+      0, 4, 7, 0, 7, 3,  // Left
+      1, 6, 5, 1, 2, 6,  // Right
+      3, 7, 6, 3, 6, 2,  // Top
+      0, 5, 4, 0, 1, 5,  // Bottom
   };
 
-  _visible = true;
   glGenVertexArrays(1, &_vertexArrayId);
   glBindVertexArray(_vertexArrayId);
   glGenBuffers(1, &_vertexBufferId);
@@ -46,21 +45,37 @@ TestRenderable::TestRenderable() : Renderable(Material::getDefault()), _position
                GL_STATIC_DRAW);
 }
 
-TestRenderable::~TestRenderable() { 
+TestRenderable::~TestRenderable() {
   glDeleteVertexArrays(1, &_vertexArrayId);
   glDeleteBuffers(1, &_vertexBufferId);
   glDeleteBuffers(1, &_indexBufferId);
 }
 
-bool TestRenderable::onPreRender(float deltaTime, float* cameraPos,
-                                 float* cameraRotation) {
+inline bool TestRenderable::PreRender(float deltaTime,
+                                      const glm::vec3& cameraPos,
+                                      const glm::vec3& cameraRotation) {
   _rotation.x += deltaTime;
   _rotation.y += deltaTime;
-  //_rotation.z += deltaTime;
-  return _visible;
+  return !_drop;
 }
 
-void TestRenderable::onRender() {
+inline bool TestRenderable::ShouldDrop() const { return _drop; }
+
+inline void TestRenderable::SetDropFlag() { _drop = true; }
+
+inline glm::mat4 TestRenderable::GetTransform() const {
+  glm::mat4 t(glm::eulerAngleYXZ(_rotation.y, _rotation.x, _rotation.z));
+  t[3][0] = _position.x;
+  t[3][1] = _position.y;
+  t[3][2] = _position.z;
+  return t;
+}
+
+inline Material* TestRenderable::GetMaterial() const { return _material; }
+
+inline void TestRenderable::SetPosition(glm::vec3 position) { _position = position; }
+
+void TestRenderable::Render() const {
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);

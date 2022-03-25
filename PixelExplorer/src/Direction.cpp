@@ -31,7 +31,7 @@ inline Direction Direction::operator=(const uint8_t val) const {
   return Direction(val);
 }
 
-inline explicit Direction::operator glm::vec3() const { return ToVec3(); }
+inline Direction::operator glm::vec3() const { return ToVec3(); }
 
 glm::vec3 Direction::ToVec3() const {
   switch (_value) {

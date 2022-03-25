@@ -35,7 +35,7 @@ inline PhysicsBase* PhysicsBase::CreatePhysicsBase() {
   return s_physicsBase;
 }
 
-void* PhysicsBase::DropPhysicsBase() {
+void PhysicsBase::DropPhysicsBase() {
   if (s_physicsBase != nullptr) {
     if (s_physicsBase->getRefCount() > 1)
       Logger::Warn(

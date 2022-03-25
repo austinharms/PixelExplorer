@@ -16,7 +16,7 @@ void DataBuffer<T>::MakeWriteable() {
 
 template <typename T>
 DataBuffer<T>::DataBuffer(uint32_t length) : Length(length) {
-  ReadOnly = false;
+  _readOnlyCounter = 0;
   Buffer = (T*)malloc(sizeof(T) * length);
 }
 

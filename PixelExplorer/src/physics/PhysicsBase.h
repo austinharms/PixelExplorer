@@ -10,7 +10,7 @@ class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
   friend class PhysicsScene;
  public:
   static PhysicsBase* CreatePhysicsBase();
-  static void* DropPhysicsBase();
+  static void DropPhysicsBase();
 
   physx::PxTriangleMesh* BakePxMesh(physx::PxTriangleMeshDesc& desc);
   physx::PxPhysics* GetPxPhysics() const;
