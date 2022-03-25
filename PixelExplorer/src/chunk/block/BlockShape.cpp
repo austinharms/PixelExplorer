@@ -5,6 +5,20 @@ BlockShape* BlockShape::s_defaultShape = nullptr;
 std::unordered_map<std::string, BlockShape*> BlockShape::s_blockShapes;
 bool BlockShape::s_shapesLoaded = false;
 
+BlockShape::BlockShape(std::string name) : Name(name) {
+  RenderIndices[0] = nullptr;
+  RenderVertices[0] = nullptr;
+  PhysicsIndices[0] = nullptr;
+  PhysicsVertices[0] = nullptr;
+}
+
+BlockShape::~BlockShape() {
+  if (RenderIndices[0] != nullptr) free(RenderIndices[0]);
+  if (RenderVertices[0] != nullptr) free(RenderVertices[0]);
+  if (PhysicsIndices[0] != nullptr) free(PhysicsIndices[0]);
+  if (PhysicsVertices[0] != nullptr) free(PhysicsVertices[0]);
+}
+
 BlockShape* BlockShape::CreateDefaultShape() {
     const float verts[72] = {
     // Front
@@ -172,13 +186,6 @@ BlockShape* BlockShape::CreateDefaultShape() {
 
   Logger::Debug("Created DEFAULT Block Shape");
   return block;
-}
-
-BlockShape::~BlockShape() {
-  if (RenderIndices[0] != nullptr) free(RenderIndices[0]);
-  if (RenderVertices[0] != nullptr) free(RenderVertices[0]);
-  if (PhysicsIndices[0] != nullptr) free(PhysicsIndices[0]);
-  if (PhysicsVertices[0] != nullptr) free(PhysicsVertices[0]);
 }
 
 BlockShape* BlockShape::GetShape(std::string shapeName) {
