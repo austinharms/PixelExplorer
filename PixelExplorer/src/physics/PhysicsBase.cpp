@@ -29,7 +29,7 @@ PhysicsBase::PhysicsBase() {
   Logger::Info("Created Physics Base");
 }
 
-inline PhysicsBase* PhysicsBase::CreatePhysicsBase() {
+PhysicsBase* PhysicsBase::CreatePhysicsBase() {
   if (s_physicsBase == nullptr) s_physicsBase = new PhysicsBase();
 
   return s_physicsBase;
@@ -64,11 +64,11 @@ physx::PxTriangleMesh* PhysicsBase::BakePxMesh(
       desc, _pxPhysics->getPhysicsInsertionCallback());
 }
 
-inline physx::PxPhysics* PhysicsBase::GetPxPhysics() const {
+physx::PxPhysics* PhysicsBase::GetPxPhysics() const {
   return _pxPhysics;
 }
 
-inline physx::PxMaterial* PhysicsBase::GetDefaultPxMaterial() const { return _pxDefaultMaterial; }
+physx::PxMaterial* PhysicsBase::GetDefaultPxMaterial() const { return _pxDefaultMaterial; }
 
 PhysicsScene* PhysicsBase::CreatePhysicsScene() {
   return new PhysicsScene(this);

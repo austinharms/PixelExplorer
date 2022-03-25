@@ -188,7 +188,7 @@ BlockShape* BlockShape::GetShape(std::string shapeName) {
   return shape->second;
 }
 
-inline bool BlockShape::GetShapesLoaded() { return s_shapesLoaded; }
+bool BlockShape::GetShapesLoaded() { return s_shapesLoaded; }
 
 void BlockShape::LoadShapes() {
   if (s_shapesLoaded) return;
@@ -209,4 +209,4 @@ void BlockShape::UnloadShapes() {
   Logger::Info("Done Unloading Block Shapes");
 }
 
-inline BlockShape* BlockShape::GetDefaultShape() { return s_defaultShape; }
+BlockShape* BlockShape::GetDefaultShape() { return s_defaultShape; }

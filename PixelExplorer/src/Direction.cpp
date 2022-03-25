@@ -13,25 +13,25 @@ Direction::Direction(uint8_t value) : _value(value) {}
 
 Direction::~Direction() {}
 
-inline Direction::operator uint8_t() const { return _value; }
+Direction::operator uint8_t() const { return _value; }
 
-inline bool Direction::operator==(const Direction& d) const {
+bool Direction::operator==(const Direction& d) const {
   return d._value == _value;
 }
 
-inline bool Direction::operator!=(const Direction& d) const {
+bool Direction::operator!=(const Direction& d) const {
   return d._value != _value;
 }
 
-inline Direction Direction::operator-(const Direction& d) const {
+Direction Direction::operator-(const Direction& d) const {
   return GetOpposite();
 }
 
-inline Direction Direction::operator=(const uint8_t val) const {
+Direction Direction::operator=(const uint8_t val) const {
   return Direction(val);
 }
 
-inline Direction::operator glm::vec3() const { return ToVec3(); }
+Direction::operator glm::vec3() const { return ToVec3(); }
 
 glm::vec3 Direction::ToVec3() const {
   switch (_value) {

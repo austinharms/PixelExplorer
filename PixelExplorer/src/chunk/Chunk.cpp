@@ -33,22 +33,22 @@ void Chunk::UpdateAdjacents() {}
 
 void Chunk::Unload() {}
 
-inline void Chunk::SetPosition(glm::vec3 position) {
+void Chunk::SetPosition(glm::vec3 position) {
   _position = position;
   _renderMesh->SetPosition(_position * CHUNK_SIZE);
 }
 
-inline glm::vec3 Chunk::GetPosition() const { return _position; }
+glm::vec3 Chunk::GetPosition() const { return _position; }
 
-inline const Chunk::Status Chunk::GetStatus() const { return _status; }
+const Chunk::Status Chunk::GetStatus() const { return _status; }
 
-inline void Chunk::SetManager(ChunkManager* mgr) {
+void Chunk::SetManager(ChunkManager* mgr) {
   if (_mgr != nullptr) _mgr->drop();
   _mgr = mgr;
   if (_mgr != nullptr) _mgr->grab();
 }
 
-inline ChunkRenderMesh* Chunk::GetRenderMesh() const { return _renderMesh; }
+ChunkRenderMesh* Chunk::GetRenderMesh() const { return _renderMesh; }
 
 #pragma region OldChunkCode
 //#include "Chunk.h"

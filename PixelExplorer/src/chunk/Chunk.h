@@ -10,7 +10,7 @@
 #include "PxRigidStatic.h"
 #include "RefCounted.h"
 #include "ChunkRenderMesh.h"
-#include "block/Block.h"
+#include "./block/Block.h"
 
 class Chunk : public RefCounted {
  public:

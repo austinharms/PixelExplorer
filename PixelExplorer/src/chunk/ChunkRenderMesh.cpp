@@ -4,13 +4,13 @@
 #include "Logger.h"
 #include "glm/gtx/euler_angles.hpp"
 
-inline void ChunkRenderMesh::SetMaterial(Material* mat) {
+void ChunkRenderMesh::SetMaterial(Material* mat) {
   if (s_material != nullptr) s_material->drop();
   s_material = mat;
   if (s_material != nullptr) s_material->grab();
 }
 
-inline void ChunkRenderMesh::DropMaterial() {
+void ChunkRenderMesh::DropMaterial() {
   if (s_material != nullptr) s_material->drop();
   s_material = nullptr;
 }
@@ -73,18 +73,18 @@ ChunkRenderMesh::~ChunkRenderMesh() {
   }
 }
 
-inline bool ChunkRenderMesh::ShouldDrop() const { return _drop || _error; }
+bool ChunkRenderMesh::ShouldDrop() const { return _drop || _error; }
 
-inline Material* ChunkRenderMesh::GetMaterial() const { return s_material; }
+Material* ChunkRenderMesh::GetMaterial() const { return s_material; }
 
-inline bool ChunkRenderMesh::PreRender(float deltaTime,
+bool ChunkRenderMesh::PreRender(float deltaTime,
                                        const glm::vec3& cameraPos,
                                        const glm::vec3& cameraRotation) {
   UpdateBuffers();
   return _active && !_error;
 }
 
-inline glm::mat4 ChunkRenderMesh::GetTransform() const { return _transform; }
+glm::mat4 ChunkRenderMesh::GetTransform() const { return _transform; }
 
 void ChunkRenderMesh::Render() const {
   if (_error) return;
@@ -93,13 +93,13 @@ void ChunkRenderMesh::Render() const {
   glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-inline void ChunkRenderMesh::SetPosition(glm::vec3 pos) {
+void ChunkRenderMesh::SetPosition(glm::vec3 pos) {
   _transform[3] = glm::vec<4, float>(pos, 0);
 }
 
-inline void ChunkRenderMesh::SetDropFlag() { _drop = true; }
+void ChunkRenderMesh::SetDropFlag() { _drop = true; }
 
-inline void ChunkRenderMesh::UpdateBuffers(DataBuffer<float>* verts,
+void ChunkRenderMesh::UpdateBuffers(DataBuffer<float>* verts,
                                            DataBuffer<uint32_t>* indices) {
   if (_error) return;
   _bufferMutex.lock();
@@ -124,9 +124,9 @@ inline void ChunkRenderMesh::UpdateBuffers(DataBuffer<float>* verts,
   _bufferMutex.unlock();
 }
 
-inline bool ChunkRenderMesh::GetError() const { return _error; }
+bool ChunkRenderMesh::GetError() const { return _error; }
 
-inline void ChunkRenderMesh::SetActive(bool active) { _active = active; }
+void ChunkRenderMesh::SetActive(bool active) { _active = active; }
 
 void ChunkRenderMesh::UpdateBuffers() {
   if (!_dirty || _error) return;

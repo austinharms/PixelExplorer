@@ -1,11 +1,11 @@
 #include "Block.h"
 
-inline Block::Block() : _id(0) {}
+Block::Block() : _id(0) {}
 
-inline Block::Block(uint16_t id) : _id(id) {}
+Block::Block(uint16_t id) : _id(id) {}
 
-inline Block::~Block() {}
+Block::~Block() {}
 
-inline uint16_t Block::GetId() const { _id& ID_BITMASK; }
+uint16_t Block::GetId() const { return _id & ID_BITMASK; }
 
-inline bool Block::IsExtended() const { return _id & EXTEND_BITMASK; }
+bool Block::IsExtended() const { return _id & EXTEND_BITMASK; }

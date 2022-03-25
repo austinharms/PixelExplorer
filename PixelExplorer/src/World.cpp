@@ -1,7 +1,7 @@
 #include "World.h"
 
-inline World* World::LoadWorld() { return nullptr; }
+World* World::LoadWorld() { return nullptr; }
 
-inline World::~World() {}
+World::~World() {}
 
-inline World::World() {}
+World::World() {}
