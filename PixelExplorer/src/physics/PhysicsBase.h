@@ -1,14 +1,21 @@
 #ifndef PHYSICSBASE_H
 #define PHYSICSBASE_H
 
+#include "PhysicsBase.fwd.h"
+#include "PhysicsScene.fwd.h"
 #include "PxPhysicsAPI.h"
 #include "RefCounted.h"
 
 class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
+  friend class PhysicsScene;
  public:
   static PhysicsBase* CreatePhysicsBase();
   static void* DropPhysicsBase();
 
+  physx::PxTriangleMesh* BakePxMesh(physx::PxTriangleMeshDesc& desc);
+  physx::PxPhysics* GetPxPhysics() const;
+  physx::PxMaterial* GetDefaultPxMaterial() const;
+  PhysicsScene* CreatePhysicsScene();
   void reportError(physx::PxErrorCode::Enum code, const char* message,
                    const char* file, int line);
   virtual ~PhysicsBase();
@@ -24,6 +31,8 @@ class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
   physx::PxCooking* _pxCooking;
   physx::PxTolerancesScale _pxScale;
   physx::PxMaterial* _pxDefaultMaterial;
+  physx::PxCpuDispatcher* _pxDispatcher;
+  physx::PxSimulationFilterShader _pxDefaultFilter;
 
   PhysicsBase();
 };

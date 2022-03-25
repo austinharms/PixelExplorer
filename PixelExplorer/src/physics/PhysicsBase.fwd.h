@@ -1,0 +1,4 @@
+#ifndef PHYSICSBASEFORWARD_H
+#define PHYSICSBASEFORWARD_H
+class PhysicsBase;
+#endif  // !PHYSICSBASEFORWARD_H

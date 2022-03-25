@@ -1,6 +1,7 @@
 #include "PhysicsBase.h"
 
 #include "Logger.h"
+#include "PhysicsScene.h"
 
 using namespace physx;
 
@@ -14,17 +15,21 @@ PhysicsBase::PhysicsBase() {
   _pxPVD = PxCreatePvd(*_pxFoundation);
   _pxPVDTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
   _pxPVD->connect(*_pxPVDTransport, PxPvdInstrumentationFlag::eALL);
-  _pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation, PxTolerancesScale(), true, _pxPVD);
+  _pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation,
+                               PxTolerancesScale(), true, _pxPVD);
   PxCookingParams params(_pxScale);
   params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
-  params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+  params.meshPreprocessParams |=
+      PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
   _pxCooking = PxCreateCooking(PX_PHYSICS_VERSION, *_pxFoundation, params);
   PxInitExtensions(*_pxPhysics, _pxPVD);
   _pxDefaultMaterial = _pxPhysics->createMaterial(1, 1, 1);
+  _pxDispatcher = PxDefaultCpuDispatcherCreate(0);
+  _pxDefaultFilter = PxDefaultSimulationFilterShader;
   Logger::Info("Created Physics Base");
 }
 
-PhysicsBase* PhysicsBase::CreatePhysicsBase() {
+inline PhysicsBase* PhysicsBase::CreatePhysicsBase() {
   if (s_physicsBase == nullptr) s_physicsBase = new PhysicsBase();
 
   return s_physicsBase;
@@ -41,6 +46,7 @@ void* PhysicsBase::DropPhysicsBase() {
 }
 
 PhysicsBase::~PhysicsBase() {
+  delete _pxDispatcher;
   _pxDefaultMaterial->release();
   PxCloseExtensions();
   _pxCooking->release();
@@ -50,6 +56,22 @@ PhysicsBase::~PhysicsBase() {
   _pxPVDTransport->release();
   _pxFoundation->release();
   Logger::Info("Destroyed Physics Base");
+}
+
+physx::PxTriangleMesh* PhysicsBase::BakePxMesh(
+    physx::PxTriangleMeshDesc& desc) {
+  return _pxCooking->createTriangleMesh(
+      desc, _pxPhysics->getPhysicsInsertionCallback());
+}
+
+inline physx::PxPhysics* PhysicsBase::GetPxPhysics() const {
+  return _pxPhysics;
+}
+
+inline physx::PxMaterial* PhysicsBase::GetDefaultPxMaterial() const { return _pxDefaultMaterial; }
+
+PhysicsScene* PhysicsBase::CreatePhysicsScene() {
+  return new PhysicsScene(this);
 }
 
 void PhysicsBase::reportError(PxErrorCode::Enum code, const char* message,
