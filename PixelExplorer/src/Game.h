@@ -10,6 +10,7 @@ class Game : public RefCounted {
  public:
   Game(Renderer* renderer, PhysicsBase* physicsBase);
   virtual ~Game();
+  void Start();
 
  private:
   Renderer* _renderer;

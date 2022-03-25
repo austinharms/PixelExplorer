@@ -12,6 +12,7 @@ int main(void) {
     PhysicsBase* physics = PhysicsBase::CreatePhysicsBase();
 
     Game* game = new Game(renderer, physics);
+    game->Start();
 
     game->drop();
     physics->drop();
