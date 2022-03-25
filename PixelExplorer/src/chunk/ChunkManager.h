@@ -14,14 +14,13 @@
 #include "PxScene.h"
 #include "glm/gtx/hash.hpp"
 
-class ChunkManager : public virtual RefCounted {
+class ChunkManager : public RefCounted {
  public:
   ChunkManager(Renderer* renderer);
-  ~ChunkManager();
-  void unloadChunks();
-  void loadChunk(glm::vec<3, int32_t> pos);
-  Chunk* getChunk(glm::vec<3, int32_t> pos);
-  physx::PxScene* getScene() { return _scene; }
+  virtual ~ChunkManager();
+  void UnloadChunks();
+  void LoadChunk(glm::vec<3, int32_t> pos);
+  Chunk* GetChunk(glm::vec<3, int32_t> pos);
   void UpdateLoadedChunks();
 
  private:
