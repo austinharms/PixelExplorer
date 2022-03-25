@@ -63,12 +63,12 @@ ChunkRenderMesh::~ChunkRenderMesh() {
   glDeleteBuffers(1, &_vertexBufferId);
   glDeleteBuffers(1, &_indexBufferId);
   if (_vertexBuffer != nullptr) {
-    _vertexBuffer->ReadOnly = false;
+    _vertexBuffer->MakeWriteable();
     _vertexBuffer->drop();
   }
 
   if (_indexBuffer != nullptr) {
-    _indexBuffer->ReadOnly = false;
+    _indexBuffer->MakeWriteable();
     _indexBuffer->drop();
   }
 }
@@ -106,20 +106,20 @@ inline void ChunkRenderMesh::UpdateBuffers(DataBuffer<float>* verts,
   _dirty = true;
 
   if (_vertexBuffer != nullptr) {
-    _vertexBuffer->ReadOnly = false;
+    _vertexBuffer->MakeWriteable();
     _vertexBuffer->drop();
   }
 
   _vertexBuffer = verts;
-  _indexBuffer->ReadOnly = true;
+  _indexBuffer->MakeReadOnly();
 
   if (_indexBuffer != nullptr) {
-    _indexBuffer->ReadOnly = false;
+    _indexBuffer->MakeWriteable();
     _indexBuffer->drop();
   }
 
   _indexBuffer = indices;
-  _indexBuffer->ReadOnly = true;
+  _indexBuffer->MakeReadOnly();
 
   _bufferMutex.unlock();
 }
@@ -140,10 +140,10 @@ void ChunkRenderMesh::UpdateBuffers() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer->GetSize(),
                _indexBuffer->Buffer, GL_STATIC_DRAW);
-  _vertexBuffer->ReadOnly = false;
+  _vertexBuffer->MakeWriteable();
   _vertexBuffer->drop();
   _vertexBuffer = nullptr;
-  _indexBuffer->ReadOnly = false;
+  _indexBuffer->MakeWriteable();
   _indexBuffer->drop();
   _indexBuffer = nullptr;
   _bufferMutex.unlock();

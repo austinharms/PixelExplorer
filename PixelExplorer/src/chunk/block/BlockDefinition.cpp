@@ -19,7 +19,6 @@ BlockDefinition* BlockDefinition::CreateDefaultDefinition() {
 
 void BlockDefinition::LoadDefinitions() {
   if (s_definitionsLoaded) return;
-  BlockShape::LoadShapes();
   Logger::Info("Loading Block Definitions");
   s_defaultDefinition = CreateDefaultDefinition();
   s_definitionsLoaded = true;
@@ -35,7 +34,6 @@ void BlockDefinition::UnloadDefinitions() {
   for (auto def : s_blockDefinitions) def.second->drop();
   s_blockDefinitions.clear();
   Logger::Info("Done Unloading Block Definitions");
-  BlockShape::UnloadShapes();
 }
 
 const BlockDefinition* BlockDefinition::GetDefinitionById(uint16_t id) {

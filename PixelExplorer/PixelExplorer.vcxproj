@@ -323,9 +323,11 @@
     <ClCompile Include="src\DataBuffer.cpp" />
     <ClCompile Include="src\Direction.cpp" />
     <ClCompile Include="src\FileUtilities.cpp" />
+    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\physics\PhysicsBase.cpp" />
-    <ClCompile Include="src\physics\PhysicsManager.cpp" />
+    <ClCompile Include="src\physics\PhysicsScene.cpp" />
+    <ClCompile Include="src\physics\StaticPhysicsObject.cpp" />
     <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
@@ -490,8 +492,12 @@
     <ClInclude Include="src\FileUtilities.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Logger.h" />
+    <ClInclude Include="src\physics\PhysicsBase.fwd.h" />
     <ClInclude Include="src\physics\PhysicsBase.h" />
-    <ClInclude Include="src\physics\PhysicsManager.h" />
+    <ClInclude Include="src\physics\PhysicsScene.fwd.h" />
+    <ClInclude Include="src\physics\PhysicsScene.h" />
+    <ClInclude Include="src\physics\StaticPhysicsObject.fwd.h" />
+    <ClInclude Include="src\physics\StaticPhysicsObject.h" />
     <ClInclude Include="src\RefCounted.h" />
     <ClInclude Include="src\rendering\Material.h" />
     <ClInclude Include="src\rendering\Renderable.h" />
