@@ -4,6 +4,8 @@
 #include "Logger.h"
 #include "glm/gtx/euler_angles.hpp"
 
+Material* ChunkRenderMesh::s_material = nullptr;
+
 void ChunkRenderMesh::SetMaterial(Material* mat) {
   if (s_material != nullptr) s_material->drop();
   s_material = mat;
