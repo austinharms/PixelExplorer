@@ -36,37 +36,37 @@
     <ClCompile Include="src\rendering\TestRenderable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SRC\CHUNK\Chunk.cpp">
+    <ClCompile Include="src\game\world\chunk\Chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World.cpp">
+    <ClCompile Include="src\game\world\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\ChunkManager.cpp">
+    <ClCompile Include="src\game\world\chunk\ChunkManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\TexturedMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileUtilities.cpp">
+    <ClCompile Include="src\util\FileUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\block\BlockDefinition.cpp">
+    <ClCompile Include="src\game\world\chunk\block\BlockDefinition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\block\BlockShape.cpp">
+    <ClCompile Include="src\game\world\chunk\block\BlockShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Direction.cpp">
+    <ClCompile Include="src\util\Direction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logger.cpp">
+    <ClCompile Include="src\common\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\block\Block.cpp">
+    <ClCompile Include="src\game\world\chunk\block\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\chunk\ChunkRenderMesh.cpp">
+    <ClCompile Include="src\game\world\chunk\ChunkRenderMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\physics\PhysicsBase.cpp">
@@ -78,7 +78,7 @@
     <ClCompile Include="src\physics\StaticPhysicsObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game.cpp">
+    <ClCompile Include="src\game\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -498,7 +498,7 @@
     <ClInclude Include="src\rendering\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RefCounted.h">
+    <ClInclude Include="src\common\RefCounted.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\Renderable.h">
@@ -1365,52 +1365,52 @@
     <ClInclude Include="src\rendering\TestRenderable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\Chunk.h">
+    <ClInclude Include="src\game\world\chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\chunk\FaceDirection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World.h">
+    <ClInclude Include="src\game\world\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\ChunkManager.h">
+    <ClInclude Include="src\game\world\chunk\ChunkManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\TexturedMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\Chunk.fwd.h">
+    <ClInclude Include="src\game\world\chunk\Chunk.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\ChunkManager.fwd.h">
+    <ClInclude Include="src\game\world\chunk\ChunkManager.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\FileUtilities.h">
+    <ClInclude Include="src\util\FileUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logger.h">
+    <ClInclude Include="src\common\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\Block.h">
+    <ClInclude Include="src\game\world\chunk\block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\BlockShape.h">
+    <ClInclude Include="src\game\world\chunk\block\BlockShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\block\BlockDefinition.h">
+    <ClInclude Include="src\game\world\chunk\block\BlockDefinition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataBuffer.h">
+    <ClInclude Include="src\util\DataBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Direction.h">
+    <ClInclude Include="src\util\Direction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\chunk\ChunkRenderMesh.h">
+    <ClInclude Include="src\game\world\chunk\ChunkRenderMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game.h">
+    <ClInclude Include="src\game\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\physics\PhysicsBase.h">
@@ -1431,7 +1431,7 @@
     <ClInclude Include="src\physics\StaticPhysicsObject.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataBuffer.inl">
+    <ClInclude Include="src\util\DataBuffer.inl">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
