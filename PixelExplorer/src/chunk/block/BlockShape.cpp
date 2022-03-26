@@ -19,7 +19,7 @@ BlockShape::~BlockShape() {
   if (PhysicsVertices[0] != nullptr) free(PhysicsVertices[0]);
 }
 
-BlockShape* BlockShape::CreateDefaultShape() {
+BlockShape* BlockShape::createDefaultShape() {
     const float verts[72] = {
     // Front
     -0.5f,  0.5f,  0.5f,
@@ -135,7 +135,7 @@ BlockShape* BlockShape::CreateDefaultShape() {
 
   block->RenderVertices[0] = (float*)malloc(sizeof(verts) + sizeof(uvs));
   if (block->RenderVertices[0] == nullptr)
-    Logger::Fatal(
+    Logger::fatal(
         "Failed to allocate vertex render buffer for DEFAULT block shape");
   block->RenderVertices[1] = block->RenderVertices[0] + 20;
   block->RenderVertices[2] = block->RenderVertices[1] + 20;
@@ -145,7 +145,7 @@ BlockShape* BlockShape::CreateDefaultShape() {
 
   block->RenderIndices[0] = (uint8_t*)malloc(sizeof(indices));
   if (block->RenderIndices[0] == nullptr)
-    Logger::Fatal(
+    Logger::fatal(
         "Failed to allocate index render buffer for DEFAULT block shape");
   block->RenderIndices[1] = block->RenderIndices[0] + 6;
   block->RenderIndices[2] = block->RenderIndices[1] + 6;
@@ -155,7 +155,7 @@ BlockShape* BlockShape::CreateDefaultShape() {
 
     block->PhysicsVertices[0] = (float*)malloc(sizeof(verts));
   if (block->PhysicsVertices[0] == nullptr)
-    Logger::Fatal(
+    Logger::fatal(
         "Failed to allocate vertex physics buffer for DEFAULT block shape");
   block->PhysicsVertices[1] = block->PhysicsVertices[0] + 12;
   block->PhysicsVertices[2] = block->PhysicsVertices[1] + 12;
@@ -165,7 +165,7 @@ BlockShape* BlockShape::CreateDefaultShape() {
 
   block->PhysicsIndices[0] = (uint8_t*)malloc(sizeof(indices));
   if (block->PhysicsIndices[0] == nullptr)
-    Logger::Fatal(
+    Logger::fatal(
         "Failed to allocate index physics buffer for DEFAULT block shape");
   block->PhysicsIndices[1] = block->PhysicsIndices[0] + 6;
   block->PhysicsIndices[2] = block->PhysicsIndices[1] + 6;
@@ -184,36 +184,36 @@ BlockShape* BlockShape::CreateDefaultShape() {
     block->RenderVertices[0][(i * 5) + 4] = uvs[(i * 2) + 1];
   }
 
-  Logger::Debug("Created DEFAULT Block Shape");
+  Logger::debug("Created DEFAULT Block Shape");
   return block;
 }
 
-BlockShape* BlockShape::GetShape(std::string shapeName) {
+BlockShape* BlockShape::getShape(std::string shapeName) {
   if (!s_shapesLoaded) return s_defaultShape;
   auto shape = s_blockShapes.find(shapeName);
   if (shape == s_blockShapes.end()) return s_defaultShape;
   return shape->second;
 }
 
-bool BlockShape::GetShapesLoaded() { return s_shapesLoaded; }
+bool BlockShape::getShapesLoaded() { return s_shapesLoaded; }
 
-void BlockShape::LoadShapes() {
+void BlockShape::loadShapes() {
   if (s_shapesLoaded) return;
-  Logger::Info("Loading Block Shapes");
-  s_defaultShape = CreateDefaultShape();
+  Logger::info("Loading Block Shapes");
+  s_defaultShape = createDefaultShape();
   s_shapesLoaded = true;
-  Logger::Info("Done Loading Block Shapes");
+  Logger::info("Done Loading Block Shapes");
 }
 
-void BlockShape::UnloadShapes() {
+void BlockShape::unloadShapes() {
   if (!s_shapesLoaded) return;
-  Logger::Info("Unloading Block Shapes");
+  Logger::info("Unloading Block Shapes");
   s_shapesLoaded = false;
   s_defaultShape->drop();
   s_defaultShape = nullptr;
   for (auto shape : s_blockShapes) shape.second->drop();
   s_blockShapes.clear();
-  Logger::Info("Done Unloading Block Shapes");
+  Logger::info("Done Unloading Block Shapes");
 }
 
-BlockShape* BlockShape::GetDefaultShape() { return s_defaultShape; }
+BlockShape* BlockShape::getDefaultShape() { return s_defaultShape; }

@@ -24,16 +24,16 @@ bool Direction::operator!=(const Direction& d) const {
 }
 
 Direction Direction::operator-(const Direction& d) const {
-  return GetOpposite();
+  return getOpposite();
 }
 
 Direction Direction::operator=(const uint8_t val) const {
   return Direction(val);
 }
 
-Direction::operator glm::vec3() const { return ToVec3(); }
+Direction::operator glm::vec3() const { return toVec3(); }
 
-glm::vec3 Direction::ToVec3() const {
+glm::vec3 Direction::toVec3() const {
   switch (_value) {
     case 0b00000001:  // FRONT
       return glm::vec3(0, 0, 1);
@@ -61,7 +61,7 @@ glm::vec3 Direction::ToVec3() const {
   }
 }
 
-Direction Direction::GetOpposite() const {
+Direction Direction::getOpposite() const {
   switch (_value) {
     case 0b00000001:  // FRONT
       return BACK;

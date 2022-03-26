@@ -29,14 +29,14 @@ class Chunk : public RefCounted {
 
   Chunk(ChunkRenderMesh* renderMesh);
   virtual ~Chunk();
-  void UpdateMesh();
-  void UpdateAdjacents();
-  void Unload();
-  void SetPosition(glm::vec3 position);
-  glm::vec3 GetPosition() const;
-  const Status GetStatus() const;
-  void SetManager(ChunkManager* mgr);
-  ChunkRenderMesh* GetRenderMesh() const;
+  void updateMesh();
+  void updateAdjacents();
+  void unload();
+  void setPosition(glm::vec3 position);
+  glm::vec3 getPosition() const;
+  const Status getStatus() const;
+  void setManager(ChunkManager* mgr);
+  ChunkRenderMesh* getRenderMesh() const;
 
  private:
   ChunkManager* _mgr;

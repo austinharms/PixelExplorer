@@ -5,15 +5,15 @@
 
 Chunk::Chunk(ChunkRenderMesh* renderMesh) {
   if (renderMesh == nullptr)
-    Logger::Fatal("Failed to Create Chunk, renderMesh was nullptr");
+    Logger::fatal("Failed to Create Chunk, renderMesh was nullptr");
   _mgr = nullptr;
   memset(_adjacentChunks, 0, sizeof(_adjacentChunks));
   _physxActor = nullptr;
   renderMesh->grab();
   _renderMesh = renderMesh;
   memset(_blocks, 0, sizeof(_blocks));
-  SetPosition(glm::vec3(0));
-  _renderMesh->SetActive(true);
+  setPosition(glm::vec3(0));
+  _renderMesh->setActive(true);
   _status = Chunk::Status::CREATED;
 }
 
@@ -22,33 +22,33 @@ Chunk::~Chunk() {
   if (_mgr != nullptr) _mgr->drop();
   // TODO drop _adjacentChunks
   // TODO drop _physxActor
-  _renderMesh->SetActive(false);
-  if (_renderMesh->getRefCount() == 2) _renderMesh->SetDropFlag();
+  _renderMesh->setActive(false);
+  if (_renderMesh->getRefCount() == 2) _renderMesh->setDropFlag();
   _renderMesh->drop();
 }
 
-void Chunk::UpdateMesh() {}
+void Chunk::updateMesh() {}
 
-void Chunk::UpdateAdjacents() {}
+void Chunk::updateAdjacents() {}
 
-void Chunk::Unload() {}
+void Chunk::unload() {}
 
-void Chunk::SetPosition(glm::vec3 position) {
+void Chunk::setPosition(glm::vec3 position) {
   _position = position;
-  _renderMesh->SetPosition(_position * CHUNK_SIZE);
+  _renderMesh->setPosition(_position * CHUNK_SIZE);
 }
 
-glm::vec3 Chunk::GetPosition() const { return _position; }
+glm::vec3 Chunk::getPosition() const { return _position; }
 
-const Chunk::Status Chunk::GetStatus() const { return _status; }
+const Chunk::Status Chunk::getStatus() const { return _status; }
 
-void Chunk::SetManager(ChunkManager* mgr) {
+void Chunk::setManager(ChunkManager* mgr) {
   if (_mgr != nullptr) _mgr->drop();
   _mgr = mgr;
   if (_mgr != nullptr) _mgr->grab();
 }
 
-ChunkRenderMesh* Chunk::GetRenderMesh() const { return _renderMesh; }
+ChunkRenderMesh* Chunk::getRenderMesh() const { return _renderMesh; }
 
 #pragma region OldChunkCode
 //#include "Chunk.h"

@@ -9,10 +9,10 @@
 int main(void) { 
     Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0", 60);
     renderer->setCursorHidden(true);
-    PhysicsBase* physics = PhysicsBase::CreatePhysicsBase();
+    PhysicsBase* physics = PhysicsBase::createPhysicsBase();
 
     Game* game = new Game(renderer, physics);
-    game->Start();
+    game->start();
 
     game->drop();
     physics->drop();

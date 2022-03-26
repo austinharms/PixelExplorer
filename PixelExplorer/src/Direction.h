@@ -21,8 +21,8 @@ struct Direction {
   Direction operator-(const Direction& d) const;
   Direction operator=(const uint8_t val) const;
   explicit operator glm::vec3() const;
-  glm::vec3 ToVec3() const;
-  Direction GetOpposite() const;
+  glm::vec3 toVec3() const;
+  Direction getOpposite() const;
   ~Direction();
 
  private:

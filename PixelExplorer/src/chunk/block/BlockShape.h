@@ -10,11 +10,11 @@ struct BlockShape : public RefCounted {
  public:
   static const int32_t FACE_COUNT = 6;
 
-  static bool GetShapesLoaded();
-  static void LoadShapes();
-  static BlockShape* GetDefaultShape();
-  static BlockShape* GetShape(std::string shapeName);
-  static void UnloadShapes();
+  static bool getShapesLoaded();
+  static void loadShapes();
+  static BlockShape* getDefaultShape();
+  static BlockShape* getShape(std::string shapeName);
+  static void unloadShapes();
 
   bool FullBlock;
   bool BlockTransparent;
@@ -38,7 +38,7 @@ struct BlockShape : public RefCounted {
   static std::unordered_map<std::string, BlockShape*> s_blockShapes;
   static bool s_shapesLoaded;
 
-  static BlockShape* CreateDefaultShape();
+  static BlockShape* createDefaultShape();
 
   BlockShape(std::string name);
 };

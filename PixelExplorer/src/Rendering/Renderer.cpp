@@ -99,17 +99,17 @@ void Renderer::addRenderable(Renderable* renderable) {
   if (_renderableObjects.begin() == _renderableObjects.end()) {
     _renderableObjects.emplace_back(renderable);
   } else {
-    uint32_t newShaderId = renderable->GetMaterial()->getShader()->getGLID();
-    uint32_t newMaterialId = renderable->GetMaterial()->getId();
+    uint32_t newShaderId = renderable->getMaterial()->getShader()->getGLID();
+    uint32_t newMaterialId = renderable->getMaterial()->getId();
     for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
          it != _renderableObjects.end(); ++it) {
       Renderable* other = *it;
-      uint32_t otherShaderId = other->GetMaterial()->getShader()->getGLID();
+      uint32_t otherShaderId = other->getMaterial()->getShader()->getGLID();
       if (newShaderId < otherShaderId) {
         _renderableObjects.insert(it, renderable);
         break;
       } else if (newShaderId == otherShaderId) {
-        if (newMaterialId <= other->GetMaterial()->getId()) {
+        if (newMaterialId <= other->getMaterial()->getId()) {
           _renderableObjects.insert(it, renderable);
           break;
         }
@@ -129,7 +129,7 @@ void Renderer::addRenderable(Renderable* renderable) {
   //}
 }
 
-void Renderer::RemoveRenderable(Renderable* renderable) {
+void Renderer::removeRenderable(Renderable* renderable) {
   std::lock_guard<std::mutex> locker(_renderLock);
   std::remove_if(_renderableObjects.begin(), _renderableObjects.end(),
                  [&renderable](Renderable* renderable) {
@@ -179,12 +179,12 @@ void Renderer::drawFrame() {
                                              glm::vec3(0, 1, 0));
     while (iter != end) {
       Renderable* renderable = *iter;
-      if (renderable->ShouldDrop()) {
+      if (renderable->shouldDrop()) {
         iter = _renderableObjects.erase(iter);
         renderable->drop();
       } else {
-        if (renderable->PreRender(_deltaTime, _position, _rotation)) {
-          Material* renderableMaterial = renderable->GetMaterial();
+        if (renderable->preRender(_deltaTime, _position, _rotation)) {
+          Material* renderableMaterial = renderable->getMaterial();
           if (renderableMaterial != currentMaterial) {
             if (currentMaterial != nullptr) currentMaterial->drop();
             renderableMaterial->grab();
@@ -203,8 +203,8 @@ void Renderer::drawFrame() {
             renderableMaterial->onPostBind();
           }
 
-          currentShader->setUniformm4("u_MVP", vp * renderable->GetTransform());
-          renderable->Render();
+          currentShader->setUniformm4("u_MVP", vp * renderable->getTransform());
+          renderable->render();
         }
         ++iter;
       }

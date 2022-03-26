@@ -8,53 +8,53 @@ BlockDefinition* BlockDefinition::s_defaultDefinition = nullptr;
 
 BlockDefinition::BlockDefinition(std::string name) : Name(name) {}
 
-BlockDefinition* BlockDefinition::CreateDefaultDefinition() {
+BlockDefinition* BlockDefinition::createDefaultDefinition() {
   BlockDefinition* blockDef = new BlockDefinition("DEFAULT");
   blockDef->_id = 0;
-  blockDef->_shape = BlockShape::GetDefaultShape();
+  blockDef->_shape = BlockShape::getDefaultShape();
   memset(blockDef->_UVOffset, 0, sizeof(blockDef->_UVOffset));
-  Logger::Debug("Created DEFAULT Block Definition");
+  Logger::debug("Created DEFAULT Block Definition");
   return blockDef;
 }
 
-void BlockDefinition::LoadDefinitions() {
+void BlockDefinition::loadDefinitions() {
   if (s_definitionsLoaded) return;
-  Logger::Info("Loading Block Definitions");
-  s_defaultDefinition = CreateDefaultDefinition();
+  Logger::info("Loading Block Definitions");
+  s_defaultDefinition = createDefaultDefinition();
   s_definitionsLoaded = true;
-  Logger::Info("Done Loading Block Definitions");
+  Logger::info("Done Loading Block Definitions");
 }
 
-void BlockDefinition::UnloadDefinitions() {
+void BlockDefinition::unloadDefinitions() {
   if (!s_definitionsLoaded) return;
-  Logger::Info("Unloading Block Definitions");
+  Logger::info("Unloading Block Definitions");
   s_definitionsLoaded = false;
   s_defaultDefinition->drop();
   s_defaultDefinition = nullptr;
   for (auto def : s_blockDefinitions) def.second->drop();
   s_blockDefinitions.clear();
-  Logger::Info("Done Unloading Block Definitions");
+  Logger::info("Done Unloading Block Definitions");
 }
 
-const BlockDefinition* BlockDefinition::GetDefinitionById(uint16_t id) {
+const BlockDefinition* BlockDefinition::getDefinitionById(uint16_t id) {
   if (!s_definitionsLoaded) return nullptr;
   auto found = s_blockDefinitions.find(id);
   if (found == s_blockDefinitions.end()) return s_defaultDefinition;
   return found->second;
 }
 
-bool BlockDefinition::GetDefinitionsLoaded() {
+bool BlockDefinition::getDefinitionsLoaded() {
   return s_definitionsLoaded;
 }
 
-const BlockDefinition* BlockDefinition::GetDefaultDefinition() {
+const BlockDefinition* BlockDefinition::getDefaultDefinition() {
   return s_defaultDefinition;
 }
 
 BlockDefinition::~BlockDefinition() {}
 
-const BlockShape* BlockDefinition::GetBaseShape() const { return _shape; }
+const BlockShape* BlockDefinition::getBaseShape() const { return _shape; }
 
-const float* BlockDefinition::GetUVOffsets() const { return _UVOffset; }
+const float* BlockDefinition::getUVOffsets() const { return _UVOffset; }
 
-const uint16_t BlockDefinition::GetId() const { return _id; }
+const uint16_t BlockDefinition::getId() const { return _id; }

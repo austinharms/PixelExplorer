@@ -26,19 +26,19 @@ PhysicsBase::PhysicsBase() {
   _pxDefaultMaterial = _pxPhysics->createMaterial(1, 1, 1);
   _pxDispatcher = PxDefaultCpuDispatcherCreate(0);
   _pxDefaultFilter = PxDefaultSimulationFilterShader;
-  Logger::Info("Created Physics Base");
+  Logger::info("Created Physics Base");
 }
 
-PhysicsBase* PhysicsBase::CreatePhysicsBase() {
+PhysicsBase* PhysicsBase::createPhysicsBase() {
   if (s_physicsBase == nullptr) s_physicsBase = new PhysicsBase();
 
   return s_physicsBase;
 }
 
-void PhysicsBase::DropPhysicsBase() {
+void PhysicsBase::dropPhysicsBase() {
   if (s_physicsBase != nullptr) {
     if (s_physicsBase->getRefCount() > 1)
-      Logger::Warn(
+      Logger::warn(
           "Dropping Physics Base, Warning Physics Base Still Referenced");
     s_physicsBase->drop();
     s_physicsBase = nullptr;
@@ -55,22 +55,22 @@ PhysicsBase::~PhysicsBase() {
   _pxPVD->release();
   _pxPVDTransport->release();
   _pxFoundation->release();
-  Logger::Info("Destroyed Physics Base");
+  Logger::info("Destroyed Physics Base");
 }
 
-physx::PxTriangleMesh* PhysicsBase::BakePxMesh(
+physx::PxTriangleMesh* PhysicsBase::bakePxMesh(
     physx::PxTriangleMeshDesc& desc) {
   return _pxCooking->createTriangleMesh(
       desc, _pxPhysics->getPhysicsInsertionCallback());
 }
 
-physx::PxPhysics* PhysicsBase::GetPxPhysics() const {
+physx::PxPhysics* PhysicsBase::getPxPhysics() const {
   return _pxPhysics;
 }
 
-physx::PxMaterial* PhysicsBase::GetDefaultPxMaterial() const { return _pxDefaultMaterial; }
+physx::PxMaterial* PhysicsBase::getDefaultPxMaterial() const { return _pxDefaultMaterial; }
 
-PhysicsScene* PhysicsBase::CreatePhysicsScene() {
+PhysicsScene* PhysicsBase::createPhysicsScene() {
   return new PhysicsScene(this);
 }
 
@@ -78,34 +78,34 @@ void PhysicsBase::reportError(PxErrorCode::Enum code, const char* message,
                               const char* file, int line) {
   switch (code) {
     case PxErrorCode::eINVALID_PARAMETER:
-      Logger::Error(std::string("PhysX Invalid Parameter: ") + message +
+      Logger::error(std::string("PhysX Invalid Parameter: ") + message +
                     ", in File: " + file + " at Line: " + std::to_string(line));
       break;
     case physx::PxErrorCode::eINVALID_OPERATION:
-      Logger::Error(std::string("PhysX Invalid Operation: ") + message +
+      Logger::error(std::string("PhysX Invalid Operation: ") + message +
                     ", in File: " + file + " at Line: " + std::to_string(line));
       break;
     case PxErrorCode::eOUT_OF_MEMORY:
-      Logger::Error(std::string("PhysX Out of Memory: ") + message +
+      Logger::error(std::string("PhysX Out of Memory: ") + message +
                     ", in File: " + file + " at Line: " + std::to_string(line));
       break;
     case PxErrorCode::eDEBUG_INFO:
-      Logger::Debug(std::string("PhysX: ") + message);
+      Logger::debug(std::string("PhysX: ") + message);
       break;
     case PxErrorCode::eDEBUG_WARNING:
-      Logger::Debug(std::string("PhysX Warning: ") + message +
+      Logger::debug(std::string("PhysX Warning: ") + message +
                     ", in File: " + file + " at Line: " + std::to_string(line));
       break;
     case PxErrorCode::ePERF_WARNING:
-      Logger::Warn(std::string("PhysX Performance: ") + message +
+      Logger::warn(std::string("PhysX Performance: ") + message +
                    ", in File: " + file + " at Line: " + std::to_string(line));
       break;
     case PxErrorCode::eABORT:
-      Logger::Fatal(std::string("PhysX: ") + message + ", in File: " + file +
+      Logger::fatal(std::string("PhysX: ") + message + ", in File: " + file +
                     " at Line: " + std::to_string(line));
       break;
     default:
-      Logger::Error(std::string("PhysX: ") + message + ", in File: " + file +
+      Logger::error(std::string("PhysX: ") + message + ", in File: " + file +
                     " at Line: " + std::to_string(line));
       break;
   }

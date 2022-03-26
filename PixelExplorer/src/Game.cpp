@@ -10,18 +10,18 @@ Game::Game(Renderer* renderer, PhysicsBase* physicsBase) {
   _physics = physicsBase;
   _physics->grab();
 
-  BlockShape::LoadShapes();
-  BlockDefinition::LoadDefinitions();
+  BlockShape::loadShapes();
+  BlockDefinition::loadDefinitions();
 }
 
 Game::~Game() {
-  BlockDefinition::UnloadDefinitions();
-  BlockShape::UnloadShapes();
+  BlockDefinition::unloadDefinitions();
+  BlockShape::unloadShapes();
   _physics->drop();
   _renderer->drop();
 }
 
-void Game::Start() {
+void Game::start() {
   TestRenderable* t = new TestRenderable();
   _renderer->addRenderable(t);
   glm::vec3 camPos(12, 12, 75);

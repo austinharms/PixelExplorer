@@ -7,14 +7,14 @@
 template <typename T>
 class DataBuffer : public RefCounted {
  public:
-  T* Buffer;
-  const uint32_t Length;
-  bool IsReadOnly();
-  void MakeReadOnly();
-  void MakeWriteable();
+  T* buffer;
+  const uint32_t length;
+  bool isReadOnly();
+  void makeReadOnly();
+  void makeWriteable();
   DataBuffer(uint32_t length);
   ~DataBuffer();
-  uint32_t GetSize() const;
+  uint32_t getSize() const;
 
  private:
   uint8_t _readOnlyCounter;

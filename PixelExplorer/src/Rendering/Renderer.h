@@ -20,7 +20,7 @@ public:
 	bool getKeyPressed(int32_t key);
 	void setFPSLimit(int32_t limit);
 	void setCursorHidden(bool hidden);
-	void RemoveRenderable(Renderable* renderable);
+	void removeRenderable(Renderable* renderable);
 
 	int getFPSLimit() const { return _FPSLimit; }
 

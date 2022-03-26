@@ -8,18 +8,18 @@ class Logger {
  public:
   enum LogLevel { LOGINFO, LOGWARN, LOGERROR, LOGDEBUG, LOGFATAL };
 
-  static void Info(const char* msg);
-  static void Warn(const char* msg);
-  static void Error(const char* msg);
-  static void Debug(const char* msg);
-  static void Fatal(const char* msg);
-  static void Info(const std::string msg);
-  static void Warn(const std::string msg);
-  static void Error(const std::string msg);
-  static void Debug(const std::string msg);
-  static void Fatal(const std::string msg);
-  static void Log(const std::string msg, LogLevel level);
-  static void Log(const char* msg, LogLevel level);
+  static void info(const char* msg);
+  static void warn(const char* msg);
+  static void error(const char* msg);
+  static void debug(const char* msg);
+  static void fatal(const char* msg);
+  static void info(const std::string msg);
+  static void warn(const std::string msg);
+  static void error(const std::string msg);
+  static void debug(const std::string msg);
+  static void fatal(const std::string msg);
+  static void log(const std::string msg, LogLevel level);
+  static void log(const char* msg, LogLevel level);
 
  private:
   static const char* toLevelString(LogLevel level);

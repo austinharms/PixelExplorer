@@ -12,22 +12,22 @@
 
 class ChunkRenderMesh : public Renderable {
  public:
-  static void SetMaterial(Material* mat);
-  static void DropMaterial();
+  static void setMaterial(Material* mat);
+  static void dropMaterial();
 
   ChunkRenderMesh();
   ~ChunkRenderMesh();
-  bool ShouldDrop() const;
-  Material* GetMaterial() const;
-  bool PreRender(float deltaTime, const glm::vec3& cameraPos,
+  bool shouldDrop() const;
+  Material* getMaterial() const;
+  bool preRender(float deltaTime, const glm::vec3& cameraPos,
                  const glm::vec3& cameraRotation);
-  glm::mat4 GetTransform() const;
-  void Render() const;
-  void SetPosition(glm::vec3 pos);
-  void SetDropFlag();
-  void UpdateBuffers(DataBuffer<float>* verts, DataBuffer<uint32_t>* indices);
-  bool GetError() const;
-  void SetActive(bool active);
+  glm::mat4 getTransform() const;
+  void render() const;
+  void setPosition(glm::vec3 pos);
+  void setDropFlag();
+  void updateBuffers(DataBuffer<float>* verts, DataBuffer<uint32_t>* indices);
+  bool getError() const;
+  void setActive(bool active);
 
  private:
   static Material* s_material;
@@ -45,6 +45,6 @@ class ChunkRenderMesh : public Renderable {
   bool _dirty;
   bool _error;
 
-  void UpdateBuffers();
+  void updateBuffers();
 };
 #endif  // !CHUNKRENDERMESH_H

@@ -11,36 +11,36 @@ StaticPhysicsObject::StaticPhysicsObject(PhysicsScene* scene,
   scene->grab();
   _scene = scene;
   _pxShape = nullptr;
-  _pxStaticBody = _scene->_base->GetPxPhysics()->createRigidStatic(
+  _pxStaticBody = _scene->_base->getPxPhysics()->createRigidStatic(
       physx::PxTransform(position.x, position.y, position.z));
   _scene->_pxScene->addActor(*_pxStaticBody);
 }
 
-void StaticPhysicsObject::UpdateMesh(DataBuffer<float>* vertices,
+void StaticPhysicsObject::updateMesh(DataBuffer<float>* vertices,
                                      DataBuffer<uint32_t>* indices,
                                      const float vertexStride) {
   physx::PxTriangleMeshDesc meshDesc;
-  vertices->MakeReadOnly();
-  meshDesc.points.count = vertices->Length / vertexStride;
+  vertices->makeReadOnly();
+  meshDesc.points.count = vertices->length / vertexStride;
   meshDesc.points.stride = sizeof(float) * vertexStride;
-  meshDesc.points.data = vertices->Buffer;
+  meshDesc.points.data = vertices->buffer;
 
-  indices->MakeReadOnly();
-  meshDesc.triangles.count = indices->Length / 3;
+  indices->makeReadOnly();
+  meshDesc.triangles.count = indices->length / 3;
   meshDesc.triangles.stride = sizeof(uint32_t) * 3;
-  meshDesc.triangles.data = indices->Buffer;
+  meshDesc.triangles.data = indices->buffer;
 
-  physx::PxTriangleMesh* mesh = _scene->_base->BakePxMesh(meshDesc);
+  physx::PxTriangleMesh* mesh = _scene->_base->bakePxMesh(meshDesc);
   physx::PxMeshScale scale(physx::PxVec3(1));
   const physx::PxTriangleMeshGeometry geom(mesh, scale);
-  physx::PxPhysics* physics = _scene->_base->GetPxPhysics();
+  physx::PxPhysics* physics = _scene->_base->getPxPhysics();
   if (_pxShape != nullptr) {
     _pxStaticBody->detachShape(*_pxShape);
     _pxShape->release();
   }
 
   _pxShape = physics->createShape(
-      geom, *(_scene->_base->GetDefaultPxMaterial()), true);
+      geom, *(_scene->_base->getDefaultPxMaterial()), true);
   _pxStaticBody->attachShape(*_pxShape);
   mesh->release();
 }

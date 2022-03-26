@@ -9,25 +9,25 @@
 
 class BlockDefinition : public RefCounted {
  public:
-  static void LoadDefinitions();
-  static void UnloadDefinitions();
-  static const BlockDefinition* GetDefinitionById(uint16_t id);
-  static bool GetDefinitionsLoaded();
-  static const BlockDefinition* GetDefaultDefinition();
+  static void loadDefinitions();
+  static void unloadDefinitions();
+  static const BlockDefinition* getDefinitionById(uint16_t id);
+  static bool getDefinitionsLoaded();
+  static const BlockDefinition* getDefaultDefinition();
 
   const std::string Name;
 
   virtual ~BlockDefinition();
-  const BlockShape* GetBaseShape() const;
-  const float* GetUVOffsets() const;
-  const uint16_t GetId() const;
+  const BlockShape* getBaseShape() const;
+  const float* getUVOffsets() const;
+  const uint16_t getId() const;
 
  private:
   static std::unordered_map<uint16_t, BlockDefinition*> s_blockDefinitions;
   static BlockDefinition* s_defaultDefinition;
   static bool s_definitionsLoaded;
 
-  static BlockDefinition* CreateDefaultDefinition();
+  static BlockDefinition* createDefaultDefinition();
 
   BlockShape* _shape;
   float _UVOffset[BlockShape::FACE_COUNT * 2];

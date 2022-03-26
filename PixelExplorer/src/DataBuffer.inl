@@ -1,32 +1,32 @@
 #include "DataBuffer.h"
 
 template <typename T>
-bool DataBuffer<T>::IsReadOnly() {
+bool DataBuffer<T>::isReadOnly() {
   return _readOnlyCounter > 0;
 }
 
 template <typename T>
-void DataBuffer<T>::MakeReadOnly() {
+void DataBuffer<T>::makeReadOnly() {
   ++_readOnlyCounter;
 }
 
 template <typename T>
-void DataBuffer<T>::MakeWriteable() {
+void DataBuffer<T>::makeWriteable() {
   --_readOnlyCounter;
 }
 
 template <typename T>
-DataBuffer<T>::DataBuffer(uint32_t length) : Length(length) {
+DataBuffer<T>::DataBuffer(uint32_t length) : length(length) {
   _readOnlyCounter = 0;
-  Buffer = (T*)malloc(sizeof(T) * length);
+  buffer = (T*)malloc(sizeof(T) * length);
 }
 
 template <typename T>
 DataBuffer<T>::~DataBuffer() {
-  free(Buffer);
+  free(buffer);
 }
 
 template <typename T>
-uint32_t DataBuffer<T>::GetSize() const {
-  return Length * sizeof(T);
+uint32_t DataBuffer<T>::getSize() const {
+  return length * sizeof(T);
 }

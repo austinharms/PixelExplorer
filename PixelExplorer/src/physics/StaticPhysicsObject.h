@@ -11,7 +11,7 @@ class StaticPhysicsObject : public RefCounted {
   friend class PhysicsScene;
 
  public:
-  void UpdateMesh(DataBuffer<float>* vertices, DataBuffer<uint32_t>* indices,
+  void updateMesh(DataBuffer<float>* vertices, DataBuffer<uint32_t>* indices,
                   const float vertexStride);
   virtual ~StaticPhysicsObject();
 

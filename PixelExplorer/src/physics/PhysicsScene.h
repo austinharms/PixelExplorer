@@ -13,7 +13,7 @@ class PhysicsScene : public RefCounted {
   friend class PhysicsBase;
   friend class StaticPhysicsObject;
  public:
-  StaticPhysicsObject* CreateStaticObject(const glm::vec3& position,
+  StaticPhysicsObject* createStaticObject(const glm::vec3& position,
                                           DataBuffer<float>* vertices,
                                           DataBuffer<uint32_t>* indices,
                                           const float vertexStride = 3);

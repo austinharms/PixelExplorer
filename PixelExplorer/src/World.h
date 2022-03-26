@@ -5,7 +5,7 @@
 
 class World : public RefCounted {
  public:
-  static World* LoadWorld();
+  static World* loadWorld();
 
   virtual ~World();
 

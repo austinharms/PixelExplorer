@@ -1,6 +1,6 @@
 #include "World.h"
 
-World* World::LoadWorld() { return nullptr; }
+World* World::loadWorld() { return nullptr; }
 
 World::~World() {}
 

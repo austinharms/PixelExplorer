@@ -9,12 +9,12 @@
 class Renderable : public RefCounted {
  public:
   virtual ~Renderable() {}
-  virtual bool ShouldDrop() const = 0;
-  virtual Material* GetMaterial() const = 0;
+  virtual bool shouldDrop() const = 0;
+  virtual Material* getMaterial() const = 0;
   // Should update and return mesh visibility
-  virtual bool PreRender(float deltaTime, const glm::vec3& cameraPos,
+  virtual bool preRender(float deltaTime, const glm::vec3& cameraPos,
                          const glm::vec3& cameraRotation) = 0;
-  virtual glm::mat4 GetTransform() const = 0;
-  virtual void Render() const = 0;
+  virtual glm::mat4 getTransform() const = 0;
+  virtual void render() const = 0;
 };
 #endif  // !RENDERABLE_H

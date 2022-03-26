@@ -11,14 +11,14 @@ class TestRenderable : public Renderable {
  public:
   TestRenderable();
   virtual ~TestRenderable();
-  bool PreRender(float deltaTime, const glm::vec3& cameraPos,
+  bool preRender(float deltaTime, const glm::vec3& cameraPos,
                  const glm::vec3& cameraRotation);
-  bool ShouldDrop() const;
-  void SetDropFlag();
-  glm::mat4 GetTransform() const;
-  Material* GetMaterial() const;
-  void SetPosition(glm::vec3 position);
-  void Render() const;
+  bool shouldDrop() const;
+  void setDropFlag();
+  glm::mat4 getTransform() const;
+  Material* getMaterial() const;
+  void setPosition(glm::vec3 position);
+  void render() const;
 
  private:
   Material* _material;

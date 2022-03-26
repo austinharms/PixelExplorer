@@ -9,13 +9,13 @@
 class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
   friend class PhysicsScene;
  public:
-  static PhysicsBase* CreatePhysicsBase();
-  static void DropPhysicsBase();
+  static PhysicsBase* createPhysicsBase();
+  static void dropPhysicsBase();
 
-  physx::PxTriangleMesh* BakePxMesh(physx::PxTriangleMeshDesc& desc);
-  physx::PxPhysics* GetPxPhysics() const;
-  physx::PxMaterial* GetDefaultPxMaterial() const;
-  PhysicsScene* CreatePhysicsScene();
+  physx::PxTriangleMesh* bakePxMesh(physx::PxTriangleMeshDesc& desc);
+  physx::PxPhysics* getPxPhysics() const;
+  physx::PxMaterial* getDefaultPxMaterial() const;
+  PhysicsScene* createPhysicsScene();
   void reportError(physx::PxErrorCode::Enum code, const char* message,
                    const char* file, int line);
   virtual ~PhysicsBase();

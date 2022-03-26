@@ -12,27 +12,27 @@
 
 class FileUtilities {
  public:
-  static bool DirectoryExists(const std::string path) {
-    return DirectoryExists(path.c_str());
+  static bool directoryExists(const std::string path) {
+    return directoryExists(path.c_str());
   }
 
-  static bool DirectoryExists(const char* path) {
+  static bool directoryExists(const char* path) {
     struct stat info;
     return stat(path, &info) == 0 && (info.st_mode & S_IFDIR);
   }
 
-  static bool FileExists(const std::string path) {
-    return FileExists(path.c_str());
+  static bool fileExists(const std::string path) {
+    return fileExists(path.c_str());
   }
 
-  static bool FileExists(const char* path) {
+  static bool fileExists(const char* path) {
     struct stat buffer;
     return (stat(path, &buffer) == 0);
   }
 
-  static const std::string GetResourceDirectory() { return _resDir; }
+  static const std::string getResourceDirectory() { return _resDir; }
 
-  static const std::string GetExecutingDirectory() { return _exeDir; }
+  static const std::string getExecutingDirectory() { return _exeDir; }
 
  private:
   static std::string _exeDir;
@@ -61,9 +61,9 @@ class FileUtilities {
     CoTaskMemFree(path);
     std::string fullPath =
         std::string(wpath.begin(), wpath.end()) + "\\PX\\0.0.0\\";
-    if (!DirectoryExists(fullPath)) {
+    if (!directoryExists(fullPath)) {
       if (!std::filesystem::create_directories(fullPath)) {
-        Logger::Warn("Failed to create Resource Directory");
+        Logger::warn("Failed to create Resource Directory");
       }
     }
 

@@ -6,13 +6,13 @@
 
 Material* ChunkRenderMesh::s_material = nullptr;
 
-void ChunkRenderMesh::SetMaterial(Material* mat) {
+void ChunkRenderMesh::setMaterial(Material* mat) {
   if (s_material != nullptr) s_material->drop();
   s_material = mat;
   if (s_material != nullptr) s_material->grab();
 }
 
-void ChunkRenderMesh::DropMaterial() {
+void ChunkRenderMesh::dropMaterial() {
   if (s_material != nullptr) s_material->drop();
   s_material = nullptr;
 }
@@ -26,12 +26,12 @@ ChunkRenderMesh::ChunkRenderMesh() {
   _dirty = false;
   _error = false;
   _transform = glm::eulerAngleXYX(0, 0, 0);
-  SetPosition(glm::vec3(0));
+  setPosition(glm::vec3(0));
 
   glGenVertexArrays(1, &_vertexArrayId);
   if (_vertexArrayId == 0) {
     _error = true;
-    Logger::Error("Failed to Create ChunkRenderMesh Vertex Array");
+    Logger::error("Failed to Create ChunkRenderMesh Vertex Array");
     return;
   }
 
@@ -39,14 +39,14 @@ ChunkRenderMesh::ChunkRenderMesh() {
   glGenBuffers(1, &_vertexBufferId);
   if (_vertexArrayId == 0) {
     _error = true;
-    Logger::Error("Failed to Create ChunkRenderMesh Vertex Buffer");
+    Logger::error("Failed to Create ChunkRenderMesh Vertex Buffer");
     return;
   }
 
   glGenBuffers(0, &_indexBufferId);
   if (_indexBufferId == 0) {
     _error = true;
-    Logger::Error("Failed to Create ChunkRenderMesh Index Buffer");
+    Logger::error("Failed to Create ChunkRenderMesh Index Buffer");
     return;
   }
 
@@ -65,87 +65,87 @@ ChunkRenderMesh::~ChunkRenderMesh() {
   glDeleteBuffers(1, &_vertexBufferId);
   glDeleteBuffers(1, &_indexBufferId);
   if (_vertexBuffer != nullptr) {
-    _vertexBuffer->MakeWriteable();
+    _vertexBuffer->makeWriteable();
     _vertexBuffer->drop();
   }
 
   if (_indexBuffer != nullptr) {
-    _indexBuffer->MakeWriteable();
+    _indexBuffer->makeWriteable();
     _indexBuffer->drop();
   }
 }
 
-bool ChunkRenderMesh::ShouldDrop() const { return _drop || _error; }
+bool ChunkRenderMesh::shouldDrop() const { return _drop || _error; }
 
-Material* ChunkRenderMesh::GetMaterial() const { return s_material; }
+Material* ChunkRenderMesh::getMaterial() const { return s_material; }
 
-bool ChunkRenderMesh::PreRender(float deltaTime,
+bool ChunkRenderMesh::preRender(float deltaTime,
                                        const glm::vec3& cameraPos,
                                        const glm::vec3& cameraRotation) {
-  UpdateBuffers();
+  updateBuffers();
   return _active && !_error;
 }
 
-glm::mat4 ChunkRenderMesh::GetTransform() const { return _transform; }
+glm::mat4 ChunkRenderMesh::getTransform() const { return _transform; }
 
-void ChunkRenderMesh::Render() const {
+void ChunkRenderMesh::render() const {
   if (_error) return;
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
   glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void ChunkRenderMesh::SetPosition(glm::vec3 pos) {
+void ChunkRenderMesh::setPosition(glm::vec3 pos) {
   _transform[3] = glm::vec<4, float>(pos, 0);
 }
 
-void ChunkRenderMesh::SetDropFlag() { _drop = true; }
+void ChunkRenderMesh::setDropFlag() { _drop = true; }
 
-void ChunkRenderMesh::UpdateBuffers(DataBuffer<float>* verts,
+void ChunkRenderMesh::updateBuffers(DataBuffer<float>* verts,
                                            DataBuffer<uint32_t>* indices) {
   if (_error) return;
   _bufferMutex.lock();
   _dirty = true;
 
   if (_vertexBuffer != nullptr) {
-    _vertexBuffer->MakeWriteable();
+    _vertexBuffer->makeWriteable();
     _vertexBuffer->drop();
   }
 
   _vertexBuffer = verts;
-  _indexBuffer->MakeReadOnly();
+  _indexBuffer->makeReadOnly();
 
   if (_indexBuffer != nullptr) {
-    _indexBuffer->MakeWriteable();
+    _indexBuffer->makeWriteable();
     _indexBuffer->drop();
   }
 
   _indexBuffer = indices;
-  _indexBuffer->MakeReadOnly();
+  _indexBuffer->makeReadOnly();
 
   _bufferMutex.unlock();
 }
 
-bool ChunkRenderMesh::GetError() const { return _error; }
+bool ChunkRenderMesh::getError() const { return _error; }
 
-void ChunkRenderMesh::SetActive(bool active) { _active = active; }
+void ChunkRenderMesh::setActive(bool active) { _active = active; }
 
-void ChunkRenderMesh::UpdateBuffers() {
+void ChunkRenderMesh::updateBuffers() {
   if (!_dirty || _error) return;
   _bufferMutex.lock();
   _dirty = false;
-  _indexCount = _indexBuffer->Length;
+  _indexCount = _indexBuffer->length;
 
   glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
-  glBufferData(GL_ARRAY_BUFFER, _vertexBuffer->GetSize(), _vertexBuffer->Buffer,
+  glBufferData(GL_ARRAY_BUFFER, _vertexBuffer->getSize(), _vertexBuffer->buffer,
                GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer->GetSize(),
-               _indexBuffer->Buffer, GL_STATIC_DRAW);
-  _vertexBuffer->MakeWriteable();
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer->getSize(),
+               _indexBuffer->buffer, GL_STATIC_DRAW);
+  _vertexBuffer->makeWriteable();
   _vertexBuffer->drop();
   _vertexBuffer = nullptr;
-  _indexBuffer->MakeWriteable();
+  _indexBuffer->makeWriteable();
   _indexBuffer->drop();
   _indexBuffer = nullptr;
   _bufferMutex.unlock();
