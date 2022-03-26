@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "RefCounted.h"
-
+namespace px::game::chunk {
 struct BlockShape : public RefCounted {
  public:
   static const int32_t FACE_COUNT = 6;
@@ -42,4 +42,5 @@ struct BlockShape : public RefCounted {
 
   BlockShape(std::string name);
 };
+}  // namespace px::game::chunk
 #endif

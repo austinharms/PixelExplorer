@@ -3,7 +3,7 @@
 
 #include "RefCounted.h"
 #include "Shader.h"
-
+namespace px::rendering {
 class Material : public virtual RefCounted {
  public:
   Material(Shader* shader) : _id(++s_idCounter), _shader(nullptr) {
@@ -26,7 +26,9 @@ class Material : public virtual RefCounted {
 
   unsigned int getId() const { return _id; }
 
-  virtual void onPostBind(){} //Should be called after the attached shader is bound if the material has not already been bound
+  virtual void onPostBind() {
+  }  // Should be called after the attached shader is bound if the material has
+     // not already been bound
 
   static Material* getDefault() {
     if (s_default == nullptr) s_default = loadDefaultMaterial();
@@ -39,7 +41,8 @@ class Material : public virtual RefCounted {
   unsigned int _id;
   static Material* loadDefaultMaterial();
 
-protected:
+ protected:
   Shader* _shader;
 };
+}  // namespace px::rendering
 #endif  // !RENDER_MATERIAL_H

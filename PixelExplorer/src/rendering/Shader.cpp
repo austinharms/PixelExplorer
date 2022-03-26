@@ -8,7 +8,7 @@
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
-
+namespace px::rendering {
 Shader* Shader::s_default = nullptr;
 
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
@@ -118,3 +118,4 @@ Shader* Shader::loadDefaultShader() {
   assert(defaultShader->isValid());
   return defaultShader;
 }
+}  // namespace px::rendering

@@ -1,4 +1,5 @@
 #include "Logger.h"
+namespace px {
 
 void Logger::info(const char* msg) { log(msg, LOGINFO); }
 void Logger::warn(const char* msg) { log(msg, LOGWARN); }
@@ -46,3 +47,4 @@ const char* Logger::toLevelString(LogLevel level) {
       return "Unknown";
   }
 }
+}  // namespace px

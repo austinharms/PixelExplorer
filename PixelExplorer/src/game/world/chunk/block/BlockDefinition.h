@@ -6,7 +6,7 @@
 
 #include "BlockShape.h"
 #include "RefCounted.h"
-
+namespace px::game::chunk {
 class BlockDefinition : public RefCounted {
  public:
   static void loadDefinitions();
@@ -35,4 +35,5 @@ class BlockDefinition : public RefCounted {
 
   BlockDefinition(std::string name);
 };
+}  // namespace px::game::chunk
 #endif  // !BLOCKDEFINITION_H

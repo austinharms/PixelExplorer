@@ -2,7 +2,7 @@
 #define DIRECTION_H
 
 #include "glm/vec3.hpp"
-
+namespace px::util {
 struct Direction {
  public:
   static const Direction NONE;
@@ -29,4 +29,5 @@ struct Direction {
   Direction(uint8_t value);
   const uint8_t _value;
 };
+}  // namespace px::util
 #endif  // !DIRECTION_H

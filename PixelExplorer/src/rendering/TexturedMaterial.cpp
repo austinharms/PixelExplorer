@@ -1,9 +1,9 @@
 #include "TexturedMaterial.h"
 
 #include "GL/glew.h"
-
-TexturedMaterial::TexturedMaterial(Shader* shader, void* texture,
-                                   int32_t width, int32_t height)
+namespace px::rendering {
+TexturedMaterial::TexturedMaterial(Shader* shader, void* texture, int32_t width,
+                                   int32_t height)
     : Material(shader) {
   _width = width;
   _height = height;
@@ -28,7 +28,8 @@ void TexturedMaterial::onPostBind() {
   if (_shader != nullptr) _shader->setUniform1i("u_Texture", 0);
 }
 
-void TexturedMaterial::updateTexture(void* texture, int32_t width, int32_t height) {
+void TexturedMaterial::updateTexture(void* texture, int32_t width,
+                                     int32_t height) {
   _width = width;
   _height = height;
   glBindTexture(GL_TEXTURE_2D, _textureId);
@@ -43,3 +44,4 @@ void TexturedMaterial::bindTexture() {
 }
 
 void TexturedMaterial::unbindTexture() { glBindTexture(GL_TEXTURE_2D, 0); }
+}  // namespace px::rendering

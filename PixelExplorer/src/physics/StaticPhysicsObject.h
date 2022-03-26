@@ -7,6 +7,7 @@
 #include "DataBuffer.h"
 #include "glm/vec3.hpp"
 
+namespace px::physics {
 class StaticPhysicsObject : public RefCounted {
   friend class PhysicsScene;
 
@@ -20,6 +21,9 @@ class StaticPhysicsObject : public RefCounted {
   physx::PxRigidStatic* _pxStaticBody;
   physx::PxShape* _pxShape;
 
-  StaticPhysicsObject(PhysicsScene* scene, const glm::vec3& position, DataBuffer<float>* vertices, DataBuffer<uint32_t>* indices, const float vertexStride);
+  StaticPhysicsObject(PhysicsScene* scene, const glm::vec3& position,
+                      DataBuffer<float>* vertices,
+                      DataBuffer<uint32_t>* indices, const float vertexStride);
 };
+}  // namespace px::physics
 #endif  // !STATICPHYSICSOBJECT_H

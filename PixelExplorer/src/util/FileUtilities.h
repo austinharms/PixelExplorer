@@ -9,7 +9,7 @@
 #include <windows.h>
 
 #include "Logger.h"
-
+namespace px::util {
 class FileUtilities {
  public:
   static bool directoryExists(const std::string path) {
@@ -74,4 +74,5 @@ class FileUtilities {
 
   ~FileUtilities() {}
 };
+}  // namespace px::util
 #endif  // !FILEUTILITIES_H

@@ -2,7 +2,7 @@
 
 #include "Logger.h"
 #include "PhysicsScene.h"
-
+namespace px::physics {
 using namespace physx;
 
 PhysicsBase* PhysicsBase::s_physicsBase = nullptr;
@@ -64,11 +64,11 @@ physx::PxTriangleMesh* PhysicsBase::bakePxMesh(
       desc, _pxPhysics->getPhysicsInsertionCallback());
 }
 
-physx::PxPhysics* PhysicsBase::getPxPhysics() const {
-  return _pxPhysics;
-}
+physx::PxPhysics* PhysicsBase::getPxPhysics() const { return _pxPhysics; }
 
-physx::PxMaterial* PhysicsBase::getDefaultPxMaterial() const { return _pxDefaultMaterial; }
+physx::PxMaterial* PhysicsBase::getDefaultPxMaterial() const {
+  return _pxDefaultMaterial;
+}
 
 PhysicsScene* PhysicsBase::createPhysicsScene() {
   return new PhysicsScene(this);
@@ -110,3 +110,4 @@ void PhysicsBase::reportError(PxErrorCode::Enum code, const char* message,
       break;
   }
 }
+}  // namespace px::physics

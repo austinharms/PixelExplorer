@@ -9,7 +9,7 @@
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 
-
+namespace px::game::chunk {
 class ChunkRenderMesh : public Renderable {
  public:
   static void setMaterial(Material* mat);
@@ -47,4 +47,5 @@ class ChunkRenderMesh : public Renderable {
 
   void updateBuffers();
 };
+}  // namespace px::game::chunk
 #endif  // !CHUNKRENDERMESH_H

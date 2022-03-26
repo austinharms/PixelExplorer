@@ -1,5 +1,5 @@
 #include "DataBuffer.h"
-
+namespace px::util {
 template <typename T>
 bool DataBuffer<T>::isReadOnly() {
   return _readOnlyCounter > 0;
@@ -30,3 +30,4 @@ template <typename T>
 uint32_t DataBuffer<T>::getSize() const {
   return length * sizeof(T);
 }
+}  // namespace px::util

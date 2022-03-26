@@ -7,7 +7,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec3.hpp"
-
+namespace px::rendering {
 std::unordered_map<GLFWwindow*, Renderer*> Renderer::s_renderers;
 
 Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
@@ -117,11 +117,12 @@ void Renderer::addRenderable(Renderable* renderable) {
     }
   }
 
-  //std::cout << "Added Renderable, Material: "
+  // std::cout << "Added Renderable, Material: "
   //          << renderable->getMaterial()->getId()
-  //          << ", Shader: " << renderable->getMaterial()->getShader()->getGLID()
+  //          << ", Shader: " <<
+  //          renderable->getMaterial()->getShader()->getGLID()
   //          << std::endl;
-  //for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
+  // for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
   //     it != _renderableObjects.end(); ++it) {
   //  std::cout << "Renderable, Material: " << (*it)->getMaterial()->getId()
   //            << ", Shader: " << (*it)->getMaterial()->getShader()->getGLID()
@@ -317,3 +318,4 @@ void Renderer::s_windowFocus(GLFWwindow* window, int focused) {
 void Renderer::s_windowResize(GLFWwindow* window, int width, int height) {
   Renderer::s_renderers[window]->windowResize(width, height);
 }
+}  // namespace px::rendering

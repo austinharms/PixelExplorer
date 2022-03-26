@@ -1,6 +1,6 @@
 #include "BlockDefinition.h"
 #include "Logger.h"
-
+namespace px::game::chunk {
 std::unordered_map<uint16_t, BlockDefinition*>
     BlockDefinition::s_blockDefinitions;
 bool BlockDefinition::s_definitionsLoaded = false;
@@ -43,9 +43,7 @@ const BlockDefinition* BlockDefinition::getDefinitionById(uint16_t id) {
   return found->second;
 }
 
-bool BlockDefinition::getDefinitionsLoaded() {
-  return s_definitionsLoaded;
-}
+bool BlockDefinition::getDefinitionsLoaded() { return s_definitionsLoaded; }
 
 const BlockDefinition* BlockDefinition::getDefaultDefinition() {
   return s_defaultDefinition;
@@ -58,3 +56,4 @@ const BlockShape* BlockDefinition::getBaseShape() const { return _shape; }
 const float* BlockDefinition::getUVOffsets() const { return _UVOffset; }
 
 const uint16_t BlockDefinition::getId() const { return _id; }
+}  // namespace px::game::chunk

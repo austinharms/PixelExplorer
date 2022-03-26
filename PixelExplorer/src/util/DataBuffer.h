@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "RefCounted.h"
-
+namespace px::util {
 template <typename T>
 class DataBuffer : public RefCounted {
  public:
@@ -19,6 +19,7 @@ class DataBuffer : public RefCounted {
  private:
   uint8_t _readOnlyCounter;
 };
+}  // namespace px::util
 
 #include "DataBuffer.inl"
 

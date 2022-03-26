@@ -5,9 +5,10 @@
 #include "PhysicsScene.fwd.h"
 #include "PxPhysicsAPI.h"
 #include "RefCounted.h"
-
+namespace px::physics {
 class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
   friend class PhysicsScene;
+
  public:
   static PhysicsBase* createPhysicsBase();
   static void dropPhysicsBase();
@@ -36,4 +37,5 @@ class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
 
   PhysicsBase();
 };
+}  // namespace px::physics
 #endif  // !PHYSICSBASE_H

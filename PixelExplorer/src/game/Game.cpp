@@ -3,7 +3,7 @@
 #include "rendering/TestRenderable.h"
 
 #include "glm/vec3.hpp"
-
+namespace px::game {
 Game::Game(Renderer* renderer, PhysicsBase* physicsBase) {
   _renderer = renderer;
   _renderer->grab();
@@ -60,4 +60,5 @@ void Game::start() {
     _renderer->setTransform(camPos, camRot);
     _renderer->drawFrame();
   }
+}
 }

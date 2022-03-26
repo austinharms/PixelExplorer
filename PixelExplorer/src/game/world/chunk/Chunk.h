@@ -11,7 +11,7 @@
 #include "RefCounted.h"
 #include "ChunkRenderMesh.h"
 #include "./block/Block.h"
-
+namespace px::game::chunk {
 class Chunk : public RefCounted {
  public:
   enum class Status : uint8_t {
@@ -48,4 +48,5 @@ class Chunk : public RefCounted {
   glm::vec<3, int32_t> _position;
   Status _status;
 };
+}  // namespace px::game::chunk
 #endif  // !CHUNK_H

@@ -5,7 +5,7 @@
 #include "RefCounted.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
-
+namespace px::rendering {
 class Renderable : public RefCounted {
  public:
   virtual ~Renderable() {}
@@ -17,4 +17,5 @@ class Renderable : public RefCounted {
   virtual glm::mat4 getTransform() const = 0;
   virtual void render() const = 0;
 };
+}  // namespace px::rendering
 #endif  // !RENDERABLE_H

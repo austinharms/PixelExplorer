@@ -3,7 +3,7 @@
 #include "Logger.h"
 #include "PhysicsBase.h"
 #include "StaticPhysicsObject.h"
-
+namespace px::physics {
 PhysicsScene::PhysicsScene(PhysicsBase* base) {
   base->grab();
   _base = base;
@@ -19,10 +19,12 @@ PhysicsScene::PhysicsScene(PhysicsBase* base) {
 StaticPhysicsObject* PhysicsScene::createStaticObject(
     const glm::vec3& position, DataBuffer<float>* vertices,
     DataBuffer<uint32_t>* indices, const float vertexStride) {
-  return new StaticPhysicsObject(this, position, vertices, indices, vertexStride);
+  return new StaticPhysicsObject(this, position, vertices, indices,
+                                 vertexStride);
 }
 
 PhysicsScene::~PhysicsScene() {
   _base->drop();
   _pxScene->release();
 }
+}  // namespace px::physics

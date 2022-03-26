@@ -8,10 +8,11 @@
 #include "RefCounted.h"
 #include "DataBuffer.h"
 #include "glm/vec3.hpp"
-
+namespace px::physics {
 class PhysicsScene : public RefCounted {
   friend class PhysicsBase;
   friend class StaticPhysicsObject;
+
  public:
   StaticPhysicsObject* createStaticObject(const glm::vec3& position,
                                           DataBuffer<float>* vertices,
@@ -25,4 +26,5 @@ class PhysicsScene : public RefCounted {
 
   PhysicsScene(PhysicsBase* base);
 };
+}  // namespace px::physics
 #endif

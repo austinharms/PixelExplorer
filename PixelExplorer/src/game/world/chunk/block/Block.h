@@ -1,7 +1,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 #include <cstdint>
-
+namespace px::game::chunk {
 class Block {
  public:
   Block();
@@ -16,4 +16,5 @@ class Block {
   const uint16_t EXTEND_BITMASK = 0b1000000000000000;
   uint16_t _id;
 };
+}  // namespace px::game::chunk
 #endif

@@ -6,7 +6,7 @@
 #include "Renderable.h"
 #include "glm/mat4x4.hpp"
 #include "glm/gtx/euler_angles.hpp"
-
+namespace px::rendering {
 class TestRenderable : public Renderable {
  public:
   TestRenderable();
@@ -28,8 +28,9 @@ class TestRenderable : public Renderable {
   glm::vec3 _position;
   glm::vec3 _rotation;
   bool _drop;
-  //glm::mat4 _transform;
+  // glm::mat4 _transform;
 };
+}  // namespace px::rendering
 #endif  // !TESTRENDERABLE_H
 
 /*

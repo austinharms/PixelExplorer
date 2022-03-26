@@ -2,6 +2,7 @@
 
 #include "ChunkManager.h"
 #include "Logger.h"
+namespace px::game::chunk {
 
 Chunk::Chunk(ChunkRenderMesh* renderMesh) {
   if (renderMesh == nullptr)
@@ -49,6 +50,7 @@ void Chunk::setManager(ChunkManager* mgr) {
 }
 
 ChunkRenderMesh* Chunk::getRenderMesh() const { return _renderMesh; }
+}  // namespace px::game::chunk
 
 #pragma region OldChunkCode
 //#include "Chunk.h"

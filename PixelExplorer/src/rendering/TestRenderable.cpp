@@ -1,7 +1,7 @@
 #include "TestRenderable.h"
 
 #include "glm/gtx/transform.hpp"
-
+namespace px::rendering {
 TestRenderable::TestRenderable() {
   _material = Material::getDefault();
   _material->grab();
@@ -73,10 +73,13 @@ inline glm::mat4 TestRenderable::getTransform() const {
 
 inline Material* TestRenderable::getMaterial() const { return _material; }
 
-inline void TestRenderable::setPosition(glm::vec3 position) { _position = position; }
+inline void TestRenderable::setPosition(glm::vec3 position) {
+  _position = position;
+}
 
 void TestRenderable::render() const {
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
 }
+}  // namespace px::rendering

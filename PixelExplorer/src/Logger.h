@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+namespace px {
 class Logger {
  public:
   enum LogLevel { LOGINFO, LOGWARN, LOGERROR, LOGDEBUG, LOGFATAL };
@@ -26,4 +27,5 @@ class Logger {
   Logger();
   ~Logger();
 };
+}  // namespace px
 #endif  // !LOGGER_H

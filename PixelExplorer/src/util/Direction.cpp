@@ -1,5 +1,5 @@
 #include "Direction.h"
-
+namespace px::util {
 const Direction Direction::NONE = 0b00000000;
 const Direction Direction::FRONT = 0b00000001;
 const Direction Direction::BACK = 0b00000010;
@@ -88,3 +88,4 @@ Direction Direction::getOpposite() const {
       return ALL;
   }
 }
+}  // namespace px::util

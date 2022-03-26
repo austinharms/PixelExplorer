@@ -60,7 +60,7 @@
     <ClCompile Include="src\util\Direction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\Logger.cpp">
+    <ClCompile Include="src\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\world\chunk\block\Block.cpp">
@@ -498,7 +498,7 @@
     <ClInclude Include="src\rendering\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\RefCounted.h">
+    <ClInclude Include="src\RefCounted.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\Renderable.h">
@@ -1389,7 +1389,7 @@
     <ClInclude Include="src\util\FileUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\Logger.h">
+    <ClInclude Include="src\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\world\chunk\block\Block.h">

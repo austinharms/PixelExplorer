@@ -13,7 +13,7 @@
 #include "ChunkManager.fwd.h"
 #include "PxScene.h"
 #include "glm/gtx/hash.hpp"
-
+namespace px::game::chunk {
 class ChunkManager : public RefCounted {
  public:
   ChunkManager(Renderer* renderer);
@@ -28,5 +28,5 @@ class ChunkManager : public RefCounted {
   std::unordered_map<glm::vec<3, int32_t>, Chunk*> _chunks;
   physx::PxScene* _scene;
 };
-
+}  // namespace px::game::chunk
 #endif

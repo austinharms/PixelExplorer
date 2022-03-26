@@ -2,8 +2,10 @@
 #define REFCOUNTED_H
 
 #include <stdint.h>
+
 #include <atomic>
 
+namespace px {
 class RefCounted {
  public:
   inline RefCounted() : _refCount(1) {}
@@ -26,5 +28,6 @@ class RefCounted {
  private:
   std::atomic<uint32_t> _refCount;
 };
+}  // namespace px
 
 #endif  // !REFCOUNTED_H

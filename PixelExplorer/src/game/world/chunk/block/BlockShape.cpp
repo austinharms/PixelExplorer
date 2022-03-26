@@ -1,6 +1,6 @@
 #include "BlockShape.h"
 #include "Logger.h"
-
+namespace px::game::chunk {
 BlockShape* BlockShape::s_defaultShape = nullptr;
 std::unordered_map<std::string, BlockShape*> BlockShape::s_blockShapes;
 bool BlockShape::s_shapesLoaded = false;
@@ -20,106 +20,202 @@ BlockShape::~BlockShape() {
 }
 
 BlockShape* BlockShape::createDefaultShape() {
-    const float verts[72] = {
-    // Front
-    -0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
+  const float verts[72] = {
+      // Front
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
 
-    // Back
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
+      // Back
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
 
-    // Left
-    -0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f, -0.5f,
+      // Left
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
 
-    // Right
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f, -0.5f,
+      // Right
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
 
-    // Top
-    -0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f, -0.5f,
+      // Top
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
 
-    // Bottom
-    -0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
+      // Bottom
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
   };
 
   const float uvs[48] = {
-    // Front
-    0,0,
-    1,0,
-    1,1,
-    0,1,
+      // Front
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
 
-    // Back
-    0,0,
-    1,0,
-    1,1,
-    0,1,
+      // Back
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
 
-    // Left
-    0,0,
-    1,0,
-    1,1,
-    0,1,
+      // Left
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
 
-    // Right
-    0,0,
-    1,0,
-    1,1,
-    0,1,
+      // Right
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
 
-    // Top
-    0,0,
-    1,0,
-    1,1,
-    0,1,
+      // Top
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
 
-    // Bottom
-    0,0,
-    1,0,
-    1,1,
-    0,1,
+      // Bottom
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
   };
 
   const uint8_t indices[36] = {
-    // Front
-    0,1,2,
-    0,2,3,
+      // Front
+      0,
+      1,
+      2,
+      0,
+      2,
+      3,
 
-    // Back
-    2,1,0,
-    2,3,0,
+      // Back
+      2,
+      1,
+      0,
+      2,
+      3,
+      0,
 
-    // Left
-    0,1,2,
-    0,2,3,
+      // Left
+      0,
+      1,
+      2,
+      0,
+      2,
+      3,
 
-    // Right
-    2,1,0,
-    2,3,0,
+      // Right
+      2,
+      1,
+      0,
+      2,
+      3,
+      0,
 
-    // Top
-    0,1,2,
-    0,2,3,
+      // Top
+      0,
+      1,
+      2,
+      0,
+      2,
+      3,
 
-    // Bottom
-    2,1,0,
-    2,3,0,
+      // Bottom
+      2,
+      1,
+      0,
+      2,
+      3,
+      0,
   };
 
   BlockShape* block = new BlockShape("DEFAULT");
@@ -153,7 +249,7 @@ BlockShape* BlockShape::createDefaultShape() {
   block->RenderIndices[4] = block->RenderIndices[3] + 6;
   block->RenderIndices[5] = block->RenderIndices[4] + 6;
 
-    block->PhysicsVertices[0] = (float*)malloc(sizeof(verts));
+  block->PhysicsVertices[0] = (float*)malloc(sizeof(verts));
   if (block->PhysicsVertices[0] == nullptr)
     Logger::fatal(
         "Failed to allocate vertex physics buffer for DEFAULT block shape");
@@ -217,3 +313,4 @@ void BlockShape::unloadShapes() {
 }
 
 BlockShape* BlockShape::getDefaultShape() { return s_defaultShape; }
+}  // namespace px::game::chunk

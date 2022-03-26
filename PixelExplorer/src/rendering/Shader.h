@@ -7,7 +7,7 @@
 #include "RefCounted.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec4.hpp"
-
+namespace px::rendering {
 class Shader : public virtual RefCounted {
  public:
   Shader(const std::string shaderFilepath);
@@ -36,4 +36,5 @@ class Shader : public virtual RefCounted {
   static Shader* s_default;
   static Shader* loadDefaultShader();
 };
+}  // namespace px::rendering
 #endif  // !SHADER_H

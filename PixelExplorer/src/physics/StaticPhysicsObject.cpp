@@ -2,7 +2,7 @@
 
 #include "PhysicsBase.h"
 #include "PhysicsScene.h"
-
+namespace px::physics {
 StaticPhysicsObject::StaticPhysicsObject(PhysicsScene* scene,
                                          const glm::vec3& position,
                                          DataBuffer<float>* vertices,
@@ -50,3 +50,4 @@ StaticPhysicsObject::~StaticPhysicsObject() {
   _pxStaticBody->release();
   _scene->drop();
 }
+}  // namespace px::physics

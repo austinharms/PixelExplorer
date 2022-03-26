@@ -2,7 +2,7 @@
 #define WORLD_H
 
 #include "RefCounted.h"
-
+namespace px::game {
 class World : public RefCounted {
  public:
   static World* loadWorld();
@@ -12,4 +12,5 @@ class World : public RefCounted {
  private:
   World();
 };
+}
 #endif
