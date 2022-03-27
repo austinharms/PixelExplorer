@@ -48,7 +48,7 @@ std::string FileUtilities::getResDir() {
       SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &path);
   if (get_folder_path_ret != S_OK) {
     CoTaskMemFree(path);
-    assert(false);
+    Logger::fatal("Failed to get Resource directory");
     return "";
   }
 
