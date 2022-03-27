@@ -3,8 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
-#include <unordered_map>
+#include <vector>
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -21,17 +20,17 @@ void Shader::bind() const { glUseProgram(_renderId); }
 
 void Shader::unbind() const { glUseProgram(0); }
 
-unsigned int Shader::compileShader(unsigned int type,
+unsigned int Shader::compileShader(uint32_t type,
                                    const std::string source) {
-  unsigned int id = glCreateShader(type);
+  uint32_t id = glCreateShader(type);
   const char* src = source.c_str();
   glShaderSource(id, 1, &src, nullptr);
   glCompileShader(id);
 
-  int res;
+  int32_t res;
   glGetShaderiv(id, GL_COMPILE_STATUS, &res);
   if (res == GL_FALSE) {
-    int maxLength = 0;
+    int32_t maxLength = 0;
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
     std::vector<GLchar> errorLog(maxLength);
     glGetShaderInfoLog(id, maxLength, &maxLength, &errorLog[0]);
@@ -52,31 +51,31 @@ int Shader::getUniformLocation(const char* name) {
   if (uniform != _uniforms.end()) {
     return uniform->second;
   } else {
-    int u = glGetUniformLocation(_renderId, name);
+    int32_t u = glGetUniformLocation(_renderId, name);
     _uniforms.insert({name, u});
     return u;
   }
 }
 
-void Shader::setUniform1i(const char* name, int value) {
-  int loc = getUniformLocation(name);
+void Shader::setUniform1i(const char* name, int32_t value) {
+  int32_t loc = getUniformLocation(name);
   if (loc == -1) return;
   glUniform1i(loc, value);
 }
 
 void Shader::setUniformm4(const char* name, glm::mat4 value) {
-  int loc = getUniformLocation(name);
+  int32_t loc = getUniformLocation(name);
   if (loc == -1) return;
   glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void Shader::setUniformv4(const char* name, glm::vec4 value) {
-  int loc = getUniformLocation(name);
+  int32_t loc = getUniformLocation(name);
   if (loc == -1) return;
   glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-unsigned int Shader::createProgram(const std::string path) {
+uint32_t Shader::createProgram(const std::string path) {
   std::ifstream stream(path);
 
   enum class ShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
@@ -94,14 +93,14 @@ unsigned int Shader::createProgram(const std::string path) {
         type = ShaderType::NONE;
       }
     } else {
-      ss[(int)type] << line << "\n";
+      ss[(int32_t)type] << line << "\n";
     }
   }
 
-  unsigned int program = glCreateProgram();
-  unsigned int vs =
+  uint32_t program = glCreateProgram();
+  uint32_t vs =
       compileShader(GL_VERTEX_SHADER, ss[(int)ShaderType::VERTEX].str());
-  unsigned int fs =
+  uint32_t fs =
       compileShader(GL_FRAGMENT_SHADER, ss[(int)ShaderType::FRAGMENT].str());
   glAttachShader(program, vs);
   glAttachShader(program, fs);

@@ -2,21 +2,23 @@
 //#include <crtdbg.h>
 //#include <stdlib.h>
 
-#include "rendering/Renderer.h"
+#include "game/Game.h"
 #include "physics/PhysicsBase.h"
-#include "Game.h"
+#include "rendering/Renderer.h"
 
-int main(void) { 
-    Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0", 60);
-    renderer->setCursorHidden(true);
-    PhysicsBase* physics = PhysicsBase::createPhysicsBase();
+int main(void) {
+  px::rendering::Renderer* renderer =
+      new px::rendering::Renderer(1200, 800, "Pixel Explorer V2.0", 60);
+  renderer->setCursorHidden(true);
+  px::physics::PhysicsBase* physics =
+      px::physics::PhysicsBase::createPhysicsBase();
 
-    Game* game = new Game(renderer, physics);
-    game->start();
+  px::game::Game* game = new px::game::Game(renderer, physics);
+  game->start();
 
-    game->drop();
-    physics->drop();
-    renderer->drop();
+  game->drop();
+  physics->drop();
+  renderer->drop();
   return 0;
 }
 
@@ -34,7 +36,7 @@ int main(void) {
 //#include "rendering/Shader.h"
 //#include "rendering/TestRenderable.h"
 
-//int main(void) {
+// int main(void) {
 //  BlockDefinition::LoadDefinitions();
 //  PhysicsManager::Init();
 //  Renderer* renderer = new Renderer(1200, 800, "Pixel Explorer V2.0", 60);

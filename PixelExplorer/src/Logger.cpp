@@ -1,4 +1,6 @@
 #include "Logger.h"
+
+#include <iostream>
 namespace px {
 
 void Logger::info(const char* msg) { log(msg, LOGINFO); }

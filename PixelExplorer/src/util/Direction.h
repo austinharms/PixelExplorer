@@ -1,7 +1,10 @@
 #ifndef DIRECTION_H
 #define DIRECTION_H
 
+#include <stdint.h>
+
 #include "glm/vec3.hpp"
+
 namespace px::util {
 struct Direction {
  public:

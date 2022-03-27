@@ -1,7 +1,9 @@
 #ifndef RENDER_TEXTUREDMATERIAL_H
 #define RENDER_TEXTUREDMATERIAL_H
+#include <stdint.h>
 
 #include "Material.h"
+#include "Shader.h"
 namespace px::rendering {
 class TexturedMaterial : public Material {
  public:

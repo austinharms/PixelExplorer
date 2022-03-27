@@ -1,5 +1,7 @@
 #include "TestRenderable.h"
 
+#include "GL/glew.h"
+#include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/transform.hpp"
 namespace px::rendering {
 TestRenderable::TestRenderable() {

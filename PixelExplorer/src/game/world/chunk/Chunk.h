@@ -6,11 +6,11 @@
 
 #include "Chunk.fwd.h"
 #include "ChunkManager.fwd.h"
-#include "Direction.h"
+#include "util/Direction.h"
 #include "PxRigidStatic.h"
 #include "RefCounted.h"
 #include "ChunkRenderMesh.h"
-#include "./block/Block.h"
+#include "block/Block.h"
 namespace px::game::chunk {
 class Chunk : public RefCounted {
  public:
@@ -40,7 +40,7 @@ class Chunk : public RefCounted {
 
  private:
   ChunkManager* _mgr;
-  Chunk* _adjacentChunks[Direction::DIRECTION_COUNT];
+  Chunk* _adjacentChunks[util::Direction::DIRECTION_COUNT];
   physx::PxRigidStatic* _physxActor;
   ChunkRenderMesh* _renderMesh;
   std::mutex _blockMutex;

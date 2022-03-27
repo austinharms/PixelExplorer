@@ -4,9 +4,9 @@
 #include "Logger.h"
 #include "glm/gtx/euler_angles.hpp"
 namespace px::game::chunk {
-Material* ChunkRenderMesh::s_material = nullptr;
+rendering::Material* ChunkRenderMesh::s_material = nullptr;
 
-void ChunkRenderMesh::setMaterial(Material* mat) {
+void ChunkRenderMesh::setMaterial(rendering::Material* mat) {
   if (s_material != nullptr) s_material->drop();
   s_material = mat;
   if (s_material != nullptr) s_material->grab();
@@ -77,7 +77,7 @@ ChunkRenderMesh::~ChunkRenderMesh() {
 
 bool ChunkRenderMesh::shouldDrop() const { return _drop || _error; }
 
-Material* ChunkRenderMesh::getMaterial() const { return s_material; }
+rendering::Material* ChunkRenderMesh::getMaterial() const { return s_material; }
 
 bool ChunkRenderMesh::preRender(float deltaTime, const glm::vec3& cameraPos,
                                 const glm::vec3& cameraRotation) {
@@ -100,8 +100,8 @@ void ChunkRenderMesh::setPosition(glm::vec3 pos) {
 
 void ChunkRenderMesh::setDropFlag() { _drop = true; }
 
-void ChunkRenderMesh::updateBuffers(DataBuffer<float>* verts,
-                                    DataBuffer<uint32_t>* indices) {
+void ChunkRenderMesh::updateBuffers(util::DataBuffer<float>* verts,
+                                    util::DataBuffer<uint32_t>* indices) {
   if (_error) return;
   _bufferMutex.lock();
   _dirty = true;

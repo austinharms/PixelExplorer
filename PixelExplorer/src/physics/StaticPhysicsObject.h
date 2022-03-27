@@ -4,7 +4,7 @@
 #include "PxPhysicsAPI.h"
 #include "RefCounted.h"
 #include "StaticPhysicsObject.fwd.h"
-#include "DataBuffer.h"
+#include "util/DataBuffer.h"
 #include "glm/vec3.hpp"
 
 namespace px::physics {
@@ -12,7 +12,8 @@ class StaticPhysicsObject : public RefCounted {
   friend class PhysicsScene;
 
  public:
-  void updateMesh(DataBuffer<float>* vertices, DataBuffer<uint32_t>* indices,
+  void updateMesh(util::DataBuffer<float>* vertices,
+                  util::DataBuffer<uint32_t>* indices,
                   const float vertexStride);
   virtual ~StaticPhysicsObject();
 
@@ -22,8 +23,9 @@ class StaticPhysicsObject : public RefCounted {
   physx::PxShape* _pxShape;
 
   StaticPhysicsObject(PhysicsScene* scene, const glm::vec3& position,
-                      DataBuffer<float>* vertices,
-                      DataBuffer<uint32_t>* indices, const float vertexStride);
+                      util::DataBuffer<float>* vertices,
+                      util::DataBuffer<uint32_t>* indices,
+                      const float vertexStride);
 };
 }  // namespace px::physics
 #endif  // !STATICPHYSICSOBJECT_H

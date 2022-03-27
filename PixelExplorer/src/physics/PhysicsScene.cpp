@@ -17,8 +17,8 @@ PhysicsScene::PhysicsScene(PhysicsBase* base) {
 }
 
 StaticPhysicsObject* PhysicsScene::createStaticObject(
-    const glm::vec3& position, DataBuffer<float>* vertices,
-    DataBuffer<uint32_t>* indices, const float vertexStride) {
+    const glm::vec3& position, util::DataBuffer<float>* vertices,
+    util::DataBuffer<uint32_t>* indices, const float vertexStride) {
   return new StaticPhysicsObject(this, position, vertices, indices,
                                  vertexStride);
 }

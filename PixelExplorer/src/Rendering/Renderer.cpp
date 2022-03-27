@@ -318,4 +318,65 @@ void Renderer::s_windowFocus(GLFWwindow* window, int focused) {
 void Renderer::s_windowResize(GLFWwindow* window, int width, int height) {
   Renderer::s_renderers[window]->windowResize(width, height);
 }
+
+int Renderer::getFPSLimit() const { return _FPSLimit; }
+
+int Renderer::getFPS() const { return _FPS; }
+
+float Renderer::getDeltaTime() const { return _deltaTime; }
+
+bool Renderer::getCursorHidden() const { return _cursorHidden; }
+
+bool Renderer::getWindowOpen() const { return !glfwWindowShouldClose(_window); }
+
+void Renderer::setPosition(glm::vec3 position) {
+  std::lock_guard<std::mutex> drawLock(_renderLock);
+  _position = position;
+}
+
+glm::vec3 Renderer::getPosition() const { return _position; }
+
+void Renderer::setRotation(glm::vec2 rotation) {
+  std::lock_guard<std::mutex> drawLock(_renderLock);
+  _rotation = glm::vec3(rotation, 0);
+  updateForwardVector();
+}
+
+void Renderer::setRotation(glm::vec3 rotation) {
+  std::lock_guard<std::mutex> drawLock(_renderLock);
+  _rotation = rotation;
+  updateForwardVector();
+}
+
+glm::vec2 Renderer::getRotation() const { return _rotation; }
+
+glm::vec2 Renderer::getRotationVec3() const { return _rotation; }
+
+void Renderer::setTransform(glm::vec3 position, glm::vec3 rotation) {
+  std::lock_guard<std::mutex> drawLock(_renderLock);
+  _position = position;
+  if (rotation != _rotation) {
+    updateForwardVector();
+    _rotation = rotation;
+  }
+}
+
+void Renderer::setTransform(glm::vec3 position, glm::vec2 rotation) {
+  std::lock_guard<std::mutex> drawLock(_renderLock);
+  _position = position;
+  if (rotation != (glm::vec2)_rotation) {
+    updateForwardVector();
+    _rotation = glm::vec3(rotation, 0);
+  }
+}
+
+glm::vec3 Renderer::getForward() const { return _forward; }
+
+double Renderer::getCursorX() const { return _cursorX; }
+
+double Renderer::getCursorY() const { return _cursorY; }
+
+double Renderer::getCursorChangeX() const { return _cursorChangeX; }
+
+double Renderer::getCursorChangeY() const { return _cursorChangeY; }
 }  // namespace px::rendering

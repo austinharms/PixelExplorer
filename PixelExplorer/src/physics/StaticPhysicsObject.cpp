@@ -5,8 +5,8 @@
 namespace px::physics {
 StaticPhysicsObject::StaticPhysicsObject(PhysicsScene* scene,
                                          const glm::vec3& position,
-                                         DataBuffer<float>* vertices,
-                                         DataBuffer<uint32_t>* indices,
+                                         util::DataBuffer<float>* vertices,
+                                         util::DataBuffer<uint32_t>* indices,
                                          const float vertexStride) {
   scene->grab();
   _scene = scene;
@@ -16,8 +16,8 @@ StaticPhysicsObject::StaticPhysicsObject(PhysicsScene* scene,
   _scene->_pxScene->addActor(*_pxStaticBody);
 }
 
-void StaticPhysicsObject::updateMesh(DataBuffer<float>* vertices,
-                                     DataBuffer<uint32_t>* indices,
+void StaticPhysicsObject::updateMesh(util::DataBuffer<float>* vertices,
+                                     util::DataBuffer<uint32_t>* indices,
                                      const float vertexStride) {
   physx::PxTriangleMeshDesc meshDesc;
   vertices->makeReadOnly();

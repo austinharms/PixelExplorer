@@ -1,28 +1,30 @@
 #include "Game.h"
 
 #include "rendering/TestRenderable.h"
+#include "world/chunk/block/BlockDefinition.h"
+#include "world/chunk/block/BlockShape.h"
 
 #include "glm/vec3.hpp"
 namespace px::game {
-Game::Game(Renderer* renderer, PhysicsBase* physicsBase) {
+Game::Game(rendering::Renderer* renderer, physics::PhysicsBase* physicsBase) {
   _renderer = renderer;
   _renderer->grab();
   _physics = physicsBase;
   _physics->grab();
 
-  BlockShape::loadShapes();
-  BlockDefinition::loadDefinitions();
+  chunk::BlockShape::loadShapes();
+  chunk::BlockDefinition::loadDefinitions();
 }
 
 Game::~Game() {
-  BlockDefinition::unloadDefinitions();
-  BlockShape::unloadShapes();
+  chunk::BlockDefinition::unloadDefinitions();
+  chunk::BlockShape::unloadShapes();
   _physics->drop();
   _renderer->drop();
 }
 
 void Game::start() {
-  TestRenderable* t = new TestRenderable();
+  rendering::TestRenderable* t = new rendering::TestRenderable();
   _renderer->addRenderable(t);
   glm::vec3 camPos(12, 12, 75);
   glm::vec3 camRot(0, 0, 0);

@@ -1,11 +1,12 @@
 #ifndef TESTRENDERABLE_H
 #define TESTRENDERABLE_H
+#include <stdint.h>
 
-#include "GL/glew.h"
-#include "RefCounted.h"
+#include "Material.h"
 #include "Renderable.h"
 #include "glm/mat4x4.hpp"
-#include "glm/gtx/euler_angles.hpp"
+#include "glm/vec3.hpp"
+
 namespace px::rendering {
 class TestRenderable : public Renderable {
  public:
@@ -22,24 +23,12 @@ class TestRenderable : public Renderable {
 
  private:
   Material* _material;
-  unsigned int _vertexBufferId;
-  unsigned int _vertexArrayId;
-  unsigned int _indexBufferId;
+  uint32_t _vertexBufferId;
+  uint32_t _vertexArrayId;
+  uint32_t _indexBufferId;
   glm::vec3 _position;
   glm::vec3 _rotation;
   bool _drop;
-  // glm::mat4 _transform;
 };
 }  // namespace px::rendering
 #endif  // !TESTRENDERABLE_H
-
-/*
-  virtual ~Renderable() {}
-  virtual bool ShouldDrop() const = 0;
-  virtual Material* GetMaterial() const = 0;
-  // Should update and return mesh visibility
-  virtual bool PreRender(float deltaTime, const glm::vec3& cameraPos,
-                         const glm::vec3& cameraRotation) = 0;
-  virtual glm::mat4 GetTransform() const = 0;
-  virtual void Render() const = 0;
-*/

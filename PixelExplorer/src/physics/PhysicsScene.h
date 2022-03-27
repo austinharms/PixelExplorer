@@ -6,7 +6,7 @@
 #include "StaticPhysicsObject.fwd.h"
 #include "PxPhysicsAPI.h"
 #include "RefCounted.h"
-#include "DataBuffer.h"
+#include "util/DataBuffer.h"
 #include "glm/vec3.hpp"
 namespace px::physics {
 class PhysicsScene : public RefCounted {
@@ -15,8 +15,8 @@ class PhysicsScene : public RefCounted {
 
  public:
   StaticPhysicsObject* createStaticObject(const glm::vec3& position,
-                                          DataBuffer<float>* vertices,
-                                          DataBuffer<uint32_t>* indices,
+                                          util::DataBuffer<float>* vertices,
+                                          util::DataBuffer<uint32_t>* indices,
                                           const float vertexStride = 3);
   virtual ~PhysicsScene();
 
