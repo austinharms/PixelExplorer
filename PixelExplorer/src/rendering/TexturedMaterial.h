@@ -10,7 +10,7 @@ class TexturedMaterial : public Material {
   TexturedMaterial(Shader* shader, void* _texture, int32_t width,
                    int32_t height);
   virtual ~TexturedMaterial();
-  void onPostBind() override;
+  void bind() override;
 
   int32_t getWidth() const { return _width; }
 
@@ -22,6 +22,7 @@ class TexturedMaterial : public Material {
   void bindTexture();
   void unbindTexture();
 
+  Shader* _shader;
   int32_t _width;
   int32_t _height;
   uint32_t _textureId;

@@ -3,8 +3,9 @@
 #include "GL/glew.h"
 namespace px::rendering {
 TexturedMaterial::TexturedMaterial(Shader* shader, void* texture, int32_t width,
-                                   int32_t height)
-    : Material(shader) {
+                                   int32_t height) {
+  _shader = shader;
+  _shader->grab();
   _width = width;
   _height = height;
   glGenTextures(1, &_textureId);
@@ -23,7 +24,7 @@ TexturedMaterial::~TexturedMaterial() {
   glDeleteTextures(1, &_textureId);
 }
 
-void TexturedMaterial::onPostBind() {
+void TexturedMaterial::bind() {
   bindTexture();
   if (_shader != nullptr) _shader->setUniform1i("u_Texture", 0);
 }

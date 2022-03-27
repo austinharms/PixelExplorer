@@ -15,7 +15,7 @@ class Material : public RefCounted {
   virtual void bind() {}
 
  private:
-  static uint32_t s_idCounter;
+  inline static uint32_t s_idCounter = 0;
   uint32_t _id;
 };
 }  // namespace px::rendering

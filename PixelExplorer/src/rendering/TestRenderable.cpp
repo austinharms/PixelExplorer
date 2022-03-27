@@ -3,10 +3,10 @@
 #include "GL/glew.h"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/transform.hpp"
+#include "BasicMaterial.h"
 namespace px::rendering {
 TestRenderable::TestRenderable() {
-  _material = Material::getDefault();
-  _material->grab();
+  _material = new BasicMaterial();
   _position = glm::vec3(0);
   _rotation = glm::vec3(0);
   _drop = false;

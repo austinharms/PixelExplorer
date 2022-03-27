@@ -12,6 +12,7 @@ class FileUtilities {
   static bool fileExists(const char* path);
   static const std::string getResourceDirectory();
   static const std::string getExecutingDirectory();
+  static const std::string getAssetDirectory();
 
  private:
   static std::string _exeDir;

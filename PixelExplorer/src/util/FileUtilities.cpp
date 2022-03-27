@@ -33,6 +33,10 @@ const std::string FileUtilities::getResourceDirectory() { return _resDir; }
 
 const std::string FileUtilities::getExecutingDirectory() { return _exeDir; }
 
+const std::string FileUtilities::getAssetDirectory() {
+  return _exeDir + "assets\\";
+}
+
 std::string FileUtilities::getExeDir() {
   TCHAR buffer[MAX_PATH] = {0};
   GetModuleFileName(NULL, buffer, MAX_PATH);

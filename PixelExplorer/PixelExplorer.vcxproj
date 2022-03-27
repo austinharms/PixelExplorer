@@ -322,10 +322,12 @@
     <ClInclude Include="src\game\world\World.fwd.h" />
     <ClInclude Include="src\game\world\WorldScene.fwd.h" />
     <ClInclude Include="src\game\world\WorldScene.h" />
+    <ClInclude Include="src\rendering\BasicMaterial.h" />
     <ClInclude Include="src\util\DataBuffer.inl">
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="src\game\world\WorldScene.cpp" />
+    <ClCompile Include="src\rendering\BasicMaterial.cpp" />
     <ClCompile Include="src\util\Direction.cpp" />
     <ClCompile Include="src\util\FileUtilities.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
@@ -342,6 +344,7 @@
     <ClCompile Include="src\game\world\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\basic.shader" />
     <None Include="res\shaders\Chunk.shader" />
     <None Include="res\shaders\Default.shader" />
     <None Include="src\vendor\glm\detail\func_common.inl" />

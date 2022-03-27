@@ -78,6 +78,9 @@
     <ClCompile Include="src\game\world\WorldScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\rendering\BasicMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Chunk.shader" />
@@ -490,6 +493,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\shaders\Default.shader" />
+    <None Include="assets\shaders\basic.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Renderer.h">
@@ -1432,6 +1436,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\world\WorldScene.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\BasicMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
