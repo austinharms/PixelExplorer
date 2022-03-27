@@ -42,9 +42,6 @@
     <ClCompile Include="src\game\world\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\world\chunk\ChunkManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\rendering\TexturedMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,6 +76,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\world\WorldScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1374,16 +1374,10 @@
     <ClInclude Include="src\game\world\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\world\chunk\ChunkManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\rendering\TexturedMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\world\chunk\Chunk.fwd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\world\chunk\ChunkManager.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\util\FileUtilities.h">
@@ -1433,6 +1427,15 @@
     </ClInclude>
     <ClInclude Include="src\util\DataBuffer.inl">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\world\WorldScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\world\World.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\world\WorldScene.fwd.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

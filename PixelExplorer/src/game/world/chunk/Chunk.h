@@ -5,7 +5,7 @@
 #include <mutex>
 
 #include "Chunk.fwd.h"
-#include "ChunkManager.fwd.h"
+#include "../WorldScene.fwd.h"
 #include "util/Direction.h"
 #include "PxRigidStatic.h"
 #include "RefCounted.h"
@@ -35,11 +35,11 @@ class Chunk : public RefCounted {
   void setPosition(glm::vec3 position);
   glm::vec3 getPosition() const;
   const Status getStatus() const;
-  void setManager(ChunkManager* mgr);
+  void setScene(world::WorldScene* scene);
   ChunkRenderMesh* getRenderMesh() const;
 
  private:
-  ChunkManager* _mgr;
+  world::WorldScene* _scene;
   Chunk* _adjacentChunks[util::Direction::DIRECTION_COUNT];
   physx::PxRigidStatic* _physxActor;
   ChunkRenderMesh* _renderMesh;

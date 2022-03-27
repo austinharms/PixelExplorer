@@ -1,13 +1,13 @@
 #include "Chunk.h"
 
-#include "ChunkManager.h"
+#include "../WorldScene.h"
 #include "Logger.h"
 namespace px::game::chunk {
 
 Chunk::Chunk(ChunkRenderMesh* renderMesh) {
   if (renderMesh == nullptr)
     Logger::fatal("Failed to Create Chunk, renderMesh was nullptr");
-  _mgr = nullptr;
+  _scene = nullptr;
   memset(_adjacentChunks, 0, sizeof(_adjacentChunks));
   _physxActor = nullptr;
   renderMesh->grab();
@@ -20,7 +20,7 @@ Chunk::Chunk(ChunkRenderMesh* renderMesh) {
 
 Chunk::~Chunk() {
   _status = Chunk::Status::UNLOADED;
-  if (_mgr != nullptr) _mgr->drop();
+  if (_scene != nullptr) _scene->drop();
   // TODO drop _adjacentChunks
   // TODO drop _physxActor
   _renderMesh->setActive(false);
@@ -43,10 +43,10 @@ glm::vec3 Chunk::getPosition() const { return _position; }
 
 const Chunk::Status Chunk::getStatus() const { return _status; }
 
-void Chunk::setManager(ChunkManager* mgr) {
-  if (_mgr != nullptr) _mgr->drop();
-  _mgr = mgr;
-  if (_mgr != nullptr) _mgr->grab();
+void Chunk::setScene(world::WorldScene* scene) {
+  if (_scene != nullptr) _scene->drop();
+  _scene = scene;
+  if (_scene != nullptr) _scene->grab();
 }
 
 ChunkRenderMesh* Chunk::getRenderMesh() const { return _renderMesh; }

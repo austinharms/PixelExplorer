@@ -1,5 +1,7 @@
 #include "World.h"
-namespace px::game {
+#include "WorldScene.h"
+
+namespace px::game::world {
 World* World::loadWorld() { return nullptr; }
 
 World::~World() {}
