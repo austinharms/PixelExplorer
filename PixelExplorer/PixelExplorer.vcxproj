@@ -333,7 +333,6 @@
     <ClCompile Include="src\physics\PhysicsBase.cpp" />
     <ClCompile Include="src\physics\PhysicsScene.cpp" />
     <ClCompile Include="src\physics\StaticPhysicsObject.cpp" />
-    <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\TestRenderable.cpp" />

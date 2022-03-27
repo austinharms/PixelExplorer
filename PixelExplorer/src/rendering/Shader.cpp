@@ -7,9 +7,8 @@
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "Logger.h"
 namespace px::rendering {
-Shader* Shader::s_default = nullptr;
-
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
   _renderId = createProgram(shaderFilepath);
 }
@@ -34,11 +33,11 @@ unsigned int Shader::compileShader(uint32_t type,
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
     std::vector<GLchar> errorLog(maxLength);
     glGetShaderInfoLog(id, maxLength, &maxLength, &errorLog[0]);
-    std::cout << "Failed to compile shader: ";
+    std::string err =  "Failed to compile shader: ";
     for (std::vector<char>::const_iterator i = errorLog.begin();
          i != errorLog.end(); ++i)
-      std::cout << *i;
-    std::cout << std::endl;
+      err += *i;
+    Logger::error(err);
     glDeleteShader(id);
     return 0;
   }
@@ -110,11 +109,5 @@ uint32_t Shader::createProgram(const std::string path) {
   glDeleteShader(fs);
 
   return program;
-}
-
-Shader* Shader::loadDefaultShader() {
-  Shader* defaultShader = new Shader("./res/shaders/Default.shader");
-  assert(defaultShader->isValid());
-  return defaultShader;
 }
 }  // namespace px::rendering

@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "Logger.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -33,30 +34,23 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
   updateForwardVector();
 
   // Init GLFW/Render Window
-#ifdef DEBUG
-  assert(glfwInit());
-#else
+
   if (!glfwInit()) {
     const char* error = nullptr;
-    std::cout << "Failed to initialize GLFW, Error Code: "
-              << glfwGetError(&error) << ", Error Msg: " << error << std::endl;
-    exit(-1);
+    Logger::fatal("Failed to initialize GLFW, Error Code: " +
+                  std::to_string(glfwGetError(&error)) + error);
   }
-#endif  // DEBUG
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   _window = glfwCreateWindow(width, height, title, NULL, NULL);
-#ifdef DEBUG
-  assert(_window);
-#else
+
   if (!_window) {
     const char* error = nullptr;
-    std::cout << "Failed to create Window, Error Code: " << glfwGetError(&error)
-              << ", Error Msg: " << error << std::endl;
-    exit(-1);
+    Logger::fatal("Failed to create Window, Error Code: " +
+                  std::to_string(glfwGetError(&error)) + error);
   }
-#endif  // DEBUG
+
   glfwMakeContextCurrent(_window);
   glfwSetWindowFocusCallback(_window, Renderer::s_windowFocus);
   glfwSetFramebufferSizeCallback(_window, Renderer::s_windowResize);
@@ -67,17 +61,14 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
   setCursorHidden(false);
 
   // Init OpenGL
-#ifdef DEBUG
-  assert(glewInit() == GLEW_OK);
-#else
   GLenum err = glewInit();
   if (GLEW_OK != err) {
     /* Problem: glewInit failed, something is seriously wrong. */
-    std::cout << "Failed to initialize GLEW, Error Code: " << (uint32_t)err
-              << ", Error Msg: " << glewGetErrorString(err) << std::endl;
-    exit(-1);
+    Logger::fatal("Failed to initialize GLEW, Error Code: " +
+                  std::to_string((uint32_t)err) +
+                  std::string((const char*)glewGetErrorString(err)));
   }
-#endif  // DEBUG
+
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(Renderer::GLErrorCallback, 0);
   glEnable(GL_DEPTH_TEST);
@@ -116,18 +107,6 @@ void Renderer::addRenderable(Renderable* renderable) {
       }
     }
   }
-
-  // std::cout << "Added Renderable, Material: "
-  //          << renderable->getMaterial()->getId()
-  //          << ", Shader: " <<
-  //          renderable->getMaterial()->getShader()->getGLID()
-  //          << std::endl;
-  // for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
-  //     it != _renderableObjects.end(); ++it) {
-  //  std::cout << "Renderable, Material: " << (*it)->getMaterial()->getId()
-  //            << ", Shader: " << (*it)->getMaterial()->getShader()->getGLID()
-  //            << std::endl;
-  //}
 }
 
 void Renderer::removeRenderable(Renderable* renderable) {
@@ -170,8 +149,8 @@ void Renderer::drawFrame() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   {
-    Material* currentMaterial = nullptr;
-    Shader* currentShader = nullptr;
+    Material* boundMaterial = nullptr;
+    Shader* boundShader = nullptr;
     std::lock_guard<std::mutex> drawLock(_renderLock);
     std::list<Renderable*>::iterator iter = _renderableObjects.begin();
     std::list<Renderable*>::iterator end = _renderableObjects.end();
@@ -183,43 +162,48 @@ void Renderer::drawFrame() {
       if (renderable->shouldDrop()) {
         iter = _renderableObjects.erase(iter);
         renderable->drop();
-      } else {
-        if (renderable->preRender(_deltaTime, _position, _rotation)) {
-          Material* renderableMaterial = renderable->getMaterial();
-          if (renderableMaterial != currentMaterial) {
-            if (currentMaterial != nullptr) currentMaterial->drop();
-            renderableMaterial->grab();
-            currentMaterial = renderableMaterial;
-            Shader* renderableShader = renderableMaterial->getShader();
-            if (renderableShader != currentShader) {
-              if (currentShader != nullptr) {
-                currentShader->unbind();
-                currentShader->drop();
-              }
-
-              renderableShader->grab();
-              currentShader = renderableShader;
-              renderableShader->bind();
-            }
-            renderableMaterial->onPostBind();
-          }
-
-          currentShader->setUniformm4("u_MVP", vp * renderable->getTransform());
-          renderable->render();
-        }
-        ++iter;
+        continue;
       }
+
+      if (!renderable->preRender(_deltaTime, _position, _rotation)) continue;
+
+      Material* renderableMaterial = renderable->getMaterial();
+      if (renderableMaterial == nullptr) {
+        iter = _renderableObjects.erase(iter);
+        renderable->drop();
+        Logger::error("Renderable returned NULL Material, Renderable removed");
+        continue;
+      }
+
+      Shader* renderableShader = renderableMaterial->getShader();
+      if (renderableShader == nullptr) {
+        iter = _renderableObjects.erase(iter);
+        renderable->drop();
+        Logger::error(
+            "Renderable Material returned NULL Shader, Renderable removed");
+        continue;
+      }
+
+      if (renderableMaterial != boundMaterial) {
+        if (renderableShader != boundShader) {
+          renderableShader->bind();
+          // dont grab shader due to grabing the parent renderable (too slow)
+          boundShader = renderableShader;
+        }
+
+        renderableMaterial->bind();
+        // dont grab material due to grabing the parent renderable (too slow)
+        boundMaterial = renderableMaterial;
+      }
+
+      boundShader->setUniformm4("u_MVP", vp * renderable->getTransform());
+      renderable->render();
+      ++iter;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    if (currentShader != nullptr) {
-      currentShader->unbind();
-      currentShader->drop();
-    }
-
-    if (currentMaterial != nullptr) currentMaterial->drop();
+    if (boundShader != nullptr) boundShader->unbind();
   }
 
   glfwSwapBuffers(_window);

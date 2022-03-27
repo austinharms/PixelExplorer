@@ -1,6 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <stdint.h>
+
 #include <list>
 #include <mutex>
 #include <unordered_map>
