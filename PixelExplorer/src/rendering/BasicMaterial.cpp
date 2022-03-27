@@ -8,7 +8,7 @@ BasicMaterial::BasicMaterial(Shader* shader) {
     _shader->grab();
   } else {
     _shader = new Shader(util::FileUtilities::getAssetDirectory() +
-                         "shaders/basic.shader");
+                         "shaders\\basic.shader");
   }
 }
 

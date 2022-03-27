@@ -6,11 +6,18 @@
 #include <vector>
 
 #include "GL/glew.h"
-#include "glm/gtc/type_ptr.hpp"
 #include "Logger.h"
+#include "glm/gtc/type_ptr.hpp"
+#include "util/FileUtilities.h"
 namespace px::rendering {
 Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
-  _renderId = createProgram(shaderFilepath);
+  if (util::FileUtilities::fileExists(shaderFilepath)) {
+    _renderId = createProgram(shaderFilepath);
+  } else {
+    _renderId = 0;
+    Logger::error("Failed to Create Shader, Shader File Does Not Exist: " +
+                  shaderFilepath);
+  }
 }
 
 Shader::~Shader() { glDeleteProgram(_renderId); }
@@ -19,8 +26,7 @@ void Shader::bind() const { glUseProgram(_renderId); }
 
 void Shader::unbind() const { glUseProgram(0); }
 
-unsigned int Shader::compileShader(uint32_t type,
-                                   const std::string source) {
+unsigned int Shader::compileShader(uint32_t type, const std::string source) {
   uint32_t id = glCreateShader(type);
   const char* src = source.c_str();
   glShaderSource(id, 1, &src, nullptr);
@@ -33,7 +39,7 @@ unsigned int Shader::compileShader(uint32_t type,
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
     std::vector<GLchar> errorLog(maxLength);
     glGetShaderInfoLog(id, maxLength, &maxLength, &errorLog[0]);
-    std::string err =  "Failed to compile shader: ";
+    std::string err = "Failed to compile shader: ";
     for (std::vector<char>::const_iterator i = errorLog.begin();
          i != errorLog.end(); ++i)
       err += *i;
