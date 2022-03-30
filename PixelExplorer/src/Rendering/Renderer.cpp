@@ -9,7 +9,8 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec3.hpp"
 namespace px::rendering {
-std::unordered_map<GLFWwindow*, Renderer*> Renderer::s_renderers;
+Renderer* Renderer::s_activeRenderer = nullptr;
+std::mutex Renderer::s_activeMutex;
 
 Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
                    uint32_t FPSLimit) {
@@ -79,9 +80,6 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
   glCullFace(GL_BACK);
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
   // glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
-
-  // Add Renderer Instance to List
-  Renderer::s_renderers.emplace(_window, this);
 }
 
 void Renderer::addRenderable(Renderable* renderable) {
@@ -238,10 +236,29 @@ void Renderer::setCursorHidden(bool hidden) {
   }
 }
 
+Renderer* Renderer::createRenderer(int32_t width, int32_t height,
+                                   const char* title, float FOV,
+                                   uint32_t FPSLimit) {
+  std::lock_guard<std::mutex> lock(s_activeMutex);
+  if (s_activeRenderer == nullptr) {
+    s_activeRenderer = new Renderer(width, height, title, FOV, FPSLimit);
+    return s_activeRenderer;
+  } else {
+    return nullptr;
+  }
+}
+
+Renderer* Renderer::getActiveRenderer() { 
+std::lock_guard<std::mutex> lock(s_activeMutex);
+  return s_activeRenderer;
+}
+
 Renderer::~Renderer() {
+  s_activeMutex.lock();
+  s_activeRenderer = nullptr;
+  s_activeMutex.unlock();
   std::lock_guard<std::mutex> locker(_renderLock);
   for (Renderable* r : _renderableObjects) r->drop();
-  Renderer::s_renderers.erase(_window);
   glfwDestroyWindow(_window);
 }
 
@@ -301,11 +318,11 @@ void GLAPIENTRY Renderer::GLErrorCallback(GLenum source, GLenum type, GLuint id,
 }
 
 void Renderer::s_windowFocus(GLFWwindow* window, int focused) {
-  Renderer::s_renderers[window]->windowFocus(focused);
+  s_activeRenderer->windowFocus(focused);
 }
 
 void Renderer::s_windowResize(GLFWwindow* window, int width, int height) {
-  Renderer::s_renderers[window]->windowResize(width, height);
+  s_activeRenderer->windowResize(width, height);
 }
 
 int Renderer::getFPSLimit() const { return _FPSLimit; }
