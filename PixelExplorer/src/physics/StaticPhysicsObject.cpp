@@ -3,17 +3,19 @@
 #include "PhysicsBase.h"
 #include "PhysicsScene.h"
 namespace px::physics {
-StaticPhysicsObject::StaticPhysicsObject(PhysicsScene* scene,
-                                         const glm::vec3& position,
+StaticPhysicsObject::StaticPhysicsObject(const glm::vec3& position,
                                          util::DataBuffer<float>* vertices,
                                          util::DataBuffer<uint32_t>* indices,
-                                         const float vertexStride) {
-  scene->grab();
-  _scene = scene;
+                                         const float vertexStride,
+                                         PhysicsScene* scene) {
+  _scene = nullptr;
   _pxShape = nullptr;
-  _pxStaticBody = _scene->_base->getPxPhysics()->createRigidStatic(
+  physx::PxPhysics* phys = PhysicsBase::getInstance().getPxPhysics();
+  _pxStaticBody = phys->createRigidStatic(
       physx::PxTransform(position.x, position.y, position.z));
-  _scene->_pxScene->addActor(*_pxStaticBody);
+  _pxStaticBody->userData = this;
+  updateMesh(vertices, indices, vertexStride);
+  setScene(scene);
 }
 
 void StaticPhysicsObject::updateMesh(util::DataBuffer<float>* vertices,
@@ -29,25 +31,48 @@ void StaticPhysicsObject::updateMesh(util::DataBuffer<float>* vertices,
   meshDesc.triangles.count = indices->length / 3;
   meshDesc.triangles.stride = sizeof(uint32_t) * 3;
   meshDesc.triangles.data = indices->buffer;
-
-  physx::PxTriangleMesh* mesh = _scene->_base->bakePxMesh(meshDesc);
+  physx::PxPhysics* phys = PhysicsBase::getInstance().getPxPhysics();
+  physx::PxCooking* cook = PhysicsBase::getInstance().getPxCooking();
+  physx::PxTriangleMesh* mesh =
+      cook->createTriangleMesh(meshDesc, phys->getPhysicsInsertionCallback());
   physx::PxMeshScale scale(physx::PxVec3(1));
   const physx::PxTriangleMeshGeometry geom(mesh, scale);
-  physx::PxPhysics* physics = _scene->_base->getPxPhysics();
   if (_pxShape != nullptr) {
     _pxStaticBody->detachShape(*_pxShape);
     _pxShape->release();
   }
 
-  _pxShape = physics->createShape(
-      geom, *(_scene->_base->getDefaultPxMaterial()), true);
+  _pxShape = phys->createShape(
+      geom, *PhysicsBase::getInstance().getDefaultPxMaterial(), true);
   _pxStaticBody->attachShape(*_pxShape);
   mesh->release();
 }
 
+void StaticPhysicsObject::setScene(PhysicsScene* scene) {
+  if (_scene != nullptr) {
+    _scene->removeObject(this);
+    _scene->drop();
+  }
+
+  _scene = scene;
+  if (_scene != nullptr) {
+    _scene->grab();
+    _scene->insertObject(this);
+  }
+}
+
+PhysicsScene* StaticPhysicsObject::getScene() const { return _scene; }
+
 StaticPhysicsObject::~StaticPhysicsObject() {
   _pxShape->release();
   _pxStaticBody->release();
-  _scene->drop();
+  if (_scene != nullptr) {
+    _scene->removeObject(this);
+    _scene->drop();
+  }
+}
+
+physx::PxActor* StaticPhysicsObject::getPxActor() const {
+  return _pxStaticBody;
 }
 }  // namespace px::physics

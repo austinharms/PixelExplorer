@@ -1,16 +1,13 @@
 #include "Game.h"
 
+#include "glm/vec3.hpp"
 #include "rendering/TestRenderable.h"
 #include "world/chunk/block/BlockDefinition.h"
 #include "world/chunk/block/BlockShape.h"
-
-#include "glm/vec3.hpp"
 namespace px::game {
-Game::Game(rendering::Renderer* renderer, physics::PhysicsBase* physicsBase) {
+Game::Game(rendering::Renderer* renderer) {
   _renderer = renderer;
   _renderer->grab();
-  _physics = physicsBase;
-  _physics->grab();
 
   chunk::BlockShape::loadShapes();
   chunk::BlockDefinition::loadDefinitions();
@@ -19,13 +16,21 @@ Game::Game(rendering::Renderer* renderer, physics::PhysicsBase* physicsBase) {
 Game::~Game() {
   chunk::BlockDefinition::unloadDefinitions();
   chunk::BlockShape::unloadShapes();
-  _physics->drop();
   _renderer->drop();
 }
 
 void Game::start() {
-  rendering::TestRenderable* t = new rendering::TestRenderable();
-  _renderer->addRenderable(t);
+  for (float x = 0; x < 25; ++x) {
+    for (float y = 0; y < 25; ++y) {
+      for (float z = 0; z < 25; ++z) {
+        rendering::TestRenderable* t = new rendering::TestRenderable();
+        t->setPosition(glm::vec3(x,y,z) * 3.0f);
+        _renderer->addRenderable(t);
+        t->drop();
+      }
+    }
+  }
+
   glm::vec3 camPos(12, 12, 75);
   glm::vec3 camRot(0, 0, 0);
   float moveSpeed = 50;
@@ -63,4 +68,4 @@ void Game::start() {
     _renderer->drawFrame();
   }
 }
-}
+}  // namespace px::game

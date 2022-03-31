@@ -53,7 +53,7 @@ TestRenderable::~TestRenderable() {
   glDeleteBuffers(1, &_indexBufferId);
 }
 
-inline bool TestRenderable::preRender(float deltaTime,
+bool TestRenderable::preRender(float deltaTime,
                                       const glm::vec3& cameraPos,
                                       const glm::vec3& cameraRotation) {
   _rotation.x += deltaTime;
@@ -61,11 +61,11 @@ inline bool TestRenderable::preRender(float deltaTime,
   return !_drop;
 }
 
-inline bool TestRenderable::shouldDrop() const { return _drop; }
+bool TestRenderable::shouldDrop() const { return _drop; }
 
-inline void TestRenderable::setDropFlag() { _drop = true; }
+void TestRenderable::setDropFlag() { _drop = true; }
 
-inline glm::mat4 TestRenderable::getTransform() const {
+glm::mat4 TestRenderable::getTransform() const {
   glm::mat4 t(glm::eulerAngleYXZ(_rotation.y, _rotation.x, _rotation.z));
   t[3][0] = _position.x;
   t[3][1] = _position.y;
@@ -73,9 +73,9 @@ inline glm::mat4 TestRenderable::getTransform() const {
   return t;
 }
 
-inline Material* TestRenderable::getMaterial() const { return _material; }
+Material* TestRenderable::getMaterial() const { return _material; }
 
-inline void TestRenderable::setPosition(glm::vec3 position) {
+void TestRenderable::setPosition(glm::vec3 position) {
   _position = position;
 }
 

@@ -1,30 +1,21 @@
 #ifndef PHYSICSSCENE_H
 #define PHYSICSSCENE_H
 
-#include "PhysicsBase.fwd.h"
-#include "PhysicsScene.fwd.h"
-#include "StaticPhysicsObject.fwd.h"
+#include "PhysicsObject.h"
+#include "PhysicsBase.h"
 #include "PxPhysicsAPI.h"
 #include "RefCounted.h"
-#include "util/DataBuffer.h"
-#include "glm/vec3.hpp"
 namespace px::physics {
 class PhysicsScene : public RefCounted {
-  friend class PhysicsBase;
-  friend class StaticPhysicsObject;
-
  public:
-  StaticPhysicsObject* createStaticObject(const glm::vec3& position,
-                                          util::DataBuffer<float>* vertices,
-                                          util::DataBuffer<uint32_t>* indices,
-                                          const float vertexStride = 3);
   virtual ~PhysicsScene();
+  void insertObject(PhysicsObject* obj);
+  void removeObject(PhysicsObject* obj);
 
  private:
   physx::PxScene* _pxScene;
-  PhysicsBase* _base;
 
-  PhysicsScene(PhysicsBase* base);
+  PhysicsScene();
 };
 }  // namespace px::physics
 #endif

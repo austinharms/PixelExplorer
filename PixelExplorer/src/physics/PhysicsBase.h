@@ -1,29 +1,26 @@
 #ifndef PHYSICSBASE_H
 #define PHYSICSBASE_H
 
-#include "PhysicsBase.fwd.h"
-#include "PhysicsScene.fwd.h"
 #include "PxPhysicsAPI.h"
-#include "RefCounted.h"
+
 namespace px::physics {
-class PhysicsBase : public RefCounted, public physx::PxErrorCallback {
-  friend class PhysicsScene;
-
+class PhysicsBase : public physx::PxErrorCallback {
  public:
-  static PhysicsBase* createPhysicsBase();
-  static void dropPhysicsBase();
+  static PhysicsBase& getInstance();
 
-  physx::PxTriangleMesh* bakePxMesh(physx::PxTriangleMeshDesc& desc);
   physx::PxPhysics* getPxPhysics() const;
   physx::PxMaterial* getDefaultPxMaterial() const;
-  PhysicsScene* createPhysicsScene();
+  physx::PxCooking* getPxCooking() const;
+  physx::PxCpuDispatcher* getPxDispatcher() const;
+  physx::PxSimulationFilterShader getPxSimulationFilter() const;
+  physx::PxTolerancesScale getPxScale() const;
   void reportError(physx::PxErrorCode::Enum code, const char* message,
                    const char* file, int line);
-  virtual ~PhysicsBase();
+  ~PhysicsBase();
+  PhysicsBase(PhysicsBase const&) = delete;
+  void operator=(PhysicsBase const&) = delete;
 
  private:
-  static PhysicsBase* s_physicsBase;
-
   physx::PxDefaultAllocator* _pxAllocator;
   physx::PxFoundation* _pxFoundation;
   physx::PxPvd* _pxPVD;

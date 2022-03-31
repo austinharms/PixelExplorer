@@ -15,10 +15,8 @@
 namespace px::rendering {
 class Renderer : public RefCounted {
  public:
-  static Renderer* createRenderer(int32_t width, int32_t height,
-                                  const char* title, float FOV,
-                                  uint32_t FPSLimit = 0);
-  static Renderer* getActiveRenderer();
+  Renderer(int32_t width, int32_t height, const char* title, float FOV,
+           uint32_t FPSLimit = 0);
 
   virtual ~Renderer();
   void addRenderable(Renderable* renderable);
@@ -47,16 +45,12 @@ class Renderer : public RefCounted {
   double getCursorChangeY() const;
 
  private:
-  static std::mutex s_activeMutex;
-  static Renderer* s_activeRenderer;
   static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
                                          GLenum severity, GLsizei length,
                                          const GLchar* message,
                                          const void* userParam);
   static void s_windowFocus(GLFWwindow* window, int focused);
   static void s_windowResize(GLFWwindow* window, int width, int height);
-  Renderer(int32_t width, int32_t height, const char* title, float FOV,
-           uint32_t FPSLimit = 0);
   void windowResize(int width, int height);
   void windowFocus(bool focused);
   void updateForwardVector();

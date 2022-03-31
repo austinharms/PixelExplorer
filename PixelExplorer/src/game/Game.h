@@ -10,13 +10,12 @@
 namespace px::game {
 class Game : public RefCounted {
  public:
-  Game(rendering::Renderer* renderer, physics::PhysicsBase* physicsBase);
+  Game(rendering::Renderer* renderer);
   virtual ~Game();
   void start();
 
  private:
   rendering::Renderer* _renderer;
-  physics::PhysicsBase* _physics;
 };
 }  // namespace px
 #endif  // !GAME_H

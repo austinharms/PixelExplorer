@@ -9,9 +9,6 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec3.hpp"
 namespace px::rendering {
-Renderer* Renderer::s_activeRenderer = nullptr;
-std::mutex Renderer::s_activeMutex;
-
 Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
                    uint32_t FPSLimit) {
   // Init Renderer Members
@@ -78,33 +75,36 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
   glFrontFace(GL_CCW);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
-  // glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //Disable Wireframe
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable Wireframe
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Disable Wireframe
+  glfwSetWindowUserPointer(_window, this);
 }
 
 void Renderer::addRenderable(Renderable* renderable) {
   std::lock_guard<std::mutex> locker(_renderLock);
   renderable->grab();
-  if (_renderableObjects.begin() == _renderableObjects.end()) {
-    _renderableObjects.emplace_back(renderable);
-  } else {
-    uint32_t newShaderId = renderable->getMaterial()->getShader()->getGLID();
-    uint32_t newMaterialId = renderable->getMaterial()->getId();
-    for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
-         it != _renderableObjects.end(); ++it) {
-      Renderable* other = *it;
-      uint32_t otherShaderId = other->getMaterial()->getShader()->getGLID();
-      if (newShaderId < otherShaderId) {
-        _renderableObjects.insert(it, renderable);
-        break;
-      } else if (newShaderId == otherShaderId) {
-        if (newMaterialId <= other->getMaterial()->getId()) {
-          _renderableObjects.insert(it, renderable);
-          break;
-        }
-      }
-    }
-  }
+  //if (_renderableObjects.begin() == _renderableObjects.end()) {
+  //  _renderableObjects.emplace_back(renderable);
+  //} else {
+  //  uint32_t newShaderId = renderable->getMaterial()->getShader()->getGLID();
+  //  uint32_t newMaterialId = renderable->getMaterial()->getId();
+  //  for (std::list<Renderable*>::iterator it = _renderableObjects.begin();
+  //       it != _renderableObjects.end(); ++it) {
+  //    Renderable* other = *it;
+  //    uint32_t otherShaderId = other->getMaterial()->getShader()->getGLID();
+  //    if (newShaderId < otherShaderId) {
+  //      _renderableObjects.insert(it, renderable);
+  //      break;
+  //    } else if (newShaderId == otherShaderId) {
+  //      if (newMaterialId <= other->getMaterial()->getId()) {
+  //        _renderableObjects.insert(it, renderable);
+  //        break;
+  //      }
+  //    }
+  //  }
+
+    _renderableObjects.insert(_renderableObjects.end() , renderable);
+  //}
 }
 
 void Renderer::removeRenderable(Renderable* renderable) {
@@ -121,6 +121,7 @@ void Renderer::removeRenderable(Renderable* renderable) {
 }
 
 void Renderer::drawFrame() {
+  glfwMakeContextCurrent(_window);
   double currentFrame = glfwGetTime();
   _deltaTime = currentFrame - _lastFrame;
   _lastFrame = currentFrame;
@@ -214,6 +215,7 @@ bool Renderer::getKeyPressed(int32_t key) {
 }
 
 void Renderer::setFPSLimit(int32_t limit) {
+  glfwMakeContextCurrent(_window);
   _FPSLimit = limit;
   glfwSwapInterval(_FPSLimit);
 }
@@ -236,27 +238,7 @@ void Renderer::setCursorHidden(bool hidden) {
   }
 }
 
-Renderer* Renderer::createRenderer(int32_t width, int32_t height,
-                                   const char* title, float FOV,
-                                   uint32_t FPSLimit) {
-  std::lock_guard<std::mutex> lock(s_activeMutex);
-  if (s_activeRenderer == nullptr) {
-    s_activeRenderer = new Renderer(width, height, title, FOV, FPSLimit);
-    return s_activeRenderer;
-  } else {
-    return nullptr;
-  }
-}
-
-Renderer* Renderer::getActiveRenderer() { 
-std::lock_guard<std::mutex> lock(s_activeMutex);
-  return s_activeRenderer;
-}
-
 Renderer::~Renderer() {
-  s_activeMutex.lock();
-  s_activeRenderer = nullptr;
-  s_activeMutex.unlock();
   std::lock_guard<std::mutex> locker(_renderLock);
   for (Renderable* r : _renderableObjects) r->drop();
   glfwDestroyWindow(_window);
@@ -318,11 +300,11 @@ void GLAPIENTRY Renderer::GLErrorCallback(GLenum source, GLenum type, GLuint id,
 }
 
 void Renderer::s_windowFocus(GLFWwindow* window, int focused) {
-  s_activeRenderer->windowFocus(focused);
+  ((Renderer*)glfwGetWindowUserPointer(window))->windowFocus(focused);
 }
 
 void Renderer::s_windowResize(GLFWwindow* window, int width, int height) {
-  s_activeRenderer->windowResize(width, height);
+  ((Renderer*)glfwGetWindowUserPointer(window))->windowResize(width, height);
 }
 
 int Renderer::getFPSLimit() const { return _FPSLimit; }

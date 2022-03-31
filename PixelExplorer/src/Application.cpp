@@ -7,16 +7,12 @@
 #include "rendering/Renderer.h"
 
 int main(void) {
-  px::rendering::Renderer* renderer = px::rendering::Renderer::createRenderer(1200, 800, "Pixel Explorer V2.0", 60);
+  px::rendering::Renderer* renderer =
+      new px::rendering::Renderer(1200, 800, "Pixel Explorer V2.0", 60);
   renderer->setCursorHidden(true);
-  px::physics::PhysicsBase* physics =
-      px::physics::PhysicsBase::createPhysicsBase();
-
-  px::game::Game* game = new px::game::Game(renderer, physics);
+  px::game::Game* game = new px::game::Game(renderer);
   game->start();
-
   game->drop();
-  physics->drop();
   renderer->drop();
   return 0;
 }

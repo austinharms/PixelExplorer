@@ -4,27 +4,23 @@
 #include "PhysicsBase.h"
 #include "StaticPhysicsObject.h"
 namespace px::physics {
-PhysicsScene::PhysicsScene(PhysicsBase* base) {
-  base->grab();
-  _base = base;
-
-  physx::PxSceneDesc desc(base->_pxScale);
+PhysicsScene::PhysicsScene() {
+  PhysicsBase* base = &PhysicsBase::getInstance();
+  physx::PxSceneDesc desc(base->getPxScale());
   desc.gravity = physx::PxVec3(0, -9.81f, 0);
-  desc.cpuDispatcher = base->_pxDispatcher;
-  desc.filterShader = base->_pxDefaultFilter;
-  _pxScene = base->_pxPhysics->createScene(desc);
+  desc.cpuDispatcher = base->getPxDispatcher();
+  desc.filterShader = base->getPxSimulationFilter();
+  _pxScene = base->getPxPhysics()->createScene(desc);
   if (_pxScene == nullptr) Logger::error("Failed to Create PhysX Scene");
 }
 
-StaticPhysicsObject* PhysicsScene::createStaticObject(
-    const glm::vec3& position, util::DataBuffer<float>* vertices,
-    util::DataBuffer<uint32_t>* indices, const float vertexStride) {
-  return new StaticPhysicsObject(this, position, vertices, indices,
-                                 vertexStride);
+PhysicsScene::~PhysicsScene() { _pxScene->release(); }
+
+void PhysicsScene::insertObject(PhysicsObject* obj) {
+  _pxScene->addActor(*(obj->getPxActor()));
 }
 
-PhysicsScene::~PhysicsScene() {
-  _base->drop();
-  _pxScene->release();
+void PhysicsScene::removeObject(PhysicsObject* obj) {
+  _pxScene->removeActor(*(obj->getPxActor()));
 }
 }  // namespace px::physics

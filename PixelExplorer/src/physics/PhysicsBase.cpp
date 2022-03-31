@@ -1,11 +1,13 @@
 #include "PhysicsBase.h"
 
 #include "Logger.h"
-#include "PhysicsScene.h"
 namespace px::physics {
 using namespace physx;
 
-PhysicsBase* PhysicsBase::s_physicsBase = nullptr;
+PhysicsBase& PhysicsBase::getInstance() {
+  static PhysicsBase instance;
+  return instance;
+}
 
 PhysicsBase::PhysicsBase() {
   _pxScale.length = 1;
@@ -26,23 +28,7 @@ PhysicsBase::PhysicsBase() {
   _pxDefaultMaterial = _pxPhysics->createMaterial(1, 1, 1);
   _pxDispatcher = PxDefaultCpuDispatcherCreate(0);
   _pxDefaultFilter = PxDefaultSimulationFilterShader;
-  Logger::info("Created Physics Base");
-}
-
-PhysicsBase* PhysicsBase::createPhysicsBase() {
-  if (s_physicsBase == nullptr) s_physicsBase = new PhysicsBase();
-
-  return s_physicsBase;
-}
-
-void PhysicsBase::dropPhysicsBase() {
-  if (s_physicsBase != nullptr) {
-    if (s_physicsBase->getRefCount() > 1)
-      Logger::warn(
-          "Dropping Physics Base, Warning Physics Base Still Referenced");
-    s_physicsBase->drop();
-    s_physicsBase = nullptr;
-  }
+  Logger::debug("Created Physics Base");
 }
 
 PhysicsBase::~PhysicsBase() {
@@ -55,13 +41,7 @@ PhysicsBase::~PhysicsBase() {
   _pxPVD->release();
   _pxPVDTransport->release();
   _pxFoundation->release();
-  Logger::info("Destroyed Physics Base");
-}
-
-physx::PxTriangleMesh* PhysicsBase::bakePxMesh(
-    physx::PxTriangleMeshDesc& desc) {
-  return _pxCooking->createTriangleMesh(
-      desc, _pxPhysics->getPhysicsInsertionCallback());
+  Logger::debug("Destroyed Physics Base");
 }
 
 physx::PxPhysics* PhysicsBase::getPxPhysics() const { return _pxPhysics; }
@@ -70,9 +50,18 @@ physx::PxMaterial* PhysicsBase::getDefaultPxMaterial() const {
   return _pxDefaultMaterial;
 }
 
-PhysicsScene* PhysicsBase::createPhysicsScene() {
-  return new PhysicsScene(this);
+physx::PxCooking* PhysicsBase::getPxCooking() const { return _pxCooking; }
+
+physx::PxCpuDispatcher* PhysicsBase::getPxDispatcher() const {
+  return _pxDispatcher;
 }
+
+physx::PxSimulationFilterShader PhysicsBase::getPxSimulationFilter()
+    const {
+  return _pxDefaultFilter;
+}
+
+physx::PxTolerancesScale PhysicsBase::getPxScale() const { return _pxScale; }
 
 void PhysicsBase::reportError(PxErrorCode::Enum code, const char* message,
                               const char* file, int line) {
