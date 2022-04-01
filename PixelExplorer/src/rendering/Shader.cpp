@@ -7,20 +7,23 @@
 
 #include "GL/glew.h"
 #include "Logger.h"
+#include "Renderer.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "util/FileUtilities.h"
 namespace px::rendering {
-Shader::Shader(const std::string shaderFilepath) : _renderId(0) {
-  if (util::FileUtilities::fileExists(shaderFilepath)) {
-    _renderId = createProgram(shaderFilepath);
-  } else {
-    _renderId = 0;
-    Logger::error("Failed to Create Shader, Shader File Does Not Exist: " +
-                  shaderFilepath);
-  }
+Shader::Shader(const std::string shaderFilepath, const std::string name, Renderer* renderer)
+    : _renderId(0), _name(name) {
+  renderer->grab();
+  _renderer = renderer;
+  _renderId = createProgram(shaderFilepath);
+  if (_renderId == 0) Logger::error("Failed to Load Shader: " + shaderFilepath);
 }
 
-Shader::~Shader() { glDeleteProgram(_renderId); }
+Shader::~Shader() {
+  _renderer->removeShader(_name);
+  _renderer->drop();
+  glDeleteProgram(_renderId);
+}
 
 void Shader::bind() const { glUseProgram(_renderId); }
 

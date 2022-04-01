@@ -10,7 +10,7 @@
 namespace px::rendering {
 class TestRenderable : public Renderable {
  public:
-  TestRenderable();
+  TestRenderable(Material* material);
   virtual ~TestRenderable();
   bool preRender(float deltaTime, const glm::vec3& cameraPos,
                  const glm::vec3& cameraRotation);

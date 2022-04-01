@@ -2,18 +2,17 @@
 //#include <crtdbg.h>
 //#include <stdlib.h>
 
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 #include "game/Game.h"
 #include "physics/PhysicsBase.h"
 #include "rendering/Renderer.h"
 
 int main(void) {
-  px::rendering::Renderer* renderer =
-      new px::rendering::Renderer(1200, 800, "Pixel Explorer V2.0", 60);
-  renderer->setCursorHidden(true);
-  px::game::Game* game = new px::game::Game(renderer);
+  px::game::Game* game = new px::game::Game();
   game->start();
   game->drop();
-  renderer->drop();
+  glfwTerminate();
   return 0;
 }
 

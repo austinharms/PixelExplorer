@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include <string>
 #include <list>
 #include <mutex>
 #include <unordered_map>
@@ -12,6 +13,8 @@
 #include "RefCounted.h"
 #include "Renderable.h"
 #include "glm/mat4x4.hpp"
+#include "Renderer.fwd.h"
+#include "Shader.fwd.h"
 namespace px::rendering {
 class Renderer : public RefCounted {
  public:
@@ -43,6 +46,8 @@ class Renderer : public RefCounted {
   double getCursorY() const;
   double getCursorChangeX() const;
   double getCursorChangeY() const;
+  Shader* loadShader(std::string shaderName);
+  void removeShader(std::string shaderName);
 
  private:
   static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,
@@ -58,6 +63,7 @@ class Renderer : public RefCounted {
 
   std::mutex _renderLock;  // locks for _renderableObjects list
   std::list<Renderable*> _renderableObjects;
+  std::unordered_map<std::string, Shader*> _shaders;
   glm::mat4 _projection;
   glm::vec3 _position;
   glm::vec3 _forward;

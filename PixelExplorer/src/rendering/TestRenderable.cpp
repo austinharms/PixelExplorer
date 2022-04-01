@@ -5,8 +5,9 @@
 #include "glm/gtx/transform.hpp"
 #include "BasicMaterial.h"
 namespace px::rendering {
-TestRenderable::TestRenderable() {
-  _material = new BasicMaterial();
+TestRenderable::TestRenderable(Material* material) {
+  _material = material;
+  _material->grab();
   _position = glm::vec3(0);
   _rotation = glm::vec3(0);
   _drop = false;
@@ -48,6 +49,7 @@ TestRenderable::TestRenderable() {
 }
 
 TestRenderable::~TestRenderable() {
+  _material->drop();
   glDeleteVertexArrays(1, &_vertexArrayId);
   glDeleteBuffers(1, &_vertexBufferId);
   glDeleteBuffers(1, &_indexBufferId);

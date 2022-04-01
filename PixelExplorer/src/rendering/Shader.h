@@ -7,10 +7,12 @@
 #include "RefCounted.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec4.hpp"
+#include "Shader.fwd.h"
+#include "Renderer.fwd.h"
 namespace px::rendering {
 class Shader : public RefCounted {
+  friend class Renderer;
  public:
-  Shader(const std::string shaderFilepath);
   virtual ~Shader();
   void bind() const;
   void unbind() const;
@@ -22,12 +24,16 @@ class Shader : public RefCounted {
   inline bool isValid() const { return _renderId != 0; }
 
  private:
+  static uint32_t compileShader(uint32_t type, const std::string source);
+  static uint32_t createProgram(const std::string path);
+
+  Renderer* _renderer;
   uint32_t _renderId;
   std::unordered_map<const char*, int32_t> _uniforms;
   int getUniformLocation(const char* name);
-  static uint32_t compileShader(uint32_t type,
-                                    const std::string source);
-  static uint32_t createProgram(const std::string path);
+  const std::string _name;
+
+  Shader(const std::string shaderFilepath, const std::string name, Renderer* renderer);
 };
 }  // namespace px::rendering
 #endif  // !SHADER_H

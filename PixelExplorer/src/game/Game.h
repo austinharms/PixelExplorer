@@ -10,7 +10,7 @@
 namespace px::game {
 class Game : public RefCounted {
  public:
-  Game(rendering::Renderer* renderer);
+  Game();
   virtual ~Game();
   void start();
 

@@ -2,12 +2,14 @@
 
 #include <iostream>
 
+#include "Shader.h"
 #include "Logger.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec3.hpp"
+#include "util/FileUtilities.h"
 namespace px::rendering {
 Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
                    uint32_t FPSLimit) {
@@ -83,7 +85,7 @@ Renderer::Renderer(int32_t width, int32_t height, const char* title, float FOV,
 void Renderer::addRenderable(Renderable* renderable) {
   std::lock_guard<std::mutex> locker(_renderLock);
   renderable->grab();
-  //if (_renderableObjects.begin() == _renderableObjects.end()) {
+  // if (_renderableObjects.begin() == _renderableObjects.end()) {
   //  _renderableObjects.emplace_back(renderable);
   //} else {
   //  uint32_t newShaderId = renderable->getMaterial()->getShader()->getGLID();
@@ -103,7 +105,7 @@ void Renderer::addRenderable(Renderable* renderable) {
   //    }
   //  }
 
-    _renderableObjects.insert(_renderableObjects.end() , renderable);
+  _renderableObjects.insert(_renderableObjects.end(), renderable);
   //}
 }
 
@@ -367,4 +369,36 @@ double Renderer::getCursorY() const { return _cursorY; }
 double Renderer::getCursorChangeX() const { return _cursorChangeX; }
 
 double Renderer::getCursorChangeY() const { return _cursorChangeY; }
+Shader* Renderer::loadShader(std::string shaderName) {
+  auto it = _shaders.find(shaderName);
+  if (it == _shaders.end()) {
+    std::string shaderPath = util::FileUtilities::getAssetDirectory() +
+                             "shaders\\" + shaderName + ".shader";
+    if (util::FileUtilities::fileExists(shaderPath)) {
+      glfwMakeContextCurrent(_window);
+      Shader* s = new Shader(shaderPath, shaderName, this);
+      _shaders.insert({shaderName, s});
+      return s;
+    } else {
+      Logger::error("Failed to Load Shader, Shader File Does Not Exist: " +
+                    shaderPath);
+      return nullptr;
+    }
+
+  } else {
+    (*it).second->grab();
+    return (*it).second;
+  }
+}
+
+void Renderer::removeShader(std::string shaderName) {
+  glfwMakeContextCurrent(_window);
+  auto it = _shaders.find(shaderName);
+  if (it == _shaders.end()) {
+    Logger::warn("Failed to Find and Remove Shader: " + shaderName +
+                 " from Shader Cache");
+  } else {
+    _shaders.erase(it);
+  }
+}
 }  // namespace px::rendering
