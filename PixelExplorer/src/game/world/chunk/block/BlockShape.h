@@ -5,42 +5,29 @@
 #include <unordered_map>
 
 #include "RefCounted.h"
+#include "util/Direction.h"
 namespace px::game::chunk {
 struct BlockShape : public RefCounted {
  public:
-  static const int32_t FACE_COUNT = 6;
-
-  static bool getShapesLoaded();
-  static void loadShapes();
-  static BlockShape* getDefaultShape();
-  static BlockShape* getShape(std::string shapeName);
-  static void unloadShapes();
+  static BlockShape* createDefaultShape();
 
   bool FullBlock;
   bool BlockTransparent;
   bool HasPhysicsShape;
   bool HasRenderShape;
-  float* RenderVertices[FACE_COUNT];
-  float* PhysicsVertices[FACE_COUNT];
-  uint8_t* RenderIndices[FACE_COUNT];
-  uint8_t* PhysicsIndices[FACE_COUNT];
-  uint8_t RenderIndexCount[FACE_COUNT];
-  uint8_t PhysicsIndexCount[FACE_COUNT];
-  uint8_t RenderVertexCount[FACE_COUNT];
-  uint8_t PhysicsVertexCount[FACE_COUNT];
-  bool TransparentFace[FACE_COUNT];
+  float* RenderVertices[util::Direction::DIRECTION_COUNT];
+  float* PhysicsVertices[util::Direction::DIRECTION_COUNT];
+  uint8_t* RenderIndices[util::Direction::DIRECTION_COUNT];
+  uint8_t* PhysicsIndices[util::Direction::DIRECTION_COUNT];
+  uint8_t RenderIndexCount[util::Direction::DIRECTION_COUNT];
+  uint8_t PhysicsIndexCount[util::Direction::DIRECTION_COUNT];
+  uint8_t RenderVertexCount[util::Direction::DIRECTION_COUNT];
+  uint8_t PhysicsVertexCount[util::Direction::DIRECTION_COUNT];
+  bool TransparentFace[util::Direction::DIRECTION_COUNT];
   const std::string Name;
 
-  virtual ~BlockShape();
-
- private:
-  static BlockShape* s_defaultShape;
-  static std::unordered_map<std::string, BlockShape*> s_blockShapes;
-  static bool s_shapesLoaded;
-
-  static BlockShape* createDefaultShape();
-
   BlockShape(std::string name);
+  virtual ~BlockShape();
 };
 }  // namespace px::game::chunk
 #endif

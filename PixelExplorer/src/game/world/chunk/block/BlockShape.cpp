@@ -1,10 +1,7 @@
 #include "BlockShape.h"
+
 #include "Logger.h"
 namespace px::game::chunk {
-BlockShape* BlockShape::s_defaultShape = nullptr;
-std::unordered_map<std::string, BlockShape*> BlockShape::s_blockShapes;
-bool BlockShape::s_shapesLoaded = false;
-
 BlockShape::BlockShape(std::string name) : Name(name) {
   RenderIndices[0] = nullptr;
   RenderVertices[0] = nullptr;
@@ -223,7 +220,7 @@ BlockShape* BlockShape::createDefaultShape() {
   block->BlockTransparent = false;
   block->HasPhysicsShape = true;
   block->HasRenderShape = true;
-  memset(block->TransparentFace, 0, sizeof(bool) * FACE_COUNT);
+  memset(block->TransparentFace, 0, sizeof(block->TransparentFace));
   memset(block->RenderIndexCount, 6, sizeof(block->RenderIndexCount));
   memset(block->RenderVertexCount, 4, sizeof(block->RenderVertexCount));
   memset(block->PhysicsIndexCount, 6, sizeof(block->PhysicsIndexCount));
@@ -283,34 +280,4 @@ BlockShape* BlockShape::createDefaultShape() {
   Logger::debug("Created DEFAULT Block Shape");
   return block;
 }
-
-BlockShape* BlockShape::getShape(std::string shapeName) {
-  if (!s_shapesLoaded) return s_defaultShape;
-  auto shape = s_blockShapes.find(shapeName);
-  if (shape == s_blockShapes.end()) return s_defaultShape;
-  return shape->second;
-}
-
-bool BlockShape::getShapesLoaded() { return s_shapesLoaded; }
-
-void BlockShape::loadShapes() {
-  if (s_shapesLoaded) return;
-  Logger::info("Loading Block Shapes");
-  s_defaultShape = createDefaultShape();
-  s_shapesLoaded = true;
-  Logger::info("Done Loading Block Shapes");
-}
-
-void BlockShape::unloadShapes() {
-  if (!s_shapesLoaded) return;
-  Logger::info("Unloading Block Shapes");
-  s_shapesLoaded = false;
-  s_defaultShape->drop();
-  s_defaultShape = nullptr;
-  for (auto shape : s_blockShapes) shape.second->drop();
-  s_blockShapes.clear();
-  Logger::info("Done Unloading Block Shapes");
-}
-
-BlockShape* BlockShape::getDefaultShape() { return s_defaultShape; }
 }  // namespace px::game::chunk

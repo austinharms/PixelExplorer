@@ -316,9 +316,11 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\game\world\chunk\block\Block.cpp" />
     <ClCompile Include="src\game\world\chunk\block\BlockDefinition.cpp" />
+    <ClCompile Include="src\game\world\chunk\block\BlockSet.cpp" />
     <ClCompile Include="src\game\world\chunk\block\BlockShape.cpp" />
     <ClCompile Include="src\game\world\chunk\Chunk.cpp" />
     <ClCompile Include="src\game\world\chunk\ChunkRenderMesh.cpp" />
+    <ClInclude Include="src\game\world\chunk\block\BlockSet.h" />
     <ClInclude Include="src\game\world\World.fwd.h" />
     <ClInclude Include="src\game\world\WorldScene.fwd.h" />
     <ClInclude Include="src\game\world\WorldScene.h" />

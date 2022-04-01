@@ -6,34 +6,21 @@
 
 #include "BlockShape.h"
 #include "RefCounted.h"
+#include "util/Direction.h"
 namespace px::game::chunk {
 class BlockDefinition : public RefCounted {
  public:
-  static void loadDefinitions();
-  static void unloadDefinitions();
-  static const BlockDefinition* getDefinitionById(uint16_t id);
-  static bool getDefinitionsLoaded();
-  static const BlockDefinition* getDefaultDefinition();
+  static BlockDefinition* createDefaultDefinition(BlockShape* shape);
 
+  BlockShape* Shape;
+  const float UVOffset[util::Direction::DIRECTION_COUNT * 2];
+  const int16_t Id;
   const std::string Name;
 
+  BlockDefinition(std::string name, int16_t id,
+                  float uv[util::Direction::DIRECTION_COUNT * 2],
+                  BlockShape* shape);
   virtual ~BlockDefinition();
-  const BlockShape* getBaseShape() const;
-  const float* getUVOffsets() const;
-  const uint16_t getId() const;
-
- private:
-  static std::unordered_map<uint16_t, BlockDefinition*> s_blockDefinitions;
-  static BlockDefinition* s_defaultDefinition;
-  static bool s_definitionsLoaded;
-
-  static BlockDefinition* createDefaultDefinition();
-
-  BlockShape* _shape;
-  float _UVOffset[BlockShape::FACE_COUNT * 2];
-  uint16_t _id;
-
-  BlockDefinition(std::string name);
 };
 }  // namespace px::game::chunk
 #endif  // !BLOCKDEFINITION_H

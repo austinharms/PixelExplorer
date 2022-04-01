@@ -9,13 +9,9 @@ namespace px::game {
 Game::Game() {
   _renderer = new rendering::Renderer(1200, 800, "Pixel Explorer", 60);
   _renderer->setCursorHidden(true);
-  chunk::BlockShape::loadShapes();
-  chunk::BlockDefinition::loadDefinitions();
 }
 
 Game::~Game() {
-  chunk::BlockDefinition::unloadDefinitions();
-  chunk::BlockShape::unloadShapes();
   _renderer->drop();
 }
 

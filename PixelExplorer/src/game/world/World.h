@@ -4,16 +4,16 @@
 #include "RefCounted.h"
 #include "World.fwd.h"
 #include "WorldScene.fwd.h"
+#include "chunk/block/BlockSet.h"
 
 namespace px::game::world {
 class World : public RefCounted {
  public:
-  static World* loadWorld();
-
+  World();
   virtual ~World();
 
  private:
-  World();
+  chunk::BlockSet* _blockSet;
 };
-}
+}  // namespace px::game::world
 #endif

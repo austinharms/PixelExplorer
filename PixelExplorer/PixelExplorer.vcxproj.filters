@@ -81,6 +81,9 @@
     <ClCompile Include="src\rendering\BasicMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\world\chunk\block\BlockSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Chunk.shader" />
@@ -1439,6 +1442,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\Shader.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\world\chunk\block\BlockSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
