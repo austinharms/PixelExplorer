@@ -19,11 +19,14 @@ class WorldScene : public RefCounted {
   WorldScene(World* world);
   virtual ~WorldScene();
   void update();
+  void unload();
+  bool getLoaded() const;
 
  private:
   World* _world;
   physics::PhysicsScene* _physicsScene;
   std::unordered_map<glm::ivec3, chunk::Chunk*> _loadedChunks;
+  bool _loaded;
 };
 }  // namespace px::game::world
 #endif  // !WORLDSCENE_H

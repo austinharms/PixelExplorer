@@ -56,5 +56,9 @@ void Game::start() {
     _renderer->setTransform(camPos, camRot);
     _renderer->drawFrame();
   }
+
+  _loadedWorld->unload();
+  _loadedWorld->drop();
+  _loadedWorld = nullptr;
 }
 }  // namespace px::game

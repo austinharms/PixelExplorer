@@ -2,11 +2,12 @@
 
 #include "Logger.h"
 #include "WorldScene.h"
-#include "rendering/TexturedMaterial.h"
 #include "rendering/Shader.h"
+#include "rendering/TexturedMaterial.h"
 
 namespace px::game::world {
 World::World(rendering::Renderer* renderer) {
+  _loaded = true;
   _renderer = renderer;
   _renderer->grab();
   rendering::Shader* chunkShader = _renderer->loadShader("chunk");
@@ -22,27 +23,47 @@ World::World(rendering::Renderer* renderer) {
 }
 
 World::~World() {
+  if (_loaded) unload();
+}
+
+void World::update() {
+  if (!_loaded) return;
+  for (uint8_t i = 0; i < _sceneCount; ++i) _scenes[i]->update();
+}
+
+void World::unload() {
+  if (!_loaded) return;
+  _loaded = false;
   _chunkMaterial->drop();
+  _chunkMaterial = nullptr;
+
+  _renderer->drop();
+  _renderer = nullptr;
 
   for (uint8_t i = 0; i < _sceneCount; ++i) {
+    _scenes[i]->unload();
     if (!_scenes[i]->drop()) {
       Logger::warn("World Scene " + std::to_string(i) +
-                   " still referenced after world destroyed");
+                   " still referenced after world unloaded");
     }
   }
 
   delete[] _scenes;
+  _scenes = nullptr;
 
   if (!_blockSet->drop())
-    Logger::warn("Block Set still referenced after world destroyed");
+    Logger::warn("Block Set still referenced after world unloaded");
+  _blockSet = nullptr;
   Logger::info("Unloaded World");
 }
 
-void World::update() {
-  for (uint8_t i = 0; i < _sceneCount; ++i) _scenes[i]->update();
-}
+bool World::getLoaded() const { return _loaded; }
 
 chunk::ChunkRenderMesh* World::createChunkMesh() {
-  return new chunk::ChunkRenderMesh(_chunkMaterial);
+  if (!_loaded) return nullptr;
+  chunk::ChunkRenderMesh* chunkMesh =
+      new chunk::ChunkRenderMesh(_chunkMaterial);
+  _renderer->addRenderable(chunkMesh);
+  return chunkMesh;
 }
 }  // namespace px::game::world

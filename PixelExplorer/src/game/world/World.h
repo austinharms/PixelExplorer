@@ -17,6 +17,8 @@ class World : public RefCounted {
   World(rendering::Renderer* renderer);
   virtual ~World();
   void update();
+  void unload();
+  bool getLoaded() const;
   chunk::ChunkRenderMesh* createChunkMesh();
 
  private:
@@ -25,6 +27,7 @@ class World : public RefCounted {
   chunk::BlockSet* _blockSet;
   WorldScene** _scenes;
   uint8_t _sceneCount;
+  bool _loaded;
 };
 }  // namespace px::game::world
 #endif
