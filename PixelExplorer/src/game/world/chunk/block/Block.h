@@ -12,8 +12,8 @@ class Block {
   bool isExtended() const;
 
  private:
-  const uint16_t ID_BITMASK = 0b0111111111111111;
-  const uint16_t EXTEND_BITMASK = 0b1000000000000000;
+  const static uint16_t ID_BITMASK = 0b0111111111111111;
+  const static uint16_t EXTEND_BITMASK = 0b1000000000000000;
   uint16_t _id;
 };
 }  // namespace px::game::chunk

@@ -1,5 +1,5 @@
 {
-  "ExtractionTool": 1,
+  "ExtractionTool": 0,
   "AutomaticExtraction": true,
   "CMakeCommandsFile": "",
   "AdditionalPreprocessorDefinitions": "",

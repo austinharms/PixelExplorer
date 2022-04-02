@@ -15,17 +15,27 @@ PhysicsBase::PhysicsBase() {
   _pxScale->speed = 9.81f;
   _pxAllocator = new PxDefaultAllocator();
   _pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, *_pxAllocator, *this);
+#ifndef NDEBUG
   _pxPVD = PxCreatePvd(*_pxFoundation);
   _pxPVDTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
   _pxPVD->connect(*_pxPVDTransport, PxPvdInstrumentationFlag::eALL);
   _pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation,
-                               *_pxScale, true, _pxPVD);
+      *_pxScale, true, _pxPVD);
+#else
+  _pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation,
+      *_pxScale, true, nullptr);
+#endif // !NDEBUG
+
   PxCookingParams params(*_pxScale);
   params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
   params.meshPreprocessParams |=
       PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
   _pxCooking = PxCreateCooking(PX_PHYSICS_VERSION, *_pxFoundation, params);
+#ifndef NDEBUG
   PxInitExtensions(*_pxPhysics, _pxPVD);
+#else
+  PxInitExtensions(*_pxPhysics, nullptr);
+#endif
   _pxDefaultMaterial = _pxPhysics->createMaterial(1, 1, 1);
   _pxDispatcher = PxDefaultCpuDispatcherCreate(0);
   _pxDefaultFilter = PxDefaultSimulationFilterShader;
@@ -38,9 +48,11 @@ PhysicsBase::~PhysicsBase() {
   PxCloseExtensions();
   _pxCooking->release();
   _pxPhysics->release();
+#ifndef NDEBUG
   _pxPVD->disconnect();
   _pxPVD->release();
   _pxPVDTransport->release();
+#endif
   _pxFoundation->release();
   delete _pxScale;
   Logger::debug("Destroyed Physics Base");

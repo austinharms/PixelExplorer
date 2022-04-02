@@ -166,6 +166,7 @@ void Renderer::drawFrame() {
         continue;
       }
 
+      ++iter;
       if (!renderable->preRender(_deltaTime, _position, _rotation)) continue;
 
       Material* renderableMaterial = renderable->getMaterial();
@@ -199,7 +200,6 @@ void Renderer::drawFrame() {
 
       boundShader->setUniformm4("u_MVP", vp * renderable->getTransform());
       renderable->render();
-      ++iter;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);

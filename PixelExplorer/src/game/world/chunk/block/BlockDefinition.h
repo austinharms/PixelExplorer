@@ -12,10 +12,10 @@ class BlockDefinition : public RefCounted {
  public:
   static BlockDefinition* createDefaultDefinition(BlockShape* shape);
 
+  const std::string Name;
   BlockShape* Shape;
   const float UVOffset[util::Direction::DIRECTION_COUNT * 2];
   const int16_t Id;
-  const std::string Name;
 
   BlockDefinition(std::string name, int16_t id,
                   float uv[util::Direction::DIRECTION_COUNT * 2],

@@ -207,7 +207,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;PX_PHYSX_STATIC_LIB;GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>src;src/vendor;$(SolutionDir)glfw-3.3.4\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include\foundation;</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -281,7 +282,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;PX_PHYSX_STATIC_LIB;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>src;src/vendor;$(SolutionDir)glfw-3.3.4\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include\foundation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

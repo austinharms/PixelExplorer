@@ -23,8 +23,10 @@ class PhysicsBase : public physx::PxErrorCallback {
  private:
   physx::PxDefaultAllocator* _pxAllocator;
   physx::PxFoundation* _pxFoundation;
+#ifndef NDEBUG
   physx::PxPvd* _pxPVD;
   physx::PxPvdTransport* _pxPVDTransport;
+#endif // !NDEBUG
   physx::PxPhysics* _pxPhysics;
   physx::PxCooking* _pxCooking;
   physx::PxTolerancesScale* _pxScale;

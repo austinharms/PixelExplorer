@@ -47,8 +47,8 @@ class Chunk : public RefCounted {
   ChunkRenderMesh* _renderMesh;
   std::mutex _blockMutex;
   Block _blocks[BLOCK_COUNT];
-  glm::ivec3 _position;
   Status _status;
+  glm::ivec3 _position;
 };
 }  // namespace px::game::chunk
 #endif  // !CHUNK_H

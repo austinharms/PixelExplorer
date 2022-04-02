@@ -71,6 +71,7 @@ rendering::Material* ChunkRenderMesh::getMaterial() const { return _material; }
 
 bool ChunkRenderMesh::preRender(float deltaTime, const glm::vec3& cameraPos,
                                 const glm::vec3& cameraRotation) {
+    return false;
   updateBuffers();
   return _active && !_error;
 }

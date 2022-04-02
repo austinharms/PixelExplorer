@@ -68,12 +68,12 @@ class Renderer : public RefCounted {
   glm::vec3 _position;
   glm::vec3 _forward;
   glm::vec3 _rotation;
+  float _FOV;
   GLFWwindow* _window;
   uint32_t _FPSLimit;
   uint32_t _FPS;
   uint32_t _frameCounter;
   float _deltaTime;
-  float _FOV;
   double _lastFrame;
   double _FPSTimer;
   double _cursorX;
