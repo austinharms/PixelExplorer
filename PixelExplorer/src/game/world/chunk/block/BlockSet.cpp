@@ -1,4 +1,5 @@
 #include "BlockSet.h"
+#include "Logger.h"
 namespace px::game::chunk {
 BlockSet::BlockSet() {
   _defaultShape = BlockShape::createDefaultShape();
@@ -8,6 +9,7 @@ BlockSet::BlockSet() {
   _defaultDefinition = BlockDefinition::createDefaultDefinition(_defaultShape);
   _defaultDefinition->grab();
   _blockDefinitions.emplace(_defaultDefinition->Id, _defaultDefinition);
+  Logger::info("Loaded Block Set");
 }
 
 BlockSet::~BlockSet() {
@@ -18,6 +20,7 @@ BlockSet::~BlockSet() {
   for (auto it = _blockShapes.begin(); it != _blockShapes.end(); ++it)
     it->second->drop();
   _defaultShape->drop();
+  Logger::info("Unloaded Block Set");
 }
 
 BlockShape* BlockSet::getDefaultShape() const { return _defaultShape; }

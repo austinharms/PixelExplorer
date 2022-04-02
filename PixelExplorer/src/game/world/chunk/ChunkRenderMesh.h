@@ -3,18 +3,15 @@
 
 #include <mutex>
 
-#include "util/DataBuffer.h"
+#include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 #include "rendering/Material.h"
 #include "rendering/Renderable.h"
-#include "glm/vec3.hpp"
-#include "glm/mat4x4.hpp"
+#include "util/DataBuffer.h"
 namespace px::game::chunk {
 class ChunkRenderMesh : public rendering::Renderable {
  public:
-  static void setMaterial(rendering::Material* mat);
-  static void dropMaterial();
-
-  ChunkRenderMesh();
+  ChunkRenderMesh(rendering::Material* material);
   ~ChunkRenderMesh();
   bool shouldDrop() const;
   rendering::Material* getMaterial() const;
@@ -30,8 +27,7 @@ class ChunkRenderMesh : public rendering::Renderable {
   void setActive(bool active);
 
  private:
-  static rendering::Material* s_material;
-
+  rendering::Material* _material;
   util::DataBuffer<float>* _vertexBuffer;
   util::DataBuffer<uint32_t>* _indexBuffer;
   uint32_t _indexCount;

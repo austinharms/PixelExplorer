@@ -7,7 +7,7 @@
 namespace px::rendering {
 class BasicMaterial : public Material {
  public:
-  BasicMaterial(Shader* shader = nullptr);
+  BasicMaterial(Shader* shader);
   virtual ~BasicMaterial();
   Shader* getShader() const;
 

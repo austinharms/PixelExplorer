@@ -350,6 +350,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\basic.shader" />
+    <None Include="assets\shaders\chunk.shader" />
     <None Include="res\shaders\Chunk.shader" />
     <None Include="res\shaders\Default.shader" />
     <None Include="src\vendor\glm\detail\func_common.inl" />

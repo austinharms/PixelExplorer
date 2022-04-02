@@ -39,6 +39,8 @@ void TexturedMaterial::updateTexture(void* texture, int32_t width,
   unbindTexture();
 }
 
+Shader* TexturedMaterial::getShader() const { return _shader; }
+
 void TexturedMaterial::bindTexture() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _textureId);

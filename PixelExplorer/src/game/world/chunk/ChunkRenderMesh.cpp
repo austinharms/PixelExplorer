@@ -4,20 +4,9 @@
 #include "Logger.h"
 #include "glm/gtx/euler_angles.hpp"
 namespace px::game::chunk {
-rendering::Material* ChunkRenderMesh::s_material = nullptr;
-
-void ChunkRenderMesh::setMaterial(rendering::Material* mat) {
-  if (s_material != nullptr) s_material->drop();
-  s_material = mat;
-  if (s_material != nullptr) s_material->grab();
-}
-
-void ChunkRenderMesh::dropMaterial() {
-  if (s_material != nullptr) s_material->drop();
-  s_material = nullptr;
-}
-
-ChunkRenderMesh::ChunkRenderMesh() {
+ChunkRenderMesh::ChunkRenderMesh(rendering::Material* material) {
+  _material = material;
+  _material->grab();
   _vertexBuffer = nullptr;
   _indexBuffer = nullptr;
   _indexCount = 0;
@@ -43,7 +32,7 @@ ChunkRenderMesh::ChunkRenderMesh() {
     return;
   }
 
-  glGenBuffers(0, &_indexBufferId);
+  glGenBuffers(1, &_indexBufferId);
   if (_indexBufferId == 0) {
     _error = true;
     Logger::error("Failed to Create ChunkRenderMesh Index Buffer");
@@ -61,6 +50,7 @@ ChunkRenderMesh::ChunkRenderMesh() {
 }
 
 ChunkRenderMesh::~ChunkRenderMesh() {
+  _material->drop();
   glDeleteVertexArrays(1, &_vertexArrayId);
   glDeleteBuffers(1, &_vertexBufferId);
   glDeleteBuffers(1, &_indexBufferId);
@@ -77,7 +67,7 @@ ChunkRenderMesh::~ChunkRenderMesh() {
 
 bool ChunkRenderMesh::shouldDrop() const { return _drop || _error; }
 
-rendering::Material* ChunkRenderMesh::getMaterial() const { return s_material; }
+rendering::Material* ChunkRenderMesh::getMaterial() const { return _material; }
 
 bool ChunkRenderMesh::preRender(float deltaTime, const glm::vec3& cameraPos,
                                 const glm::vec3& cameraRotation) {

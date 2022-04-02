@@ -3,6 +3,7 @@
 
 #pragma once
 #include "../detail/type_vec3.hpp"
+#include <stdint.h>
 
 namespace glm
 {
@@ -12,7 +13,7 @@ namespace glm
 	/// 3 components vector of signed integer numbers.
 	///
 	/// @see <a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 4.1.5 Vectors</a>
-	typedef vec<3, int, defaultp>		ivec3;
+	typedef vec<3, int32_t, defaultp>		ivec3;
 
 	/// @}
 }//namespace glm

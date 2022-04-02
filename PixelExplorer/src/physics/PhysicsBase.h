@@ -13,7 +13,7 @@ class PhysicsBase : public physx::PxErrorCallback {
   physx::PxCooking* getPxCooking() const;
   physx::PxCpuDispatcher* getPxDispatcher() const;
   physx::PxSimulationFilterShader getPxSimulationFilter() const;
-  physx::PxTolerancesScale getPxScale() const;
+  physx::PxTolerancesScale* getPxScale() const;
   void reportError(physx::PxErrorCode::Enum code, const char* message,
                    const char* file, int line);
   ~PhysicsBase();
@@ -27,7 +27,7 @@ class PhysicsBase : public physx::PxErrorCallback {
   physx::PxPvdTransport* _pxPVDTransport;
   physx::PxPhysics* _pxPhysics;
   physx::PxCooking* _pxCooking;
-  physx::PxTolerancesScale _pxScale;
+  physx::PxTolerancesScale* _pxScale;
   physx::PxMaterial* _pxDefaultMaterial;
   physx::PxCpuDispatcher* _pxDispatcher;
   physx::PxSimulationFilterShader _pxDefaultFilter;

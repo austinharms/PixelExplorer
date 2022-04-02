@@ -497,6 +497,7 @@
     </None>
     <None Include="res\shaders\Default.shader" />
     <None Include="assets\shaders\basic.shader" />
+    <None Include="assets\shaders\chunk.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Renderer.h">

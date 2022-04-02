@@ -6,7 +6,7 @@
 namespace px::physics {
 PhysicsScene::PhysicsScene() {
   PhysicsBase* base = &PhysicsBase::getInstance();
-  physx::PxSceneDesc desc(base->getPxScale());
+  physx::PxSceneDesc desc(*(base->getPxScale()));
   desc.gravity = physx::PxVec3(0, -9.81f, 0);
   desc.cpuDispatcher = base->getPxDispatcher();
   desc.filterShader = base->getPxSimulationFilter();

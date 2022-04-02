@@ -10,16 +10,17 @@ PhysicsBase& PhysicsBase::getInstance() {
 }
 
 PhysicsBase::PhysicsBase() {
-  _pxScale.length = 1;
-  _pxScale.speed = 9.81f;
+  _pxScale = new physx::PxTolerancesScale();
+  _pxScale->length = 1;
+  _pxScale->speed = 9.81f;
   _pxAllocator = new PxDefaultAllocator();
   _pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, *_pxAllocator, *this);
   _pxPVD = PxCreatePvd(*_pxFoundation);
   _pxPVDTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
   _pxPVD->connect(*_pxPVDTransport, PxPvdInstrumentationFlag::eALL);
   _pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation,
-                               PxTolerancesScale(), true, _pxPVD);
-  PxCookingParams params(_pxScale);
+                               *_pxScale, true, _pxPVD);
+  PxCookingParams params(*_pxScale);
   params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
   params.meshPreprocessParams |=
       PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
@@ -41,6 +42,7 @@ PhysicsBase::~PhysicsBase() {
   _pxPVD->release();
   _pxPVDTransport->release();
   _pxFoundation->release();
+  delete _pxScale;
   Logger::debug("Destroyed Physics Base");
 }
 
@@ -61,7 +63,7 @@ physx::PxSimulationFilterShader PhysicsBase::getPxSimulationFilter()
   return _pxDefaultFilter;
 }
 
-physx::PxTolerancesScale PhysicsBase::getPxScale() const { return _pxScale; }
+physx::PxTolerancesScale* PhysicsBase::getPxScale() const { return _pxScale; }
 
 void PhysicsBase::reportError(PxErrorCode::Enum code, const char* message,
                               const char* file, int line) {

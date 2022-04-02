@@ -11,12 +11,10 @@ class TexturedMaterial : public Material {
                    int32_t height);
   virtual ~TexturedMaterial();
   void bind() override;
-
   int32_t getWidth() const { return _width; }
-
   int32_t getHeight() const { return _height; }
-
   void updateTexture(void* _texture, int32_t width, int32_t height);
+  Shader* getShader() const;
 
  private:
   void bindTexture();

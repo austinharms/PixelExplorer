@@ -6,6 +6,7 @@
 #include "physics/PhysicsBase.h"
 #include "physics/PhysicsBase.h"
 #include "rendering/Renderer.h"
+#include "world/World.h"
 
 namespace px::game {
 class Game : public RefCounted {
@@ -16,6 +17,7 @@ class Game : public RefCounted {
 
  private:
   rendering::Renderer* _renderer;
+  world::World* _loadedWorld;
 };
 }  // namespace px
 #endif  // !GAME_H

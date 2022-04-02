@@ -8,6 +8,7 @@
 namespace px::physics {
 class PhysicsScene : public RefCounted {
  public:
+  PhysicsScene();
   virtual ~PhysicsScene();
   void insertObject(PhysicsObject* obj);
   void removeObject(PhysicsObject* obj);
@@ -15,7 +16,6 @@ class PhysicsScene : public RefCounted {
  private:
   physx::PxScene* _pxScene;
 
-  PhysicsScene();
 };
 }  // namespace px::physics
 #endif

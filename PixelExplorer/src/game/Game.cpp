@@ -1,40 +1,30 @@
 #include "Game.h"
 
+#include "Logger.h"
 #include "glm/vec3.hpp"
+#include "rendering/BasicMaterial.h"
 #include "rendering/TestRenderable.h"
 #include "world/chunk/block/BlockDefinition.h"
 #include "world/chunk/block/BlockShape.h"
-#include "rendering/BasicMaterial.h"
 namespace px::game {
 Game::Game() {
   _renderer = new rendering::Renderer(1200, 800, "Pixel Explorer", 60);
-  _renderer->setCursorHidden(true);
+  _loadedWorld = nullptr;
 }
 
 Game::~Game() {
-  _renderer->drop();
+  if (!_renderer->drop())
+    Logger::warn("Rendere still referenced after game destroyed");
 }
 
 void Game::start() {
-  rendering::BasicMaterial* mat = new rendering::BasicMaterial(_renderer->loadShader("basic"));
-  for (float x = 0; x < 25; ++x) {
-    for (float y = 0; y < 25; ++y) {
-      for (float z = 0; z < 25; ++z) {
-        rendering::TestRenderable* t = new rendering::TestRenderable(mat);
-        t->setPosition(glm::vec3(x,y,z) * 3.0f);
-        _renderer->addRenderable(t);
-        t->drop();
-      }
-    }
-  }
-
-  mat->drop();
-
+  _loadedWorld = new world::World(_renderer);
   glm::vec3 camPos(12, 12, 75);
   glm::vec3 camRot(0, 0, 0);
   float moveSpeed = 50;
 
   while (_renderer->getWindowOpen()) {
+    _loadedWorld->update();
     if (_renderer->getKeyPressed(GLFW_KEY_W)) {
       camPos += _renderer->getDeltaTime() * _renderer->getForward() * moveSpeed;
     } else if (_renderer->getKeyPressed(GLFW_KEY_S)) {

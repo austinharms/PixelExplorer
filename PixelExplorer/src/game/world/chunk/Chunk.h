@@ -11,6 +11,8 @@
 #include "RefCounted.h"
 #include "ChunkRenderMesh.h"
 #include "block/Block.h"
+#include "glm/vec3.hpp"
+
 namespace px::game::chunk {
 class Chunk : public RefCounted {
  public:
@@ -45,7 +47,7 @@ class Chunk : public RefCounted {
   ChunkRenderMesh* _renderMesh;
   std::mutex _blockMutex;
   Block _blocks[BLOCK_COUNT];
-  glm::vec<3, int32_t> _position;
+  glm::ivec3 _position;
   Status _status;
 };
 }  // namespace px::game::chunk
