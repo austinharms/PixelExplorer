@@ -10,9 +10,9 @@ namespace px::game::world {
 		world->grab();
 		_world = world;
 		_physicsScene = new physics::PhysicsScene();
-		for (int32_t x = 0; x < 75; ++x) {
-			for (int32_t y = 0; y < 75; ++y) {
-				for (int32_t z = 0; z < 75; ++z) {
+		for (int32_t x = 0; x < 25; ++x) {
+			for (int32_t y = 0; y < 25; ++y) {
+				for (int32_t z = 0; z < 25; ++z) {
 					chunk::Chunk* chunk = new chunk::Chunk(_world->createChunkMesh());
 					chunk->setPosition(glm::ivec3(x, y, z));
 					chunk->setScene(this);

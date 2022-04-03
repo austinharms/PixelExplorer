@@ -13,6 +13,7 @@ Game::Game() {
 }
 
 Game::~Game() {
+    _renderer->unload();
   if (!_renderer->drop())
     Logger::warn("Rendere still referenced after game destroyed");
 }

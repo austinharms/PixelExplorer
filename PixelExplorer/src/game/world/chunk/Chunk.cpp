@@ -2,6 +2,10 @@
 
 #include "../WorldScene.h"
 #include "Logger.h"
+#include "block/BlockSet.h"
+#include "block/BlockDefinition.h"
+#include "block/BlockShape.h"
+
 namespace px::game::chunk {
 
 Chunk::Chunk(ChunkRenderMesh* renderMesh) {
@@ -28,7 +32,9 @@ Chunk::~Chunk() {
   _renderMesh->drop();
 }
 
-void Chunk::updateMesh() {}
+void Chunk::updateMesh() {
+    
+}
 
 void Chunk::updateAdjacents() {}
 

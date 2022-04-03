@@ -48,6 +48,7 @@ class Renderer : public RefCounted {
   double getCursorChangeY() const;
   Shader* loadShader(std::string shaderName);
   void removeShader(std::string shaderName);
+  void unload();
 
  private:
   static void GLAPIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id,

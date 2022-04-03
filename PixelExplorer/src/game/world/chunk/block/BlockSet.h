@@ -20,9 +20,9 @@ class BlockSet : public RefCounted {
 
  private:
   BlockShape* _defaultShape;
-  BlockDefinition* _defaultDefinition;
   std::unordered_map<std::string, BlockShape*> _blockShapes;
-  std::unordered_map<uint16_t, BlockDefinition*> _blockDefinitions;
+  BlockDefinition** _blockDefinitions;
+  uint16_t _blockDefinitionCount;
 };
 }  // namespace px::game::chunk
 #endif  // !BLOCKSET_H
