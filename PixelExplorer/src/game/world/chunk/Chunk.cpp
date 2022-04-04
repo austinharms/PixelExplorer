@@ -22,8 +22,8 @@ namespace px::game::chunk {
 		_renderMesh->setPosition(positon);
 		_renderMesh->setActive(true);
 		_status = Chunk::Status::LOADING;
-		//_blocks[0] = 1;
-		memset(_blocks, 1, sizeof(_blocks));
+		_blocks[0] = 1;
+		//memset(_blocks, 1, sizeof(_blocks));
 		_status = Chunk::Status::LOADED;
 	}
 

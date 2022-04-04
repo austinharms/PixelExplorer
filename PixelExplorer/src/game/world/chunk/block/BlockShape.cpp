@@ -167,52 +167,28 @@ BlockShape* BlockShape::createDefaultShape() {
 
   const uint8_t indices[36] = {
       // Front
-      0,
-      1,
-      2,
-      0,
-      2,
-      3,
+      0,2,1,
+      0,3,2,
 
       // Back
-      2,
-      1,
-      0,
-      2,
-      3,
-      0,
+      0,1,2,
+      0,2,3,
 
       // Left
-      0,
-      1,
-      2,
-      0,
-      2,
-      3,
+      0,2,1,
+      0,3,2,
 
       // Right
-      2,
-      1,
-      0,
-      2,
-      3,
-      0,
+      0,1,2,
+      0,2,3,
 
       // Top
-      0,
-      1,
-      2,
-      0,
-      2,
-      3,
+      0,1,2,
+      0,2,3,
 
       // Bottom
-      2,
-      1,
-      0,
-      2,
-      3,
-      0,
+      0,2,1,
+      0,3,2,
   };
 
   BlockShape* block = new BlockShape("DEFAULT");
