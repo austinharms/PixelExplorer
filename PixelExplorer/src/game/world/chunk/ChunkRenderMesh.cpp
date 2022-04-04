@@ -32,13 +32,6 @@ ChunkRenderMesh::ChunkRenderMesh(rendering::Material* material) {
     return;
   }
 
-  glGenBuffers(1, &_indexBufferId);
-  if (_indexBufferId == 0) {
-    _error = true;
-    Logger::error("Failed to Create ChunkRenderMesh Index Buffer");
-    return;
-  }
-
   glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
@@ -47,6 +40,13 @@ ChunkRenderMesh::ChunkRenderMesh(rendering::Material* material) {
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  glGenBuffers(1, &_indexBufferId);
+  if (_indexBufferId == 0) {
+      _error = true;
+      Logger::error("Failed to Create ChunkRenderMesh Index Buffer");
+      return;
+  }
 }
 
 ChunkRenderMesh::~ChunkRenderMesh() {
@@ -71,7 +71,6 @@ rendering::Material* ChunkRenderMesh::getMaterial() const { return _material; }
 
 bool ChunkRenderMesh::preRender(float deltaTime, const glm::vec3& cameraPos,
                                 const glm::vec3& cameraRotation) {
-    return false;
   updateBuffers();
   return _active && !_error;
 }
@@ -83,10 +82,11 @@ void ChunkRenderMesh::render() const {
   glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
   glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, nullptr);
+  //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
 void ChunkRenderMesh::setPosition(glm::vec3 pos) {
-  _transform[3] = glm::vec<4, float>(pos, 0);
+  _transform[3] = glm::vec<4, float>(pos, 1);
 }
 
 void ChunkRenderMesh::setDropFlag() { _drop = true; }
@@ -103,7 +103,8 @@ void ChunkRenderMesh::updateBuffers(util::DataBuffer<float>* verts,
   }
 
   _vertexBuffer = verts;
-  _indexBuffer->makeReadOnly();
+  _vertexBuffer->grab();
+  _vertexBuffer->makeReadOnly();
 
   if (_indexBuffer != nullptr) {
     _indexBuffer->makeWriteable();
@@ -111,6 +112,7 @@ void ChunkRenderMesh::updateBuffers(util::DataBuffer<float>* verts,
   }
 
   _indexBuffer = indices;
+  _indexBuffer->grab();
   _indexBuffer->makeReadOnly();
 
   _bufferMutex.unlock();
@@ -125,7 +127,7 @@ void ChunkRenderMesh::updateBuffers() {
   _bufferMutex.lock();
   _dirty = false;
   _indexCount = _indexBuffer->length;
-
+  glBindVertexArray(_vertexArrayId);
   glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
   glBufferData(GL_ARRAY_BUFFER, _vertexBuffer->getSize(), _vertexBuffer->buffer,
                GL_STATIC_DRAW);

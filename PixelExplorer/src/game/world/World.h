@@ -20,6 +20,7 @@ class World : public RefCounted {
   void unload();
   bool getLoaded() const;
   chunk::ChunkRenderMesh* createChunkMesh();
+  chunk::BlockSet* getBlockSet() const;
 
  private:
   rendering::Renderer* _renderer;

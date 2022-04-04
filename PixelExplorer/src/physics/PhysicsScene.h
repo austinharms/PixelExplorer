@@ -6,16 +6,19 @@
 #include "PxPhysicsAPI.h"
 #include "RefCounted.h"
 namespace px::physics {
-class PhysicsScene : public RefCounted {
- public:
-  PhysicsScene();
-  virtual ~PhysicsScene();
-  void insertObject(PhysicsObject* obj);
-  void removeObject(PhysicsObject* obj);
+	class PhysicsScene : public RefCounted {
+	public:
+		const static float FIXED_STEP;
+		PhysicsScene();
+		virtual ~PhysicsScene();
+		void insertObject(PhysicsObject* obj);
+		void removeObject(PhysicsObject* obj);
+		void simulate(float time);
 
- private:
-  physx::PxScene* _pxScene;
+	private:
+		physx::PxScene* _pxScene;
+		float _accumulator;
 
-};
+	};
 }  // namespace px::physics
 #endif

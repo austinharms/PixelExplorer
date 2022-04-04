@@ -21,6 +21,8 @@ class WorldScene : public RefCounted {
   void update();
   void unload();
   bool getLoaded() const;
+  World* getWorld() const;
+  physics::PhysicsScene* getPhysicsScene() const;
 
  private:
   World* _world;

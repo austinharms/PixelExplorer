@@ -10,13 +10,10 @@ namespace px::game::world {
 		world->grab();
 		_world = world;
 		_physicsScene = new physics::PhysicsScene();
-		for (int32_t x = 0; x < 25; ++x) {
-			for (int32_t y = 0; y < 25; ++y) {
-				for (int32_t z = 0; z < 25; ++z) {
-					chunk::Chunk* chunk = new chunk::Chunk(_world->createChunkMesh());
-					chunk->setPosition(glm::ivec3(x, y, z));
-					chunk->setScene(this);
-					chunk->updateAdjacents();
+		for (int32_t x = 0; x < 1; ++x) {
+			for (int32_t y = 0; y < 1; ++y) {
+				for (int32_t z = 0; z < 1; ++z) {
+					chunk::Chunk* chunk = new chunk::Chunk(this, glm::ivec3(x, y, z));
 					chunk->updateMesh();
 					_loadedChunks.emplace(chunk->getPosition(), chunk);
 				}
@@ -28,7 +25,9 @@ namespace px::game::world {
 		if (_loaded) unload();
 	}
 
-	void WorldScene::update() {}
+	void WorldScene::update() {
+		_physicsScene->simulate(0.1f);
+	}
 
 	void WorldScene::unload() {
 		if (!_loaded) return;
@@ -49,4 +48,12 @@ namespace px::game::world {
 	}
 
 	bool WorldScene::getLoaded() const { return _loaded; }
+	World* WorldScene::getWorld() const
+	{
+		return _world;
+	}
+	physics::PhysicsScene* WorldScene::getPhysicsScene() const
+	{
+		return _physicsScene;
+	}
 }  // namespace px::game::world
