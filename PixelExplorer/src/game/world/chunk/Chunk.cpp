@@ -7,6 +7,7 @@
 #include "block/BlockSet.h"
 #include "../World.h"
 #include "physics/PhysicsScene.h"
+#include "util/Direction.h"
 
 namespace px::game::chunk {
 
@@ -22,8 +23,8 @@ namespace px::game::chunk {
 		_renderMesh->setPosition(positon);
 		_renderMesh->setActive(true);
 		_status = Chunk::Status::LOADING;
-		_blocks[0] = 1;
-		//memset(_blocks, 1, sizeof(_blocks));
+		memset(_blocks, 1, sizeof(_blocks));
+		_blocks[0] = 0;
 		_status = Chunk::Status::LOADED;
 	}
 
@@ -41,22 +42,23 @@ namespace px::game::chunk {
 		uint32_t renderIndexCount = 0;
 		uint32_t physicsVertexCount = 0;
 		uint32_t physicsIndexCount = 0;
-		float x = -1;
-		float y = 0;
-		float z = 0;
+		glm::ivec3 pos(-1, 0, 0);
 
 		for (int32_t i = 0; i < BLOCK_COUNT; ++i) {
-			if (++x == CHUNK_SIZE) {
-				x = 0;
-				if (++z == CHUNK_SIZE) {
-					z = 0;
-					++y;
+			if (++pos.x == CHUNK_SIZE) {
+				pos.x = 0;
+				if (++pos.z == CHUNK_SIZE) {
+					pos.z = 0;
+					++pos.y;
 				}
 			}
 
 			if (_blocks[i].getId() == 0) continue;
 			const BlockDefinition* def = blockSet->getDefinitionById(_blocks[i].getId());
+
 			for (int8_t j = 0; j < util::Direction::DIRECTION_COUNT; ++j) {
+				Block* other = getBlock(pos - (glm::ivec3)util::Direction::fromIndex(j).getOpposite());
+				if (other != nullptr && other->getId() != 0) continue;
 				renderIndexCount += def->Shape->RenderIndexCount[j];
 				renderVertexCount += def->Shape->RenderVertexCount[j] * 5;
 				physicsIndexCount += def->Shape->PhysicsIndexCount[j];
@@ -64,9 +66,9 @@ namespace px::game::chunk {
 			}
 		}
 
-		x = -1;
-		y = 0;
-		z = 0;
+		pos.x = -1;
+		pos.y = 0;
+		pos.z = 0;
 		util::DataBuffer<float>* renderVertexBuffer = new util::DataBuffer<float>(renderVertexCount);
 		util::DataBuffer<float>* physicsVertexBuffer = new util::DataBuffer<float>(physicsVertexCount);
 		util::DataBuffer<uint32_t>* renderIndexBuffer = new util::DataBuffer<uint32_t>(renderIndexCount);
@@ -77,25 +79,28 @@ namespace px::game::chunk {
 		physicsIndexCount = 0;
 
 		for (int32_t i = 0; i < BLOCK_COUNT; ++i) {
-			if (++x == CHUNK_SIZE) {
-				x = 0;
-				if (++z == CHUNK_SIZE) {
-					z = 0;
-					++y;
+			if (++pos.x == CHUNK_SIZE) {
+				pos.x = 0;
+				if (++pos.z == CHUNK_SIZE) {
+					pos.z = 0;
+					++pos.y;
 				}
 			}
 
 			if (_blocks[i].getId() == 0) continue;
 			const BlockDefinition* def = blockSet->getDefinitionById(_blocks[i].getId());
 			for (int8_t j = 0; j < util::Direction::DIRECTION_COUNT; ++j) {
+				Block* other = getBlock(pos - (glm::ivec3)util::Direction::fromIndex(j).getOpposite());
+				if (other != nullptr && other->getId() != 0) continue;
+
 				for (uint8_t k = 0; k < def->Shape->RenderIndexCount[j]; ++k) {
 					renderIndexBuffer->buffer[renderIndexCount++] = def->Shape->RenderIndices[j][k] + (renderVertexCount/5);
 				}
 
 				for (uint8_t k = 0; k < def->Shape->RenderVertexCount[j]; ++k) {
-					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 0] + (_position.x * CHUNK_SIZE) + x;
-					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 1] + (_position.y * CHUNK_SIZE) + y;
-					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 2] + (_position.z * CHUNK_SIZE) + z;
+					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 0] + (_position.x * CHUNK_SIZE) + pos.x;
+					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 1] + (_position.y * CHUNK_SIZE) + pos.y;
+					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 2] + (_position.z * CHUNK_SIZE) + pos.z;
 					// TODO update uvs
 					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 3];
 					renderVertexBuffer->buffer[renderVertexCount++] = def->Shape->RenderVertices[j][(k * 5) + 4];
@@ -107,23 +112,13 @@ namespace px::game::chunk {
 				}
 
 				for (uint8_t k = 0; k < def->Shape->PhysicsVertexCount[j]; ++k) {
-					physicsVertexBuffer->buffer[physicsVertexCount++] = def->Shape->PhysicsVertices[j][(k * 3) + 0] + (_position.x * CHUNK_SIZE) + x;
-					physicsVertexBuffer->buffer[physicsVertexCount++] = def->Shape->PhysicsVertices[j][(k * 3) + 1] + (_position.y * CHUNK_SIZE) + y;
-					physicsVertexBuffer->buffer[physicsVertexCount++] = def->Shape->PhysicsVertices[j][(k * 3) + 2] + (_position.z * CHUNK_SIZE) + z;
+					physicsVertexBuffer->buffer[physicsVertexCount++] = def->Shape->PhysicsVertices[j][(k * 3) + 0] + (_position.x * CHUNK_SIZE) + pos.x;
+					physicsVertexBuffer->buffer[physicsVertexCount++] = def->Shape->PhysicsVertices[j][(k * 3) + 1] + (_position.y * CHUNK_SIZE) + pos.y;
+					physicsVertexBuffer->buffer[physicsVertexCount++] = def->Shape->PhysicsVertices[j][(k * 3) + 2] + (_position.z * CHUNK_SIZE) + pos.z;
 				}
 			}
 		}
 
-		//std::string msg = "";
-		//for (int32_t i = 0; i < renderVertexBuffer->length; ++i)
-		//	msg += std::to_string(renderVertexBuffer->buffer[i]) + ", ";
-		//Logger::info(msg);
-
-		//msg = "";
-		//for (int32_t i = 0; i < renderIndexBuffer->length; ++i)
-		//	msg += std::to_string(renderIndexBuffer->buffer[i]) + ", ";
-		//Logger::info(msg);
-		//_physicsObject->updateMesh(renderVertexBuffer, renderIndexBuffer, 5);
 		_physicsObject->updateMesh(physicsVertexBuffer, physicsIndexBuffer, 3);
 		_renderMesh->updateBuffers(renderVertexBuffer, renderIndexBuffer);
 		physicsIndexBuffer->drop();
@@ -167,6 +162,13 @@ namespace px::game::chunk {
 	//}
 
 	ChunkRenderMesh* Chunk::getRenderMesh() const { return _renderMesh; }
+
+	Block* Chunk::getBlock(glm::ivec3 localPos) const
+	{
+		if (localPos.x < 0 || localPos.y < 0 || localPos.z < 0 || localPos.x >= CHUNK_SIZE || localPos.y >= CHUNK_SIZE || localPos.z >= CHUNK_SIZE )
+			return nullptr;
+		return (Block*)&_blocks[localPos.x + (localPos.z * CHUNK_SIZE) + (localPos.y * LAYER_SIZE)];
+	}
 }  // namespace px::game::chunk
 
 #pragma region OldChunkCode

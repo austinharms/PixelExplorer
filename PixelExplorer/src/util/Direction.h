@@ -18,13 +18,18 @@ struct Direction {
   static const Direction ALL;
   static const uint8_t DIRECTION_COUNT = 6;
 
+  static Direction fromIndex(int32_t index);
+
   operator uint8_t() const;
   bool operator==(const Direction& d) const;
   bool operator!=(const Direction& d) const;
   Direction operator-(const Direction& d) const;
   Direction operator=(const uint8_t val) const;
   explicit operator glm::vec3() const;
+  explicit operator glm::ivec3() const;
   glm::vec3 toVec3() const;
+  glm::ivec3 toIVec3() const;
+  int32_t toIndex() const;
   Direction getOpposite() const;
   ~Direction();
 

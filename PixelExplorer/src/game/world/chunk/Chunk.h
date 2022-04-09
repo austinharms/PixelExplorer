@@ -49,6 +49,8 @@ namespace px::game::chunk {
 		Block _blocks[BLOCK_COUNT];
 		Status _status;
 		glm::ivec3 _position;
+
+		Block* getBlock(glm::ivec3 localPos) const;
 	};
 }  // namespace px::game::chunk
 #endif  // !CHUNK_H
