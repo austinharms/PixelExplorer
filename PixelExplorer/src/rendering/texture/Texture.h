@@ -16,6 +16,7 @@ namespace px::rendering {
 		const uint8_t* Pixels;
 		const uint16_t Width;
 		const uint16_t Height;
+		const uint16_t FrameCount = 1;
 
 		Texture* loadTexture(const char* path);
 		~Texture();

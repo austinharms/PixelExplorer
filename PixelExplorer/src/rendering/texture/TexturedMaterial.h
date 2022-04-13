@@ -4,6 +4,7 @@
 
 #include "../Material.h"
 #include "../Shader.h"
+#include "Texture.h"
 namespace px::rendering {
 class TexturedMaterial : public Material {
  public:
@@ -14,6 +15,7 @@ class TexturedMaterial : public Material {
   int32_t getWidth() const { return _width; }
   int32_t getHeight() const { return _height; }
   void updateTexture(void* _texture, int32_t width, int32_t height);
+  void updateTexture(Texture* texture);
   Shader* getShader() const;
 
  private:
