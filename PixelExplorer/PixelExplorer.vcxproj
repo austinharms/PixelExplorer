@@ -330,11 +330,13 @@
     <ClInclude Include="src\rendering\BasicMaterial.h" />
     <ClInclude Include="src\rendering\Renderer.fwd.h" />
     <ClInclude Include="src\rendering\Shader.fwd.h" />
+    <ClInclude Include="src\rendering\texture\Texture.h" />
     <ClInclude Include="src\util\DataBuffer.inl">
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="src\game\world\WorldScene.cpp" />
     <ClCompile Include="src\rendering\BasicMaterial.cpp" />
+    <ClCompile Include="src\rendering\texture\Texture.cpp" />
     <ClCompile Include="src\util\Direction.cpp" />
     <ClCompile Include="src\util\FileUtilities.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
@@ -345,7 +347,7 @@
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\TestRenderable.cpp" />
-    <ClCompile Include="src\rendering\TexturedMaterial.cpp" />
+    <ClCompile Include="src\rendering\texture\TexturedMaterial.cpp" />
     <ClCompile Include="src\vendor\glm\detail\glm.cpp" />
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="src\game\world\World.cpp" />
@@ -514,7 +516,7 @@
     <ClInclude Include="src\rendering\Renderer.h" />
     <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\rendering\TestRenderable.h" />
-    <ClInclude Include="src\rendering\TexturedMaterial.h" />
+    <ClInclude Include="src\rendering\texture\TexturedMaterial.h" />
     <ClInclude Include="src\vendor\FastNoiseLite.h" />
     <ClInclude Include="src\vendor\glm\common.hpp" />
     <ClInclude Include="src\vendor\glm\detail\compute_common.hpp" />

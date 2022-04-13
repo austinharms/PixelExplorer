@@ -3,7 +3,7 @@
 #include "Logger.h"
 #include "WorldScene.h"
 #include "rendering/Shader.h"
-#include "rendering/TexturedMaterial.h"
+#include "rendering/texture/TexturedMaterial.h"
 #include "rendering/BasicMaterial.h"
 
 namespace px::game::world {
