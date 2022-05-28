@@ -23,9 +23,18 @@
     <ClInclude Include="src\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\RefCount.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\RenderWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Logger.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="src\RefCount.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
