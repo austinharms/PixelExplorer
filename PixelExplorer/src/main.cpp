@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <iostream>
+#include "Logger.h"
 
 int main(void) {
-	std::cout << "Hello World" << std::endl;
+	pixelexplore::Logger::info("Hello World");
 	return 0;
 }
