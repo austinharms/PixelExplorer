@@ -1,7 +1,7 @@
 #include <string>
 
 #ifndef PIXELEXPLORER_LOGGER_H_
-#define PIXELEXPLORE_LOGGER_H_
+#define PIXELEXPLORER_LOGGER_H_
 namespace pixelexplore::Logger {
 	enum class LogLevel
 	{
