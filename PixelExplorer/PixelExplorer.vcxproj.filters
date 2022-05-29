@@ -49,5 +49,6 @@
     <None Include="src\RefCount.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="assets\shaders\base.shader" />
   </ItemGroup>
 </Project>

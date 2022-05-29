@@ -4,6 +4,7 @@
 
 int main(void) {
 	pixelexplore::rendering::RenderWindow* window = new pixelexplore::rendering::RenderWindow(600, 400, "Pixel Explore");
+	window->dropShader(window->loadShader("./assets/shaders/base.shader"));
 	while (!window->shouldClose())
 	{
 		window->drawFrame();

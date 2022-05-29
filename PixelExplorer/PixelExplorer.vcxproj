@@ -157,6 +157,7 @@
     <ClInclude Include="src\rendering\Shader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\base.shader" />
     <None Include="src\Logger.inl" />
     <None Include="src\RefCount.inl" />
   </ItemGroup>
