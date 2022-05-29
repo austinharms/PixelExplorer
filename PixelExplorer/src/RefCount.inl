@@ -5,7 +5,7 @@ namespace pixelexplore {
 
 	RefCount::~RefCount() {}
 
-	RefCount* RefCount::grab() {
+	void RefCount::grab() {
 		++_count;
 	}
 

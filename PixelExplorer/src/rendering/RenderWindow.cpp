@@ -1,13 +1,20 @@
 #include "RenderWindow.h"
 
-#include <string>
-
 #include "RenderGlobal.h"
 #include "Logger.h"
+
+#define MAINTHREADCHECK() { \
+							if(std::this_thread::get_id() != _spawnThreadId) { \
+								Logger::error(__FUNCTION__ " must be called from the thread that created the window"); \
+								return; \
+							}\
+						}
+
 
 namespace pixelexplore::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
 	{
+		_spawnThreadId = std::this_thread::get_id();
 		glfwSetErrorCallback(global::glfwErrorCallback);
 		global::glfwInit = glfwInit();
 		if (!global::glfwInit) {
@@ -53,6 +60,9 @@ namespace pixelexplore::rendering {
 
 	RenderWindow::~RenderWindow()
 	{
+		if (std::this_thread::get_id() != _spawnThreadId)
+			Logger::fatal(__FUNCTION__ " must be called from the thread that created the window");
+
 		glfwDestroyWindow(_window);
 		if (--global::windowCount == 0) {
 			glfwTerminate();
@@ -69,8 +79,51 @@ namespace pixelexplore::rendering {
 
 	void RenderWindow::drawFrame()
 	{
+		MAINTHREADCHECK();
+		glfwMakeContextCurrent(_window);
 		glfwSwapBuffers(_window);
 		glfwPollEvents();
+	}
+
+	Shader* RenderWindow::loadShader(std::string path)
+	{
+		if (std::this_thread::get_id() != _spawnThreadId) {
+			Logger::error(__FUNCTION__ " must be called from the thread that created the window");
+			return nullptr;
+		}
+
+		auto it = _loadedShaders.find(path);
+		if (it != _loadedShaders.end()) {
+			it->second->grab();
+			return it->second;
+		}
+
+		Shader* shader = new Shader(path);
+		if (!shader->isValid()) {
+			shader->drop();
+			return nullptr;
+		}
+
+		_loadedShaders.insert({ path, shader });
+		shader->grab();
+		return shader;
+	}
+
+	bool RenderWindow::dropShader(Shader* shader)
+	{
+		if (std::this_thread::get_id() != _spawnThreadId) {
+			Logger::error(__FUNCTION__ " must be called from the thread that created the window");
+			return false;
+		}
+
+		shader->drop();
+		if (shader->getRefCount() == 1) {
+			_loadedShaders.erase(shader->_path);
+			assert(shader->drop());
+			return true;
+		}
+
+		return false;
 	}
 
 	void RenderWindow::glfwStaticResizeCallback(GLFWwindow* window, int width, int height)

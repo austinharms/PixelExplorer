@@ -4,8 +4,8 @@
 #include "Logger.h"
 #include "GL/glew.h"
 
-#ifndef PIXELEXPLORE_RENDERGLOBAL_H_
-#define PIXELEXPLORE_RENDERGLOBAL_H_
+#ifndef PIXELEXPLORE_RENDERING_RENDERGLOBAL_H_
+#define PIXELEXPLORE_RENDERING_RENDERGLOBAL_H_
 
 namespace pixelexplore::rendering::global {
 	uint32_t windowCount = 0;
