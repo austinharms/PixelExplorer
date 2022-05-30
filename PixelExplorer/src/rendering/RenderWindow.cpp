@@ -81,6 +81,27 @@ namespace pixelexplore::rendering {
 	{
 		MAINTHREADCHECK();
 		glfwMakeContextCurrent(_window);
+
+		_addRemoveRenderMeshMutex.lock();
+		if (!_addedRenderMeshes.empty())
+			for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i) {
+				_renderMeshes.push_front(*i);
+				(*i)->createGlObjects();
+			}
+
+		if (!_removedRenderMeshes.empty())
+			for (auto i = _removedRenderMeshes.begin(); i != _removedRenderMeshes.end(); ++i) {
+				_renderMeshes.remove(*i);
+				(*i)->deleteGlObjects();
+				(*i)->drop();
+			}
+
+		_addRemoveRenderMeshMutex.unlock();
+		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
+			(*i)->updateGlObjects();
+			// Render Mesh Here
+		}
+
 		glfwSwapBuffers(_window);
 		glfwPollEvents();
 	}
@@ -124,6 +145,21 @@ namespace pixelexplore::rendering {
 		}
 
 		return false;
+	}
+
+	void RenderWindow::addRenderMesh(RenderMesh* renderMesh)
+	{
+		renderMesh->grab();
+		_addRemoveRenderMeshMutex.lock();
+		_addedRenderMeshes.push_front(renderMesh);
+		_addRemoveRenderMeshMutex.unlock();
+	}
+
+	void RenderWindow::removeRenderMesh(RenderMesh* renderMesh)
+	{
+		_addRemoveRenderMeshMutex.lock();
+		_removedRenderMeshes.push_front(renderMesh);
+		_addRemoveRenderMeshMutex.unlock();
 	}
 
 	void RenderWindow::glfwStaticResizeCallback(GLFWwindow* window, int width, int height)

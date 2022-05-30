@@ -14,11 +14,13 @@ namespace pixelexplore::rendering {
 		RenderMesh();
 		virtual ~RenderMesh();
 		virtual Shader* getShader();
-		virtual void onPreRender();
 		virtual inline const glm::mat4 getPositionMatrix() const { return positionMatrix; }
 
 	protected:
 		glm::mat4 positionMatrix;
+		virtual void updateGlObjects();
+		virtual void deleteGlObjects();
+		virtual void createGlObjects();
 
 	private:
 		uint32_t _vertexArrayGlId;
