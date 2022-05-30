@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\rendering\RenderMesh.cpp" />
     <ClCompile Include="src\rendering\RenderWindow.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
   </ItemGroup>
