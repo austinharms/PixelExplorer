@@ -50,6 +50,9 @@
     <ClInclude Include="src\rendering\RenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\rendering\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Logger.inl">

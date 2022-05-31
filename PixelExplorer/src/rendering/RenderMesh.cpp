@@ -12,10 +12,7 @@ namespace pixelexplore::rendering {
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
 		_shader = nullptr;
-		positionMatrix = glm::mat4(glm::eulerAngleYXZ(0,0,0));
-		positionMatrix[3][0] = 0;
-		positionMatrix[3][1] = 0;
-		positionMatrix[3][2] = 0;
+		positionMatrix = glm::mat4(1.0f);
 	}
 
 	RenderMesh::~RenderMesh() {}

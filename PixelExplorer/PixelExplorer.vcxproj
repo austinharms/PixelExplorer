@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\RefCount.h" />
+    <ClInclude Include="src\rendering\Material.h" />
     <ClInclude Include="src\rendering\RenderGlobal.h" />
     <ClInclude Include="src\rendering\RenderMesh.h" />
     <ClInclude Include="src\rendering\RenderObject.h" />
