@@ -3,7 +3,6 @@
 #include "RenderObject.h"
 #include "RenderWindow.h"
 #include "Shader.h"
-#include "glm/mat4x4.hpp"
 
 #ifndef PIXELEXPLORE_RENDERING_RENDERMESH_H_
 #define  PIXELEXPLORE_RENDERING_RENDERMESH_H_

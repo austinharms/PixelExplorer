@@ -40,6 +40,7 @@ namespace pixelexplore::rendering {
 		}
 
 		++global::windowCount;
+		Logger::debug("Window Created");
 		glfwSetWindowUserPointer(_window, this);
 		glfwMakeContextCurrent(_window);
 		glfwSetWindowSizeCallback(_window, glfwStaticResizeCallback);
@@ -61,7 +62,7 @@ namespace pixelexplore::rendering {
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		_viewMatrix = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
+		_viewMatrix = glm::lookAt(glm::vec3(1, 2, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		// this creates/update the projection matrix
 		glfwResizeCallback(width, height);
 	}
@@ -134,6 +135,7 @@ namespace pixelexplore::rendering {
 
 		_addRemoveRenderMeshMutex.unlock();
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::mat4 vp(_projectionMatrix * _viewMatrix);
 		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
 			RenderObject* renderObj = *i;
@@ -218,7 +220,10 @@ namespace pixelexplore::rendering {
 	void RenderWindow::glfwResizeCallback(uint32_t width, uint32_t height)
 	{
 		Logger::debug("Window resized: " + std::to_string(width) + "X" + std::to_string(height));
-		_projectionMatrix = glm::perspective(90.0f, (float)height / width, 0.1f, 100.0f);
+		if (width != 0 && height != 0) {
+			_projectionMatrix = glm::perspective(90.0f, (float)width / (float)height, 0.1f, 100.0f);
+			glViewport(0, 0, width, height);
+		}
 	}
 
 	void RenderWindow::glfwFocusCallback(bool focused)
