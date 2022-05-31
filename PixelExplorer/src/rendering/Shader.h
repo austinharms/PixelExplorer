@@ -20,12 +20,12 @@ namespace pixelexplore::rendering {
 		inline bool isValid() const { return _glId != 0; }
 		inline const std::string getPath() const { return _path; }
 		inline uint32_t getGLId() const { return _glId; }
-		void setUniform1i(const std::string& name, int32_t value);
-		void setUniform1f(const std::string& name, float value);
-		void setUniform2fv(const std::string& name, glm::vec2 value);
-		void setUniform3fv(const std::string& name, glm::vec3 value);
-		void setUniform4fv(const std::string& name, glm::vec4 value);
-		void setUniformm4fv(const std::string& name, glm::mat4 value);
+		void setUniform1i(const std::string& name, const int32_t value);
+		void setUniform1f(const std::string& name, const float value);
+		void setUniform2fv(const std::string& name, const glm::vec2& value);
+		void setUniform3fv(const std::string& name, const glm::vec3& value);
+		void setUniform4fv(const std::string& name, const glm::vec4& value);
+		void setUniformm4fv(const std::string& name, const glm::mat4& value);
 
 	private:
 		Shader(const std::string& path);

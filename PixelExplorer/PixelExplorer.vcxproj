@@ -155,6 +155,7 @@
     <ClInclude Include="src\RefCount.h" />
     <ClInclude Include="src\rendering\RenderGlobal.h" />
     <ClInclude Include="src\rendering\RenderMesh.h" />
+    <ClInclude Include="src\rendering\RenderObject.h" />
     <ClInclude Include="src\rendering\RenderWindow.h" />
     <ClInclude Include="src\rendering\Shader.h" />
   </ItemGroup>

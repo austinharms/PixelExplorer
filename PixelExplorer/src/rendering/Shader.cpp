@@ -67,13 +67,18 @@ namespace pixelexplore::rendering {
 					type = ShaderType::FRAGMENT;
 				}
 				else {
-					type = ShaderType::NONE;
-					Logger::warn("Found unknow shader type '" + line + "' when loading shader from " + path);
+					Logger::error("Found unknow shader type '" + line + "' when loading shader from " + path);
+					return 0;
 				}
 			}
 			else {
 				ss[(int32_t)type] << line << "\n";
 			}
+		}
+
+		if (type == ShaderType::NONE) {
+			Logger::error("Failed to Load Shader, File Empty or Not Found, Path " + path);
+			return 0;
 		}
 
 		uint32_t vs = compileShader(GL_VERTEX_SHADER, ss[(int)ShaderType::VERTEX].str());
@@ -120,28 +125,28 @@ namespace pixelexplore::rendering {
 		glUniform1f(location, value);
 	}
 
-	void Shader::setUniform2fv(const std::string& name, glm::vec2 value)
+	void Shader::setUniform2fv(const std::string& name, const glm::vec2& value)
 	{
 		int32_t location = getUniformLocation(name);
 		if (location == -1) return;
 		glUniform2fv(location, 1, glm::value_ptr(value));
 	}
 
-	void Shader::setUniform3fv(const std::string& name, glm::vec3 value)
+	void Shader::setUniform3fv(const std::string& name, const glm::vec3& value)
 	{
 		int32_t location = getUniformLocation(name);
 		if (location == -1) return;
 		glUniform3fv(location, 1, glm::value_ptr(value));
 	}
 
-	void Shader::setUniform4fv(const std::string& name, glm::vec4 value)
+	void Shader::setUniform4fv(const std::string& name, const glm::vec4& value)
 	{
 		int32_t location = getUniformLocation(name);
 		if (location == -1) return;
 		glUniform4fv(location, 1, glm::value_ptr(value));
 	}
 
-	void Shader::setUniformm4fv(const std::string& name, glm::mat4 value)
+	void Shader::setUniformm4fv(const std::string& name, const glm::mat4& value)
 	{
 		int32_t location = getUniformLocation(name);
 		if (location == -1) return;

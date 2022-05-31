@@ -1,7 +1,12 @@
 #include "RenderWindow.h"
 
+#include <assert.h>
+#include <algorithm>
+
 #include "RenderGlobal.h"
 #include "Logger.h"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 #define MAINTHREADCHECK() { \
 							if(std::this_thread::get_id() != _spawnThreadId) { \
@@ -9,7 +14,6 @@
 								return; \
 							}\
 						}
-
 
 namespace pixelexplore::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
@@ -56,12 +60,25 @@ namespace pixelexplore::rendering {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		_viewMatrix = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
+		// this creates/update the projection matrix
+		glfwResizeCallback(width, height);
 	}
 
 	RenderWindow::~RenderWindow()
 	{
 		if (std::this_thread::get_id() != _spawnThreadId)
 			Logger::fatal(__FUNCTION__ " must be called from the thread that created the window");
+
+		glfwMakeContextCurrent(_window);
+		for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i)
+			(*i)->drop();
+
+		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
+			(*i)->deleteGlObjects(this);
+			(*i)->drop();
+		}
 
 		glfwDestroyWindow(_window);
 		if (--global::windowCount == 0) {
@@ -83,23 +100,49 @@ namespace pixelexplore::rendering {
 		glfwMakeContextCurrent(_window);
 
 		_addRemoveRenderMeshMutex.lock();
-		if (!_addedRenderMeshes.empty())
+		if (!_addedRenderMeshes.empty()) {
 			for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i) {
 				_renderMeshes.push_front(*i);
-				(*i)->createGlObjects();
+				(*i)->createGlObjects(this);
 			}
 
-		if (!_removedRenderMeshes.empty())
+			_addedRenderMeshes.clear();
+		}
+
+		if (!_removedRenderMeshes.empty()) {
 			for (auto i = _removedRenderMeshes.begin(); i != _removedRenderMeshes.end(); ++i) {
-				_renderMeshes.remove(*i);
-				(*i)->deleteGlObjects();
-				(*i)->drop();
+				auto prev = _renderMeshes.before_begin();
+				for (auto it = _renderMeshes.begin(); it != _renderMeshes.end(); ++it) {
+					if (*it == *i) {
+						_renderMeshes.erase_after(prev);
+						prev = _renderMeshes.end();
+						(*i)->deleteGlObjects(this);
+						(*i)->drop();
+						break;
+					}
+
+					prev = it;
+				}
+
+				if (prev != _renderMeshes.end()) {
+					Logger::warn(__FUNCTION__ " Attempted to remove RenderObject that is not in the RenderWindow");
+				}
 			}
+
+			_removedRenderMeshes.clear();
+		}
 
 		_addRemoveRenderMeshMutex.unlock();
+
+		glm::mat4 vp(_projectionMatrix * _viewMatrix);
 		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
-			(*i)->updateGlObjects();
-			// Render Mesh Here
+			RenderObject* renderObj = *i;
+			if (renderObj->meshVisible()) {
+				Shader* shader = renderObj->getShader();
+				shader->bind();
+				shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
+				renderObj->drawMesh();
+			}
 		}
 
 		glfwSwapBuffers(_window);
@@ -147,18 +190,18 @@ namespace pixelexplore::rendering {
 		return false;
 	}
 
-	void RenderWindow::addRenderMesh(RenderMesh* renderMesh)
+	void RenderWindow::addRenderMesh(RenderObject* renderObject)
 	{
-		renderMesh->grab();
+		renderObject->grab();
 		_addRemoveRenderMeshMutex.lock();
-		_addedRenderMeshes.push_front(renderMesh);
+		_addedRenderMeshes.push_front(renderObject);
 		_addRemoveRenderMeshMutex.unlock();
 	}
 
-	void RenderWindow::removeRenderMesh(RenderMesh* renderMesh)
+	void RenderWindow::removeRenderMesh(RenderObject* renderObject)
 	{
 		_addRemoveRenderMeshMutex.lock();
-		_removedRenderMeshes.push_front(renderMesh);
+		_removedRenderMeshes.push_front(renderObject);
 		_addRemoveRenderMeshMutex.unlock();
 	}
 
@@ -175,6 +218,7 @@ namespace pixelexplore::rendering {
 	void RenderWindow::glfwResizeCallback(uint32_t width, uint32_t height)
 	{
 		Logger::debug("Window resized: " + std::to_string(width) + "X" + std::to_string(height));
+		_projectionMatrix = glm::perspective(90.0f, (float)height / width, 0.1f, 100.0f);
 	}
 
 	void RenderWindow::glfwFocusCallback(bool focused)

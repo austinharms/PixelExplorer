@@ -9,12 +9,12 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "Shader.h"
-#include "RenderMesh.h"
+#include "RenderObject.h"
+#include "glm/mat4x4.hpp"
 
 #ifndef PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
 #define PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
 namespace pixelexplore::rendering {
-
 	class RenderWindow : public RefCount
 	{
 	public:
@@ -24,8 +24,8 @@ namespace pixelexplore::rendering {
 		void drawFrame();
 		Shader* loadShader(std::string path);
 		bool dropShader(Shader* shader);
-		void addRenderMesh(RenderMesh* renderMesh);
-		void removeRenderMesh(RenderMesh* renderMesh);
+		void addRenderMesh(RenderObject* renderObject);
+		void removeRenderMesh(RenderObject* renderObject);
 
 	private:
 		static void glfwStaticResizeCallback(GLFWwindow* window, int width, int height);
@@ -34,10 +34,12 @@ namespace pixelexplore::rendering {
 		GLFWwindow* _window;
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
-		std::forward_list<RenderMesh*> _addedRenderMeshes;
-		std::forward_list<RenderMesh*> _removedRenderMeshes;
-		std::forward_list<RenderMesh*> _renderMeshes;
+		std::forward_list<RenderObject*> _addedRenderMeshes;
+		std::forward_list<RenderObject*> _removedRenderMeshes;
+		std::forward_list<RenderObject*> _renderMeshes;
 		std::mutex _addRemoveRenderMeshMutex;
+		glm::mat4 _viewMatrix;
+		glm::mat4 _projectionMatrix;
 
 		void glfwResizeCallback(uint32_t width, uint32_t height);
 		void glfwFocusCallback(bool focused);

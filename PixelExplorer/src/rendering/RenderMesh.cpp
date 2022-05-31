@@ -9,60 +9,77 @@ namespace pixelexplore::rendering {
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
-		indexCount = 0;
-		indexType = GL_UNSIGNED_SHORT;
-		_hasGlObjects = false;
-		_buffersDirty = false;
-		positionMatrix = glm::mat4();
+		_shader = nullptr;
 	}
 
-	RenderMesh::~RenderMesh()
-	{
-#ifdef DEBUG
-		assert(!_hasGlObjects);
-#endif // DEBUG
+	RenderMesh::~RenderMesh() {}
 
-		if (_hasGlObjects)
-			Logger::warn("Render Mesh GL Buffers not deallocated");
-	}
-
-	void RenderMesh::updateGlObjects()
+	Shader* RenderMesh::getShader()
 	{
-		if (!_buffersDirty) return;
-		//glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertices, GL_STATIC_DRAW);
-		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices, GL_STATIC_DRAW);
-		_buffersDirty = false;
+		return _shader;
 	}
 
 	void RenderMesh::drawMesh()
 	{
 		glBindVertexArray(_vertexArrayGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
-		glDrawElements(GL_TRIANGLES, indexCount, indexType, nullptr);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
 	}
 
-	void RenderMesh::deleteGlObjects()
+	void RenderMesh::deleteGlObjects(RenderWindow* window)
 	{
+		if (!getHasGlObjects()) { 
+			Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
+			return; 
+		}
+
+		window->dropShader(_shader);
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
 		glDeleteBuffers(1, &_indexBufferGlId);
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
-		_hasGlObjects = false;
+		setHasGlObjects(false);
 	}
 
-	void RenderMesh::createGlObjects()
+	void RenderMesh::createGlObjects(RenderWindow* window)
 	{
-		_hasGlObjects = true;
+		if (getHasGlObjects()) { 
+			Logger::warn( __FUNCTION__ " Attempted to overwrite GL objects");
+			return; 
+		}
+
+		float vertices[12]{
+			-0.5,  0.5, 1, // 0
+			-0.5, -0.5, 1, // 1
+			 0.5, -0.5, 1, // 2
+			 0.5,  0.5, 1  // 3
+		};
+
+		uint16_t indices[6]{
+			0,1,2,
+			0,2,3
+		};
+
+		setHasGlObjects(true);
+		_shader = window->loadShader("./assets/shaders/base.shader");
+
+		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);
 		glBindVertexArray(_vertexArrayGlId);
 		glGenBuffers(1, &_vertexBufferGlId);
 		glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferGlId);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 		glEnableVertexAttribArray(0);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+
+		// Create and load index buffer
 		glGenBuffers(1, &_indexBufferGlId);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 }
