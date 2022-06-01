@@ -7,3 +7,6 @@
 [submodule "PixelExplorer/src/vendor/glm"]
 	path = PixelExplorer/src/vendor/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "PixelExplorer/src/vendor/imgui"]
+	path = PixelExplorer/src/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
