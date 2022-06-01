@@ -18,6 +18,7 @@
 namespace pixelexplore::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
 	{
+		global::windowCreationLock.lock();
 		_spawnThreadId = std::this_thread::get_id();
 		glfwSetErrorCallback(global::glfwErrorCallback);
 		global::glfwInit = glfwInit();
@@ -40,6 +41,7 @@ namespace pixelexplore::rendering {
 		}
 
 		++global::windowCount;
+		global::windowCreationLock.unlock();
 		Logger::debug("Window Created");
 		glfwSetWindowUserPointer(_window, this);
 		glfwMakeContextCurrent(_window);
@@ -82,10 +84,12 @@ namespace pixelexplore::rendering {
 		}
 
 		glfwDestroyWindow(_window);
+		global::windowCreationLock.lock();
 		if (--global::windowCount == 0) {
 			glfwTerminate();
 			global::glfwInit = false;
 		}
+		global::windowCreationLock.unlock();
 
 		Logger::debug("Window closed");
 	}

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <string>
+#include <mutex>
 
 #include "Logger.h"
 #include "GL/glew.h"
@@ -10,6 +11,7 @@
 namespace pixelexplore::rendering::global {
 	uint32_t windowCount = 0;
 	bool glfwInit = false;
+	std::mutex windowCreationLock;
 
 	void glfwErrorCallback(int error, const char* description) {
 		Logger::error("GLFW Code: " + std::to_string(error) + " Description: " + description);
