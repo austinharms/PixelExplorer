@@ -4,23 +4,12 @@
 
 #include <stdint.h>
 #include "Logger.h"
-#include "rendering/RenderWindow.h"
-#include "rendering/RenderMesh.h"
+#include "game/Game.h"
 
 int main(void) {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
-	pixelexplore::rendering::RenderWindow* window = new pixelexplore::rendering::RenderWindow(600, 400, "Pixel Explore");
-	pixelexplore::rendering::RenderMesh* renderMesh = new pixelexplore::rendering::RenderMesh();
-
-	window->addRenderMesh(renderMesh);
-	while (!window->shouldClose())
-	{
-		window->drawFrame();
-	}
-
-	window->removeRenderMesh(renderMesh);
-	renderMesh->drop();
-	window->drop();
+	pixelexplore::game::Game* game = new pixelexplore::game::Game();
+	game->start();
+	game->drop();
 	return 0;
 }
