@@ -20,7 +20,9 @@ namespace pixelexplore::rendering {
 		positionMatrix = glm::mat4(1.0f);
 	}
 
-	RenderMesh::~RenderMesh() {}
+	RenderMesh::~RenderMesh() {
+		_material->drop();
+	}
 
 	Shader* RenderMesh::getShader()
 	{
