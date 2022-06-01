@@ -27,6 +27,9 @@
     <ClCompile Include="src\rendering\RenderMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\rendering\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Logger.h">
@@ -65,5 +68,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="assets\shaders\base.shader" />
+    <None Include="assets\shaders\cube.shader" />
   </ItemGroup>
 </Project>

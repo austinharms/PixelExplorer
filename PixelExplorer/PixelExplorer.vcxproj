@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\RenderMesh.cpp" />
     <ClCompile Include="src\rendering\RenderWindow.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\base.shader" />
+    <None Include="assets\shaders\cube.shader" />
     <None Include="src\Logger.inl" />
     <None Include="src\RefCount.inl" />
   </ItemGroup>

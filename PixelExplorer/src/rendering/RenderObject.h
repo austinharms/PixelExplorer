@@ -4,6 +4,7 @@
 #include "glm/mat4x4.hpp"
 #include "Shader.h"
 #include "Logger.h"
+#include "Material.h"
 
 #ifndef PIXELEXPLORE_RENDERING_RENDEROBJECT_H_
 #define PIXELEXPLORE_RENDERING_RENDEROBJECT_H_
@@ -27,6 +28,7 @@ namespace pixelexplore::rendering {
 		}
 
 		virtual Shader* getShader() = 0;
+		inline virtual Material* getMaterial() { return nullptr; }
 		inline virtual const glm::mat4 getPositionMatrix() const { return positionMatrix; }
 
 	protected:

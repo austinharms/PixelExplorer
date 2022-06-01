@@ -3,6 +3,7 @@
 #include "RenderObject.h"
 #include "RenderWindow.h"
 #include "Shader.h"
+#include "Material.h"
 
 #ifndef PIXELEXPLORE_RENDERING_RENDERMESH_H_
 #define  PIXELEXPLORE_RENDERING_RENDERMESH_H_
@@ -17,10 +18,12 @@ namespace pixelexplore::rendering {
 	protected:
 		void deleteGlObjects(RenderWindow* window);
 		void createGlObjects(RenderWindow* window);
+		Material* getMaterial();
 		void drawMesh();
 
 	private:
 		Shader* _shader;
+		Material* _material;
 		uint32_t _vertexArrayGlId;
 		uint32_t _vertexBufferGlId;
 		uint32_t _indexBufferGlId;

@@ -107,6 +107,9 @@ namespace pixelexplore::rendering {
 		else {
 			int32_t u = glGetUniformLocation(_glId, name.c_str());
 			_uniforms.insert({ name, u });
+			if (u == -1)
+				Logger::warn("Failed to find uniform " + name + " in shader " + _path);
+
 			return u;
 		}
 	}

@@ -111,23 +111,20 @@ namespace pixelexplore::rendering {
 		}
 
 		if (!_removedRenderMeshes.empty()) {
-			for (auto i = _removedRenderMeshes.begin(); i != _removedRenderMeshes.end(); ++i) {
-				auto prev = _renderMeshes.before_begin();
-				for (auto it = _renderMeshes.begin(); it != _renderMeshes.end(); ++it) {
-					if (*it == *i) {
-						_renderMeshes.erase_after(prev);
-						prev = _renderMeshes.end();
-						(*i)->deleteGlObjects(this);
-						(*i)->drop();
+			for (auto it = _removedRenderMeshes.begin(); it != _removedRenderMeshes.end(); ++it) {
+				bool droppedMesh = false;
+				for (auto mesh = _renderMeshes.begin(); mesh != _renderMeshes.end(); ++mesh) {
+					if (*it == *mesh) {
+						(*mesh)->deleteGlObjects(this);
+						(*mesh)->drop();
+						_renderMeshes.erase(mesh);
+						droppedMesh = true;
 						break;
 					}
-
-					prev = it;
 				}
 
-				if (prev != _renderMeshes.end()) {
-					Logger::warn(__FUNCTION__ " Attempted to remove RenderObject that is not in the RenderWindow");
-				}
+				if (!droppedMesh)
+					Logger::warn("Attempted to remove RenderObject that is not in the RenderWindow");
 			}
 
 			_removedRenderMeshes.clear();
@@ -141,7 +138,16 @@ namespace pixelexplore::rendering {
 			RenderObject* renderObj = *i;
 			if (renderObj->meshVisible()) {
 				Shader* shader = renderObj->getShader();
+				if (shader == nullptr) {
+					Logger::error("Render Object returned NULL Shader, Render Object removed");
+					i = _renderMeshes.erase(i);
+					continue;
+				}
+
 				shader->bind();
+				Material* material = renderObj->getMaterial();
+				if (material != nullptr)
+					material->applyMaterial(shader);
 				shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
 				renderObj->drawMesh();
 			}

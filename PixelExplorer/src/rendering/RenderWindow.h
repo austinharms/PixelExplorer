@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <thread>
-#include <forward_list>
+#include <list>
 #include <mutex>
 
 #include "RefCount.h"
@@ -34,9 +34,9 @@ namespace pixelexplore::rendering {
 		GLFWwindow* _window;
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
-		std::forward_list<RenderObject*> _addedRenderMeshes;
-		std::forward_list<RenderObject*> _removedRenderMeshes;
-		std::forward_list<RenderObject*> _renderMeshes;
+		std::list<RenderObject*> _addedRenderMeshes;
+		std::list<RenderObject*> _removedRenderMeshes;
+		std::list<RenderObject*> _renderMeshes;
 		std::mutex _addRemoveRenderMeshMutex;
 		glm::mat4 _viewMatrix;
 		glm::mat4 _projectionMatrix;

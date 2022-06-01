@@ -18,17 +18,18 @@ namespace pixelexplore::rendering {
 	public:
 		Material();
 		virtual ~Material();
-		virtual void applyMaterial(Shader* shader);
-		virtual void removeProperty(const std::string& propertyName);
-		void addProperty(const std::string& propertyName, float value);
-		void addProperty(const std::string& propertyName, int32_t value);
-		void addProperty(const std::string& propertyName, glm::vec2 value);
-		void addProperty(const std::string& propertyName, glm::vec3 value);
-		void addProperty(const std::string& propertyName, glm::vec4 value);
-		void addProperty(const std::string& propertyName, glm::mat4 value);
-		void addProperty(const std::string& propertyName, MaterialProperty* prop);
-	private:
+		void applyMaterial(Shader* shader);
+		void removeProperty(const std::string& propertyName);
+		void setProperty(const std::string& propertyName, float value);
+		void setProperty(const std::string& propertyName, int32_t value);
+		void setProperty(const std::string& propertyName, glm::vec2 value);
+		void setProperty(const std::string& propertyName, glm::vec3 value);
+		void setProperty(const std::string& propertyName, glm::vec4 value);
+		void setProperty(const std::string& propertyName, glm::mat4 value);
+		void setProperty(const std::string& propertyName, MaterialProperty* prop);
 
+	private:
+		std::unordered_map<std::string, MaterialProperty*> _properties;
 	};
 }
 #endif // !PIXELEXPLORE_RENDERING_MATERIAL_H_

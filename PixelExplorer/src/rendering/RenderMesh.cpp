@@ -1,9 +1,12 @@
 #include "RenderMesh.h"
 
+#include <random>
+
 #include "GL/glew.h"
 #include "Logger.h"
 #include "glm/mat4x4.hpp"
 #include "glm/gtx/euler_angles.hpp"
+#include "glm/vec4.hpp"
 
 namespace pixelexplore::rendering {
 	RenderMesh::RenderMesh()
@@ -12,6 +15,8 @@ namespace pixelexplore::rendering {
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
 		_shader = nullptr;
+		_material = new Material();
+		_material->setProperty("u_Color", glm::vec4(1, 1, 1, 1));
 		positionMatrix = glm::mat4(1.0f);
 	}
 
@@ -24,6 +29,7 @@ namespace pixelexplore::rendering {
 
 	void RenderMesh::drawMesh()
 	{
+		_material->setProperty("u_Color", glm::vec4((float)rand()/RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1));
 		glBindVertexArray(_vertexArrayGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
@@ -74,7 +80,7 @@ namespace pixelexplore::rendering {
 		};
 
 		setHasGlObjects(true);
-		_shader = window->loadShader("./assets/shaders/base.shader");
+		_shader = window->loadShader("./assets/shaders/cube.shader");
 
 		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);
@@ -92,5 +98,10 @@ namespace pixelexplore::rendering {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	Material* RenderMesh::getMaterial()
+	{
+		return _material;
 	}
 }
