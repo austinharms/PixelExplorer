@@ -8,6 +8,7 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
+#include "MaterialProperties.h"
 
 #ifndef PIXELEXPLORE_RENDERING_MATERIAL_H_
 #define PIXELEXPLORE_RENDERING_MATERIAL_H_
@@ -15,16 +16,6 @@ namespace pixelexplore::rendering {
 	class Material : public RefCount
 	{
 	public:
-		enum class PropertyType
-		{
-			FLOAT = 0,
-			INT32,
-			GLM_VEC2,
-			GLM_VEC3,
-			GLM_VEC4,
-			GLM_MAT4,
-		};
-
 		Material();
 		virtual ~Material();
 		virtual void applyMaterial(Shader* shader);
@@ -35,18 +26,7 @@ namespace pixelexplore::rendering {
 		void addProperty(const std::string& propertyName, glm::vec3 value);
 		void addProperty(const std::string& propertyName, glm::vec4 value);
 		void addProperty(const std::string& propertyName, glm::mat4 value);
-
-	protected:
-		struct MaterialProperty
-		{
-			uint32_t typeId;
-			void* valuePtr;
-			~MaterialProperty() {
-				free(valuePtr);
-			}
-		};
-
-		virtual void applyProperty(Shader* shader, MaterialProperty p);
+		void addProperty(const std::string& propertyName, MaterialProperty* prop);
 	private:
 
 	};
