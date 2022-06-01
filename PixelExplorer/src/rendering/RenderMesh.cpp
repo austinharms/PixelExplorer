@@ -37,6 +37,11 @@ namespace pixelexplore::rendering {
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
 	}
 
+	void RenderMesh::setPosition(const glm::vec3& pos)
+	{
+		positionMatrix[3] = glm::vec4(pos, 1);
+	}
+
 	void RenderMesh::deleteGlObjects(RenderWindow* window)
 	{
 		if (!getHasGlObjects()) { 

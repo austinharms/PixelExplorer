@@ -62,7 +62,7 @@ namespace pixelexplore::rendering {
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		_viewMatrix = glm::lookAt(glm::vec3(1, 2, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		_viewMatrix = glm::lookAt(glm::vec3(0, 0, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		// this creates/update the projection matrix
 		glfwResizeCallback(width, height);
 	}

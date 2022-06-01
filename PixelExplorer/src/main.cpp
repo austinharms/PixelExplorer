@@ -6,6 +6,7 @@
 int main(void) {
 	pixelexplore::rendering::RenderWindow* window = new pixelexplore::rendering::RenderWindow(600, 400, "Pixel Explore");
 	pixelexplore::rendering::RenderMesh* renderMesh = new pixelexplore::rendering::RenderMesh();
+
 	window->addRenderMesh(renderMesh);
 	while (!window->shouldClose())
 	{

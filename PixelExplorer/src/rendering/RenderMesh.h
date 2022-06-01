@@ -14,11 +14,12 @@ namespace pixelexplore::rendering {
 		RenderMesh();
 		virtual ~RenderMesh();
 		Shader* getShader();
+		Material* getMaterial();
+		void setPosition(const glm::vec3& pos);
 
 	protected:
 		void deleteGlObjects(RenderWindow* window);
 		void createGlObjects(RenderWindow* window);
-		Material* getMaterial();
 		void drawMesh();
 
 	private:
