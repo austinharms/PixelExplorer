@@ -92,11 +92,27 @@ namespace pixelexplore::rendering {
 			Logger::fatal(__FUNCTION__ " must be called from the thread that created the window");
 
 		glfwMakeContextCurrent(_window);
-		for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i)
+		_renderObjectMutex.lock();
+		_guiElementMutext.lock();
+		_glQueueMutex.lock();
+
+		for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i)
 			(*i)->drop();
 
-		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
-			(*i)->deleteGlObjects(this);
+		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
+			(*i)->destroyGLObjects(this);
+			(*i)->drop();
+		}
+
+		for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
+			if ((*i)->getHasGLObjects())
+				(*i)->destroyGLObjects(this);
+			(*i)->drop();
+		}
+
+		for (auto i = _guiElements.begin(); i != _guiElements.end(); ++i) {
+			if ((*i)->getHasGLObjects())
+				(*i)->destroyGLObjects(this);
 			(*i)->drop();
 		}
 
@@ -112,6 +128,9 @@ namespace pixelexplore::rendering {
 			global::glfwInit = false;
 		}
 		global::windowCreationLock.unlock();
+		_renderObjectMutex.unlock();
+		_guiElementMutext.unlock();
+		_glQueueMutex.unlock();
 
 		Logger::debug("Window closed");
 	}
@@ -125,7 +144,7 @@ namespace pixelexplore::rendering {
 	{
 		MAINTHREADCHECK();
 		glfwMakeContextCurrent(_window);
-		updateRenderObjectList();
+		updateGLQueues();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawRenderObjects();
 		glfwPollEvents();
@@ -177,16 +196,40 @@ namespace pixelexplore::rendering {
 	void RenderWindow::addRenderMesh(RenderObject* renderObject)
 	{
 		renderObject->grab();
-		_addRemoveRenderMeshMutex.lock();
-		_addedRenderMeshes.push_front(renderObject);
-		_addRemoveRenderMeshMutex.unlock();
+		_renderObjectMutex.lock();
+		_renderObjects.push_front(renderObject);
+		if (renderObject->requiresGLObjects()) {
+			_glQueueMutex.lock();
+			_glCreationQueue.push_front(renderObject);
+			_glQueueMutex.unlock();
+		}
+
+		_renderObjectMutex.unlock();
 	}
 
 	void RenderWindow::removeRenderMesh(RenderObject* renderObject)
 	{
-		_addRemoveRenderMeshMutex.lock();
-		_removedRenderMeshes.push_front(renderObject);
-		_addRemoveRenderMeshMutex.unlock();
+		_renderObjectMutex.lock();
+		bool drppedElement = false;
+		for (auto it = _renderObjects.begin(); it != _renderObjects.end(); ++it) {
+			if ((*it) == renderObject) {
+				drppedElement = true;
+				_renderObjects.erase(it);
+				if (renderObject->getHasGLObjects()) {
+					_glQueueMutex.lock();
+					_glDeletionQueue.push_front(renderObject);
+					_glQueueMutex.unlock();
+				}
+				else {
+					renderObject->drop();
+				}
+				break;
+			}
+		}
+
+		_renderObjectMutex.unlock();
+		if (!drppedElement)
+			Logger::warn("Attempted to remove Render Object that is not in the RenderWindow");
 	}
 
 	void RenderWindow::addGUIElement(GUIElement* element)
@@ -205,7 +248,12 @@ namespace pixelexplore::rendering {
 		if (!insertedElement)
 			_guiElements.push_back(element);
 
-		//_guiElements.push_front(element);
+		if (element->requiresGLObjects()) {
+			_glQueueMutex.lock();
+			_glCreationQueue.push_front(element);
+			_glQueueMutex.unlock();
+		}
+
 		_guiElementMutext.unlock();
 	}
 
@@ -217,7 +265,14 @@ namespace pixelexplore::rendering {
 			if ((*it) == element) {
 				drppedElement = true;
 				_guiElements.erase(it);
-				element->drop();
+				if (element->getHasGLObjects()) {
+					_glQueueMutex.lock();
+					_glDeletionQueue.push_front(element);
+					_glQueueMutex.unlock();
+				}
+				else {
+					element->drop();
+				}
 				break;
 			}
 		}
@@ -253,51 +308,38 @@ namespace pixelexplore::rendering {
 		Logger::debug("Window focused: " + std::to_string(focused));
 	}
 
-	void RenderWindow::updateRenderObjectList()
+	void RenderWindow::updateGLQueues()
 	{
-		_addRemoveRenderMeshMutex.lock();
-		if (!_addedRenderMeshes.empty()) {
-			for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i) {
-				_renderMeshes.push_front(*i);
-				(*i)->createGlObjects(this);
-			}
-
-			_addedRenderMeshes.clear();
+		_glQueueMutex.lock();
+		for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i) {
+			(*i)->createGLObjects(this);
 		}
 
-		if (!_removedRenderMeshes.empty()) {
-			for (auto it = _removedRenderMeshes.begin(); it != _removedRenderMeshes.end(); ++it) {
-				bool droppedMesh = false;
-				for (auto mesh = _renderMeshes.begin(); mesh != _renderMeshes.end(); ++mesh) {
-					if (*it == *mesh) {
-						(*mesh)->deleteGlObjects(this);
-						(*mesh)->drop();
-						_renderMeshes.erase(mesh);
-						droppedMesh = true;
-						break;
-					}
-				}
-
-				if (!droppedMesh)
-					Logger::warn("Attempted to remove RenderObject that is not in the RenderWindow");
-			}
-
-			_removedRenderMeshes.clear();
+		_glCreationQueue.clear();
+		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
+			(*i)->createGLObjects(this);
+			(*i)->drop();
 		}
 
-		_addRemoveRenderMeshMutex.unlock();
+		_glDeletionQueue.clear();
+		_glQueueMutex.unlock();
 	}
 
 	void RenderWindow::drawRenderObjects()
 	{
 		glm::mat4 vp(_projectionMatrix * _viewMatrix);
-		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
+		for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
 			RenderObject* renderObj = *i;
 			if (renderObj->meshVisible()) {
 				Shader* shader = renderObj->getShader();
 				if (shader == nullptr) {
 					Logger::error("Render Object returned NULL Shader, Render Object removed");
-					i = _renderMeshes.erase(i);
+					if (renderObj->getHasGLObjects()) {
+						renderObj->destroyGLObjects(this);
+					}
+
+					renderObj->drop();
+					i = _renderObjects.erase(i);
 					continue;
 				}
 

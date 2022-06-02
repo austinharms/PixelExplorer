@@ -16,9 +16,9 @@ namespace pixelexplore::game {
 		_renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore");
 		gui::TestScreen* testScreen = new gui::TestScreen();
 		_renderWindow->addGUIElement(testScreen);
-		//rendering::RenderMesh* testMesh = new rendering::RenderMesh();
-		//_renderWindow->addRenderMesh(testMesh);
-		//testMesh->drop();
+		rendering::RenderMesh* testMesh = new rendering::RenderMesh();
+		_renderWindow->addRenderMesh(testMesh);
+		testMesh->drop();
 		while (!_renderWindow->shouldClose())
 		{
 			if (testScreen != nullptr && testScreen->getShouldClose()) {

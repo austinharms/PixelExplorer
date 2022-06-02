@@ -42,9 +42,9 @@ namespace pixelexplore::rendering {
 		positionMatrix[3] = glm::vec4(pos, 1);
 	}
 
-	void RenderMesh::deleteGlObjects(RenderWindow* window)
+	void RenderMesh::destroyGLObjects(RenderWindow* window)
 	{
-		if (!getHasGlObjects()) { 
+		if (!getHasGLObjects()) { 
 			Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
 			return; 
 		}
@@ -56,12 +56,12 @@ namespace pixelexplore::rendering {
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
-		setHasGlObjects(false);
+		setHasGLObjects(false);
 	}
 
-	void RenderMesh::createGlObjects(RenderWindow* window)
+	void RenderMesh::createGLObjects(RenderWindow* window)
 	{
-		if (getHasGlObjects()) { 
+		if (getHasGLObjects()) { 
 			Logger::warn( __FUNCTION__ " Attempted to overwrite GL objects");
 			return; 
 		}
@@ -86,7 +86,7 @@ namespace pixelexplore::rendering {
 			0, 5, 4, 0, 1, 5,  // Bottom
 		};
 
-		setHasGlObjects(true);
+		setHasGLObjects(true);
 		_shader = window->loadShader("./assets/shaders/cube.shader");
 
 		// Create and load Vertex Array & Vertex Buffer

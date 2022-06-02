@@ -3,6 +3,7 @@
 #include <string>
 #include <thread>
 #include <list>
+#include <forward_list>
 #include <mutex>
 
 #include "RefCount.h"
@@ -10,6 +11,7 @@
 #include "GLFW/glfw3.h"
 #include "Shader.h"
 #include "RenderObject.h"
+#include "GLObject.h"
 #include "glm/mat4x4.hpp"
 #include "imgui.h"
 #include "GUIElement.h"
@@ -30,6 +32,8 @@ namespace pixelexplore::rendering {
 		void removeRenderMesh(RenderObject* renderObject);
 		void addGUIElement(GUIElement* element);
 		void removeGUIElement(GUIElement* element);
+		inline float getWindowWidth() const { return _windowWidth; }
+		inline float getWindowHeight() const { return _windowHeight; }
 
 	private:
 		static void glfwStaticResizeCallback(GLFWwindow* window, int width, int height);
@@ -41,18 +45,19 @@ namespace pixelexplore::rendering {
 		float _windowHeight;
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
-		std::list<RenderObject*> _addedRenderMeshes;
-		std::list<RenderObject*> _removedRenderMeshes;
-		std::list<RenderObject*> _renderMeshes;
+		std::forward_list<GLObject*> _glCreationQueue;
+		std::forward_list<GLObject*> _glDeletionQueue;
+		std::list<RenderObject*> _renderObjects;
 		std::list<GUIElement*> _guiElements;
-		std::mutex _addRemoveRenderMeshMutex;
+		std::mutex _renderObjectMutex;
 		std::mutex _guiElementMutext;
+		std::mutex _glQueueMutex;
 		glm::mat4 _viewMatrix;
 		glm::mat4 _projectionMatrix;
 
 		void glfwResizeCallback(uint32_t width, uint32_t height);
 		void glfwFocusCallback(bool focused);
-		void updateRenderObjectList();
+		void updateGLQueues();
 		void drawRenderObjects();
 		void drawGui();
 	};

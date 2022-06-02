@@ -18,8 +18,8 @@ namespace pixelexplore::rendering {
 		void setPosition(const glm::vec3& pos);
 
 	protected:
-		void deleteGlObjects(RenderWindow* window);
-		void createGlObjects(RenderWindow* window);
+		void destroyGLObjects(RenderWindow* window);
+		void createGLObjects(RenderWindow* window);
 		void drawMesh();
 
 	private:
