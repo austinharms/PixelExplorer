@@ -16,6 +16,7 @@ namespace pixelexplore::rendering {
 
 	Shader::~Shader()
 	{
+		unbind();
 		glDeleteProgram(_glId);
 	}
 
