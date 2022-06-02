@@ -1,4 +1,7 @@
+#include <stdint.h>
+
 #include "RefCount.h"
+#include "stb_image.h"
 
 #ifndef PIXELEXPLORER_RENDERING_TEXTURE_H_
 #define PIXELEXPLORER_RENDERING_TEXTURE_H_
@@ -7,18 +10,10 @@ namespace pixelexplorer::rendering {
 	{
 	public:
 		Texture();
-		~Texture();
+		virtual ~Texture();
 
 	private:
-
+		uint8_t* _pixelBuffer;
 	};
-
-	Texture::Texture()
-	{
-	}
-
-	Texture::~Texture()
-	{
-	}
 }
 #endif // !PIXELEXPLORER_RENDERING_TEXTURE_H_
