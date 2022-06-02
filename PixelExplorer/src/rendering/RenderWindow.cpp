@@ -125,63 +125,9 @@ namespace pixelexplore::rendering {
 	{
 		MAINTHREADCHECK();
 		glfwMakeContextCurrent(_window);
-
-		_addRemoveRenderMeshMutex.lock();
-		if (!_addedRenderMeshes.empty()) {
-			for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i) {
-				_renderMeshes.push_front(*i);
-				(*i)->createGlObjects(this);
-			}
-
-			_addedRenderMeshes.clear();
-		}
-
-		if (!_removedRenderMeshes.empty()) {
-			for (auto it = _removedRenderMeshes.begin(); it != _removedRenderMeshes.end(); ++it) {
-				bool droppedMesh = false;
-				for (auto mesh = _renderMeshes.begin(); mesh != _renderMeshes.end(); ++mesh) {
-					if (*it == *mesh) {
-						(*mesh)->deleteGlObjects(this);
-						(*mesh)->drop();
-						_renderMeshes.erase(mesh);
-						droppedMesh = true;
-						break;
-					}
-				}
-
-				if (!droppedMesh)
-					Logger::warn("Attempted to remove RenderObject that is not in the RenderWindow");
-			}
-
-			_removedRenderMeshes.clear();
-		}
-
-		_addRemoveRenderMeshMutex.unlock();
-
-
-		// Draw the frame
+		updateRenderObjectList();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glm::mat4 vp(_projectionMatrix * _viewMatrix);
-		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
-			RenderObject* renderObj = *i;
-			if (renderObj->meshVisible()) {
-				Shader* shader = renderObj->getShader();
-				if (shader == nullptr) {
-					Logger::error("Render Object returned NULL Shader, Render Object removed");
-					i = _renderMeshes.erase(i);
-					continue;
-				}
-
-				shader->bind();
-				Material* material = renderObj->getMaterial();
-				if (material != nullptr)
-					material->applyMaterial(shader);
-				shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
-				renderObj->drawMesh();
-			}
-		}
-
-		// Update ImGui
+		drawRenderObjects();
 		glfwPollEvents();
 		drawGui();
 		glfwSwapBuffers(_window);
@@ -243,6 +189,44 @@ namespace pixelexplore::rendering {
 		_addRemoveRenderMeshMutex.unlock();
 	}
 
+	void RenderWindow::addGUIElement(GUIElement* element)
+	{
+		element->grab();
+		_guiElementMutext.lock();
+		bool insertedElement = false;
+		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it) {
+			if ((*it)->getZIndex() >= element->getZIndex()) {
+				_guiElements.insert(it, element);
+				insertedElement = true;
+				break;
+			}
+		}
+
+		if (!insertedElement)
+			_guiElements.push_back(element);
+
+		//_guiElements.push_front(element);
+		_guiElementMutext.unlock();
+	}
+
+	void RenderWindow::removeGUIElement(GUIElement* element)
+	{
+		_guiElementMutext.lock();
+		bool drppedElement = false;
+		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it) {
+			if ((*it) == element) {
+				drppedElement = true;
+				_guiElements.erase(it);
+				element->drop();
+				break;
+			}
+		}
+
+		_guiElementMutext.unlock();
+		if (!drppedElement)
+			Logger::warn("Attempted to remove GUIElement that is not in the RenderWindow");
+	}
+
 	void RenderWindow::glfwStaticResizeCallback(GLFWwindow* window, int width, int height)
 	{
 		((RenderWindow*)glfwGetWindowUserPointer(window))->glfwResizeCallback(width, height);
@@ -268,37 +252,75 @@ namespace pixelexplore::rendering {
 	{
 		Logger::debug("Window focused: " + std::to_string(focused));
 	}
+
+	void RenderWindow::updateRenderObjectList()
+	{
+		_addRemoveRenderMeshMutex.lock();
+		if (!_addedRenderMeshes.empty()) {
+			for (auto i = _addedRenderMeshes.begin(); i != _addedRenderMeshes.end(); ++i) {
+				_renderMeshes.push_front(*i);
+				(*i)->createGlObjects(this);
+			}
+
+			_addedRenderMeshes.clear();
+		}
+
+		if (!_removedRenderMeshes.empty()) {
+			for (auto it = _removedRenderMeshes.begin(); it != _removedRenderMeshes.end(); ++it) {
+				bool droppedMesh = false;
+				for (auto mesh = _renderMeshes.begin(); mesh != _renderMeshes.end(); ++mesh) {
+					if (*it == *mesh) {
+						(*mesh)->deleteGlObjects(this);
+						(*mesh)->drop();
+						_renderMeshes.erase(mesh);
+						droppedMesh = true;
+						break;
+					}
+				}
+
+				if (!droppedMesh)
+					Logger::warn("Attempted to remove RenderObject that is not in the RenderWindow");
+			}
+
+			_removedRenderMeshes.clear();
+		}
+
+		_addRemoveRenderMeshMutex.unlock();
+	}
+
+	void RenderWindow::drawRenderObjects()
+	{
+		glm::mat4 vp(_projectionMatrix * _viewMatrix);
+		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
+			RenderObject* renderObj = *i;
+			if (renderObj->meshVisible()) {
+				Shader* shader = renderObj->getShader();
+				if (shader == nullptr) {
+					Logger::error("Render Object returned NULL Shader, Render Object removed");
+					i = _renderMeshes.erase(i);
+					continue;
+				}
+
+				shader->bind();
+				Material* material = renderObj->getMaterial();
+				if (material != nullptr)
+					material->applyMaterial(shader);
+				shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
+				renderObj->drawMesh();
+			}
+		}
+	}
+
 	void RenderWindow::drawGui()
 	{
-		ImGuiWindowFlags window_flags = 0;
-		window_flags |= ImGuiWindowFlags_NoTitleBar;
-		window_flags |= ImGuiWindowFlags_NoScrollbar;
-		//window_flags |= ImGuiWindowFlags_MenuBar;
-		window_flags |= ImGuiWindowFlags_NoMove;
-		window_flags |= ImGuiWindowFlags_NoResize;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-		window_flags |= ImGuiWindowFlags_NoNav;
-		window_flags |= ImGuiWindowFlags_NoBackground;
-		//window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-		window_flags |= ImGuiWindowFlags_UnsavedDocument;
-
-		// We specify a default position/size in case there's no data in the .ini file.
-		// We only do it to make the demo applications a little more welcoming, but typically this isn't required.
-		//const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-		//ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y), ImGuiCond_Always);
-		//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		//ImGui::SetNextWindowSize(ImVec2(_windowWidth, _windowHeight), ImGuiCond_Always);
-
 		ImGui::SetCurrentContext(_guiContext);
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(_windowWidth, _windowHeight), ImGuiCond_Always);
-		//ImGui::Begin("Render Window", nullptr, window_flags);
-		//ImGui::BulletText("See the ShowDemoWindow() code in imgui_demo.cpp. <- you are here!");
-		//ImGui::End();
-		ImGui::ShowDemoWindow();
+		_guiElementMutext.lock();
+		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it)
+			(*it)->drawElement(_windowWidth, _windowHeight);
+		_guiElementMutext.unlock();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
