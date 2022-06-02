@@ -12,6 +12,7 @@ namespace pixelexplore::game::gui {
 	public:
 		inline TestScreen() : rendering::GUIElement(100) {
 			_shouldClose = false;
+			_removeTestMesh = false;
 			_clickCounter = 0;
 			_windowFlags = 0;
 			_windowFlags |= ImGuiWindowFlags_NoTitleBar;
@@ -37,15 +38,19 @@ namespace pixelexplore::game::gui {
 			ImGui::Text(("Click Count: " + std::to_string(_clickCounter)).c_str());
 			if (ImGui::Button("Close", ImVec2(50, 20)))
 				_shouldClose = true;
+			if (ImGui::Button("Remove", ImVec2(50, 20)))
+				_removeTestMesh = true;
 			ImGui::End();
 		}
 
 		inline bool getShouldClose() const { return _shouldClose; }
+		inline bool getRemoveTestMesh() const { return _removeTestMesh; }
 
 	private:
 		uint32_t _clickCounter;
 		ImGuiWindowFlags _windowFlags;
 		bool _shouldClose;
+		bool _removeTestMesh;
 	};
 }
 #endif // !PIXELEXPLORE_GAME_GUI_TESTSCREEN_H_

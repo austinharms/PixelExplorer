@@ -317,7 +317,7 @@ namespace pixelexplore::rendering {
 
 		_glCreationQueue.clear();
 		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
-			(*i)->createGLObjects(this);
+			(*i)->destroyGLObjects(this);
 			(*i)->drop();
 		}
 

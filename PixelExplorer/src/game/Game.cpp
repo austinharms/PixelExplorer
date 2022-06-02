@@ -18,13 +18,18 @@ namespace pixelexplore::game {
 		_renderWindow->addGUIElement(testScreen);
 		rendering::RenderMesh* testMesh = new rendering::RenderMesh();
 		_renderWindow->addRenderMesh(testMesh);
-		testMesh->drop();
 		while (!_renderWindow->shouldClose())
 		{
 			if (testScreen != nullptr && testScreen->getShouldClose()) {
 				_renderWindow->removeGUIElement(testScreen);
 				testScreen->drop();
 				testScreen = nullptr;
+			}
+
+			if (testMesh != nullptr && testScreen != nullptr && testScreen->getRemoveTestMesh()) {
+				_renderWindow->removeRenderMesh(testMesh);
+				testMesh->drop();
+				testMesh = nullptr;
 			}
 
 			_renderWindow->drawFrame();
@@ -34,6 +39,12 @@ namespace pixelexplore::game {
 			_renderWindow->removeGUIElement(testScreen);
 			testScreen->drop();
 			testScreen = nullptr;
+		}
+
+		if (testMesh != nullptr) {
+			_renderWindow->removeRenderMesh(testMesh);
+			testMesh->drop();
+			testMesh = nullptr;
 		}
 	}
 
