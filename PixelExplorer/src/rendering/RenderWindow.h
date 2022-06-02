@@ -34,6 +34,8 @@ namespace pixelexplore::rendering {
 
 		GLFWwindow* _window;
 		ImGuiContext* _guiContext;
+		float _windowWidth;
+		float _windowHeight;
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
 		std::list<RenderObject*> _addedRenderMeshes;
@@ -45,6 +47,7 @@ namespace pixelexplore::rendering {
 
 		void glfwResizeCallback(uint32_t width, uint32_t height);
 		void glfwFocusCallback(bool focused);
+		void drawGui();
 	};
 }
 #endif // !PIXELEXPLORE_RENDERWINDOW_H_

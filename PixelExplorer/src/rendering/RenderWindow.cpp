@@ -100,6 +100,11 @@ namespace pixelexplore::rendering {
 			(*i)->drop();
 		}
 
+		ImGui::SetCurrentContext(_guiContext);
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
 		glfwDestroyWindow(_window);
 		global::windowCreationLock.lock();
 		if (--global::windowCount == 0) {
@@ -178,15 +183,7 @@ namespace pixelexplore::rendering {
 
 		// Update ImGui
 		glfwPollEvents();
-		ImGui::SetCurrentContext(_guiContext);
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::Begin("Hello, world!");
-		ImGui::ShowDemoWindow();
-		ImGui::End();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		drawGui();
 		glfwSwapBuffers(_window);
 	}
 
@@ -260,7 +257,9 @@ namespace pixelexplore::rendering {
 	{
 		Logger::debug("Window resized: " + std::to_string(width) + "X" + std::to_string(height));
 		if (width != 0 && height != 0) {
-			_projectionMatrix = glm::perspective(90.0f, (float)width / (float)height, 0.1f, 100.0f);
+			_windowHeight = height;
+			_windowWidth = width;
+			_projectionMatrix = glm::perspective(90.0f, _windowWidth / _windowHeight, 0.1f, 100.0f);
 			glViewport(0, 0, width, height);
 		}
 	}
@@ -268,5 +267,39 @@ namespace pixelexplore::rendering {
 	void RenderWindow::glfwFocusCallback(bool focused)
 	{
 		Logger::debug("Window focused: " + std::to_string(focused));
+	}
+	void RenderWindow::drawGui()
+	{
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoTitleBar;
+		window_flags |= ImGuiWindowFlags_NoScrollbar;
+		//window_flags |= ImGuiWindowFlags_MenuBar;
+		window_flags |= ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		window_flags |= ImGuiWindowFlags_NoBackground;
+		//window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+		window_flags |= ImGuiWindowFlags_UnsavedDocument;
+
+		// We specify a default position/size in case there's no data in the .ini file.
+		// We only do it to make the demo applications a little more welcoming, but typically this isn't required.
+		//const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+		//ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y), ImGuiCond_Always);
+		//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		//ImGui::SetNextWindowSize(ImVec2(_windowWidth, _windowHeight), ImGuiCond_Always);
+
+		ImGui::SetCurrentContext(_guiContext);
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(_windowWidth, _windowHeight), ImGuiCond_Always);
+		//ImGui::Begin("Render Window", nullptr, window_flags);
+		//ImGui::BulletText("See the ShowDemoWindow() code in imgui_demo.cpp. <- you are here!");
+		//ImGui::End();
+		ImGui::ShowDemoWindow();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 }

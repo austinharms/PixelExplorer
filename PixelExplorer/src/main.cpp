@@ -16,12 +16,12 @@ void playGame() {
 
 int main(void) {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	std::thread a(playGame);
-	std::thread b(playGame);
-	std::thread c(playGame);
-	a.join();
-	b.join();
-	c.join();
-	//playGame();
+	//std::thread a(playGame);
+	//std::thread b(playGame);
+	//std::thread c(playGame);
+	//a.join();
+	//b.join();
+	//c.join();
+	playGame();
 	return 0;
 }
