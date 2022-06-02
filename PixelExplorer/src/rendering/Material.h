@@ -12,7 +12,7 @@
 
 #ifndef PIXELEXPLORE_RENDERING_MATERIAL_H_
 #define PIXELEXPLORE_RENDERING_MATERIAL_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class Material : public RefCount
 	{
 	public:

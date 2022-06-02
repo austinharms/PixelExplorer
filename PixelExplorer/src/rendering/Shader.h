@@ -9,7 +9,7 @@
 #include "RefCount.h"
 #ifndef PIXELEXPLORE_RENDERING_SHADER_H_
 #define PIXELEXPLORE_RENDERING_SHADER_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class Shader : private RefCount
 	{
 		friend class RenderWindow;

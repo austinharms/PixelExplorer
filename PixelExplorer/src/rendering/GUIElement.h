@@ -4,7 +4,7 @@
 
 #ifndef PIXELEXPLORE_RENDERING_GUIELEMENT_H_
 #define PIXELEXPLORE_RENDERING_GUIELEMENT_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class GUIElement : public GLObject
 	{
 		friend class RenderWindow;

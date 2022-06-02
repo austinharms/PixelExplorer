@@ -4,7 +4,7 @@
 #include "rendering/RenderMesh.h"
 #include "gui/TestScreen.h"
 
-namespace pixelexplore::game {
+namespace pixelexplorer::game {
 	Game::Game()
 	{
 		_renderWindow = nullptr;

@@ -8,7 +8,7 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec4.hpp"
 
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	RenderMesh::RenderMesh()
 	{
 		_vertexArrayGlId = 0;

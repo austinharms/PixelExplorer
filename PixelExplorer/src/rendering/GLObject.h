@@ -5,7 +5,7 @@
 
 #ifndef PIXELEXPLORE_RENDERING_GLOBJECT_H_
 #define PIXELEXPLORE_RENDERING_GLOBJECT_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class GLObject : public RefCount
 	{
 		friend class RenderWindow;

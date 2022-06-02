@@ -6,7 +6,7 @@
 
 #ifndef PIXELEXPLORE_GAME_GUI_TESTSCREEN_H_
 #define PIXELEXPLORE_GAME_GUI_TESTSCREEN_H_
-namespace pixelexplore::game::gui {
+namespace pixelexplorer::game::gui {
 	class TestScreen : public rendering::GUIElement
 	{
 	public:

@@ -9,7 +9,7 @@
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
 
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	Shader::Shader(const std::string& path) : _path(path) {
 		_glId = loadShader(_path);
 	}

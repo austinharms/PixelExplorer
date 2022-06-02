@@ -1,7 +1,7 @@
 #include "Material.h"
 #include "Logger.h"
 
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	Material::Material()
 	{
 	}

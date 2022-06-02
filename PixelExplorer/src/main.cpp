@@ -9,7 +9,7 @@
 #include "game/Game.h"
 
 void playGame() {
-	pixelexplore::game::Game* game = new pixelexplore::game::Game();
+	pixelexplorer::game::Game* game = new pixelexplorer::game::Game();
 	game->start();
 	game->drop();
 }

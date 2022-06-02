@@ -7,7 +7,7 @@
 
 #ifndef PIXELEXPLORE_RENDERING_RENDERMESH_H_
 #define  PIXELEXPLORE_RENDERING_RENDERMESH_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class RenderMesh : public RenderObject
 	{
 	public:

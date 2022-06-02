@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-namespace pixelexplore {
+namespace pixelexplorer {
 	RefCount::RefCount() : _count(1) {}
 
 	RefCount::~RefCount() {}

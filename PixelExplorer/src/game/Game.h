@@ -5,7 +5,7 @@
 
 #ifndef PIXELEXPLORE_GAME_H_
 #define PIXELEXPLORE_GAME_H_
-namespace pixelexplore::game {
+namespace pixelexplorer::game {
 	class Game : public RefCount
 	{
 	public:

@@ -3,7 +3,7 @@
 
 #ifndef PIXELEXPLORE_REFCOUNT_H_
 #define PIXELEXPLORE_REFCOUNT_H_
-namespace pixelexplore {
+namespace pixelexplorer {
 	class RefCount
 	{
 	public:

@@ -19,7 +19,7 @@
 
 thread_local ImGuiContext* MyImGuiTLS;
 
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
 	{
 		global::windowCreationLock.lock();

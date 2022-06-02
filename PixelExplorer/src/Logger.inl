@@ -1,7 +1,7 @@
 #include <iostream>
 #include <assert.h>
 
-namespace pixelexplore::Logger {
+namespace pixelexplorer::Logger {
 	const char* levelString(LogLevel level) {
 		switch (level)
 		{

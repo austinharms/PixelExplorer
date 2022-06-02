@@ -18,7 +18,7 @@
 
 #ifndef PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
 #define PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class RenderWindow : public RefCount
 	{
 	public:

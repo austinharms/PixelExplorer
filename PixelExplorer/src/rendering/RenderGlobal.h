@@ -8,7 +8,7 @@
 #ifndef PIXELEXPLORE_RENDERING_RENDERGLOBAL_H_
 #define PIXELEXPLORE_RENDERING_RENDERGLOBAL_H_
 
-namespace pixelexplore::rendering::global {
+namespace pixelexplorer::rendering::global {
 	uint32_t windowCount = 0;
 	bool glfwInit = false;
 	std::mutex windowCreationLock;

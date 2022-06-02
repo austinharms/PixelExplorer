@@ -6,7 +6,7 @@
 
 #ifndef PIXELEXPLORE_RENDERING_RENDEROBJECT_H_
 #define PIXELEXPLORE_RENDERING_RENDEROBJECT_H_
-namespace pixelexplore::rendering {
+namespace pixelexplorer::rendering {
 	class RenderObject : public GLObject
 	{
 		friend class RenderWindow;

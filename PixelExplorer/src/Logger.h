@@ -2,7 +2,7 @@
 
 #ifndef PIXELEXPLORER_LOGGER_H_
 #define PIXELEXPLORER_LOGGER_H_
-namespace pixelexplore::Logger {
+namespace pixelexplorer::Logger {
 	enum class LogLevel
 	{
 		DEBUG = 0,
