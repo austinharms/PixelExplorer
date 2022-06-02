@@ -183,6 +183,7 @@ namespace pixelexplore::rendering {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGui::Begin("Hello, world!");
+		ImGui::ShowDemoWindow();
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
