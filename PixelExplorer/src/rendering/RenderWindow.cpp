@@ -7,6 +7,8 @@
 #include "Logger.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #define MAINTHREADCHECK() { \
 							if(std::this_thread::get_id() != _spawnThreadId) { \
@@ -14,6 +16,8 @@
 								return; \
 							}\
 						}
+
+thread_local ImGuiContext* MyImGuiTLS;
 
 namespace pixelexplore::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
@@ -67,6 +71,19 @@ namespace pixelexplore::rendering {
 		_viewMatrix = glm::lookAt(glm::vec3(0, 0, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		// this creates/update the projection matrix
 		glfwResizeCallback(width, height);
+
+		// Init imgui
+		IMGUI_CHECKVERSION();
+		_guiContext = ImGui::CreateContext();
+		ImGui::SetCurrentContext(_guiContext);
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsClassic();
+		ImGui_ImplGlfw_InitForOpenGL(_window, true);
+		// Should not hard code the version
+		ImGui_ImplOpenGL3_Init("#version 150");
 	}
 
 	RenderWindow::~RenderWindow()
@@ -136,6 +153,8 @@ namespace pixelexplore::rendering {
 
 		_addRemoveRenderMeshMutex.unlock();
 
+
+		// Draw the frame
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::mat4 vp(_projectionMatrix * _viewMatrix);
 		for (auto i = _renderMeshes.begin(); i != _renderMeshes.end(); ++i) {
@@ -157,8 +176,17 @@ namespace pixelexplore::rendering {
 			}
 		}
 
-		glfwSwapBuffers(_window);
+		// Update ImGui
 		glfwPollEvents();
+		ImGui::SetCurrentContext(_guiContext);
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::Begin("Hello, world!");
+		ImGui::End();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glfwSwapBuffers(_window);
 	}
 
 	Shader* RenderWindow::loadShader(std::string path)

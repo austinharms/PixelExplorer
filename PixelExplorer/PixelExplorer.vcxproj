@@ -77,7 +77,7 @@
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
@@ -96,7 +96,7 @@
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,7 +114,7 @@
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
@@ -133,7 +133,7 @@
       <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,6 +151,14 @@
     <ClCompile Include="src\rendering\RenderMesh.cpp" />
     <ClCompile Include="src\rendering\RenderWindow.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
+    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\vendor\imgui\misc\cpp\imgui_stdlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\Game.h" />
@@ -163,6 +171,17 @@
     <ClInclude Include="src\rendering\RenderObject.h" />
     <ClInclude Include="src\rendering\RenderWindow.h" />
     <ClInclude Include="src\rendering\Shader.h" />
+    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="src\vendor\imgui\imconfig.h" />
+    <ClInclude Include="src\vendor\imgui\imgui.h" />
+    <ClInclude Include="src\vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="src\vendor\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\vendor\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\vendor\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="src\vendor\imgui\misc\single_file\imgui_single_file.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\base.shader" />

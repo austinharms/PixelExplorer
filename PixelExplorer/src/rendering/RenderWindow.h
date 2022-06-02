@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include "RenderObject.h"
 #include "glm/mat4x4.hpp"
+#include "imgui.h"
 
 #ifndef PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
 #define PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
@@ -32,6 +33,7 @@ namespace pixelexplore::rendering {
 		static void glfwStaticFocusCallback(GLFWwindow* window, int focused);
 
 		GLFWwindow* _window;
+		ImGuiContext* _guiContext;
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
 		std::list<RenderObject*> _addedRenderMeshes;
