@@ -151,6 +151,7 @@
     <ClCompile Include="src\rendering\RenderMesh.cpp" />
     <ClCompile Include="src\rendering\RenderWindow.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
+    <ClCompile Include="src\rendering\Texture.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
