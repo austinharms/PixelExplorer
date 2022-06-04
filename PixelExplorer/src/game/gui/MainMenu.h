@@ -39,7 +39,7 @@ namespace pixelexplorer::game::gui {
 			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 			ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
 			ImGui::Begin("Main Menu", nullptr, _windowFlags);
-			ImGui::PushStyleColor(ImGuiCol_Text, 0xff000000);
+			ImGui::PushStyleColor(ImGuiCol_Text, 0xffffffff);
 			ImGui::PushStyleColor(ImGuiCol_Button, 0xff737373);
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, 0xff969696);
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, 0xff4a4a4a);
