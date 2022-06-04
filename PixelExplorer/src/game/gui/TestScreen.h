@@ -33,7 +33,7 @@ namespace pixelexplorer::game::gui {
 
 		inline virtual ~TestScreen() { _texture->drop(); }
 
-		inline void drawElement(float windowWidth, float windowHeight) {
+		inline void drawElement(float windowWidth, float windowHeight, float uiScale) {
 			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 			ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
 			ImGui::Begin("Main Menu", nullptr, _windowFlags);

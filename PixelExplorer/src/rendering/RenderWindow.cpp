@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <math.h>
 
 #include "RenderGlobal.h"
 #include "Logger.h"
@@ -359,9 +360,13 @@ namespace pixelexplorer::rendering {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
+		//float widthScale = _windowWidth / 600;
+		//float heightScale = _windowHeight / 400;
+		float scale = fminf(_windowWidth / 600, _windowHeight / 400);
 		_guiElementMutext.lock();
 		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it)
-			(*it)->drawElement(_windowWidth, _windowHeight);
+			(*it)->drawElement(_windowWidth, _windowHeight, scale);
 		_guiElementMutext.unlock();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

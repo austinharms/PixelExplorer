@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\Game.h" />
+    <ClInclude Include="src\game\gui\MainMenu.h" />
     <ClInclude Include="src\game\gui\TestScreen.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\RefCount.h" />

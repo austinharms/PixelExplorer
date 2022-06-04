@@ -12,7 +12,7 @@ namespace pixelexplorer::rendering {
 		inline GUIElement(uint32_t zIndex = 0) { this->zIndex = zIndex; }
 		inline virtual ~GUIElement() {}
 		virtual uint32_t getZIndex() { return zIndex; }
-		virtual void drawElement(float windowWidth, float windowHeight) = 0;
+		virtual void drawElement(float windowWidth, float windowHeight, float uiScale) = 0;
 
 	protected:
 		// 0 is first layer and is behide all other layers

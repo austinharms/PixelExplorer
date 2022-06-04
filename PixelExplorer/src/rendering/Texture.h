@@ -17,6 +17,8 @@ namespace pixelexplorer::rendering {
 		void deleteGlTexture();
 		void bind(uint8_t slot = 0);
 		inline uint32_t getGlId() const { return _glTextureId; }
+		inline uint32_t getWidth() const { return _width; }
+		inline uint32_t getHeight() const { return _height; }
 
 	private:
 		uint8_t* _pixelBuffer;
