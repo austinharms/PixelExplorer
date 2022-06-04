@@ -1,6 +1,6 @@
 wsl.exe git submodule init
 wsl.exe git submodule update
-wsl.exe cd glew/auto `&`& sudo make
+wsl.exe ./buildGLEW.sh
 rm -rf "./glfw/build"
 mkdir "./glfw/build"
 mkdir "./glfw/build/Win32"
