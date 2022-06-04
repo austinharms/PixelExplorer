@@ -34,6 +34,7 @@ namespace pixelexplorer::rendering {
 		void removeGUIElement(GUIElement* element);
 		inline float getWindowWidth() const { return _windowWidth; }
 		inline float getWindowHeight() const { return _windowHeight; }
+		ImFont* loadFont(const std::string& path);
 
 	private:
 		static void glfwStaticResizeCallback(GLFWwindow* window, int width, int height);
@@ -45,6 +46,7 @@ namespace pixelexplorer::rendering {
 		float _windowHeight;
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
+		std::unordered_map<std::string, ImFont*> _loadedFonts;
 		std::forward_list<GLObject*> _glCreationQueue;
 		std::forward_list<GLObject*> _glDeletionQueue;
 		std::list<RenderObject*> _renderObjects;

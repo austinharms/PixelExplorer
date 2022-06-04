@@ -28,27 +28,30 @@ namespace pixelexplorer::game::gui {
 			//_windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 			//_windowFlags |= ImGuiWindowFlags_MenuBar;
 			_backgroundTexture = new rendering::Texture("./assets/textures/main_menu_background.png");
+			_font = nullptr;
 		}
 
 		inline virtual ~MainMenu() { _backgroundTexture->drop(); }
 
 		inline void drawElement(float windowWidth, float windowHeight, float uiScale) {
+
+			// Create Full Screen window and set styles
 			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 			ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
 			ImGui::Begin("Main Menu", nullptr, _windowFlags);
+			ImGui::PushStyleColor(ImGuiCol_Text, 0xff000000);
+			ImGui::PushStyleColor(ImGuiCol_Button, 0xff737373);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, 0xff969696);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, 0xff4a4a4a);
+			ImGui::PushFont(_font);
 
 			// Draw Background Image (scaled to fill screen)
 			float imageScale = fmaxf(windowWidth / _backgroundTexture->getWidth(), windowHeight / _backgroundTexture->getHeight());
 			ImGui::SetCursorPos(ImVec2(-(((_backgroundTexture->getWidth() * imageScale) - windowWidth) / 2), -(((_backgroundTexture->getHeight() * imageScale) - windowHeight) / 2)));
 			ImGui::Image((ImTextureID)_backgroundTexture->getGlId(), ImVec2(_backgroundTexture->getWidth() * imageScale, _backgroundTexture->getHeight() * imageScale));
 
-			ImGui::PushStyleColor(ImGuiCol_Text, 0xff000000);
-			ImGui::PushStyleColor(ImGuiCol_Button, 0xff737373);
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, 0xff969696);
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, 0xff4a4a4a);
-
 			// Draw Title
-			ImGui::SetWindowFontScale(roundf(3 * uiScale));
+			ImGui::SetWindowFontScale(roundf(2 * uiScale));
 			ImVec2 textSize = ImGui::CalcTextSize("Pixel Explorer");
 			ImGui::SetCursorPos(ImVec2((windowWidth / 2) - (textSize.x / 2), 50 * uiScale));
 			ImGui::Text("Pixel Explorer");
@@ -61,6 +64,7 @@ namespace pixelexplorer::game::gui {
 				_shouldClose = true;
 
 			ImGui::PopStyleColor(4);
+			ImGui::PopFont();
 			ImGui::End();
 
 		}
@@ -71,6 +75,7 @@ namespace pixelexplorer::game::gui {
 				return;
 			}
 
+			_font = window->loadFont("./assets/fonts/roboto.ttf");
 			_backgroundTexture->createGlTexture();
 			setHasGLObjects(true);
 		}
@@ -80,6 +85,9 @@ namespace pixelexplorer::game::gui {
 				Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
 				return;
 			}
+
+			// Font memory is handled by ImGui
+			_font = nullptr;
 
 			_backgroundTexture->deleteGlTexture();
 			setHasGLObjects(false);
@@ -91,6 +99,7 @@ namespace pixelexplorer::game::gui {
 
 	private:
 		rendering::Texture* _backgroundTexture;
+		ImFont* _font;
 		ImGuiWindowFlags _windowFlags;
 		bool _shouldClose;
 	};

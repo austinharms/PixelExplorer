@@ -283,6 +283,31 @@ namespace pixelexplorer::rendering {
 			Logger::warn("Attempted to remove GUIElement that is not in the RenderWindow");
 	}
 
+	ImFont* RenderWindow::loadFont(const std::string& path)
+	{
+		if (std::this_thread::get_id() != _spawnThreadId) {
+			Logger::error(__FUNCTION__ " must be called from the thread that created the window");
+			return nullptr;
+		}
+
+		auto it = _loadedFonts.find(path);
+		if (it != _loadedFonts.end())
+			return it->second;
+
+		ImGui::SetCurrentContext(_guiContext);
+		ImGuiIO& io = ImGui::GetIO();
+		ImFontConfig config;
+		config.OversampleH = 3;
+		config.OversampleV = 3;
+		config.GlyphExtraSpacing.x = 1.0f;
+		ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), 30, &config);
+		if (font == nullptr)
+			Logger::warn("Failed to load font " + path);
+
+		_loadedFonts.emplace(path, font);
+		return font;
+	}
+
 	void RenderWindow::glfwStaticResizeCallback(GLFWwindow* window, int width, int height)
 	{
 		((RenderWindow*)glfwGetWindowUserPointer(window))->glfwResizeCallback(width, height);
