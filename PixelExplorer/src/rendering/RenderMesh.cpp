@@ -50,6 +50,7 @@ namespace pixelexplorer::rendering {
 		}
 
 		window->dropShader(_shader);
+		_shader = nullptr;
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
 		glDeleteBuffers(1, &_indexBufferGlId);

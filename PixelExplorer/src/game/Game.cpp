@@ -3,6 +3,8 @@
 #include "Logger.h"
 #include "rendering/RenderMesh.h"
 #include "gui/MainMenu.h"
+#include "block/Shape.h"
+#include "block/RenderShape.h"
 
 namespace pixelexplorer::game {
 	Game::Game()
@@ -13,11 +15,17 @@ namespace pixelexplorer::game {
 
 	void Game::start() {
 		Logger::debug("Started Game");
+
 		_renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore");
+
 		gui::MainMenu* mainMenu = new gui::MainMenu();
 		_renderWindow->addGUIElement(mainMenu);
-		//rendering::RenderMesh* testMesh = new rendering::RenderMesh();
-		//_renderWindow->addRenderMesh(testMesh);
+
+		block::Shape* testShape = new block::Shape("./assets/blocks/shapes/test.obj");
+		block::RenderShape* testMesh = new block::RenderShape(testShape);
+		testShape->drop();
+		_renderWindow->addRenderMesh(testMesh);
+
 		while (!_renderWindow->shouldClose())
 		{
 			if (mainMenu != nullptr && mainMenu->getShouldClose()) {
@@ -25,12 +33,6 @@ namespace pixelexplorer::game {
 				mainMenu->drop();
 				mainMenu = nullptr;
 			}
-
-			//if (testMesh != nullptr && testScreen != nullptr && testScreen->getRemoveTestMesh()) {
-			//	_renderWindow->removeRenderMesh(testMesh);
-			//	testMesh->drop();
-			//	testMesh = nullptr;
-			//}
 
 			_renderWindow->drawFrame();
 		}
@@ -41,11 +43,11 @@ namespace pixelexplorer::game {
 			mainMenu = nullptr;
 		}
 
-		//if (testMesh != nullptr) {
-		//	_renderWindow->removeRenderMesh(testMesh);
-		//	testMesh->drop();
-		//	testMesh = nullptr;
-		//}
+		if (testMesh != nullptr) {
+			_renderWindow->removeRenderMesh(testMesh);
+			testMesh->drop();
+			testMesh = nullptr;
+		}
 	}
 
 	Game::~Game()
