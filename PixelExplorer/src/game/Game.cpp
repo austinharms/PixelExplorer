@@ -21,7 +21,7 @@ namespace pixelexplorer::game {
 		gui::MainMenu* mainMenu = new gui::MainMenu();
 		_renderWindow->addGUIElement(mainMenu);
 
-		block::Shape* testShape = new block::Shape("./assets/blocks/shapes/test.obj");
+		block::Shape* testShape = new block::Shape("./assets/blocks/shapes/default.obj");
 		block::RenderShape* testMesh = new block::RenderShape(testShape);
 		testShape->drop();
 		_renderWindow->addRenderMesh(testMesh);
