@@ -44,7 +44,7 @@ namespace pixelexplorer::game::block {
 		glBindVertexArray(_vertexArrayGlId);
 		glGenBuffers(1, &_vertexBufferGlId);
 		glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferGlId);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 5 * _shape->vertexCount, _shape->vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * _shape->vertexCount[0], _shape->vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (const void*)(sizeof(float) * 2));
@@ -55,7 +55,7 @@ namespace pixelexplorer::game::block {
 		// Create and load index buffer
 		glGenBuffers(1, &_indexBufferGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _shape->indexCount * sizeof(uint8_t), _shape->indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _shape->indexCount[0] * sizeof(uint8_t), _shape->indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
@@ -81,6 +81,6 @@ namespace pixelexplorer::game::block {
 	{
 		glBindVertexArray(_vertexArrayGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
-		glDrawElements(GL_TRIANGLES, _shape->indexCount, GL_UNSIGNED_BYTE, nullptr);
+		glDrawElements(GL_TRIANGLES, _shape->indexCount[0], GL_UNSIGNED_BYTE, nullptr);
 	}
 }
