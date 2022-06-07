@@ -1,8 +1,8 @@
 #include "Shape.h"
 
+#include <errno.h>
 #include <stdio.h>
-#include <string>
-#include <vector>
+#include <string.h>
 #include <stdint.h>
 #include <unordered_map>
 
@@ -13,193 +13,11 @@
 namespace pixelexplorer::game::block {
 	Shape::Shape(const std::string& path) : name(getFileName(path))
 	{
-		memset(indices, 0, sizeof(indices));
-		memset(vertices, 0, sizeof(vertices));
-		memset(vertexCount, 0, sizeof(vertexCount));
-		memset(indexCount, 0, sizeof(indexCount));
-
-		FILE* shapeFile;
-		if (fopen_s(&shapeFile, path.c_str(), "r") != 0 || shapeFile == nullptr) {
-			Logger::error("Failed to open shape file " + path);
-			return;
-		}
-
-		enum class MeshDirection { NONE = -1, FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM };
-		MeshDirection direction = MeshDirection::NONE;
-		uint32_t totalVertexCount = 0;
-		uint32_t totalIndexCount = 0;
-		char lineStart[3] = { 0,0,0 };
-
-		while (fread(lineStart, 1, 2, shapeFile) == 2) {
-			if (strcmp(lineStart, "d ") == 0) {
-				char dir[7] = { 0,0,0,0,0,0,0 };
-				for (uint8_t i = 0; i < 6; ++i) {
-					dir[i] = fgetc(shapeFile);
-					if (dir[i] == '\n') {
-						dir[i] = 0;
-						break;
-					}
-				}
-
-				if (strcmp(dir, "FRONT") == 0) {
-					direction = MeshDirection::FRONT;
-				}
-				else if (strcmp(dir, "BACK") == 0) {
-					direction = MeshDirection::BACK;
-				}
-				else if (strcmp(dir, "LEFT") == 0) {
-					direction = MeshDirection::LEFT;
-				}
-				else if (strcmp(dir, "RIGHT") == 0) {
-					direction = MeshDirection::RIGHT;
-				}
-				else if (strcmp(dir, "TOP") == 0) {
-					direction = MeshDirection::TOP;
-				}
-				else if (strcmp(dir, "BOTTOM") == 0) {
-					direction = MeshDirection::BOTTOM;
-				}
-				else {
-					fclose(shapeFile);
-					Logger::error("Failed to parse shape file, found invalid direction " + path);
-					return;
-				}
-			}
-			else if (strcmp(lineStart, "vc") == 0) {
-				if (direction == MeshDirection::NONE) {
-					fclose(shapeFile);
-					Logger::error("Failed to parse shape file, found invalid direction " + path);
-					return;
-				}
-
-				int32_t vc;
-				fscanf_s(shapeFile, "%i\n", &vc);
-				totalVertexCount += vc * 5;
-				vertexCount[(int32_t)direction] = vc;
-			}
-			else if (strcmp(lineStart, "fc") == 0) {
-				if (direction == MeshDirection::NONE) {
-					fclose(shapeFile);
-					Logger::error("Failed to parse shape file, found invalid direction " + path);
-					return;
-				}
-
-				int32_t fc;
-				fscanf_s(shapeFile, "%i\n", &fc);
-				totalIndexCount += fc * 3;
-				indexCount[(int32_t)direction] += fc * 3;
-			}
-			else {
-				char c;
-				do {
-					c = fgetc(shapeFile);
-				} while (c != '\n' && !feof(shapeFile));
-			}
-		}
-
-		indices[0] = (uint8_t*)malloc(totalIndexCount * sizeof(uint8_t));
-		vertices[0] = (float*)malloc(totalVertexCount * sizeof(float));
-		for (uint8_t i = 1; i < 6; ++i) {
-			indices[i] = indices[i - 1] + indexCount[i - 1];
-			vertices[i] = vertices[i - 1] + vertexCount[i - 1] * 5;
-		}
-
-		uint32_t loadedVertexCount = 0;
-		uint32_t loadedIndexCount = 0;
-		rewind(shapeFile);
-		while (fread(lineStart, 1, 2, shapeFile) == 2)
-		{
-			if (strcmp(lineStart, "d ") == 0) {
-				char dir[7] = { 0,0,0,0,0,0,0 };
-				for (uint8_t i = 0; i < 6; ++i) {
-					dir[i] = fgetc(shapeFile);
-					if (dir[i] == '\n') {
-						dir[i] = 0;
-						break;
-					}
-				}
-
-				if (strcmp(dir, "FRONT") == 0) {
-					direction = MeshDirection::FRONT;
-				}
-				else if (strcmp(dir, "BACK") == 0) {
-					direction = MeshDirection::BACK;
-				}
-				else if (strcmp(dir, "LEFT") == 0) {
-					direction = MeshDirection::LEFT;
-				}
-				else if (strcmp(dir, "RIGHT") == 0) {
-					direction = MeshDirection::RIGHT;
-				}
-				else if (strcmp(dir, "TOP") == 0) {
-					direction = MeshDirection::TOP;
-				}
-				else if (strcmp(dir, "BOTTOM") == 0) {
-					direction = MeshDirection::BOTTOM;
-				}
-				else {
-					fclose(shapeFile);
-					freeShape();
-					Logger::error("Failed to parse shape file, found invalid direction " + path);
-					return;
-				}
-			}
-			else if (strcmp(lineStart, "v ") == 0) {
-				if (direction == MeshDirection::NONE) {
-					fclose(shapeFile);
-					Logger::error("Failed to parse shape file, found invalid direction " + path);
-					return;
-				}
-
-				if (loadedVertexCount + 5 > totalVertexCount || fscanf_s(shapeFile, "%f %f %f %f %f\n", vertices[0] + loadedVertexCount, vertices[0] + loadedVertexCount + 1, vertices[0] + loadedVertexCount + 2, vertices[0] + loadedVertexCount + 3, vertices[0] + loadedVertexCount + 4) != 5) {
-					fclose(shapeFile);
-					freeShape();
-					Logger::error("Failed to parse shape file, found invalid vertex count " + path);
-					return;
-				}
-
-				loadedVertexCount += 5;
-			}
-			else if (strcmp(lineStart, "f ") == 0) {
-				if (direction == MeshDirection::NONE) {
-					fclose(shapeFile);
-					Logger::error("Failed to parse shape file, found invalid direction " + path);
-					return;
-				}
-
-				if (loadedIndexCount + 3 > totalIndexCount || fscanf_s(shapeFile, "%i/%i/%i\n", indices[0] + loadedIndexCount, indices[0] + loadedIndexCount + 1, indices[0] + loadedIndexCount + 2) != 3) {
-					fclose(shapeFile);
-					freeShape();
-					Logger::error("Failed to parse shape file, found invalid index count " + path);
-					return;
-				}
-
-				loadedIndexCount += 3;
-			}
-			else {
-
-				char c;
-				do {
-					c = fgetc(shapeFile);
-				} while (c != '\n' && !feof(shapeFile));
-			}
-		}
-
-		fclose(shapeFile);
-		if (loadedIndexCount != totalIndexCount) {
-			freeShape();
-			Logger::error("Failed to parse shape file, found invalid index count " + path);
-			return;
-		}
-
-		if (loadedVertexCount != totalVertexCount) {
-			freeShape();
-			Logger::error("Failed to parse shape file, found invalid vertex count " + path);
-			return;
-		}
-
-		Logger::debug("Loaded block shape " + name + " from " + path + " loaded: " + std::to_string(totalIndexCount) + " indices, " + std::to_string(totalVertexCount) + " vertices");
-
+		memset(&indices, 0, sizeof(indices));
+		memset(&vertices, 0, sizeof(vertices));
+		memset(&vertexCount, 0, sizeof(vertexCount));
+		memset(&indexCount, 0, sizeof(indexCount));
+		loadShapeFile(path);
 		// OBJ file loading
 		//FILE* shapeFile;
 		//if (fopen_s(&shapeFile, path.c_str(), "r") != 0 || shapeFile == nullptr) {
@@ -325,9 +143,217 @@ namespace pixelexplorer::game::block {
 	{
 		free(indices[0]);
 		free(vertices[0]);
-		memset(indices, 0, sizeof(indices));
-		memset(vertices, 0, sizeof(vertices));
-		memset(vertexCount, 0, sizeof(vertexCount));
-		memset(indexCount, 0, sizeof(indexCount));
+		memset(&indices, 0, sizeof(indices));
+		memset(&vertices, 0, sizeof(vertices));
+		memset(&vertexCount, 0, sizeof(vertexCount));
+		memset(&indexCount, 0, sizeof(indexCount));
+	}
+
+	void Shape::loadShapeFile(const std::string& path)
+	{
+		enum class ShapeDirection { NONE = -1, FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM };
+
+		FILE* shape = nullptr;
+		errno_t fileError = fopen_s(&shape, path.c_str(), "r");
+		if (fileError != 0 || shape == nullptr) {
+			Logger::error("Failed to open shape file " + path + ", error: " + std::to_string(fileError));
+			return;
+		}
+
+		freeShape();
+		ShapeDirection currentDirection = ShapeDirection::NONE;
+		char let;
+		while ((let = fgetc(shape)) && !feof(shape))
+		{
+			switch (let) {
+			case 'd': {
+				char dirStr[7] = { 0,0,0,0,0,0,0 };
+				for (int8_t i = 0; i < 6; ++i) {
+					dirStr[i] = fgetc(shape);
+					if (i == 0 && dirStr[0] == ' ') {
+						--i;
+						continue;
+					}
+
+					if (dirStr[i] == '\n') {
+						dirStr[i] = 0;
+						break;
+					}
+				}
+
+				if (strcmp(dirStr, "FRONT") == 0) {
+					currentDirection = ShapeDirection::FRONT;
+				}
+				else if (strcmp(dirStr, "BACK") == 0) {
+					currentDirection = ShapeDirection::BACK;
+				}
+				else if (strcmp(dirStr, "LEFT") == 0) {
+					currentDirection = ShapeDirection::LEFT;
+				}
+				else if (strcmp(dirStr, "RIGHT") == 0) {
+					currentDirection = ShapeDirection::RIGHT;
+				}
+				else if (strcmp(dirStr, "TOP") == 0) {
+					currentDirection = ShapeDirection::TOP;
+				}
+				else if (strcmp(dirStr, "BOTTOM") == 0) {
+					currentDirection = ShapeDirection::BOTTOM;
+				}
+				else {
+					Logger::error("Failed to parse shape file " + path + " invalid direction: " + dirStr);
+					fclose(shape);
+					return;
+				}
+			} break;
+
+			case 'v':
+				if (currentDirection == ShapeDirection::NONE) {
+					Logger::error("Failed to parse shape file " + path + " found vertex before direction");
+					fclose(shape);
+					return;
+				}
+
+				++vertexCount[(int32_t)currentDirection];
+				readTillLineEnd(shape);
+				break;
+
+			case 'f':
+				if (currentDirection == ShapeDirection::NONE) {
+					Logger::error("Failed to parse shape file " + path + " found face before direction");
+					fclose(shape);
+					return;
+				}
+
+				indexCount[(int32_t)currentDirection] += 3;
+				readTillLineEnd(shape);
+				break;
+
+			default:
+				readTillLineEnd(shape);
+				break;
+			}
+		}
+
+		rewind(shape);
+		indices[0] = (uint8_t*)malloc((indexCount[0] + indexCount[1] + indexCount[2] + indexCount[3] + indexCount[4] + indexCount[5]) * sizeof(uint8_t));
+		vertices[0] = (float*)malloc((vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3] + vertexCount[4] + vertexCount[5]) * 5 * sizeof(float));
+		for (uint8_t i = 1; i < 6; ++i) {
+			indices[i] = indices[i - 1] + indexCount[i - 1];
+			vertices[i] = vertices[i - 1] + (vertexCount[i - 1] * 5);
+		}
+
+		if (vertices[0] == nullptr || indices[0] == nullptr) {
+			Logger::error("Failed to allocate shape buffers for shape " + name);
+			freeShape();
+			fclose(shape);
+			return;
+		}
+
+		memset(&vertexCount, 0, sizeof(vertexCount));
+		memset(&indexCount, 0, sizeof(indexCount));
+
+		while ((let = fgetc(shape)) && !feof(shape))
+		{
+			switch (let) {
+			case 'd': {
+				char dirStr[7] = { 0,0,0,0,0,0,0 };
+				for (uint8_t i = 0; i < 6; ++i) {
+					dirStr[i] = fgetc(shape);
+					if (i == 0 && dirStr[0] == ' ') {
+						--i;
+						continue;
+					}
+
+					if (dirStr[i] == '\n') {
+						dirStr[i] = 0;
+						break;
+					}
+				}
+
+				if (strcmp(dirStr, "FRONT") == 0) {
+					currentDirection = ShapeDirection::FRONT;
+				}
+				else if (strcmp(dirStr, "BACK") == 0) {
+					currentDirection = ShapeDirection::BACK;
+				}
+				else if (strcmp(dirStr, "LEFT") == 0) {
+					currentDirection = ShapeDirection::LEFT;
+				}
+				else if (strcmp(dirStr, "RIGHT") == 0) {
+					currentDirection = ShapeDirection::RIGHT;
+				}
+				else if (strcmp(dirStr, "TOP") == 0) {
+					currentDirection = ShapeDirection::TOP;
+				}
+				else if (strcmp(dirStr, "BOTTOM") == 0) {
+					currentDirection = ShapeDirection::BOTTOM;
+				}
+				else {
+					Logger::error("Failed to parse shape file " + path + " invalid direction: " + dirStr);
+					freeShape();
+					fclose(shape);
+					return;
+				}
+			} break;
+
+			case 'v': {
+				if (currentDirection == ShapeDirection::NONE) {
+					Logger::error("Failed to parse shape file " + path + " found vertex before direction");
+					fclose(shape);
+					freeShape();
+					return;
+				}
+
+				float* vp = vertices[(int32_t)currentDirection] + (vertexCount[(int32_t)currentDirection] * 5);
+				if (fscanf_s(shape, "%f %f %f %f %f\n", vp, vp + 1, vp + 2, vp + 3, vp + 4) != 5) {
+					fclose(shape);
+					freeShape();
+					Logger::error("Failed to parse shape file " + path + " found invalid vertex");
+					return;
+				}
+
+				++vertexCount[(int32_t)currentDirection];
+			} break;
+
+			case 'f': {
+				if (currentDirection == ShapeDirection::NONE) {
+					Logger::error("Failed to parse shape file " + path + " found face before direction");
+					fclose(shape);
+					freeShape();
+					return;
+				}
+
+				uint8_t* ip = indices[(int32_t)currentDirection] + indexCount[(int32_t)currentDirection];
+				int32_t values[3];
+				if (fscanf_s(shape, "%i/%i/%i\n", values, values + 1, values + 2) != 3) {
+					fclose(shape);
+					freeShape();
+					Logger::error("Failed to parse shape file " + path + " found invalid face");
+					return;
+				}
+
+				ip[0] = values[0];
+				ip[1] = values[1];
+				ip[2] = values[2];
+				indexCount[(int32_t)currentDirection] += 3;
+			} break;
+
+			default:
+				readTillLineEnd(shape);
+				break;
+			}
+		}
+
+		fclose(shape);
+		Logger::debug("Loaded shape " + name + " from " + path);
+	}
+
+	void Shape::readTillLineEnd(FILE* file)
+	{
+		char c;
+		do
+		{
+			c = fgetc(file);
+		} while (c != '\n' && !feof(file));
 	}
 }

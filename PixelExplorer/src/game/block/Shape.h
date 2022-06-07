@@ -35,6 +35,8 @@ namespace pixelexplorer::game::block {
 
 		std::string getFileName(const std::string& path);
 		void freeShape();
+		void loadShapeFile(const std::string& path);
+		void readTillLineEnd(FILE* file);
 	};
 }
 #endif // !PIXELEXPLORER_GAME_SHAPE_H_

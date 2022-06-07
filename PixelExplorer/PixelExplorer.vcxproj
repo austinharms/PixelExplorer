@@ -79,6 +79,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -97,6 +99,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,6 +119,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +139,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
