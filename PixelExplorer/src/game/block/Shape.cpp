@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
+#include "FaceDirection.h"
 
 namespace pixelexplorer::game::block {
 	Shape::Shape(const std::string& path) : name(getFileName(path))
@@ -151,8 +152,6 @@ namespace pixelexplorer::game::block {
 
 	void Shape::loadShapeFile(const std::string& path)
 	{
-		enum class ShapeDirection { NONE = -1, FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM };
-
 		FILE* shape = nullptr;
 		errno_t fileError = fopen_s(&shape, path.c_str(), "r");
 		if (fileError != 0 || shape == nullptr) {
@@ -161,7 +160,7 @@ namespace pixelexplorer::game::block {
 		}
 
 		freeShape();
-		ShapeDirection currentDirection = ShapeDirection::NONE;
+		FaceDirection currentDirection = FaceDirection::NONE;
 		char let;
 		while ((let = fgetc(shape)) && !feof(shape))
 		{
@@ -182,22 +181,22 @@ namespace pixelexplorer::game::block {
 				}
 
 				if (strcmp(dirStr, "FRONT") == 0) {
-					currentDirection = ShapeDirection::FRONT;
+					currentDirection = FaceDirection::FRONT;
 				}
 				else if (strcmp(dirStr, "BACK") == 0) {
-					currentDirection = ShapeDirection::BACK;
+					currentDirection = FaceDirection::BACK;
 				}
 				else if (strcmp(dirStr, "LEFT") == 0) {
-					currentDirection = ShapeDirection::LEFT;
+					currentDirection = FaceDirection::LEFT;
 				}
 				else if (strcmp(dirStr, "RIGHT") == 0) {
-					currentDirection = ShapeDirection::RIGHT;
+					currentDirection = FaceDirection::RIGHT;
 				}
 				else if (strcmp(dirStr, "TOP") == 0) {
-					currentDirection = ShapeDirection::TOP;
+					currentDirection = FaceDirection::TOP;
 				}
 				else if (strcmp(dirStr, "BOTTOM") == 0) {
-					currentDirection = ShapeDirection::BOTTOM;
+					currentDirection = FaceDirection::BOTTOM;
 				}
 				else {
 					Logger::error("Failed to parse shape file " + path + " invalid direction: " + dirStr);
@@ -207,7 +206,7 @@ namespace pixelexplorer::game::block {
 			} break;
 
 			case 'v':
-				if (currentDirection == ShapeDirection::NONE) {
+				if (currentDirection == FaceDirection::NONE) {
 					Logger::error("Failed to parse shape file " + path + " found vertex before direction");
 					fclose(shape);
 					return;
@@ -218,7 +217,7 @@ namespace pixelexplorer::game::block {
 				break;
 
 			case 'f':
-				if (currentDirection == ShapeDirection::NONE) {
+				if (currentDirection == FaceDirection::NONE) {
 					Logger::error("Failed to parse shape file " + path + " found face before direction");
 					fclose(shape);
 					return;
@@ -271,22 +270,22 @@ namespace pixelexplorer::game::block {
 				}
 
 				if (strcmp(dirStr, "FRONT") == 0) {
-					currentDirection = ShapeDirection::FRONT;
+					currentDirection = FaceDirection::FRONT;
 				}
 				else if (strcmp(dirStr, "BACK") == 0) {
-					currentDirection = ShapeDirection::BACK;
+					currentDirection = FaceDirection::BACK;
 				}
 				else if (strcmp(dirStr, "LEFT") == 0) {
-					currentDirection = ShapeDirection::LEFT;
+					currentDirection = FaceDirection::LEFT;
 				}
 				else if (strcmp(dirStr, "RIGHT") == 0) {
-					currentDirection = ShapeDirection::RIGHT;
+					currentDirection = FaceDirection::RIGHT;
 				}
 				else if (strcmp(dirStr, "TOP") == 0) {
-					currentDirection = ShapeDirection::TOP;
+					currentDirection = FaceDirection::TOP;
 				}
 				else if (strcmp(dirStr, "BOTTOM") == 0) {
-					currentDirection = ShapeDirection::BOTTOM;
+					currentDirection = FaceDirection::BOTTOM;
 				}
 				else {
 					Logger::error("Failed to parse shape file " + path + " invalid direction: " + dirStr);
@@ -297,7 +296,7 @@ namespace pixelexplorer::game::block {
 			} break;
 
 			case 'v': {
-				if (currentDirection == ShapeDirection::NONE) {
+				if (currentDirection == FaceDirection::NONE) {
 					Logger::error("Failed to parse shape file " + path + " found vertex before direction");
 					fclose(shape);
 					freeShape();
@@ -316,7 +315,7 @@ namespace pixelexplorer::game::block {
 			} break;
 
 			case 'f': {
-				if (currentDirection == ShapeDirection::NONE) {
+				if (currentDirection == FaceDirection::NONE) {
 					Logger::error("Failed to parse shape file " + path + " found face before direction");
 					fclose(shape);
 					freeShape();

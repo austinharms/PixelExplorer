@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\block\Block.cpp" />
     <ClCompile Include="src\game\block\RenderShape.cpp" />
     <ClCompile Include="src\game\block\Shape.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
@@ -172,6 +173,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\block\Block.h" />
+    <ClInclude Include="src\game\block\BlockInstance.h" />
+    <ClInclude Include="src\game\block\FaceDirection.h" />
     <ClInclude Include="src\game\block\RenderShape.h" />
     <ClInclude Include="src\game\block\Shape.h" />
     <ClInclude Include="src\game\Game.h" />

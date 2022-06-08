@@ -1,0 +1,8 @@
+#ifndef PIXELEXPLORER_GAME_BLOCK_FACEDIRECTION_H_
+#define PIXELEXPLORER_GAME_BLOCK_FACEDIRECTION_H_
+
+namespace pixelexplorer::game::block {
+	enum class FaceDirection { NONE = -1, FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM };
+}
+
+#endif // !PIXELEXPLORER_GAME_BLOCK_FACEDIRECTION_H_
