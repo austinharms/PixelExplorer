@@ -158,6 +158,9 @@
     <ClInclude Include="src\game\block\RenderShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\block\Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Logger.inl">
