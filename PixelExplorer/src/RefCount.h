@@ -9,8 +9,8 @@ namespace pixelexplorer {
 	public:
 		inline RefCount();
 		inline virtual ~RefCount();
-		inline void grab();
-		inline bool drop();
+		inline virtual void grab();
+		inline virtual bool drop();
 		inline uint32_t getRefCount() const;
 
 	private:

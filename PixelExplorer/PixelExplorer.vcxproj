@@ -185,6 +185,7 @@
     <ClInclude Include="src\game\gui\TestScreen.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\RefCount.h" />
+    <ClInclude Include="src\rendering\GLAsset.h" />
     <ClInclude Include="src\rendering\GLObject.fwd.h" />
     <ClInclude Include="src\rendering\GLObject.h" />
     <ClInclude Include="src\rendering\GUIElement.h" />
