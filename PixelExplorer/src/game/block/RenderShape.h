@@ -19,8 +19,8 @@ namespace pixelexplorer::game::block {
 		rendering::Shader* getShader();
 
 	protected:
-		void createGLObjects(rendering::RenderWindow* window);
-		void destroyGLObjects(rendering::RenderWindow* window);
+		void createGLObjects();
+		void destroyGLObjects();
 		void drawMesh();
 
 	private:

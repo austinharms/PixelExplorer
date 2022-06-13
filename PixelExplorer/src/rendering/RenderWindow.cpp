@@ -110,14 +110,16 @@ namespace pixelexplorer::rendering {
 		}
 
 		for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
-			if ((*i)->getHasGLObjects())
-				(*i)->destroyGLObjects(this);
+			if (((GLObject*)*i)->_objectInitialized)
+				((GLObject*)*i)->uninitGLObjects();
+			((GLObject*)*i)->_currentWindow = nullptr;
 			(*i)->drop();
 		}
 
 		for (auto i = _guiElements.begin(); i != _guiElements.end(); ++i) {
-			if ((*i)->getHasGLObjects())
-				(*i)->destroyGLObjects(this);
+			if (((GLObject*)*i)->_objectInitialized)
+				((GLObject*)*i)->uninitGLObjects();
+			((GLObject*)*i)->_currentWindow = nullptr;
 			(*i)->drop();
 		}
 

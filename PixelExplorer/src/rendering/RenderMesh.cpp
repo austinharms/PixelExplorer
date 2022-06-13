@@ -42,14 +42,9 @@ namespace pixelexplorer::rendering {
 		positionMatrix[3] = glm::vec4(pos, 1);
 	}
 
-	void RenderMesh::destroyGLObjects(RenderWindow* window)
+	void RenderMesh::destroyGLObjects()
 	{
-		if (!getHasGLObjects()) { 
-			Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
-			return; 
-		}
-
-		window->dropShader(_shader);
+		getRenderWindow()->dropShader(_shader);
 		_shader = nullptr;
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
@@ -57,16 +52,10 @@ namespace pixelexplorer::rendering {
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
-		setHasGLObjects(false);
 	}
 
-	void RenderMesh::createGLObjects(RenderWindow* window)
+	void RenderMesh::createGLObjects()
 	{
-		if (getHasGLObjects()) { 
-			Logger::warn( __FUNCTION__ " Attempted to overwrite GL objects");
-			return; 
-		}
-
 		float vertices[24] = {
 			 -0.5f, -0.5f, -0.5f,  // 0
 			  0.5f, -0.5f, -0.5f,  // 1
@@ -87,8 +76,7 @@ namespace pixelexplorer::rendering {
 			0, 5, 4, 0, 1, 5,  // Bottom
 		};
 
-		setHasGLObjects(true);
-		_shader = window->loadShader("./assets/shaders/cube.shader");
+		_shader = getRenderWindow()->loadShader("./assets/shaders/cube.shader");
 
 		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);

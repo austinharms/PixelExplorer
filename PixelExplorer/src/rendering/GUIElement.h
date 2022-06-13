@@ -13,12 +13,11 @@ namespace pixelexplorer::rendering {
 		inline virtual ~GUIElement() {}
 		virtual uint32_t getZIndex() { return zIndex; }
 		virtual void drawElement(float windowWidth, float windowHeight, float uiScale) = 0;
+		bool requiresGLObjects() { return false; }
 
 	protected:
 		// 0 is first layer and is behide all other layers
 		uint32_t zIndex;
-
-		bool requiresGLObjects() { return false; }
 	};
 }
 #endif // !PIXELEXPLORE_RENDERING_GUIELEMENT_H_

@@ -69,32 +69,18 @@ namespace pixelexplorer::game::gui {
 
 		}
 
-		inline void createGLObjects(rendering::RenderWindow* window) {
-			if (getHasGLObjects()) {
-				Logger::warn(__FUNCTION__ " Attempted to overwrite GL objects");
-				return;
-			}
-
-			_font = window->loadFont("./assets/fonts/roboto.ttf");
+		inline void createGLObjects() {
+			_font = getRenderWindow()->loadFont("./assets/fonts/roboto.ttf");
 			_backgroundTexture->createGlTexture();
-			setHasGLObjects(true);
 		}
 
-		inline void destroyGLObjects(rendering::RenderWindow* window) {
-			if (!getHasGLObjects()) {
-				Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
-				return;
-			}
-
+		inline void destroyGLObjects() {
 			// Font memory is handled by ImGui
 			_font = nullptr;
-
 			_backgroundTexture->deleteGlTexture();
-			setHasGLObjects(false);
 		}
 
 		inline bool getShouldClose() const { return _shouldClose; }
-
 		inline bool requiresGLObjects() { return true; }
 
 	private:

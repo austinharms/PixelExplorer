@@ -24,7 +24,7 @@ namespace pixelexplorer::game {
 		block::Shape* testShape = new block::Shape("./assets/blocks/shapes/default.shape");
 		block::RenderShape* testMesh = new block::RenderShape(testShape);
 		testShape->drop();
-		_renderWindow->addRenderMesh(testMesh);
+		_renderWindow->addRenderObject(testMesh);
 
 		while (!_renderWindow->shouldClose())
 		{
@@ -44,7 +44,7 @@ namespace pixelexplorer::game {
 		}
 
 		if (testMesh != nullptr) {
-			_renderWindow->removeRenderMesh(testMesh);
+			_renderWindow->removeRenderObject(testMesh);
 			testMesh->drop();
 			testMesh = nullptr;
 		}

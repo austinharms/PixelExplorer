@@ -29,15 +29,9 @@ namespace pixelexplorer::game::block {
 		return _shader;
 	}
 
-	void RenderShape::createGLObjects(rendering::RenderWindow* window)
+	void RenderShape::createGLObjects()
 	{
-		if (getHasGLObjects()) {
-			Logger::warn(__FUNCTION__ " Attempted to overwrite GL objects");
-			return;
-		}
-
-		setHasGLObjects(true);
-		_shader = window->loadShader("./assets/shaders/cube.shader");
+		_shader = getRenderWindow()->loadShader("./assets/shaders/cube.shader");
 
 		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);
@@ -59,14 +53,9 @@ namespace pixelexplorer::game::block {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	void RenderShape::destroyGLObjects(rendering::RenderWindow* window)
+	void RenderShape::destroyGLObjects()
 	{
-		if (!getHasGLObjects()) {
-			Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
-			return;
-		}
-
-		window->dropShader(_shader);
+		getRenderWindow()->dropShader(_shader);
 		_shader = nullptr;
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
@@ -74,7 +63,6 @@ namespace pixelexplorer::game::block {
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
-		setHasGLObjects(false);
 	}
 
 	void RenderShape::drawMesh()
