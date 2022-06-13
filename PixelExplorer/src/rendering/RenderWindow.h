@@ -10,8 +10,9 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "Shader.h"
+#include "GLObject.fwd.h"
+#include "RenderWindow.fwd.h"
 #include "RenderObject.h"
-#include "GLObject.h"
 #include "glm/mat4x4.hpp"
 #include "imgui.h"
 #include "GUIElement.h"
@@ -28,13 +29,15 @@ namespace pixelexplorer::rendering {
 		void drawFrame();
 		Shader* loadShader(std::string path);
 		bool dropShader(Shader* shader);
-		void addRenderMesh(RenderObject* renderObject);
-		void removeRenderMesh(RenderObject* renderObject);
-		void addGUIElement(GUIElement* element);
-		void removeGUIElement(GUIElement* element);
 		inline float getWindowWidth() const { return _windowWidth; }
 		inline float getWindowHeight() const { return _windowHeight; }
 		ImFont* loadFont(const std::string& path);
+
+		// GLObject functions
+		void addRenderObject(RenderObject* renderObject);
+		void removeRenderObject(RenderObject* renderObject);
+		void addGUIElement(GUIElement* element);
+		void removeGUIElement(GUIElement* element);
 
 	private:
 		static void glfwStaticResizeCallback(GLFWwindow* window, int width, int height);

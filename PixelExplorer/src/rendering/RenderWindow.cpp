@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <math.h>
 
+#include "GLObject.h"
 #include "RenderGlobal.h"
 #include "Logger.h"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -97,11 +98,14 @@ namespace pixelexplorer::rendering {
 		_guiElementMutext.lock();
 		_glQueueMutex.lock();
 
-		for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i)
-			(*i)->drop();
+		//for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i) {
+		//	(*i)->_currentWindow = nullptr;
+		//	(*i)->drop();
+		//}
 
 		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
-			(*i)->destroyGLObjects(this);
+			(*i)->uninitGLObjects();
+			(*i)->_currentWindow = nullptr;
 			(*i)->drop();
 		}
 
@@ -194,9 +198,21 @@ namespace pixelexplorer::rendering {
 		return false;
 	}
 
-	void RenderWindow::addRenderMesh(RenderObject* renderObject)
+	void RenderWindow::addRenderObject(RenderObject* renderObject)
 	{
+		if (renderObject->getRenderWindow() != nullptr) {
+			if (renderObject->getRenderWindow() != this) {
+				Logger::warn("Attempted to add RenderObject already assigned to Window, RenderObject not Added");
+			}
+			else {
+				Logger::warn("Attempted to readd RenderObject to Window");
+			}
+
+			return;
+		}
+
 		renderObject->grab();
+		((GLObject*)renderObject)->_currentWindow = this;
 		_renderObjectMutex.lock();
 		_renderObjects.push_front(renderObject);
 		if (renderObject->requiresGLObjects()) {
@@ -208,20 +224,26 @@ namespace pixelexplorer::rendering {
 		_renderObjectMutex.unlock();
 	}
 
-	void RenderWindow::removeRenderMesh(RenderObject* renderObject)
+	void RenderWindow::removeRenderObject(RenderObject* renderObject)
 	{
+		if (((GLObject*)renderObject)->_currentWindow != this) {
+			Logger::error("Attempted to remove RenderObject that is not in the RenderWindow");
+			return;
+		}
+
 		_renderObjectMutex.lock();
 		bool drppedElement = false;
 		for (auto it = _renderObjects.begin(); it != _renderObjects.end(); ++it) {
 			if ((*it) == renderObject) {
 				drppedElement = true;
 				_renderObjects.erase(it);
-				if (renderObject->getHasGLObjects()) {
+				if (((GLObject*)renderObject)->_objectInitialized) {
 					_glQueueMutex.lock();
 					_glDeletionQueue.push_front(renderObject);
 					_glQueueMutex.unlock();
 				}
 				else {
+					((GLObject*)renderObject)->_currentWindow = nullptr;
 					renderObject->drop();
 				}
 				break;
@@ -230,12 +252,24 @@ namespace pixelexplorer::rendering {
 
 		_renderObjectMutex.unlock();
 		if (!drppedElement)
-			Logger::warn("Attempted to remove Render Object that is not in the RenderWindow");
+			Logger::error("Failed to remove RenderObject from RenderWindow, Object not found?");
 	}
 
 	void RenderWindow::addGUIElement(GUIElement* element)
 	{
+		if (element->getRenderWindow() != nullptr) {
+			if (element->getRenderWindow() != this) {
+				Logger::warn("Attempted to add GUIElement already assigned to Window, GUIElement not Added");
+			}
+			else {
+				Logger::warn("Attempted to readd GUIElement to RenderWindow");
+			}
+
+			return;
+		}
+
 		element->grab();
+		((GLObject*)element)->_currentWindow = this;
 		_guiElementMutext.lock();
 		bool insertedElement = false;
 		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it) {
@@ -260,18 +294,24 @@ namespace pixelexplorer::rendering {
 
 	void RenderWindow::removeGUIElement(GUIElement* element)
 	{
+		if (((GLObject*)element)->_currentWindow != this) {
+			Logger::error("Attempted to remove GUIElement that is not in the RenderWindow");
+			return;
+		}
+
 		_guiElementMutext.lock();
 		bool drppedElement = false;
 		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it) {
 			if ((*it) == element) {
 				drppedElement = true;
 				_guiElements.erase(it);
-				if (element->getHasGLObjects()) {
+				if (((GLObject*)element)->_objectInitialized) {
 					_glQueueMutex.lock();
 					_glDeletionQueue.push_front(element);
 					_glQueueMutex.unlock();
 				}
 				else {
+					((GLObject*)element)->_currentWindow = nullptr;
 					element->drop();
 				}
 				break;
@@ -280,7 +320,7 @@ namespace pixelexplorer::rendering {
 
 		_guiElementMutext.unlock();
 		if (!drppedElement)
-			Logger::warn("Attempted to remove GUIElement that is not in the RenderWindow");
+			Logger::error("Failed to remove GUIElement from RenderWindow, Object not found?");
 	}
 
 	ImFont* RenderWindow::loadFont(const std::string& path)
@@ -338,12 +378,13 @@ namespace pixelexplorer::rendering {
 	{
 		_glQueueMutex.lock();
 		for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i) {
-			(*i)->createGLObjects(this);
+			(*i)->initGLObjects();
 		}
 
 		_glCreationQueue.clear();
 		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
-			(*i)->destroyGLObjects(this);
+			(*i)->uninitGLObjects();
+			(*i)->_currentWindow = nullptr;
 			(*i)->drop();
 		}
 
@@ -359,11 +400,11 @@ namespace pixelexplorer::rendering {
 			if (renderObj->meshVisible()) {
 				Shader* shader = renderObj->getShader();
 				if (shader == nullptr) {
-					Logger::error("Render Object returned NULL Shader, Render Object removed");
-					if (renderObj->getHasGLObjects()) {
-						renderObj->destroyGLObjects(this);
-					}
+					Logger::warn("RenderObject returned NULL Shader, RenderObject removed from RenderWindow");
+					if (((GLObject*)renderObj)->_objectInitialized)
+						((GLObject*)renderObj)->uninitGLObjects();
 
+					((GLObject*)renderObj)->_currentWindow = nullptr;
 					renderObj->drop();
 					i = _renderObjects.erase(i);
 					continue;

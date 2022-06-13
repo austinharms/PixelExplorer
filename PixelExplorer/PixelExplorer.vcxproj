@@ -156,6 +156,7 @@
     <ClCompile Include="src\game\block\Shape.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\rendering\GLObject.cpp" />
     <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\RenderMesh.cpp" />
     <ClCompile Include="src\rendering\RenderWindow.cpp" />
@@ -177,11 +178,14 @@
     <ClInclude Include="src\game\block\FaceDirection.h" />
     <ClInclude Include="src\game\block\RenderShape.h" />
     <ClInclude Include="src\game\block\Shape.h" />
+    <ClInclude Include="src\game\chunk\Chunk.h" />
+    <ClInclude Include="src\game\chunk\ChunkRenderMesh.h" />
     <ClInclude Include="src\game\Game.h" />
     <ClInclude Include="src\game\gui\MainMenu.h" />
     <ClInclude Include="src\game\gui\TestScreen.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\RefCount.h" />
+    <ClInclude Include="src\rendering\GLObject.fwd.h" />
     <ClInclude Include="src\rendering\GLObject.h" />
     <ClInclude Include="src\rendering\GUIElement.h" />
     <ClInclude Include="src\rendering\Material.h" />
@@ -189,6 +193,7 @@
     <ClInclude Include="src\rendering\RenderGlobal.h" />
     <ClInclude Include="src\rendering\RenderMesh.h" />
     <ClInclude Include="src\rendering\RenderObject.h" />
+    <ClInclude Include="src\rendering\RenderWindow.fwd.h" />
     <ClInclude Include="src\rendering\RenderWindow.h" />
     <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\rendering\Texture.h" />

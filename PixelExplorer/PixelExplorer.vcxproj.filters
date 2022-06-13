@@ -72,6 +72,9 @@
     <ClCompile Include="src\game\block\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\rendering\GLObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Logger.h">
@@ -168,6 +171,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\block\BlockInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\chunk\Chunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\chunk\ChunkRenderMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\RenderWindow.fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\GLObject.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
