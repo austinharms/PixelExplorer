@@ -1,7 +1,8 @@
-#include "RenderMesh.h"
+#include "ExampleRenderMesh.h"
 
 #include <random>
 
+#include "RenderWindow.h"
 #include "GL/glew.h"
 #include "Logger.h"
 #include "glm/mat4x4.hpp"
@@ -9,7 +10,7 @@
 #include "glm/vec4.hpp"
 
 namespace pixelexplorer::rendering {
-	RenderMesh::RenderMesh()
+	ExampleRenderMesh::ExampleRenderMesh()
 	{
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
@@ -17,34 +18,35 @@ namespace pixelexplorer::rendering {
 		_shader = nullptr;
 		_material = new Material();
 		_material->setProperty("u_Color", glm::vec4(1, 1, 1, 1));
-		positionMatrix = glm::mat4(1.0f);
+		_positionMatrix = glm::mat4(1.0f);
 	}
 
-	RenderMesh::~RenderMesh() {
+	ExampleRenderMesh::~ExampleRenderMesh() {
 		_material->drop();
 	}
 
-	Shader* RenderMesh::getShader()
+	void ExampleRenderMesh::onRender()
 	{
-		return _shader;
-	}
-
-	void RenderMesh::drawMesh()
-	{
-		_material->setProperty("u_Color", glm::vec4((float)rand()/RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1));
+		if (_shader == nullptr) return;
+		_material->setProperty("u_Color", glm::vec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1));
+		RenderWindow* window = getRenderWindow();
+		window->setShader(_shader);
+		_material->applyMaterial(_shader);
+		window->setModelMatrix(_positionMatrix);
 		glBindVertexArray(_vertexArrayGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
 	}
 
-	void RenderMesh::setPosition(const glm::vec3& pos)
+	void ExampleRenderMesh::setPosition(const glm::vec3& pos)
 	{
-		positionMatrix[3] = glm::vec4(pos, 1);
+		_positionMatrix[3] = glm::vec4(pos, 1);
 	}
 
-	void RenderMesh::destroyGLObjects()
+	void ExampleRenderMesh::onTerminate()
 	{
-		getRenderWindow()->dropShader(_shader);
+		if (_shader != nullptr)
+			_shader->drop();
 		_shader = nullptr;
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
@@ -54,7 +56,7 @@ namespace pixelexplorer::rendering {
 		_indexBufferGlId = 0;
 	}
 
-	void RenderMesh::createGLObjects()
+	void ExampleRenderMesh::onInitialize()
 	{
 		float vertices[24] = {
 			 -0.5f, -0.5f, -0.5f,  // 0
@@ -76,7 +78,7 @@ namespace pixelexplorer::rendering {
 			0, 5, 4, 0, 1, 5,  // Bottom
 		};
 
-		_shader = getRenderWindow()->loadShader("./assets/shaders/cube.shader");
+		_shader = getRenderWindow()->getShader("./assets/shaders/cube.shader");
 
 		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);
@@ -94,10 +96,5 @@ namespace pixelexplorer::rendering {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
-	Material* RenderMesh::getMaterial()
-	{
-		return _material;
 	}
 }

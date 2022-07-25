@@ -24,7 +24,7 @@
     <ClCompile Include="src\rendering\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\RenderMesh.cpp">
+    <ClCompile Include="src\rendering\ExampleRenderMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\Material.cpp">
@@ -60,7 +60,7 @@
     <ClCompile Include="src\vendor\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Texture.cpp">
+    <ClCompile Include="src\rendering\GlTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\block\Shape.cpp">
@@ -92,10 +92,7 @@
     <ClInclude Include="src\rendering\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\RenderMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\RenderObject.h">
+    <ClInclude Include="src\rendering\ExampleRenderMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\Material.h">
@@ -149,7 +146,7 @@
     <ClInclude Include="src\rendering\GLObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Texture.h">
+    <ClInclude Include="src\rendering\GLTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\stb_image.h">
@@ -186,6 +183,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\GLAsset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\BasicGLRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

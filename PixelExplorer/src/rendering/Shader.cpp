@@ -8,17 +8,12 @@
 #include "Logger.h"
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "RenderWindow.h"
 
 namespace pixelexplorer::rendering {
-	Shader::Shader(const std::string& path) : _path(path) {
-		_glId = loadShader(_path);
-	}
+	Shader::Shader(const std::string& path) : _path(path), _glId(0) {}
 
-	Shader::~Shader()
-	{
-		unbind();
-		glDeleteProgram(_glId);
-	}
+	Shader::~Shader() { Logger::debug("Shader unloaded: " + _path); }
 
 	uint32_t Shader::compileShader(uint32_t shaderType, const std::string& source) const
 	{
@@ -54,7 +49,6 @@ namespace pixelexplorer::rendering {
 	uint32_t Shader::loadShader(const std::string& path) const
 	{
 		enum class ShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
-
 		std::ifstream stream(path);
 		std::string line;
 		std::stringstream ss[2];
@@ -96,6 +90,7 @@ namespace pixelexplorer::rendering {
 
 		glDeleteShader(vs);
 		glDeleteShader(fs);
+		if (program != 0) Logger::debug("Loaded Shader: " + path);
 		return program;
 	}
 
@@ -155,6 +150,28 @@ namespace pixelexplorer::rendering {
 		int32_t location = getUniformLocation(name);
 		if (location == -1) return;
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	bool Shader::drop()
+	{
+		if (getRefCount() == 2 && getRenderWindow() != nullptr) {
+			getRenderWindow()->removeShader(this);
+			getRenderWindow()->removeGLObject(this);
+		}
+
+		return RefCount::drop();
+	}
+
+	void Shader::onInitialize()
+	{
+		_glId = loadShader(_path);
+	}
+
+	void Shader::onTerminate()
+	{
+		if (isValid())
+			unbind();
+		glDeleteProgram(_glId);
 	}
 
 	void Shader::bind() const

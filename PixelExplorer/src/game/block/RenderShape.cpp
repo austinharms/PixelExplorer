@@ -1,4 +1,7 @@
 #include "RenderShape.h"
+
+#include "rendering/RenderWindow.h"
+
 namespace pixelexplorer::game::block {
 	RenderShape::RenderShape(Shape* shape)
 	{
@@ -8,7 +11,6 @@ namespace pixelexplorer::game::block {
 		_shader = nullptr;
 		_material = new rendering::Material();
 		_material->setProperty("u_Color", glm::vec4(0, 1, 0, 1));
-		positionMatrix = glm::mat4(1.0f);
 		_shape = shape;
 		_shape->grab();
 	}
@@ -19,19 +21,9 @@ namespace pixelexplorer::game::block {
 		_material->drop();
 	}
 
-	rendering::Material* RenderShape::getMaterial()
+	void RenderShape::onInitialize()
 	{
-		return _material;
-	}
-
-	rendering::Shader* RenderShape::getShader()
-	{
-		return _shader;
-	}
-
-	void RenderShape::createGLObjects()
-	{
-		_shader = getRenderWindow()->loadShader("./assets/shaders/cube.shader");
+		_shader = getRenderWindow()->getShader("./assets/shaders/cube.shader");
 
 		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);
@@ -53,9 +45,10 @@ namespace pixelexplorer::game::block {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	void RenderShape::destroyGLObjects()
+	void RenderShape::onTerminate()
 	{
-		getRenderWindow()->dropShader(_shader);
+		if (_shader != nullptr)
+			_shader->drop();
 		_shader = nullptr;
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
@@ -65,8 +58,13 @@ namespace pixelexplorer::game::block {
 		_indexBufferGlId = 0;
 	}
 
-	void RenderShape::drawMesh()
+	void RenderShape::onRender()
 	{
+		if (_shader == nullptr) return;
+		rendering::RenderWindow* window = getRenderWindow();
+		window->setShader(_shader);
+		_material->applyMaterial(_shader);
+		window->setModelMatrix(glm::mat4(1.0));
 		glBindVertexArray(_vertexArrayGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
 		glDrawElements(GL_TRIANGLES, _shape->indexCount[0], GL_UNSIGNED_BYTE, nullptr);

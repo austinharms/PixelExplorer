@@ -2,7 +2,6 @@
 
 #include <assert.h>
 #include <algorithm>
-#include <math.h>
 
 #include "GLObject.h"
 #include "RenderGlobal.h"
@@ -24,6 +23,14 @@ thread_local ImGuiContext* MyImGuiTLS;
 namespace pixelexplorer::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
 	{
+		_glAssets.next = nullptr;
+		_glAssets.prev = nullptr;
+		_glAssets.value = nullptr;
+		_glRenderObjects.prev = nullptr;
+		_glRenderObjects.next = nullptr;
+		_glRenderObjects.value = nullptr;
+		_loadedImGuiContext = false;
+		_currentShader = nullptr;
 		global::windowCreationLock.lock();
 		_spawnThreadId = std::this_thread::get_id();
 		glfwSetErrorCallback(global::glfwErrorCallback);
@@ -94,39 +101,59 @@ namespace pixelexplorer::rendering {
 			Logger::fatal(__FUNCTION__ " must be called from the thread that created the window");
 
 		glfwMakeContextCurrent(_window);
-		_renderObjectMutex.lock();
-		_guiElementMutext.lock();
+		_glRenderObjectsMutex.lock();
+		_glAssetsMutex.lock();
 		_glQueueMutex.lock();
 
-		//for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i) {
-		//	(*i)->_currentWindow = nullptr;
-		//	(*i)->drop();
-		//}
-
-		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
-			(*i)->uninitGLObjects();
-			(*i)->_currentWindow = nullptr;
-			(*i)->drop();
+		for (auto i = _glObjectAddQueue.begin(); i != _glObjectAddQueue.end(); ++i) {
+			GLObject* obj = (*i);
+			obj->removeNode();
+			obj->_attachedWindow = nullptr;
+			obj->_remove = false;
+			obj->drop();
 		}
 
-		for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
-			if (((GLObject*)*i)->_objectInitialized)
-				((GLObject*)*i)->uninitGLObjects();
-			((GLObject*)*i)->_currentWindow = nullptr;
-			(*i)->drop();
+		for (auto i = _glObjectRemoveQueue.begin(); i != _glObjectRemoveQueue.end(); ++i) {
+			GLObject* obj = (*i);
+			if (obj->getInitialized())
+				obj->terminate();
+			obj->removeNode();
+			obj->_attachedWindow = nullptr;
+			obj->_remove = false;
+			obj->drop();
 		}
 
-		for (auto i = _guiElements.begin(); i != _guiElements.end(); ++i) {
-			if (((GLObject*)*i)->_objectInitialized)
-				((GLObject*)*i)->uninitGLObjects();
-			((GLObject*)*i)->_currentWindow = nullptr;
-			(*i)->drop();
+		GLObjectNode* curNode = _glRenderObjects.next;
+		while (curNode != nullptr)
+		{
+			GLObject* obj = curNode->value;
+			curNode = curNode->next;
+			if (obj->getInitialized())
+				obj->terminate();
+			obj->removeNode();
+			obj->_attachedWindow = nullptr;
+			obj->_remove = false;
+			obj->drop();
+		}
+
+		curNode = _glAssets.next;
+		while (curNode != nullptr)
+		{
+			GLObject* obj = curNode->value;
+			curNode = curNode->next;
+			if (obj->getInitialized())
+				obj->terminate();
+			obj->removeNode();
+			obj->_attachedWindow = nullptr;
+			obj->_remove = false;
+			obj->drop();
 		}
 
 		ImGui::SetCurrentContext(_guiContext);
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
+		_guiContext = nullptr;
 
 		glfwDestroyWindow(_window);
 		global::windowCreationLock.lock();
@@ -134,9 +161,10 @@ namespace pixelexplorer::rendering {
 			glfwTerminate();
 			global::glfwInit = false;
 		}
+
 		global::windowCreationLock.unlock();
-		_renderObjectMutex.unlock();
-		_guiElementMutext.unlock();
+		_glRenderObjectsMutex.unlock();
+		_glAssetsMutex.unlock();
 		_glQueueMutex.unlock();
 
 		Logger::debug("Window closed");
@@ -153,19 +181,13 @@ namespace pixelexplorer::rendering {
 		glfwMakeContextCurrent(_window);
 		updateGLQueues();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		drawRenderObjects();
 		glfwPollEvents();
-		drawGui();
+		drawRenderObjects();
 		glfwSwapBuffers(_window);
 	}
 
-	Shader* RenderWindow::loadShader(std::string path)
+	Shader* RenderWindow::getShader(std::string path)
 	{
-		if (std::this_thread::get_id() != _spawnThreadId) {
-			Logger::error(__FUNCTION__ " must be called from the thread that created the window");
-			return nullptr;
-		}
-
 		auto it = _loadedShaders.find(path);
 		if (it != _loadedShaders.end()) {
 			it->second->grab();
@@ -173,34 +195,14 @@ namespace pixelexplorer::rendering {
 		}
 
 		Shader* shader = new Shader(path);
-		if (!shader->isValid()) {
-			shader->drop();
-			return nullptr;
-		}
-
+		addGLAsset(shader);
+		_glAssetsMutex.lock();
 		_loadedShaders.insert({ path, shader });
-		shader->grab();
+		_glAssetsMutex.unlock();
 		return shader;
 	}
 
-	bool RenderWindow::dropShader(Shader* shader)
-	{
-		if (std::this_thread::get_id() != _spawnThreadId) {
-			Logger::error(__FUNCTION__ " must be called from the thread that created the window");
-			return false;
-		}
-
-		shader->drop();
-		if (shader->getRefCount() == 1) {
-			_loadedShaders.erase(shader->_path);
-			assert(shader->drop());
-			return true;
-		}
-
-		return false;
-	}
-
-	void RenderWindow::addRenderObject(RenderObject* renderObject)
+	void RenderWindow::addGLRenderObject(BasicGLRenderObject* renderObject)
 	{
 		if (renderObject->getRenderWindow() != nullptr) {
 			if (renderObject->getRenderWindow() != this) {
@@ -214,121 +216,78 @@ namespace pixelexplorer::rendering {
 		}
 
 		renderObject->grab();
-		((GLObject*)renderObject)->_currentWindow = this;
-		_renderObjectMutex.lock();
-		_renderObjects.push_front(renderObject);
-		if (renderObject->requiresGLObjects()) {
-			_glQueueMutex.lock();
-			_glCreationQueue.push_front(renderObject);
-			_glQueueMutex.unlock();
-		}
-
-		_renderObjectMutex.unlock();
+		GLObject* obj = (GLObject*)renderObject;
+		obj->preInit(this);
+		_glQueueMutex.lock();
+		_glRenderObjectsMutex.lock();
+		_glObjectAddQueue.emplace_back(obj);
+		// TODO: need to sort by renderIndex here
+		obj->insertNodeBetween(&_glRenderObjects, _glRenderObjects.next);
+		_glRenderObjectsMutex.unlock();
+		_glQueueMutex.unlock();
 	}
 
-	void RenderWindow::removeRenderObject(RenderObject* renderObject)
+	void RenderWindow::updateGLAsset(GLAsset* asset)
 	{
-		if (((GLObject*)renderObject)->_currentWindow != this) {
-			Logger::error("Attempted to remove RenderObject that is not in the RenderWindow");
+		MAINTHREADCHECK();
+		asset->update();
+	}
+
+	void RenderWindow::loadImGuiContext()
+	{
+		MAINTHREADCHECK();
+		if (!_loadedImGuiContext) {
+			_loadedImGuiContext = true;
+			ImGui::SetCurrentContext(_guiContext);
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+		}
+	}
+
+	void RenderWindow::setShader(const Shader* shader)
+	{
+		MAINTHREADCHECK();
+		if (shader == nullptr) {
+			Logger::error("Failed to set RenderWindow shader, shader was NULL");
 			return;
 		}
 
-		_renderObjectMutex.lock();
-		bool drppedElement = false;
-		for (auto it = _renderObjects.begin(); it != _renderObjects.end(); ++it) {
-			if ((*it) == renderObject) {
-				drppedElement = true;
-				_renderObjects.erase(it);
-				if (((GLObject*)renderObject)->_objectInitialized) {
-					_glQueueMutex.lock();
-					_glDeletionQueue.push_front(renderObject);
-					_glQueueMutex.unlock();
-				}
-				else {
-					((GLObject*)renderObject)->_currentWindow = nullptr;
-					renderObject->drop();
-				}
-				break;
-			}
-		}
-
-		_renderObjectMutex.unlock();
-		if (!drppedElement)
-			Logger::error("Failed to remove RenderObject from RenderWindow, Object not found?");
+		_currentShader = (Shader*)shader;
+		shader->bind();
 	}
 
-	void RenderWindow::addGUIElement(GUIElement* element)
+	void RenderWindow::setModelMatrix(const glm::mat4& mtx)
 	{
-		if (element->getRenderWindow() != nullptr) {
-			if (element->getRenderWindow() != this) {
-				Logger::warn("Attempted to add GUIElement already assigned to Window, GUIElement not Added");
-			}
-			else {
-				Logger::warn("Attempted to readd GUIElement to RenderWindow");
-			}
+		MAINTHREADCHECK();
+		if (_currentShader != nullptr)
+			_currentShader->setUniformm4fv("u_MVP", _vpMatrix * mtx);
+	}
 
+	void RenderWindow::removeGLObject(GLObject* glObject)
+	{
+		if (glObject->getRenderWindow() != this) {
+			Logger::warn("Attempted to remove RenderObject that is not in the RenderWindow");
 			return;
 		}
 
-		element->grab();
-		((GLObject*)element)->_currentWindow = this;
-		_guiElementMutext.lock();
-		bool insertedElement = false;
-		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it) {
-			if ((*it)->getZIndex() >= element->getZIndex()) {
-				_guiElements.insert(it, element);
-				insertedElement = true;
-				break;
-			}
-		}
-
-		if (!insertedElement)
-			_guiElements.push_back(element);
-
-		if (element->requiresGLObjects()) {
-			_glQueueMutex.lock();
-			_glCreationQueue.push_front(element);
-			_glQueueMutex.unlock();
-		}
-
-		_guiElementMutext.unlock();
+		_glQueueMutex.lock();
+		_glObjectRemoveQueue.emplace_back(glObject);
+		_glQueueMutex.unlock();
 	}
 
-	void RenderWindow::removeGUIElement(GUIElement* element)
+	void RenderWindow::removeShader(Shader* shader)
 	{
-		if (((GLObject*)element)->_currentWindow != this) {
-			Logger::error("Attempted to remove GUIElement that is not in the RenderWindow");
-			return;
-		}
-
-		_guiElementMutext.lock();
-		bool drppedElement = false;
-		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it) {
-			if ((*it) == element) {
-				drppedElement = true;
-				_guiElements.erase(it);
-				if (((GLObject*)element)->_objectInitialized) {
-					_glQueueMutex.lock();
-					_glDeletionQueue.push_front(element);
-					_glQueueMutex.unlock();
-				}
-				else {
-					((GLObject*)element)->_currentWindow = nullptr;
-					element->drop();
-				}
-				break;
-			}
-		}
-
-		_guiElementMutext.unlock();
-		if (!drppedElement)
-			Logger::error("Failed to remove GUIElement from RenderWindow, Object not found?");
+		_glAssetsMutex.lock();
+		if (_loadedShaders.erase(shader->_path) != 1)
+			Logger::warn("Failed to remove " + shader->_path + " from RenderWindow Shader cache");
+		_glAssetsMutex.unlock();
 	}
 
-	ImFont* RenderWindow::loadFont(const std::string& path)
+	ImFont* RenderWindow::getFont(const std::string& path)
 	{
 		if (std::this_thread::get_id() != _spawnThreadId) {
-			Logger::error(__FUNCTION__ " must be called from the thread that created the window");
+			Logger::warn(__FUNCTION__ " must be called from the thread that created the window");
 			return nullptr;
 		}
 
@@ -348,6 +307,30 @@ namespace pixelexplorer::rendering {
 
 		_loadedFonts.emplace(path, font);
 		return font;
+	}
+
+	void RenderWindow::addGLAsset(GLAsset* asset)
+	{
+		if (asset->getRenderWindow() != nullptr) {
+			if (asset->getRenderWindow() != this) {
+				Logger::warn("Attempted to add GLAsset already assigned to Window, GLAsset not Added");
+			}
+			else {
+				Logger::warn("Attempted to readd GLAsset to Window");
+			}
+
+			return;
+		}
+
+		asset->grab();
+		GLObject* obj = (GLObject*)asset;
+		obj->preInit(this);
+		_glQueueMutex.lock();
+		_glAssetsMutex.lock();
+		_glObjectAddQueue.emplace_back(obj);
+		obj->insertNodeBetween(&_glAssets, _glAssets.next);
+		_glAssetsMutex.unlock();
+		_glQueueMutex.unlock();
 	}
 
 	void RenderWindow::glfwStaticResizeCallback(GLFWwindow* window, int width, int height)
@@ -379,64 +362,67 @@ namespace pixelexplorer::rendering {
 	void RenderWindow::updateGLQueues()
 	{
 		_glQueueMutex.lock();
-		for (auto i = _glCreationQueue.begin(); i != _glCreationQueue.end(); ++i) {
-			(*i)->initGLObjects();
+		for (auto i = _glObjectAddQueue.begin(); i != _glObjectAddQueue.end(); ++i)
+			(*i)->initialize();
+		_glObjectAddQueue.clear();
+		for (auto i = _glObjectRemoveQueue.begin(); i != _glObjectRemoveQueue.end(); ++i) {
+			GLObject* obj = (*i);
+			if (obj->getInitialized())
+				obj->terminate();
+			obj->removeNode();
+			obj->_attachedWindow = nullptr;
+			obj->_remove = false;
+			obj->drop();
 		}
 
-		_glCreationQueue.clear();
-		for (auto i = _glDeletionQueue.begin(); i != _glDeletionQueue.end(); ++i) {
-			(*i)->uninitGLObjects();
-			(*i)->_currentWindow = nullptr;
-			(*i)->drop();
-		}
-
-		_glDeletionQueue.clear();
+		_glObjectRemoveQueue.clear();
 		_glQueueMutex.unlock();
 	}
 
 	void RenderWindow::drawRenderObjects()
 	{
-		glm::mat4 vp(_projectionMatrix * _viewMatrix);
-		for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
-			RenderObject* renderObj = *i;
-			if (renderObj->meshVisible()) {
-				Shader* shader = renderObj->getShader();
-				if (shader == nullptr) {
-					Logger::warn("RenderObject returned NULL Shader, RenderObject removed from RenderWindow");
-					if (((GLObject*)renderObj)->_objectInitialized)
-						((GLObject*)renderObj)->uninitGLObjects();
 
-					((GLObject*)renderObj)->_currentWindow = nullptr;
-					renderObj->drop();
-					i = _renderObjects.erase(i);
-					continue;
-				}
+		//glm::mat4 vp(_projectionMatrix * _viewMatrix);
+		//for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
+		//	RenderObject* renderObj = *i;
+		//	if (renderObj->meshVisible()) {
+		//		Shader* shader = renderObj->getShader();
+		//		if (shader == nullptr) {
+		//			Logger::warn("RenderObject returned NULL Shader, RenderObject removed from RenderWindow");
+		//			if (((GLObject*)renderObj)->_objectInitialized)
+		//				((GLObject*)renderObj)->uninitGLObjects();
 
-				shader->bind();
-				Material* material = renderObj->getMaterial();
-				if (material != nullptr)
-					material->applyMaterial(shader);
-				shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
-				renderObj->drawMesh();
-			}
+		//			((GLObject*)renderObj)->_currentWindow = nullptr;
+		//			renderObj->drop();
+		//			i = _renderObjects.erase(i);
+		//			continue;
+		//		}
+
+		//		shader->bind();
+		//		Material* material = renderObj->getMaterial();
+		//		if (material != nullptr)
+		//			material->applyMaterial(shader);
+		//		shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
+		//		renderObj->drawMesh();
+		//	}
+		//}
+
+		_vpMatrix = _projectionMatrix * _viewMatrix;
+		GLObjectNode* curNode = _glRenderObjects.next;
+		while (curNode != nullptr)
+		{
+			((BasicGLRenderObject*)(curNode->value))->onRender();
+			curNode = curNode->next;
 		}
-	}
 
-	void RenderWindow::drawGui()
-	{
-		ImGui::SetCurrentContext(_guiContext);
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		if (_loadedImGuiContext) {
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			_loadedImGuiContext = false;
+		}
 
-		//float widthScale = _windowWidth / 600;
-		//float heightScale = _windowHeight / 400;
-		float scale = fminf(_windowWidth / 600, _windowHeight / 400);
-		_guiElementMutext.lock();
-		for (auto it = _guiElements.begin(); it != _guiElements.end(); ++it)
-			(*it)->drawElement(_windowWidth, _windowHeight, scale);
-		_guiElementMutext.unlock();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		if (_currentShader != nullptr)
+			_currentShader->unbind();
+		_currentShader = nullptr;
 	}
 }

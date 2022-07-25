@@ -1,24 +1,27 @@
 #include <stdint.h>
 #include <string>
 
-#include "RefCount.h"
+#include "GLAsset.h"
 #include "stb_image.h"
 
-#ifndef PIXELEXPLORER_RENDERING_TEXTURE_H_
-#define PIXELEXPLORER_RENDERING_TEXTURE_H_
+#ifndef PIXELEXPLORER_RENDERING_GLTEXTURE_H_
+#define PIXELEXPLORER_RENDERING_GLTEXTURE_H_
 namespace pixelexplorer::rendering {
-	class Texture : public RefCount
+	class GLTexture : public GLAsset
 	{
 	public:
-		Texture(uint32_t width, uint32_t height);
-		Texture(const std::string& path);
-		virtual ~Texture();
-		void createGlTexture();
-		void deleteGlTexture();
+		GLTexture(uint32_t width, uint32_t height);
+		GLTexture(const std::string& path);
+		virtual ~GLTexture();
 		void bind(uint8_t slot = 0);
 		inline uint32_t getGlId() const { return _glTextureId; }
 		inline uint32_t getWidth() const { return _width; }
 		inline uint32_t getHeight() const { return _height; }
+
+	protected:
+		void onInitialize() override;
+		void onTerminate() override;
+		void onUpdate() override;
 
 	private:
 		uint8_t* _pixelBuffer;
@@ -26,7 +29,6 @@ namespace pixelexplorer::rendering {
 		uint32_t _width;
 		uint32_t _height;
 		bool _stbImage;
-		bool _hasGlObject;
 	};
 }
 #endif // !PIXELEXPLORER_RENDERING_TEXTURE_H_

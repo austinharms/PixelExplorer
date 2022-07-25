@@ -7,14 +7,18 @@ namespace pixelexplorer::rendering {
 	class GLAsset : public GLObject
 	{
 	public:
-		inline GLAsset() {}
+		inline GLAsset() { _updateFlag = false; }
 		inline virtual ~GLAsset() {}
-		inline bool drop() {
-			if (getRefCount() == 2)
-				getRenderWindow();
+		inline bool getUpdateFlag() const { return _updateFlag; }
 
-			return RefCount::drop();
-		}
+	protected:
+		virtual inline void onUpdate() {}
+		virtual inline void setUpdateFlag() { _updateFlag = true; }
+
+	private:
+		friend class RenderWindow;
+		bool _updateFlag;
+		inline void update() { _updateFlag = false; onUpdate(); }
 	};
 }
 #endif // !PIXELEXPLORER_RENDERING_GLASSET_H_

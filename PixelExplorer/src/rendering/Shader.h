@@ -6,17 +6,16 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
-#include "RefCount.h"
+#include "GLAsset.h"
+
 #ifndef PIXELEXPLORE_RENDERING_SHADER_H_
 #define PIXELEXPLORE_RENDERING_SHADER_H_
 namespace pixelexplorer::rendering {
-	class Shader : private RefCount
+	class Shader : public GLAsset
 	{
 		friend class RenderWindow;
 	public:
 		virtual ~Shader();
-		inline void grab() { RefCount::grab(); }
-		inline uint32_t getRefCount() const { return RefCount::getRefCount(); }
 		inline bool isValid() const { return _glId != 0; }
 		inline const std::string getPath() const { return _path; }
 		inline uint32_t getGLId() const { return _glId; }
@@ -26,6 +25,11 @@ namespace pixelexplorer::rendering {
 		void setUniform3fv(const std::string& name, const glm::vec3& value);
 		void setUniform4fv(const std::string& name, const glm::vec4& value);
 		void setUniformm4fv(const std::string& name, const glm::mat4& value);
+		bool drop() override;
+
+	protected:
+		void onInitialize() override;
+		void onTerminate() override;
 
 	private:
 		Shader(const std::string& path);
@@ -34,6 +38,8 @@ namespace pixelexplorer::rendering {
 		int32_t getUniformLocation(const std::string& name);
 		void bind() const;
 		void unbind() const;
+		inline void setRemoveFlag() final {}
+		inline void setUpdateFlag() final {}
 
 		uint32_t _glId;
 		const std::string _path;

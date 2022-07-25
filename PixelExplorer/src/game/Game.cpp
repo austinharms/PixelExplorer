@@ -1,7 +1,6 @@
 #include "Game.h"
 
 #include "Logger.h"
-#include "rendering/RenderMesh.h"
 #include "gui/MainMenu.h"
 #include "block/Shape.h"
 #include "block/RenderShape.h"
@@ -19,17 +18,16 @@ namespace pixelexplorer::game {
 		_renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore");
 
 		gui::MainMenu* mainMenu = new gui::MainMenu();
-		_renderWindow->addGUIElement(mainMenu);
+		_renderWindow->addGLRenderObject(mainMenu);
 
 		block::Shape* testShape = new block::Shape("./assets/blocks/shapes/default.shape");
 		block::RenderShape* testMesh = new block::RenderShape(testShape);
 		testShape->drop();
-		_renderWindow->addRenderObject(testMesh);
+		_renderWindow->addGLRenderObject(testMesh);
 
 		while (!_renderWindow->shouldClose())
 		{
-			if (mainMenu != nullptr && mainMenu->getShouldClose()) {
-				_renderWindow->removeGUIElement(mainMenu);
+			if (mainMenu != nullptr && mainMenu->getShouldClose()) {;
 				mainMenu->drop();
 				mainMenu = nullptr;
 			}
@@ -38,13 +36,11 @@ namespace pixelexplorer::game {
 		}
 
 		if (mainMenu != nullptr) {
-			_renderWindow->removeGUIElement(mainMenu);
 			mainMenu->drop();
 			mainMenu = nullptr;
 		}
 
 		if (testMesh != nullptr) {
-			_renderWindow->removeRenderObject(testMesh);
 			testMesh->drop();
 			testMesh = nullptr;
 		}

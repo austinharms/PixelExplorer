@@ -5,7 +5,7 @@
 #include "imgui.h"
 #include "rendering/RenderWindow.h"
 #include "rendering/GUIElement.h"
-#include "rendering/Texture.h"
+#include "rendering/GLTexture.h"
 
 #ifndef PIXELEXPLORE_GAME_GUI_TESTSCREEN_H_
 #define PIXELEXPLORE_GAME_GUI_TESTSCREEN_H_
@@ -13,7 +13,7 @@ namespace pixelexplorer::game::gui {
 	class TestScreen : public rendering::GUIElement
 	{
 	public:
-		inline TestScreen() : rendering::GUIElement(100) {
+		inline TestScreen() {
 			_shouldClose = false;
 			_removeTestMesh = false;
 			_clickCounter = 0;
@@ -28,12 +28,17 @@ namespace pixelexplorer::game::gui {
 			_windowFlags |= ImGuiWindowFlags_UnsavedDocument;
 			//_windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 			//_windowFlags |= ImGuiWindowFlags_MenuBar;
-			_texture = new rendering::Texture("./assets/textures/testbackground.png");
+			_texture = new rendering::GLTexture("./assets/textures/testbackground.png");
 		}
 
 		inline virtual ~TestScreen() { _texture->drop(); }
 
-		inline void drawElement(float windowWidth, float windowHeight, float uiScale) {
+		inline void onInitialize() override {
+			if (_texture->getRenderWindow() == nullptr)
+				getRenderWindow()->addGLAsset(_texture);
+		}
+
+		inline void onRenderGui(float windowWidth, float windowHeight, float uiScale) override {
 			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 			ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
 			ImGui::Begin("Main Menu", nullptr, _windowFlags);
@@ -54,28 +59,8 @@ namespace pixelexplorer::game::gui {
 		inline bool getRemoveTestMesh() const { return _removeTestMesh; }
 		inline bool requiresGLObjects() { return true; }
 
-		inline void createGLObjects(rendering::RenderWindow* window) {
-			if (getHasGLObjects()) {
-				Logger::warn(__FUNCTION__ " Attempted to overwrite GL objects");
-				return;
-			}
-
-			_texture->createGlTexture();
-			setHasGLObjects(true);
-		}
-
-		inline void destroyGLObjects(rendering::RenderWindow* window) {
-			if (!getHasGLObjects()) {
-				Logger::warn(__FUNCTION__ " Attempted to delete empty GL objects");
-				return;
-			}
-
-			_texture->deleteGlTexture();
-			setHasGLObjects(false);
-		}
-
 	private:
-		rendering::Texture* _texture;
+		rendering::GLTexture* _texture;
 		uint32_t _clickCounter;
 		ImGuiWindowFlags _windowFlags;
 		bool _shouldClose;
