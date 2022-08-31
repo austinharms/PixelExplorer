@@ -3,47 +3,97 @@
 #include "RenderWindow.h"
 
 namespace pixelexplorer::rendering {
-	GLObject::GLObject()
+	GLObject::GLObject(int16_t priority)
 	{
+		_priority = priority;
 		_attachedWindow = nullptr;
 		_initialized = false;
-		_remove = false;
-		_node.prev = nullptr;
-		_node.next = nullptr;
-		_node.value = this;
+		_dirty = false;
 	}
 
 	GLObject::~GLObject() {
+		// this should never happen, but just in case log it
 		if (_attachedWindow != nullptr) {
 			if (_initialized) {
-				Logger::error("GLObject destroyed without being removed from window, GLObjects not deallocated");
+				Logger::error(__FUNCTION__" GLObject destroyed without being removed from window, GLObjects not deallocated");
 			}
 			else {
-				Logger::error("GLObject destroyed without being removed from window");
+				Logger::error(__FUNCTION__" GLObject destroyed without being removed from window");
 			}
 		}
 	}
-	
+
 	bool GLObject::drop() {
-		if (getRefCount() == 2 && _attachedWindow)
-			setRemoveFlag();
-		return RefCount::drop();
+		bool dropped = RefCount::drop();
+		if (!dropped && getRefCount() == 1 && _attachedWindow)
+			_attachedWindow->terminateGLObject(this);
+		return dropped;
 	}
 
-	void GLObject::setRemoveFlag()
+	void GLObject::addDependency(GLObject* dependency, int16_t priority)
 	{
-		if (_remove) return;
-		if(_attachedWindow == nullptr) {
-			Logger::warn(__FUNCTION__" was called on uninitialized object");
+		if (dependency == nullptr) return;
+		dependency->grab();
+		if (hasDependency(dependency)) {
+			Logger::warn(__FUNCTION__" called with duplicate dependency");
+			dependency->drop();
 			return;
 		}
 
-		_remove = true;
-		_attachedWindow->removeGLObject(this);
+		if (!dependency->getAttached()) {
+			Logger::warn(__FUNCTION__" added unregistering dependency, registering dependency");
+			getRenderWindow()->registerGLObject(dependency);
+		}
+		else if (dependency->getRenderWindow() != getRenderWindow()) {
+			Logger::error(__FUNCTION__" called with dependency registered to a different RenderWindow, dependency not added");
+			dependency->drop();
+			return;
+		}
+
+		std::list<GLObject*>::iterator it = _dependencies.begin();
+		while (it != _dependencies.end() && (*it)->_priority < priority) ++it;
+		_dependencies.emplace(it, dependency);
 	}
 
-	void GLObject::preInit(RenderWindow* window) {
+	void GLObject::removeDependency(GLObject* dependency) {
+		if (dependency == nullptr) return;
+		for (auto it = _dependencies.begin(); it != _dependencies.end(); ++it) {
+			if ((*it) == dependency) {
+				(*it)->drop();
+				_dependencies.erase(it);
+				return;
+			}
+		}
+
+		Logger::warn(__FUNCTION__" failed to remove dependency, dependency did not exist");
+		return;
+	}
+
+	void GLObject::clearDependencies() {
+		auto it = _dependencies.begin();
+		while (it != _dependencies.end()) {
+			(*it)->drop();
+			it = _dependencies.erase(it);
+		}
+	}
+
+	bool GLObject::hasDependency(GLObject* dependency, bool recursive) const {
+		for (const GLObject* dep : _dependencies) {
+			if (dep == dependency) return true;
+		}
+
+		if (recursive) {
+			for (const GLObject* dep : _dependencies) {
+				if (dep->hasDependency(dependency, true)) return true;
+			}
+		}
+
+		return false;
+	}
+
+	void GLObject::attach(RenderWindow* window) {
 		_attachedWindow = window;
+		onAttach();
 	}
 
 	void GLObject::initialize()
@@ -53,8 +103,9 @@ namespace pixelexplorer::rendering {
 			return;
 		}
 
+		// this should never happen, but just in case log it
 		if (_attachedWindow == nullptr) {
-			Logger::warn(__FUNCTION__" was called with NULL RenderWindow, object not initialize");
+			Logger::error(__FUNCTION__" was called with NULL RenderWindow, object not initialize");
 			return;
 		}
 
@@ -64,35 +115,43 @@ namespace pixelexplorer::rendering {
 
 	void GLObject::terminate()
 	{
-		if (!_initialized && _attachedWindow == nullptr) {
-			Logger::warn(__FUNCTION__" was called on uninitialized object");
+		// this should never happen, but just in case log it
+		if (!_initialized && !getAttached()) {
+			Logger::error(__FUNCTION__" was called on uninitialized object");
 			return;
 		}
 
-		if (_initialized) onTerminate();
-		_initialized = false;
+		
+		if (_initialized)
+		{
+			_initialized = false;
+			onTerminate();
+		}
+
+		clearDependencies();
 		_attachedWindow = nullptr;
 	}
 
-	void GLObject::removeNode()
-	{
-		if (_node.prev != nullptr)
-			_node.prev->next = _node.next;
-		if (_node.next != nullptr)
-			_node.next->prev = _node.prev;
+	void GLObject::update() {
+		// this should never happen, but just in case log it
+		if (!getAttached()) {
+			Logger::error(__FUNCTION__" was called on uninitialized object");
+			return;
+		}
 
-		_node.next = nullptr;
-		_node.prev = nullptr;
-	}
+		std::list<GLObject*>::iterator it = _dependencies.begin();
+		while (it != _dependencies.end() && (*it)->_priority < 0)
+		{
+			(*it)->update();
+			++it;
+		}
 
-	void GLObject::insertNodeBetween(GLObjectNode* prev, GLObjectNode* next)
-	{
-		_node.prev = prev;
-		if (prev != nullptr)
-			prev->next = &_node;
-
-		_node.next = next;
-		if (next != nullptr)
-			next->prev = &_node;
+		if (!_initialized) initialize();
+		onUpdate();
+		while (it != _dependencies.end())
+		{
+			(*it)->update();
+			++it;
+		}
 	}
 }

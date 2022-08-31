@@ -182,10 +182,10 @@
     <ClInclude Include="src\rendering\GLObject.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GLAsset.h">
+    <ClInclude Include="src\rendering\GLNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\BasicGLRenderObject.h">
+    <ClInclude Include="src\rendering\GLRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

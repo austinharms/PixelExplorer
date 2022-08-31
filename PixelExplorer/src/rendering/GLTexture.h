@@ -1,13 +1,13 @@
 #include <stdint.h>
 #include <string>
 
-#include "GLAsset.h"
+#include "GLObject.h"
 #include "stb_image.h"
 
 #ifndef PIXELEXPLORER_RENDERING_GLTEXTURE_H_
 #define PIXELEXPLORER_RENDERING_GLTEXTURE_H_
 namespace pixelexplorer::rendering {
-	class GLTexture : public GLAsset
+	class GLTexture : public GLObject
 	{
 	public:
 		GLTexture(uint32_t width, uint32_t height);

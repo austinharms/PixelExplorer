@@ -181,14 +181,14 @@
     <ClInclude Include="src\game\chunk\Chunk.h" />
     <ClInclude Include="src\game\chunk\ChunkRenderMesh.h" />
     <ClInclude Include="src\game\Game.h" />
+    <ClInclude Include="src\rendering\GLRenderObject.h" />
     <ClInclude Include="src\game\gui\MainMenu.h" />
     <ClInclude Include="src\game\gui\TestScreen.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\RefCount.h" />
-    <ClInclude Include="src\rendering\BasicGLRenderObject.h" />
-    <ClInclude Include="src\rendering\GLAsset.h" />
     <ClInclude Include="src\rendering\GLObject.fwd.h" />
     <ClInclude Include="src\rendering\GLObject.h" />
+    <ClInclude Include="src\rendering\GLNode.h" />
     <ClInclude Include="src\rendering\GUIElement.h" />
     <ClInclude Include="src\rendering\Material.h" />
     <ClInclude Include="src\rendering\MaterialProperties.h" />

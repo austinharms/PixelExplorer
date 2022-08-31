@@ -27,7 +27,8 @@ namespace pixelexplorer::game {
 
 		while (!_renderWindow->shouldClose())
 		{
-			if (mainMenu != nullptr && mainMenu->getShouldClose()) {;
+			if (mainMenu != nullptr && mainMenu->getShouldClose()) {
+				_renderWindow->removeGLRenderObject(mainMenu);
 				mainMenu->drop();
 				mainMenu = nullptr;
 			}

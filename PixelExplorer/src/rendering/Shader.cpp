@@ -11,9 +11,10 @@
 #include "RenderWindow.h"
 
 namespace pixelexplorer::rendering {
-	Shader::Shader(const std::string& path) : _path(path), _glId(0) {}
+	// defaults to -10000 priority (pre onUpdate)
+	Shader::Shader(const std::string& path) : GLObject(-10000), _path(path), _glId(0) {}
 
-	Shader::~Shader() { Logger::debug("Shader unloaded: " + _path); }
+	Shader::~Shader() { Logger::debug(__FUNCTION__" Shader unloaded: " + _path); }
 
 	uint32_t Shader::compileShader(uint32_t shaderType, const std::string& source) const
 	{
@@ -30,13 +31,13 @@ namespace pixelexplorer::rendering {
 			char* errorString = (char*)malloc(errorLength);
 			glGetShaderInfoLog(id, errorLength, &errorLength, errorString);
 			if (shaderType == GL_VERTEX_SHADER) {
-				Logger::error(std::string("Failed to compile Vertex shader, ") + errorString);
+				Logger::error(std::string(__FUNCTION__" Failed to compile Vertex shader, ") + errorString);
 			}
 			else if (shaderType == GL_FRAGMENT_SHADER) {
-				Logger::error(std::string("Failed to compile Fragment shader, ") + errorString);
+				Logger::error(std::string(__FUNCTION__" Failed to compile Fragment shader, ") + errorString);
 			}
 			else {
-				Logger::error(std::string("Failed to compile shader, ") + errorString);
+				Logger::error(std::string(__FUNCTION__" Failed to compile shader, ") + errorString);
 			}
 
 			glDeleteShader(id);
@@ -62,7 +63,7 @@ namespace pixelexplorer::rendering {
 					type = ShaderType::FRAGMENT;
 				}
 				else {
-					Logger::error("Found unknow shader type '" + line + "' when loading shader from " + path);
+					Logger::error(__FUNCTION__" Found unknow shader type '" + line + "' when loading shader from " + path);
 					return 0;
 				}
 			}
@@ -72,7 +73,7 @@ namespace pixelexplorer::rendering {
 		}
 
 		if (type == ShaderType::NONE) {
-			Logger::error("Failed to Load Shader, File Empty or Not Found, Path " + path);
+			Logger::error(__FUNCTION__" Failed to Load Shader, File Empty or Not Found, Path " + path);
 			return 0;
 		}
 
@@ -90,7 +91,7 @@ namespace pixelexplorer::rendering {
 
 		glDeleteShader(vs);
 		glDeleteShader(fs);
-		if (program != 0) Logger::debug("Loaded Shader: " + path);
+		if (program != 0) Logger::debug(__FUNCTION__" Loaded Shader: " + path);
 		return program;
 	}
 
@@ -104,7 +105,7 @@ namespace pixelexplorer::rendering {
 			int32_t u = glGetUniformLocation(_glId, name.c_str());
 			_uniforms.insert({ name, u });
 			if (u == -1)
-				Logger::warn("Failed to find uniform " + name + " in shader " + _path);
+				Logger::warn(__FUNCTION__" Failed to find uniform " + name + " in shader " + _path);
 
 			return u;
 		}
@@ -152,26 +153,26 @@ namespace pixelexplorer::rendering {
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 
-	bool Shader::drop()
-	{
-		if (getRefCount() == 2 && getRenderWindow() != nullptr) {
-			getRenderWindow()->removeShader(this);
-			getRenderWindow()->removeGLObject(this);
-		}
-
-		return RefCount::drop();
-	}
-
 	void Shader::onInitialize()
 	{
 		_glId = loadShader(_path);
 	}
 
+	void Shader::onUpdate() {
+		getRenderWindow()->setActiveShader(this);
+	}
+
 	void Shader::onTerminate()
 	{
-		if (isValid())
+		RenderWindow* window = getRenderWindow();
+		window->removeShaderFromCache(this);
+		if (window->getActiveShader() == this) {
+			window->setActiveShader(nullptr);
 			unbind();
+		}
+
 		glDeleteProgram(_glId);
+		_glId = 0;
 	}
 
 	void Shader::bind() const

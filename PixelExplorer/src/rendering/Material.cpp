@@ -1,10 +1,11 @@
 #include "Material.h"
 #include "Logger.h"
+#include "Shader.h"
+#include "RenderWindow.h"
 
 namespace pixelexplorer::rendering {
-	Material::Material()
-	{
-	}
+	// GLObject priority is -9000 (pre onUpdate, after shader onUpdate)
+	Material::Material() : GLObject(-9000) {}
 
 	Material::~Material()
 	{
@@ -12,8 +13,10 @@ namespace pixelexplorer::rendering {
 			delete it->second;
 	}
 
-	void Material::applyMaterial(Shader* shader)
+	void Material::onUpdate()
 	{
+		Shader* shader = getRenderWindow()->getActiveShader();
+		if (shader == nullptr) return;
 		for (auto it = _properties.begin(); it != _properties.end(); ++it)
 			it->second->applyProperty(shader, it->first);
 	}
@@ -22,7 +25,7 @@ namespace pixelexplorer::rendering {
 	{
 		auto it = _properties.find(propertyName);
 		if (it == _properties.end()) {
-			Logger::warn("Attempted to remove non existent material property " + propertyName);
+			Logger::warn(__FUNCTION__" Attempted to remove non existent material property " + propertyName);
 		}
 		else {
 			_properties.erase(it);

@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 #include "Shape.h"
-#include "rendering/BasicGLRenderObject.h"
+#include "rendering/GLRenderObject.h"
 #include "rendering/Shader.h"
 #include "rendering/RenderWindow.h"
 #include "rendering/Material.h"
@@ -9,7 +9,7 @@
 #ifndef PIEXELEXPLORER_GAME_BLOCK_RENDERSHAPE_H_
 #define PIEXELEXPLORER_GAME_BLOCK_RENDERSHAPE_H_
 namespace pixelexplorer::game::block {
-	class RenderShape : public rendering::BasicGLRenderObject
+	class RenderShape : public rendering::GLRenderObject
 	{
 	public:
 		RenderShape(Shape* shape);
@@ -18,12 +18,10 @@ namespace pixelexplorer::game::block {
 	protected:
 		void onInitialize() override;
 		void onTerminate() override;
-		void onRender() override;
+		void onUpdate() override;
 
 	private:
-		rendering::Shader* _shader;
 		Shape* _shape;
-		rendering::Material* _material;
 		uint32_t _vertexArrayGlId;
 		uint32_t _vertexBufferGlId;
 		uint32_t _indexBufferGlId;

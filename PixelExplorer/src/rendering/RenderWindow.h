@@ -12,9 +12,9 @@
 
 #include "RefCount.h"
 #include "RenderWindow.fwd.h"
+#include "GLNode.h"
 #include "GLObject.fwd.h"
-#include "BasicGLRenderObject.h"
-#include "GLAsset.h"
+#include "GLRenderObject.h"
 #include "Shader.h"
 #include "glm/mat4x4.hpp"
 
@@ -26,22 +26,24 @@ namespace pixelexplorer::rendering {
 	public:
 		RenderWindow(int32_t width, int32_t height, const char* title);
 		virtual ~RenderWindow();
-
-		inline float getWindowWidth() const { return _windowWidth; }
-		inline float getWindowHeight() const { return _windowHeight; }
-		inline float getWindowScale() const { return fminf(_windowWidth / 600, _windowHeight / 400); }
 		bool shouldClose() const;
-
 		void drawFrame();
 		Shader* getShader(std::string path);
 		ImFont* getFont(const std::string& path);
-		void addGLAsset(GLAsset* asset);
-		void addGLRenderObject(BasicGLRenderObject* renderObject);
-		void updateGLAsset(GLAsset* asset);
-
+		void registerGLObject(GLObject* obj);
+		void addGLRenderObject(GLRenderObject* renderObject);
+		void removeGLRenderObject(GLRenderObject* renderObject);
 		void loadImGuiContext();
-		void setShader(const Shader* shader);
+		void setActiveShader(const Shader* shader);
 		void setModelMatrix(const glm::mat4& mtx);
+
+		inline float getWindowWidth() const { return _windowWidth; }
+
+		inline float getWindowHeight() const { return _windowHeight; }
+
+		inline float getWindowScale() const { return fminf(_windowWidth / 600, _windowHeight / 400); }
+
+		inline Shader* getActiveShader() const { return _currentShader; }
 
 	private:
 		friend class GLObject;
@@ -57,13 +59,11 @@ namespace pixelexplorer::rendering {
 		std::thread::id _spawnThreadId;
 		std::unordered_map<std::string, Shader*> _loadedShaders;
 		std::unordered_map<std::string, ImFont*> _loadedFonts;
-		GLObjectNode _glAssets;
-		GLObjectNode _glRenderObjects;
-		std::list<GLObject*> _glObjectAddQueue;
-		std::list<GLObject*> _glObjectRemoveQueue;
+		GLNode<GLRenderObject> _glRenderObjects;
+		GLNode<GLObject> _staticGLObjects;
+		GLNode<GLObject> _staticGLObjectsRemoveQueue;
 		std::recursive_mutex _glRenderObjectsMutex;
-		std::recursive_mutex _glAssetsMutex;
-		std::recursive_mutex _glQueueMutex;
+		std::recursive_mutex _staticGLObjectsMutex;
 		glm::mat4 _viewMatrix;
 		glm::mat4 _projectionMatrix;
 		// the view and projection matrix multiplied together
@@ -73,8 +73,9 @@ namespace pixelexplorer::rendering {
 
 		void glfwResizeCallback(uint32_t width, uint32_t height);
 		void glfwFocusCallback(bool focused);
-		void removeGLObject(GLObject* glObject);
-		void removeShader(Shader* shader);
+		void terminateGLObject(GLObject* glObject);
+		void terminateGLObjectUnsafe(GLObject* glObject);
+		void removeShaderFromCache(Shader* shader);
 		void updateGLQueues();
 		void drawRenderObjects();
 	};

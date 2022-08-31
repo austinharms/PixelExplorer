@@ -2,8 +2,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "RefCount.h"
-#include "Shader.h"
+#include "GLObject.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -13,12 +12,11 @@
 #ifndef PIXELEXPLORE_RENDERING_MATERIAL_H_
 #define PIXELEXPLORE_RENDERING_MATERIAL_H_
 namespace pixelexplorer::rendering {
-	class Material : public RefCount
+	class Material : public GLObject
 	{
 	public:
 		Material();
 		virtual ~Material();
-		void applyMaterial(Shader* shader);
 		void removeProperty(const std::string& propertyName);
 		void setProperty(const std::string& propertyName, float value);
 		void setProperty(const std::string& propertyName, int32_t value);
@@ -27,6 +25,9 @@ namespace pixelexplorer::rendering {
 		void setProperty(const std::string& propertyName, glm::vec4 value);
 		void setProperty(const std::string& propertyName, glm::mat4 value);
 		void setProperty(const std::string& propertyName, MaterialProperty* prop);
+
+	protected:
+		void onUpdate() override;
 
 	private:
 		std::unordered_map<std::string, MaterialProperty*> _properties;

@@ -6,12 +6,12 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
-#include "GLAsset.h"
+#include "GLObject.h"
 
 #ifndef PIXELEXPLORE_RENDERING_SHADER_H_
 #define PIXELEXPLORE_RENDERING_SHADER_H_
 namespace pixelexplorer::rendering {
-	class Shader : public GLAsset
+	class Shader : public GLObject
 	{
 		friend class RenderWindow;
 	public:
@@ -25,10 +25,10 @@ namespace pixelexplorer::rendering {
 		void setUniform3fv(const std::string& name, const glm::vec3& value);
 		void setUniform4fv(const std::string& name, const glm::vec4& value);
 		void setUniformm4fv(const std::string& name, const glm::mat4& value);
-		bool drop() override;
 
 	protected:
 		void onInitialize() override;
+		void onUpdate() override;
 		void onTerminate() override;
 
 	private:
@@ -38,8 +38,6 @@ namespace pixelexplorer::rendering {
 		int32_t getUniformLocation(const std::string& name);
 		void bind() const;
 		void unbind() const;
-		inline void setRemoveFlag() final {}
-		inline void setUpdateFlag() final {}
 
 		uint32_t _glId;
 		const std::string _path;

@@ -27,17 +27,23 @@ namespace pixelexplorer::game::gui {
 			_windowFlags |= ImGuiWindowFlags_UnsavedDocument;
 			//_windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 			//_windowFlags |= ImGuiWindowFlags_MenuBar;
-			_backgroundTexture = new rendering::GLTexture("./assets/textures/main_menu_background.png");
+			_backgroundTexture = nullptr;
 			_font = nullptr;
 		}
 
-		inline virtual ~MainMenu() { _backgroundTexture->drop(); }
+		inline virtual ~MainMenu() {}
 
 		inline void onInitialize() override {
-			if (_font == nullptr)
-				_font = getRenderWindow()->getFont("./assets/fonts/roboto.ttf");
-			if (_backgroundTexture->getRenderWindow() == nullptr)
-				getRenderWindow()->addGLAsset(_backgroundTexture);
+			_font = getRenderWindow()->getFont("./assets/fonts/roboto.ttf");
+			_backgroundTexture = new rendering::GLTexture("./assets/textures/main_menu_background.png");
+			getRenderWindow()->registerGLObject(_backgroundTexture);
+		}
+
+		inline void onTerminate() override {
+			// should font be a GLObject? how is font memory managed?
+			_font = nullptr;
+			_backgroundTexture->drop();
+			_backgroundTexture = nullptr;
 		}
 
 		inline void onRenderGui(float windowWidth, float windowHeight, float uiScale) override {
@@ -75,7 +81,6 @@ namespace pixelexplorer::game::gui {
 		}
 
 		inline bool getShouldClose() const { return _shouldClose; }
-		inline bool requiresGLObjects() { return true; }
 
 	private:
 		rendering::GLTexture* _backgroundTexture;

@@ -15,23 +15,16 @@ namespace pixelexplorer::rendering {
 		_vertexArrayGlId = 0;
 		_vertexBufferGlId = 0;
 		_indexBufferGlId = 0;
-		_shader = nullptr;
-		_material = new Material();
-		_material->setProperty("u_Color", glm::vec4(1, 1, 1, 1));
+		_material = nullptr;
 		_positionMatrix = glm::mat4(1.0f);
 	}
 
-	ExampleRenderMesh::~ExampleRenderMesh() {
-		_material->drop();
-	}
+	ExampleRenderMesh::~ExampleRenderMesh() {}
 
-	void ExampleRenderMesh::onRender()
+	void ExampleRenderMesh::onUpdate()
 	{
-		if (_shader == nullptr) return;
 		_material->setProperty("u_Color", glm::vec4((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1));
 		RenderWindow* window = getRenderWindow();
-		window->setShader(_shader);
-		_material->applyMaterial(_shader);
 		window->setModelMatrix(_positionMatrix);
 		glBindVertexArray(_vertexArrayGlId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
@@ -45,9 +38,8 @@ namespace pixelexplorer::rendering {
 
 	void ExampleRenderMesh::onTerminate()
 	{
-		if (_shader != nullptr)
-			_shader->drop();
-		_shader = nullptr;
+		_material->drop();
+		_material = nullptr;
 		glDeleteVertexArrays(1, &_vertexArrayGlId);
 		glDeleteBuffers(1, &_vertexBufferGlId);
 		glDeleteBuffers(1, &_indexBufferGlId);
@@ -78,8 +70,6 @@ namespace pixelexplorer::rendering {
 			0, 5, 4, 0, 1, 5,  // Bottom
 		};
 
-		_shader = getRenderWindow()->getShader("./assets/shaders/cube.shader");
-
 		// Create and load Vertex Array & Vertex Buffer
 		glGenVertexArrays(1, &_vertexArrayGlId);
 		glBindVertexArray(_vertexArrayGlId);
@@ -96,5 +86,14 @@ namespace pixelexplorer::rendering {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferGlId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		_material = new Material();
+		addDependency(_material);
+		Shader* shader = getRenderWindow()->getShader("./assets/shaders/cube.shader");
+		if (shader != nullptr) {
+			addDependency(shader);
+			shader->drop();
+			shader = nullptr;
+		}
 	}
 }

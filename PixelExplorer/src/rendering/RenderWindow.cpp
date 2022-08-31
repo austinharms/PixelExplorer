@@ -23,12 +23,6 @@ thread_local ImGuiContext* MyImGuiTLS;
 namespace pixelexplorer::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
 	{
-		_glAssets.next = nullptr;
-		_glAssets.prev = nullptr;
-		_glAssets.value = nullptr;
-		_glRenderObjects.prev = nullptr;
-		_glRenderObjects.next = nullptr;
-		_glRenderObjects.value = nullptr;
 		_loadedImGuiContext = false;
 		_currentShader = nullptr;
 		global::windowCreationLock.lock();
@@ -39,7 +33,7 @@ namespace pixelexplorer::rendering {
 			const char* error;
 			glfwGetError(&error);
 			Logger::error(error);
-			Logger::fatal("Failed to Init GLFW");
+			Logger::fatal(__FUNCTION__" Failed to Init GLFW");
 		}
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -50,12 +44,12 @@ namespace pixelexplorer::rendering {
 			const char* error;
 			glfwGetError(&error);
 			Logger::error(error);
-			Logger::fatal("Failed to Create Window");
+			Logger::fatal(__FUNCTION__" Failed to Create Window");
 		}
 
 		++global::windowCount;
 		global::windowCreationLock.unlock();
-		Logger::debug("Window Created");
+		Logger::debug(__FUNCTION__" Window Created");
 		glfwSetWindowUserPointer(_window, this);
 		glfwMakeContextCurrent(_window);
 		glfwSetWindowSizeCallback(_window, glfwStaticResizeCallback);
@@ -64,7 +58,7 @@ namespace pixelexplorer::rendering {
 		GLenum initCode = glewInit();
 		if (initCode != GLEW_OK) {
 			Logger::error(std::to_string(initCode) + ": " + (const char*)glewGetErrorString(initCode));
-			Logger::fatal("Failed to Init GLEW");
+			Logger::fatal(__FUNCTION__" Failed to Init GLEW");
 		}
 
 		glEnable(GL_DEBUG_OUTPUT);
@@ -91,62 +85,44 @@ namespace pixelexplorer::rendering {
 		ImGui::StyleColorsDark();
 		//ImGui::StyleColorsClassic();
 		ImGui_ImplGlfw_InitForOpenGL(_window, true);
-		// Should not hard code the version
+		// TODO fix hard coding the version
 		ImGui_ImplOpenGL3_Init("#version 150");
 	}
 
 	RenderWindow::~RenderWindow()
 	{
 		if (std::this_thread::get_id() != _spawnThreadId)
-			Logger::fatal(__FUNCTION__ " must be called from the thread that created the window");
+			Logger::fatal(__FUNCTION__ " Render window destructor must be called from the thread that created the window");
 
 		glfwMakeContextCurrent(_window);
 		_glRenderObjectsMutex.lock();
-		_glAssetsMutex.lock();
-		_glQueueMutex.lock();
+		_staticGLObjectsMutex.lock();
 
-		for (auto i = _glObjectAddQueue.begin(); i != _glObjectAddQueue.end(); ++i) {
-			GLObject* obj = (*i);
-			obj->removeNode();
-			obj->_attachedWindow = nullptr;
-			obj->_remove = false;
-			obj->drop();
-		}
-
-		for (auto i = _glObjectRemoveQueue.begin(); i != _glObjectRemoveQueue.end(); ++i) {
-			GLObject* obj = (*i);
-			if (obj->getInitialized())
-				obj->terminate();
-			obj->removeNode();
-			obj->_attachedWindow = nullptr;
-			obj->_remove = false;
-			obj->drop();
-		}
-
-		GLObjectNode* curNode = _glRenderObjects.next;
-		while (curNode != nullptr)
 		{
-			GLObject* obj = curNode->value;
-			curNode = curNode->next;
-			if (obj->getInitialized())
-				obj->terminate();
-			obj->removeNode();
-			obj->_attachedWindow = nullptr;
-			obj->_remove = false;
-			obj->drop();
+			GLNode<GLRenderObject>* currentNode = _glRenderObjects.next;
+			while (currentNode != nullptr) {
+				GLRenderObject* renderObject = static_cast<GLRenderObject*>(currentNode);
+				currentNode = currentNode->next;
+				removeGLRenderObject(renderObject);
+			}
 		}
 
-		curNode = _glAssets.next;
-		while (curNode != nullptr)
 		{
-			GLObject* obj = curNode->value;
-			curNode = curNode->next;
-			if (obj->getInitialized())
-				obj->terminate();
-			obj->removeNode();
-			obj->_attachedWindow = nullptr;
-			obj->_remove = false;
-			obj->drop();
+			GLNode<GLObject>* currentNode = _staticGLObjects.next;
+			while (currentNode != nullptr) {
+				GLObject* glObj = static_cast<GLObject*>(currentNode);
+				currentNode = currentNode->next;
+				terminateGLObjectUnsafe(glObj);
+			}
+		}
+
+		{
+			GLNode<GLObject>* currentNode = _staticGLObjectsRemoveQueue.next;
+			while (currentNode != nullptr) {
+				GLObject* glObj = static_cast<GLObject*>(currentNode);
+				currentNode = currentNode->next;
+				terminateGLObjectUnsafe(glObj);
+			}
 		}
 
 		ImGui::SetCurrentContext(_guiContext);
@@ -163,10 +139,8 @@ namespace pixelexplorer::rendering {
 		}
 
 		global::windowCreationLock.unlock();
+		_staticGLObjectsMutex.unlock();
 		_glRenderObjectsMutex.unlock();
-		_glAssetsMutex.unlock();
-		_glQueueMutex.unlock();
-
 		Logger::debug("Window closed");
 	}
 
@@ -195,42 +169,64 @@ namespace pixelexplorer::rendering {
 		}
 
 		Shader* shader = new Shader(path);
-		addGLAsset(shader);
-		_glAssetsMutex.lock();
+		_staticGLObjectsMutex.lock();
+		registerGLObject(shader);
 		_loadedShaders.insert({ path, shader });
-		_glAssetsMutex.unlock();
+		_staticGLObjectsMutex.unlock();
 		return shader;
 	}
 
-	void RenderWindow::addGLRenderObject(BasicGLRenderObject* renderObject)
+	void RenderWindow::addGLRenderObject(GLRenderObject* renderObject)
 	{
-		if (renderObject->getRenderWindow() != nullptr) {
+		if (renderObject->getAttached()) {
 			if (renderObject->getRenderWindow() != this) {
-				Logger::warn("Attempted to add RenderObject already assigned to Window, RenderObject not Added");
+				Logger::error(__FUNCTION__" Attempted to add GLRenderObject already attached to different Window, GLRenderObject not added");
+				return;
 			}
-			else {
-				Logger::warn("Attempted to readd RenderObject to Window");
-			}
+		}
+		else {
+			registerGLObject(renderObject);
+		}
 
+		if (renderObject->inRenderQueue()) {
+			Logger::warn(__FUNCTION__" Attempted to add GLRenderObject already in render queue to render queue");
 			return;
 		}
 
 		renderObject->grab();
-		GLObject* obj = (GLObject*)renderObject;
-		obj->preInit(this);
-		_glQueueMutex.lock();
 		_glRenderObjectsMutex.lock();
-		_glObjectAddQueue.emplace_back(obj);
-		// TODO: need to sort by renderIndex here
-		obj->insertNodeBetween(&_glRenderObjects, _glRenderObjects.next);
+		GLNode<GLRenderObject>* lastNode = &_glRenderObjects;
+		GLNode<GLRenderObject>* node = _glRenderObjects.next;
+		while (node != nullptr && static_cast<GLRenderObject*>(node)->getPriority() < renderObject->getPriority()) {
+			lastNode = node;
+			node = node->next;
+		}
+
+		static_cast<GLNode<GLRenderObject>*>(renderObject)->insertNodeAfter<GLRenderObject>(lastNode);
 		_glRenderObjectsMutex.unlock();
-		_glQueueMutex.unlock();
 	}
 
-	void RenderWindow::updateGLAsset(GLAsset* asset)
-	{
-		MAINTHREADCHECK();
-		asset->update();
+	void RenderWindow::removeGLRenderObject(GLRenderObject* renderObject) {
+		if (renderObject->getAttached()) {
+			if (renderObject->getRenderWindow() != this) {
+				Logger::error(__FUNCTION__" Attempted to remove GLRenderObject attached to different Window, GLRenderObject not removed");
+				return;
+			}
+		}
+		else {
+			Logger::error(__FUNCTION__" Attempted to remove GLRenderObject not attached to Window, GLRenderObject not removed");
+			return;
+		}
+
+		if (!renderObject->inRenderQueue()) {
+			Logger::warn(__FUNCTION__" Attempted to remove GLRenderObject not in render queue, GLRenderObject not removed");
+			return;
+		}
+
+		_glRenderObjectsMutex.lock();
+		static_cast<GLNode<GLRenderObject>*>(renderObject)->removeNode<GLRenderObject>();
+		_glRenderObjectsMutex.unlock();
+		renderObject->drop();
 	}
 
 	void RenderWindow::loadImGuiContext()
@@ -245,7 +241,7 @@ namespace pixelexplorer::rendering {
 		}
 	}
 
-	void RenderWindow::setShader(const Shader* shader)
+	void RenderWindow::setActiveShader(const Shader* shader)
 	{
 		MAINTHREADCHECK();
 		if (shader == nullptr) {
@@ -264,24 +260,38 @@ namespace pixelexplorer::rendering {
 			_currentShader->setUniformm4fv("u_MVP", _vpMatrix * mtx);
 	}
 
-	void RenderWindow::removeGLObject(GLObject* glObject)
+	void RenderWindow::terminateGLObject(GLObject* glObject)
 	{
 		if (glObject->getRenderWindow() != this) {
-			Logger::warn("Attempted to remove RenderObject that is not in the RenderWindow");
+			Logger::error("Attempted to remove RenderObject that is not in the RenderWindow");
 			return;
 		}
 
-		_glQueueMutex.lock();
-		_glObjectRemoveQueue.emplace_back(glObject);
-		_glQueueMutex.unlock();
+		_staticGLObjectsMutex.lock();
+		glObject->removeNode<GLObject>();
+		if (std::this_thread::get_id() == _spawnThreadId) {
+			terminateGLObjectUnsafe(glObject);
+		}
+		else {
+			glObject->insertNodeAfter(&_staticGLObjectsRemoveQueue);
+		}
+
+		_staticGLObjectsMutex.unlock();
 	}
 
-	void RenderWindow::removeShader(Shader* shader)
+	void RenderWindow::terminateGLObjectUnsafe(GLObject* glObject)
 	{
-		_glAssetsMutex.lock();
-		if (_loadedShaders.erase(shader->_path) != 1)
+		glObject->removeNode<GLObject>();
+		glObject->terminate();
+		glObject->drop();
+	}
+
+	void RenderWindow::removeShaderFromCache(Shader* shader)
+	{
+		_staticGLObjectsMutex.lock();
+		if (_loadedShaders.erase(shader->_path) == 0)
 			Logger::warn("Failed to remove " + shader->_path + " from RenderWindow Shader cache");
-		_glAssetsMutex.unlock();
+		_staticGLObjectsMutex.unlock();
 	}
 
 	ImFont* RenderWindow::getFont(const std::string& path)
@@ -303,34 +313,25 @@ namespace pixelexplorer::rendering {
 		config.GlyphExtraSpacing.x = 1.0f;
 		ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), 30, &config);
 		if (font == nullptr)
-			Logger::warn("Failed to load font " + path);
+			Logger::error(__FUNCTION__" Failed to load font " + path);
 
 		_loadedFonts.emplace(path, font);
 		return font;
 	}
 
-	void RenderWindow::addGLAsset(GLAsset* asset)
+	void RenderWindow::registerGLObject(GLObject* obj)
 	{
-		if (asset->getRenderWindow() != nullptr) {
-			if (asset->getRenderWindow() != this) {
-				Logger::warn("Attempted to add GLAsset already assigned to Window, GLAsset not Added");
-			}
-			else {
-				Logger::warn("Attempted to readd GLAsset to Window");
-			}
-
+		if (obj->getAttached()) {
+			if (obj->getRenderWindow() != this)
+				Logger::error(__FUNCTION__" Attempted to register GLObject already attached to different Window, GLObject not register");
 			return;
 		}
 
-		asset->grab();
-		GLObject* obj = (GLObject*)asset;
-		obj->preInit(this);
-		_glQueueMutex.lock();
-		_glAssetsMutex.lock();
-		_glObjectAddQueue.emplace_back(obj);
-		obj->insertNodeBetween(&_glAssets, _glAssets.next);
-		_glAssetsMutex.unlock();
-		_glQueueMutex.unlock();
+		obj->grab();
+		obj->attach(this);
+		_staticGLObjectsMutex.lock();
+		obj->insertNodeAfter<GLObject>(&_staticGLObjects);
+		_staticGLObjectsMutex.unlock();
 	}
 
 	void RenderWindow::glfwStaticResizeCallback(GLFWwindow* window, int width, int height)
@@ -345,7 +346,7 @@ namespace pixelexplorer::rendering {
 
 	void RenderWindow::glfwResizeCallback(uint32_t width, uint32_t height)
 	{
-		Logger::debug("Window resized: " + std::to_string(width) + "X" + std::to_string(height));
+		Logger::debug(__FUNCTION__" Window resized: " + std::to_string(width) + "X" + std::to_string(height));
 		if (width != 0 && height != 0) {
 			_windowHeight = height;
 			_windowWidth = width;
@@ -356,27 +357,22 @@ namespace pixelexplorer::rendering {
 
 	void RenderWindow::glfwFocusCallback(bool focused)
 	{
-		Logger::debug("Window focused: " + std::to_string(focused));
+		Logger::debug(__FUNCTION__" Window focused: " + std::to_string(focused));
 	}
 
 	void RenderWindow::updateGLQueues()
 	{
-		_glQueueMutex.lock();
-		for (auto i = _glObjectAddQueue.begin(); i != _glObjectAddQueue.end(); ++i)
-			(*i)->initialize();
-		_glObjectAddQueue.clear();
-		for (auto i = _glObjectRemoveQueue.begin(); i != _glObjectRemoveQueue.end(); ++i) {
-			GLObject* obj = (*i);
-			if (obj->getInitialized())
-				obj->terminate();
-			obj->removeNode();
-			obj->_attachedWindow = nullptr;
-			obj->_remove = false;
-			obj->drop();
-		}
+		if (_staticGLObjectsRemoveQueue.next != nullptr) {
+			_staticGLObjectsMutex.lock();
+			GLNode<GLObject>* currentNode = _staticGLObjectsRemoveQueue.next;
+			while (currentNode != nullptr) {
+				GLObject* glObj = static_cast<GLObject*>(currentNode);
+				currentNode = currentNode->next;
+				terminateGLObjectUnsafe(glObj);
+			}
 
-		_glObjectRemoveQueue.clear();
-		_glQueueMutex.unlock();
+			_staticGLObjectsMutex.unlock();
+		}
 	}
 
 	void RenderWindow::drawRenderObjects()
@@ -407,12 +403,30 @@ namespace pixelexplorer::rendering {
 		//	}
 		//}
 
+		//_vpMatrix = _projectionMatrix * _viewMatrix;
+		//GLObjectNode* curNode = _glRenderObjects.next;
+		//while (curNode != nullptr)
+		//{
+		//	((BasicGLRenderObject*)(curNode->value))->onRender();
+		//	curNode = curNode->next;
+		//}
+
+		//if (_loadedImGuiContext) {
+		//	ImGui::Render();
+		//	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//	_loadedImGuiContext = false;
+		//}
+
+		//if (_currentShader != nullptr)
+		//	_currentShader->unbind();
+		//_currentShader = nullptr;
+
 		_vpMatrix = _projectionMatrix * _viewMatrix;
-		GLObjectNode* curNode = _glRenderObjects.next;
-		while (curNode != nullptr)
+		GLNode<GLRenderObject>* node = _glRenderObjects.next;
+		while (node != nullptr)
 		{
-			((BasicGLRenderObject*)(curNode->value))->onRender();
-			curNode = curNode->next;
+			static_cast<GLRenderObject*>(node)->update();
+			node = node->next;
 		}
 
 		if (_loadedImGuiContext) {

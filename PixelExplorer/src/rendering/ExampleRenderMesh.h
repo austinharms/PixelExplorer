@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include "BasicGLRenderObject.h"
+#include "GLRenderObject.h"
 #include "Shader.h"
 #include "Material.h"
 #include "glm/mat4x4.hpp"
@@ -8,7 +8,7 @@
 #ifndef PIXELEXPLORE_RENDERING_EXAMPLERENDERMESH_H_
 #define  PIXELEXPLORE_RENDERING_EXAMPLERENDERMESH_H_
 namespace pixelexplorer::rendering {
-	class ExampleRenderMesh : public BasicGLRenderObject
+	class ExampleRenderMesh : public GLRenderObject
 	{
 	public:
 		ExampleRenderMesh();
@@ -18,10 +18,9 @@ namespace pixelexplorer::rendering {
 	protected:
 		void onInitialize() override;
 		void onTerminate() override;
-		void onRender() override;
+		void onUpdate() override;
 
 	private:
-		Shader* _shader;
 		Material* _material;
 		glm::mat4 _positionMatrix;
 		uint32_t _vertexArrayGlId;
