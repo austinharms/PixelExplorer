@@ -73,8 +73,8 @@ namespace pixelexplorer::rendering {
 
 		void glfwResizeCallback(uint32_t width, uint32_t height);
 		void glfwFocusCallback(bool focused);
-		void terminateGLObject(GLObject* glObject);
-		void terminateGLObjectUnsafe(GLObject* glObject);
+		bool terminateGLObject(GLObject* glObject);
+		bool terminateGLObjectUnsafe(GLObject* glObject);
 		void removeShaderFromCache(Shader* shader);
 		void updateGLQueues();
 		void drawRenderObjects();

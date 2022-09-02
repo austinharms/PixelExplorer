@@ -25,6 +25,8 @@ namespace pixelexplorer::rendering {
 		void setProperty(const std::string& propertyName, glm::vec4 value);
 		void setProperty(const std::string& propertyName, glm::mat4 value);
 		void setProperty(const std::string& propertyName, MaterialProperty* prop);
+		using GLObject::addDependency;
+		using GLObject::removeDependency;
 
 	protected:
 		void onUpdate() override;

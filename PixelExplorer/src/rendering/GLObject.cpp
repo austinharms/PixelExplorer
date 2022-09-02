@@ -26,7 +26,7 @@ namespace pixelexplorer::rendering {
 	bool GLObject::drop() {
 		bool dropped = RefCount::drop();
 		if (!dropped && getRefCount() == 1 && _attachedWindow)
-			_attachedWindow->terminateGLObject(this);
+			return _attachedWindow->terminateGLObject(this);
 		return dropped;
 	}
 
@@ -45,9 +45,14 @@ namespace pixelexplorer::rendering {
 			getRenderWindow()->registerGLObject(dependency);
 		}
 		else if (dependency->getRenderWindow() != getRenderWindow()) {
-			Logger::error(__FUNCTION__" called with dependency registered to a different RenderWindow, dependency not added");
-			dependency->drop();
-			return;
+			if (getAttached()) {
+				Logger::error(__FUNCTION__" called with dependency registered to a different RenderWindow, dependency not added");
+				dependency->drop();
+				return;
+			}
+			else {
+				Logger::warn(__FUNCTION__" called with dependency registered to a RenderWindow without being registered to a RenderWindow");
+			}
 		}
 
 		std::list<GLObject*>::iterator it = _dependencies.begin();

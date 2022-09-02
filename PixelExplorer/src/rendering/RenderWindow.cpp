@@ -260,30 +260,29 @@ namespace pixelexplorer::rendering {
 			_currentShader->setUniformm4fv("u_MVP", _vpMatrix * mtx);
 	}
 
-	void RenderWindow::terminateGLObject(GLObject* glObject)
+	bool RenderWindow::terminateGLObject(GLObject* glObject)
 	{
 		if (glObject->getRenderWindow() != this) {
 			Logger::error("Attempted to remove RenderObject that is not in the RenderWindow");
-			return;
+			return false;
 		}
 
-		_staticGLObjectsMutex.lock();
+		std::lock_guard<std::recursive_mutex> lock(_staticGLObjectsMutex);
 		glObject->removeNode<GLObject>();
 		if (std::this_thread::get_id() == _spawnThreadId) {
-			terminateGLObjectUnsafe(glObject);
+			return terminateGLObjectUnsafe(glObject);
 		}
 		else {
 			glObject->insertNodeAfter(&_staticGLObjectsRemoveQueue);
+			return false;
 		}
-
-		_staticGLObjectsMutex.unlock();
 	}
 
-	void RenderWindow::terminateGLObjectUnsafe(GLObject* glObject)
+	bool RenderWindow::terminateGLObjectUnsafe(GLObject* glObject)
 	{
 		glObject->removeNode<GLObject>();
 		glObject->terminate();
-		glObject->drop();
+		return glObject->drop();
 	}
 
 	void RenderWindow::removeShaderFromCache(Shader* shader)
