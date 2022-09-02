@@ -10,6 +10,7 @@
 #include "rendering/RenderWindow.h"
 #include "ChunkRenderMesh.h"
 #include "Chunk.h"
+#include "../block/BlockManifest.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/vec3.hpp"
 #include "glm/gtx/hash.hpp"
@@ -21,9 +22,11 @@ namespace pixelexplorer::game::chunk {
 	class ChunkManager : public RefCount
 	{
 	public:
-		inline ChunkManager(rendering::RenderWindow* window) {
+		inline ChunkManager(rendering::RenderWindow* window, block::BlockManifest* blockManifest) {
 			window->grab();
 			_renderWindow = window;
+			blockManifest->grab();
+			_blockManifest = blockManifest;
 			_chunkMaterial = new rendering::Material();
 			_chunkMaterial->setProperty("u_Color", glm::vec4(0, 1, 0, 1));
 			_renderWindow->registerGLObject(_chunkMaterial);
@@ -40,6 +43,7 @@ namespace pixelexplorer::game::chunk {
 			_chunkMutex.unlock();
 			_chunkMaterial->drop();
 			_renderWindow->drop();
+			_blockManifest->drop();
 		}
 
 		inline Chunk* getChunk(const glm::i32vec3& pos, bool forceLoad = false) {
@@ -66,6 +70,7 @@ namespace pixelexplorer::game::chunk {
 			Chunk* chunk = new Chunk(renderMesh, pos);
 			_loadedChunks.insert({ glm::i32vec3(pos), chunk });
 			_chunkMutex.unlock();
+			remeshChunk(chunk);
 			_chunkMaterial->getRenderWindow()->addGLRenderObject(renderMesh);
 			renderMesh->drop();
 			return chunk;
@@ -114,8 +119,29 @@ namespace pixelexplorer::game::chunk {
 			_chunkMutex.unlock();
 		}
 
+		inline void remeshChunk(Chunk* chunk) {
+			if (chunk == nullptr) {
+				Logger::warn(__FUNCTION__" attempted to remesh null chunk");
+				return;
+			}
+
+			chunk->grab();
+			ChunkRenderMesh* renderMesh = chunk->getRenderMesh();
+			if (renderMesh == nullptr) {
+				Logger::warn(__FUNCTION__" attempted to remesh chunk with null render mesh");
+				chunk->drop();
+				return;
+			}
+
+			renderMesh->grab();
+			// remesh chunk
+			renderMesh->drop();
+			chunk->drop();
+		}
+
 	private:
 		rendering::RenderWindow* _renderWindow;
+		block::BlockManifest* _blockManifest;
 		rendering::Material* _chunkMaterial;
 		std::unordered_map<glm::i32vec3, Chunk*> _loadedChunks;
 		std::queue<ChunkRenderMesh*> _unusedRenderMeshes;

@@ -1,38 +1,42 @@
 #include "Game.h"
 
 #include "Logger.h"
+#include "rendering/RenderWindow.h"
 #include "gui/MainMenu.h"
 #include "chunk/ChunkManager.h"
 #include "rendering/ExampleRenderMesh.h"
+#include "block/BlockManifest.h"
 
 namespace pixelexplorer::game {
 	Game::Game()
 	{
-		_renderWindow = nullptr;
 		Logger::debug(__FUNCTION__" Created Game");
 	}
 
 	void Game::start() {
 		Logger::debug(__FUNCTION__" Started Game");
 
-		_renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore");
-		chunk::ChunkManager* chunkManager = new chunk::ChunkManager(_renderWindow);
+		rendering::RenderWindow* renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore");
+		block::BlockManifest* blockManifest = new block::BlockManifest();
+		blockManifest->load();
+		chunk::ChunkManager* chunkManager = new chunk::ChunkManager(renderWindow, blockManifest);
 		gui::MainMenu* mainMenu = new gui::MainMenu();
-		_renderWindow->addGLRenderObject(mainMenu);
+		renderWindow->addGLRenderObject(mainMenu);
 
-		while (!_renderWindow->shouldClose())
+		while (!renderWindow->shouldClose())
 		{
 			if (mainMenu != nullptr && mainMenu->getShouldClose()) {
-				for (int32_t x = -10; x < 10; ++x)
-					for (int32_t y = -10; y < 10; ++y)
-						for (int32_t z = -10; z < 10; ++z)
+				uint16_t chunkCount = 10;
+				for (int32_t x = -chunkCount; x < chunkCount; ++x)
+					for (int32_t y = -chunkCount; y < chunkCount; ++y)
+						for (int32_t z = -chunkCount; z < chunkCount; ++z)
 							chunkManager->loadChunk(glm::i32vec3(x,y,z));
-				_renderWindow->removeGLRenderObject(mainMenu);
+				renderWindow->removeGLRenderObject(mainMenu);
 				mainMenu->drop();
 				mainMenu = nullptr;
 			}
 
-			_renderWindow->drawFrame();
+			renderWindow->drawFrame();
 		}
 
 		if (mainMenu != nullptr) {
@@ -44,15 +48,16 @@ namespace pixelexplorer::game {
 		chunkManager->drop();
 		chunkManager = nullptr;
 
-		_renderWindow->drop();
-		_renderWindow = nullptr;
+		blockManifest->unload();
+		blockManifest->drop();
+		blockManifest = nullptr;
+
+		renderWindow->drop();
+		renderWindow = nullptr;
 	}
 
 	Game::~Game()
 	{
-		if (_renderWindow != nullptr)
-			_renderWindow->drop();
-		_renderWindow = nullptr;
 		Logger::debug(__FUNCTION__" Destroyed Game");
 	}
 }

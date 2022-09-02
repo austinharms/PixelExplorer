@@ -5,8 +5,8 @@
 #include "BlockFaceDefinition.h"
 #include "FaceDirection.h"
 
-#ifndef PIXELEXPLORER_GAME_BLOCK_BLOCK_H_
-#define PIXELEXPLORER_GAME_BLOCK_BLOCK_H_
+#ifndef PIXELEXPLORER_GAME_BLOCK_BLOCKDEFINITION_H_
+#define PIXELEXPLORER_GAME_BLOCK_BLOCKDEFINITION_H_
 namespace pixelexplorer::game::block {
 	class BlockDefinition : public RefCount
 	{
@@ -41,4 +41,4 @@ namespace pixelexplorer::game::block {
 		BlockFaceDefinition* _faces[6];
 	};
 }
-#endif // !PIXELEXPLORER_GAME_BLOCK_BLOCK_H_
+#endif // !PIXELEXPLORER_GAME_BLOCK_BLOCKDEFINITION_H_

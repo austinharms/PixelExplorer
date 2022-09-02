@@ -1,7 +1,12 @@
+//#define LOG_RENDER_FPS
+
 #include "RenderWindow.h"
 
 #include <assert.h>
 #include <algorithm>
+#ifdef LOG_RENDER_FPS
+#include <chrono>
+#endif
 
 #include "GLObject.h"
 #include "RenderGlobal.h"
@@ -54,6 +59,7 @@ namespace pixelexplorer::rendering {
 		glfwMakeContextCurrent(_window);
 		glfwSetWindowSizeCallback(_window, glfwStaticResizeCallback);
 		glfwSetWindowFocusCallback(_window, glfwStaticFocusCallback);
+		glfwSwapInterval(0);
 
 		GLenum initCode = glewInit();
 		if (initCode != GLEW_OK) {
@@ -151,6 +157,9 @@ namespace pixelexplorer::rendering {
 
 	void RenderWindow::drawFrame()
 	{
+#ifdef LOG_RENDER_FPS
+		auto start = std::chrono::high_resolution_clock::now();
+#endif
 		MAINTHREADCHECK();
 		glfwMakeContextCurrent(_window);
 		updateGLQueues();
@@ -158,6 +167,12 @@ namespace pixelexplorer::rendering {
 		glfwPollEvents();
 		drawRenderObjects();
 		glfwSwapBuffers(_window);
+#ifdef LOG_RENDER_FPS
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+		float ms = ((float)duration.count()) / 1000.0f;
+		Logger::debug("Frame took: " + std::to_string(ms) + "ms, FPS: " + std::to_string((1.0f / ms) * 1000));
+#endif
 	}
 
 	Shader* RenderWindow::getShader(std::string path)

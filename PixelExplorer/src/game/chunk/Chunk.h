@@ -23,7 +23,7 @@ namespace pixelexplorer::game::chunk {
 				_blocks[i].Id = 0;
 			}
 
-			_renderMesh->setPosition(_position);
+			_renderMesh->setPosition(glm::vec3(_position.x * CHUNK_SIZE, _position.y * CHUNK_SIZE, _position.z * CHUNK_SIZE));
 		}
 
 		inline virtual ~Chunk() {
