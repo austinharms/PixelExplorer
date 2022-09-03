@@ -52,12 +52,13 @@ namespace pixelexplorer::game::block {
 			for (uint8_t i = 0; i < 6; ++i)
 				faces[i] = face;
 			_blockDefinitions[0] = new BlockDefinition(faces, 1, "TEST_BLOCK");
+			_blockIdMap.emplace(_blockDefinitions[0]->getName(), 1);
 			_loadedBlocks = true;
 			Logger::debug(__FUNCTION__" loaded blocks");
 		}
 
 		inline BlockDefinition* getBlock(uint32_t id) const {
-			if (id >= _blockIdMap.size() || id == 0) return nullptr;
+			if (id > _blockIdMap.size() || id == 0) return nullptr;
 			return _blockDefinitions[id - 1];
 		}
 

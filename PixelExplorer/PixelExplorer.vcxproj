@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\block\BlockShape.cpp" />
     <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -177,11 +178,14 @@
     <ClInclude Include="src\game\block\BlockDefinition.h" />
     <ClInclude Include="src\game\block\BlockFaceDefinition.h" />
     <ClInclude Include="src\game\block\BlockManifest.h" />
+    <ClInclude Include="src\game\block\BlockShape.h" />
     <ClInclude Include="src\game\block\FaceDirection.h" />
     <ClInclude Include="src\game\chunk\Chunk.h" />
     <ClInclude Include="src\game\chunk\ChunkManager.h" />
     <ClInclude Include="src\game\chunk\ChunkRenderMesh.h" />
     <ClInclude Include="src\game\Game.h" />
+    <ClInclude Include="src\rendering\Camera.h" />
+    <ClInclude Include="src\rendering\CameraInterface.h" />
     <ClInclude Include="src\rendering\GLRenderObject.h" />
     <ClInclude Include="src\game\gui\MainMenu.h" />
     <ClInclude Include="src\game\gui\TestScreen.h" />

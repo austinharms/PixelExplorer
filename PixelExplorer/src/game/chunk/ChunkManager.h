@@ -10,7 +10,13 @@
 #include "rendering/RenderWindow.h"
 #include "ChunkRenderMesh.h"
 #include "Chunk.h"
+#include "../block/Block.h"
+#include "../block/BlockDefinition.h"
+#include "../block/BlockFaceDefinition.h"
 #include "../block/BlockManifest.h"
+#include "../block/FaceDirection.h"
+#include "../block/BlockShape.h"
+#include "DataBuffer.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/vec3.hpp"
 #include "glm/gtx/hash.hpp"
@@ -135,6 +141,73 @@ namespace pixelexplorer::game::chunk {
 
 			renderMesh->grab();
 			// remesh chunk
+			uint32_t faceCount = 0;
+			uint32_t x = 0;
+			uint32_t y = 0;
+			uint32_t z = 0;
+			for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
+				const block::Block& block = chunk->getBlock(i);
+				if (block.Id != 0) {
+					block::BlockDefinition* blockDef = _blockManifest->getBlock(block.Id);
+					if (blockDef != nullptr) {
+						for (uint8_t faceIndex = 0; faceIndex < 6; ++faceIndex) {
+							if (blockDef->getBlockFace((block::FaceDirection)faceIndex)) ++faceCount;
+						}
+					}
+				}
+				
+				if (++x == Chunk::CHUNK_SIZE) {
+					x = 0;
+					if (++z == Chunk::CHUNK_SIZE) {
+						z = 0;
+						++y;
+					}
+				}
+			}
+
+			uint32_t loadedFaceCount = 0;
+			uint32_t vertexCount = 0;
+			uint32_t indexCount = 0;
+			DataBuffer<float>* vertextBuffer = new DataBuffer<float>(faceCount * block::BlockShape::getFaceFloatCount());
+			DataBuffer<uint32_t>* indexBuffer = new DataBuffer<uint32_t>(faceCount * block::BlockShape::getFaceIndexCount());
+			bool buildError = false;
+
+			x = 0;
+			y = 0;
+			z = 0;
+			for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
+				const block::Block& block = chunk->getBlock(i);
+				if (block.Id != 0) {
+					block::BlockDefinition* blockDef = _blockManifest->getBlock(block.Id);
+					if (blockDef != nullptr) {
+						const block::BlockFaceDefinition* blockFace;
+						for (uint8_t faceIndex = 0; faceIndex < 6; ++faceIndex) {
+							if ((blockFace = blockDef->getBlockFace(block::FaceDirection::FRONT))) {
+								if (++loadedFaceCount > faceCount) {
+									buildError = true;
+									Logger::error(__FUNCTION__" failed to build chunk mesh, chunk face count overrun");
+									break;
+								}
+
+								block::BlockShape::loadFaceMesh((block::FaceDirection)faceIndex, glm::vec3(x, y, z), indexCount, vertexCount, *indexBuffer, *vertextBuffer);
+							}
+						}
+					}
+				}
+
+				if (++x == Chunk::CHUNK_SIZE) {
+					x = 0;
+					if (++z == Chunk::CHUNK_SIZE) {
+						z = 0;
+						++y;
+					}
+				}
+			}
+
+			if (!buildError)
+				renderMesh->updateMesh(indexBuffer, vertextBuffer);
+			vertextBuffer->drop();
+			indexBuffer->drop();
 			renderMesh->drop();
 			chunk->drop();
 		}

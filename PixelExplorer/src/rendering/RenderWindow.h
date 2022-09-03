@@ -9,7 +9,7 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "imgui.h"
-
+#include "CameraInterface.h"
 #include "RefCount.h"
 #include "RenderWindow.fwd.h"
 #include "GLNode.h"
@@ -24,7 +24,7 @@ namespace pixelexplorer::rendering {
 	class RenderWindow : public RefCount
 	{
 	public:
-		RenderWindow(int32_t width, int32_t height, const char* title);
+		RenderWindow(int32_t width, int32_t height, const char* title, CameraInterface* camera = nullptr);
 		virtual ~RenderWindow();
 		bool shouldClose() const;
 		void drawFrame();
@@ -36,14 +36,17 @@ namespace pixelexplorer::rendering {
 		void loadImGuiContext();
 		void setActiveShader(const Shader* shader);
 		void setModelMatrix(const glm::mat4& mtx);
+		void setCamera(CameraInterface* camera);
 
 		inline float getWindowWidth() const { return _windowWidth; }
 
 		inline float getWindowHeight() const { return _windowHeight; }
 
-		inline float getWindowScale() const { return fminf(_windowWidth / 600, _windowHeight / 400); }
+		inline float getWindowScale() const { return _windowScale; }
 
-		inline Shader* getActiveShader() const { return _currentShader; }
+		inline Shader* getActiveShader() const { return _activeShader; }
+
+		inline const CameraInterface* getCamera() const { return _camera; }
 
 	private:
 		friend class GLObject;
@@ -53,23 +56,20 @@ namespace pixelexplorer::rendering {
 
 		GLFWwindow* _window;
 		ImGuiContext* _guiContext;
-		Shader* _currentShader;
-		float _windowWidth;
-		float _windowHeight;
-		std::thread::id _spawnThreadId;
-		std::unordered_map<std::string, Shader*> _loadedShaders;
-		std::unordered_map<std::string, ImFont*> _loadedFonts;
+		CameraInterface* _camera;
+		Shader* _activeShader;
 		GLNode<GLRenderObject> _glRenderObjects;
 		GLNode<GLObject> _staticGLObjects;
 		GLNode<GLObject> _staticGLObjectsRemoveQueue;
+		std::unordered_map<std::string, Shader*> _loadedShaders;
+		std::unordered_map<std::string, ImFont*> _loadedFonts;
 		std::recursive_mutex _glRenderObjectsMutex;
 		std::recursive_mutex _staticGLObjectsMutex;
-		glm::mat4 _viewMatrix;
-		glm::mat4 _projectionMatrix;
-		// the view and projection matrix multiplied together
-		glm::mat4 _vpMatrix;
-		// used to track if we need to render ImGui
-		bool _loadedImGuiContext;
+		std::thread::id _spawnThreadId;
+		uint32_t _windowWidth;
+		uint32_t _windowHeight;
+		float _windowScale;
+		bool _activatedGuiContext;
 
 		void glfwResizeCallback(uint32_t width, uint32_t height);
 		void glfwFocusCallback(bool focused);

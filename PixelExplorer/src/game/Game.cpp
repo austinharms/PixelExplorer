@@ -6,6 +6,7 @@
 #include "chunk/ChunkManager.h"
 #include "rendering/ExampleRenderMesh.h"
 #include "block/BlockManifest.h"
+#include "rendering/Camera.h"
 
 namespace pixelexplorer::game {
 	Game::Game()
@@ -15,8 +16,8 @@ namespace pixelexplorer::game {
 
 	void Game::start() {
 		Logger::debug(__FUNCTION__" Started Game");
-
-		rendering::RenderWindow* renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore");
+		rendering::Camera* camera = new rendering::Camera();
+		rendering::RenderWindow* renderWindow = new rendering::RenderWindow(600, 400, "Pixel Explore", camera);
 		block::BlockManifest* blockManifest = new block::BlockManifest();
 		blockManifest->load();
 		chunk::ChunkManager* chunkManager = new chunk::ChunkManager(renderWindow, blockManifest);
@@ -26,7 +27,7 @@ namespace pixelexplorer::game {
 		while (!renderWindow->shouldClose())
 		{
 			if (mainMenu != nullptr && mainMenu->getShouldClose()) {
-				uint16_t chunkCount = 10;
+				uint16_t chunkCount = 3;
 				for (int32_t x = -chunkCount; x < chunkCount; ++x)
 					for (int32_t y = -chunkCount; y < chunkCount; ++y)
 						for (int32_t z = -chunkCount; z < chunkCount; ++z)

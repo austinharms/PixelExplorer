@@ -1,4 +1,4 @@
-//#define LOG_RENDER_FPS
+#define LOG_RENDER_FPS
 
 #include "RenderWindow.h"
 
@@ -11,8 +11,6 @@
 #include "GLObject.h"
 #include "RenderGlobal.h"
 #include "Logger.h"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
@@ -26,10 +24,11 @@
 thread_local ImGuiContext* MyImGuiTLS;
 
 namespace pixelexplorer::rendering {
-	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title)
+	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title, CameraInterface* camera)
 	{
-		_loadedImGuiContext = false;
-		_currentShader = nullptr;
+		_activatedGuiContext = false;
+		_activeShader = nullptr;
+		_camera = nullptr;
 		global::windowCreationLock.lock();
 		_spawnThreadId = std::this_thread::get_id();
 		glfwSetErrorCallback(global::glfwErrorCallback);
@@ -76,9 +75,7 @@ namespace pixelexplorer::rendering {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		_viewMatrix = glm::lookAt(glm::vec3(0, 0, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-		// this creates/update the projection matrix
+		setCamera(camera);
 		glfwResizeCallback(width, height);
 
 		// Init imgui
@@ -103,6 +100,18 @@ namespace pixelexplorer::rendering {
 		glfwMakeContextCurrent(_window);
 		_glRenderObjectsMutex.lock();
 		_staticGLObjectsMutex.lock();
+
+		if (_activeShader != nullptr) {
+			_activeShader->unbind();
+			_activeShader->drop();
+			_activeShader = nullptr;
+		}
+
+		if (_camera != nullptr) {
+			_camera->setActive(false);
+			_camera->drop();
+			_camera = nullptr;
+		}
 
 		{
 			GLNode<GLRenderObject>* currentNode = _glRenderObjects.next;
@@ -247,8 +256,8 @@ namespace pixelexplorer::rendering {
 	void RenderWindow::loadImGuiContext()
 	{
 		MAINTHREADCHECK();
-		if (!_loadedImGuiContext) {
-			_loadedImGuiContext = true;
+		if (!_activatedGuiContext) {
+			_activatedGuiContext = true;
 			ImGui::SetCurrentContext(_guiContext);
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
@@ -264,15 +273,30 @@ namespace pixelexplorer::rendering {
 			return;
 		}
 
-		_currentShader = (Shader*)shader;
-		shader->bind();
+		_activeShader = (Shader*)shader;
+		_activeShader->bind();
+		if (_camera != nullptr)
+			_activeShader->setUniformm4fv("u_ViewProjectionMatrix", _camera->getVPMatrix());
 	}
 
 	void RenderWindow::setModelMatrix(const glm::mat4& mtx)
 	{
 		MAINTHREADCHECK();
-		if (_currentShader != nullptr)
-			_currentShader->setUniformm4fv("u_MVP", _vpMatrix * mtx);
+		if (_activeShader != nullptr)
+			_activeShader->setUniformm4fv("u_ModelMatrix", mtx);
+	}
+
+	void RenderWindow::setCamera(CameraInterface* camera) {
+		if (_camera != nullptr) {
+			_camera->setActive(false);
+			_camera->drop();
+		}
+
+		if ((_camera = camera) != nullptr) {
+			_camera->grab();
+			_camera->setActive(true);
+			_camera->windowResize(_windowWidth, _windowHeight);
+		}
 	}
 
 	bool RenderWindow::terminateGLObject(GLObject* glObject)
@@ -364,8 +388,10 @@ namespace pixelexplorer::rendering {
 		if (width != 0 && height != 0) {
 			_windowHeight = height;
 			_windowWidth = width;
-			_projectionMatrix = glm::perspective(90.0f, _windowWidth / _windowHeight, 0.1f, 100.0f);
 			glViewport(0, 0, width, height);
+			_windowScale = fminf((float)_windowWidth / 600.0f, (float)_windowHeight / 400.0f);
+			if (_camera != nullptr)
+				_camera->windowResize(width, height);
 		}
 	}
 
@@ -391,51 +417,11 @@ namespace pixelexplorer::rendering {
 
 	void RenderWindow::drawRenderObjects()
 	{
+		if (_camera == nullptr) {
+			Logger::warn(__FUNCTION__" attempted to render with null camera, frame not rendered");
+			return;
+		}
 
-		//glm::mat4 vp(_projectionMatrix * _viewMatrix);
-		//for (auto i = _renderObjects.begin(); i != _renderObjects.end(); ++i) {
-		//	RenderObject* renderObj = *i;
-		//	if (renderObj->meshVisible()) {
-		//		Shader* shader = renderObj->getShader();
-		//		if (shader == nullptr) {
-		//			Logger::warn("RenderObject returned NULL Shader, RenderObject removed from RenderWindow");
-		//			if (((GLObject*)renderObj)->_objectInitialized)
-		//				((GLObject*)renderObj)->uninitGLObjects();
-
-		//			((GLObject*)renderObj)->_currentWindow = nullptr;
-		//			renderObj->drop();
-		//			i = _renderObjects.erase(i);
-		//			continue;
-		//		}
-
-		//		shader->bind();
-		//		Material* material = renderObj->getMaterial();
-		//		if (material != nullptr)
-		//			material->applyMaterial(shader);
-		//		shader->setUniformm4fv("u_MVP", vp * renderObj->getPositionMatrix());
-		//		renderObj->drawMesh();
-		//	}
-		//}
-
-		//_vpMatrix = _projectionMatrix * _viewMatrix;
-		//GLObjectNode* curNode = _glRenderObjects.next;
-		//while (curNode != nullptr)
-		//{
-		//	((BasicGLRenderObject*)(curNode->value))->onRender();
-		//	curNode = curNode->next;
-		//}
-
-		//if (_loadedImGuiContext) {
-		//	ImGui::Render();
-		//	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		//	_loadedImGuiContext = false;
-		//}
-
-		//if (_currentShader != nullptr)
-		//	_currentShader->unbind();
-		//_currentShader = nullptr;
-
-		_vpMatrix = _projectionMatrix * _viewMatrix;
 		GLNode<GLRenderObject>* node = _glRenderObjects.next;
 		while (node != nullptr)
 		{
@@ -443,14 +429,15 @@ namespace pixelexplorer::rendering {
 			node = node->next;
 		}
 
-		if (_loadedImGuiContext) {
+		if (_activatedGuiContext) {
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-			_loadedImGuiContext = false;
+			_activatedGuiContext = false;
 		}
 
-		if (_currentShader != nullptr)
-			_currentShader->unbind();
-		_currentShader = nullptr;
+		if (_activeShader != nullptr) {
+			_activeShader->unbind();
+			_activeShader = nullptr;
+		}
 	}
 }
