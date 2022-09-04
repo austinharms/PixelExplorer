@@ -1,12 +1,13 @@
 #include <stdint.h>
 #include <string>
 
+#include "common/RefCount.h"
 #include "GLObject.h"
 #include "stb_image.h"
 
-#ifndef PIXELEXPLORER_RENDERING_GLTEXTURE_H_
-#define PIXELEXPLORER_RENDERING_GLTEXTURE_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORER_ENGINE_RENDERING_GLTEXTURE_H_
+#define PIXELEXPLORER_ENGINE_RENDERING_GLTEXTURE_H_
+namespace pixelexplorer::engine::rendering {
 	class GLTexture : public GLObject
 	{
 	public:

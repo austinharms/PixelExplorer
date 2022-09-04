@@ -7,9 +7,9 @@
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
 
-#ifndef PIXELEXPLORE_RENDERING_MATERIALPROPERTIES_H_
-#define PIXELEXPLORE_RENDERING_MATERIALPROPERTIES_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORE_ENGINE_RENDERING_MATERIALPROPERTIES_H_
+#define PIXELEXPLORE_ENGINE_RENDERING_MATERIALPROPERTIES_H_
+namespace pixelexplorer::engine::rendering {
 	class MaterialProperty
 	{
 	public:

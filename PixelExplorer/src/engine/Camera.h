@@ -1,15 +1,15 @@
 #include <stdint.h>
 
-#include "CameraInterface.h"
+#include "rendering/CameraInterface.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/glm/ext/matrix_transform.hpp"
 #include "glm/glm/ext/matrix_clip_space.hpp"
 
-#ifndef PIXELEXPLORER_RENDERING_CAMERA_H_
-#define PIXELEXPLORER_RENDERING_CAMERA_H_
-namespace pixelexplorer::rendering {
-	class Camera : public CameraInterface
+#ifndef PIXELEXPLORER_ENGINE_CAMERA_H_
+#define PIXELEXPLORER_ENGINE_CAMERA_H_
+namespace pixelexplorer::engine {
+	class Camera : public rendering::CameraInterface
 	{
 	public:
 		inline Camera() {
@@ -76,4 +76,4 @@ namespace pixelexplorer::rendering {
 		bool _active;
 	};
 }
-#endif // !PIXELEXPLORER_RENDERING_CAMERA_H_
+#endif // !PIXELEXPLORER_ENGINE_CAMERA_H_

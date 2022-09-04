@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "RefCount.h"
+#include "common/RefCount.h"
 #include "BlockFaceDefinition.h"
 #include "FaceDirection.h"
 

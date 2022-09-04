@@ -10,7 +10,7 @@
 
 #include "GLObject.h"
 #include "RenderGlobal.h"
-#include "Logger.h"
+#include "common/Logger.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
@@ -23,7 +23,7 @@
 
 thread_local ImGuiContext* MyImGuiTLS;
 
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title, CameraInterface* camera)
 	{
 		_activatedGuiContext = false;
@@ -75,8 +75,9 @@ namespace pixelexplorer::rendering {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		setCamera(camera);
 		glfwResizeCallback(width, height);
+		// needs to happen after glfwResizeCallback due to setCamera using _windowHeight and _windowWidth, (_windowWidth and _windowHeight are set in glfwResizeCallback)
+		setCamera(camera);
 
 		// Init imgui
 		IMGUI_CHECKVERSION();

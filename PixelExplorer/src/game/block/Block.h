@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "RefCount.h"
+#include "common/RefCount.h"
 
 #ifndef PIXELEXPLORER_GAME_BLOCK_BLOCK_H_
 #define PIXELEXPLORER_GAME_BLOCK_BLOCK_H_

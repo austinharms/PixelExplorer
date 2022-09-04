@@ -3,12 +3,12 @@
 
 #include "RenderWindow.fwd.h"
 #include "GLObject.fwd.h"
-#include "RefCount.h"
+#include "common/RefCount.h"
 #include "GLNode.h"
 
-#ifndef PIXELEXPLORER_RENDERING_GLOBJECT_H_
-#define PIXELEXPLORER_RENDERING_GLOBJECT_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORER_ENGINE_RENDERING_GLOBJECT_H_
+#define PIXELEXPLORER_ENGINE_RENDERING_GLOBJECT_H_
+namespace pixelexplorer::engine::rendering {
 	class GLObject : private GLNode<GLObject>, public RefCount
 	{
 	public:

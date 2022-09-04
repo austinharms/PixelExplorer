@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <string>
 
-#include "RefCount.h"
-#include "Color.h"
+#include "common/RefCount.h"
+#include "common/Color.h"
 
 #ifndef PIXELEXPLORER_GAME_BLOCK_BLOCKFACEDEFINITION_H_
 #define PIXELEXPLORER_GAME_BLOCK_BLOCKFACEDEFINITION_H_

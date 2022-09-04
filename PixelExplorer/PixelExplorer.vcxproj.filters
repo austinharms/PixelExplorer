@@ -18,16 +18,16 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\RenderWindow.cpp">
+    <ClCompile Include="src\engine\rendering\RenderWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Shader.cpp">
+    <ClCompile Include="src\engine\rendering\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\ExampleRenderMesh.cpp">
+    <ClCompile Include="src\engine\rendering\ExampleRenderMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Material.cpp">
+    <ClCompile Include="src\engine\rendering\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\Game.cpp">
@@ -60,10 +60,10 @@
     <ClCompile Include="src\vendor\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\GlTexture.cpp">
+    <ClCompile Include="src\engine\rendering\GlTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\GLObject.cpp">
+    <ClCompile Include="src\engine\rendering\GLObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp">
@@ -74,28 +74,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Logger.h">
+    <ClInclude Include="src\common\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RefCount.h">
+    <ClInclude Include="src\common\RefCount.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\RenderWindow.h">
+    <ClInclude Include="src\engine\rendering\RenderWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\RenderGlobal.h">
+    <ClInclude Include="src\engine\rendering\RenderGlobal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Shader.h">
+    <ClInclude Include="src\engine\rendering\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\ExampleRenderMesh.h">
+    <ClInclude Include="src\engine\rendering\ExampleRenderMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Material.h">
+    <ClInclude Include="src\engine\rendering\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\MaterialProperties.h">
+    <ClInclude Include="src\engine\rendering\MaterialProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\Game.h">
@@ -134,16 +134,13 @@
     <ClInclude Include="src\vendor\imgui\misc\single_file\imgui_single_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GUIElement.h">
+    <ClInclude Include="src\engine\rendering\GUIElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\gui\TestScreen.h">
+    <ClInclude Include="src\engine\rendering\GLObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GLObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\GLTexture.h">
+    <ClInclude Include="src\engine\rendering\GLTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\stb_image.h">
@@ -167,28 +164,28 @@
     <ClInclude Include="src\game\chunk\ChunkRenderMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\RenderWindow.fwd.h">
+    <ClInclude Include="src\engine\rendering\RenderWindow.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GLObject.fwd.h">
+    <ClInclude Include="src\engine\rendering\GLObject.fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GLNode.h">
+    <ClInclude Include="src\engine\rendering\GLNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GLRenderObject.h">
+    <ClInclude Include="src\engine\rendering\GLRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\block\BlockFaceDefinition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataBuffer.h">
+    <ClInclude Include="src\common\DataBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\chunk\ChunkManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Color.h">
+    <ClInclude Include="src\common\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\block\BlockManifest.h">
@@ -197,18 +194,21 @@
     <ClInclude Include="src\game\block\BlockShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Camera.h">
+    <ClInclude Include="src\engine\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\CameraInterface.h">
+    <ClInclude Include="src\engine\rendering\CameraInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Logger.inl">
+    <None Include="src\common\Logger.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="src\RefCount.inl">
+    <None Include="src\common\RefCount.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="assets\shaders\base.shader" />

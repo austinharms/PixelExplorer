@@ -1,9 +1,9 @@
 #include "Material.h"
-#include "Logger.h"
+#include "common/Logger.h"
 #include "Shader.h"
 #include "RenderWindow.h"
 
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	// GLObject priority is -9000 (pre onUpdate, after shader onUpdate)
 	Material::Material() : GLObject(-9000) {}
 

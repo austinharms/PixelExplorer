@@ -3,9 +3,9 @@
 #include <malloc.h>
 
 #include "GL/glew.h"
-#include "Logger.h"
+#include "common/Logger.h"
 
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	GLTexture::GLTexture(uint32_t width, uint32_t height)
 	{
 		_pixelBuffer = (uint8_t*)malloc(width * height * 4);

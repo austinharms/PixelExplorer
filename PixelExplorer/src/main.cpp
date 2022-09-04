@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <thread>
 
-#include "Logger.h"
 #include "game/Game.h"
 
 void playGame() {

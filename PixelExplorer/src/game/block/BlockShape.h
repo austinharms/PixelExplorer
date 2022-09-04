@@ -2,7 +2,7 @@
 
 #include "FaceDirection.h"
 #include "glm/vec3.hpp"
-#include "DataBuffer.h"
+#include "common/DataBuffer.h"
 
 #ifndef PIXELEXPLORER_GAME_BLOCK_BLOCKSHAPE_H_
 #define PIXELEXPLORER_GAME_BLOCK_BLOCKSHAPE_H_

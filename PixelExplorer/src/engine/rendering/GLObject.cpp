@@ -1,8 +1,8 @@
 #include "GLObject.h"
-#include "Logger.h"
+#include "common/Logger.h"
 #include "RenderWindow.h"
 
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	GLObject::GLObject(int16_t priority)
 	{
 		_priority = priority;

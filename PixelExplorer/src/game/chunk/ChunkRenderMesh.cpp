@@ -1,13 +1,13 @@
 #include "ChunkRenderMesh.h"
-#include "Logger.h"
+#include "common/Logger.h"
 #include "GL/glew.h"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec4.hpp"
 #include "glm/vec3.hpp"
-#include "rendering/RenderWindow.h"
+#include "engine/rendering/RenderWindow.h"
 
 namespace pixelexplorer::game::chunk {
-	ChunkRenderMesh::ChunkRenderMesh(rendering::Material* material, rendering::RenderWindow* window, const glm::vec3& pos)
+	ChunkRenderMesh::ChunkRenderMesh(engine::rendering::Material* material, engine::rendering::RenderWindow* window, const glm::vec3& pos)
 	{
 		if (window != nullptr)
 			window->registerGLObject(this);

@@ -1,19 +1,19 @@
 #include <stdint.h>
 #include <mutex>
 
-#include "rendering/GLRenderObject.h"
-#include "rendering/Material.h"
-#include "DataBuffer.h"
+#include "engine/rendering/GLRenderObject.h"
+#include "engine/rendering/Material.h"
+#include "common/DataBuffer.h"
 #include "glm/mat4x4.hpp"
-#include "rendering/RenderWindow.h"
+#include "engine/rendering/RenderWindow.h"
 
 #ifndef PIXELEXPLORER_GAME_CHUNK_CHUNKRENDERMESH_H_
 #define PIXELEXPLORER_GAME_CHUNK_CHUNKRENDERMESH_H_
 namespace pixelexplorer::game::chunk {
-	class ChunkRenderMesh : public rendering::GLRenderObject
+	class ChunkRenderMesh : public engine::rendering::GLRenderObject
 	{
 	public:
-		ChunkRenderMesh(rendering::Material* material, rendering::RenderWindow* window = nullptr, const glm::vec3& pos = glm::vec3(0));
+		ChunkRenderMesh(engine::rendering::Material* material, engine::rendering::RenderWindow* window = nullptr, const glm::vec3& pos = glm::vec3(0));
 		virtual ~ChunkRenderMesh();
 
 		void updateMesh(DataBuffer<uint32_t>* indices, DataBuffer<float>* vertices);

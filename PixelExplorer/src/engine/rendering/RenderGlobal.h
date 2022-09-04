@@ -2,13 +2,13 @@
 #include <string>
 #include <mutex>
 
-#include "Logger.h"
+#include "common/Logger.h"
 #include "GL/glew.h"
 
-#ifndef PIXELEXPLORE_RENDERING_RENDERGLOBAL_H_
-#define PIXELEXPLORE_RENDERING_RENDERGLOBAL_H_
+#ifndef PIXELEXPLORE_ENGINE_RENDERING_RENDERGLOBAL_H_
+#define PIXELEXPLORE_ENGINE_RENDERING_RENDERGLOBAL_H_
 
-namespace pixelexplorer::rendering::global {
+namespace pixelexplorer::engine::rendering::global {
 	uint32_t windowCount = 0;
 	bool glfwInit = false;
 	std::mutex windowCreationLock;

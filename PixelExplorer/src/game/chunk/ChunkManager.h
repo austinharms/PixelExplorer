@@ -3,11 +3,12 @@
 #include <queue>
 #include <mutex>
 
-#include "Logger.h"
-#include "RefCount.h"
-#include "rendering/Material.h"
-#include "rendering/Shader.h"
-#include "rendering/RenderWindow.h"
+#include "common/Logger.h"
+#include "common/RefCount.h"
+#include "common/DataBuffer.h"
+#include "engine/rendering/Material.h"
+#include "engine/rendering/Shader.h"
+#include "engine/rendering/RenderWindow.h"
 #include "ChunkRenderMesh.h"
 #include "Chunk.h"
 #include "../block/Block.h"
@@ -16,7 +17,6 @@
 #include "../block/BlockManifest.h"
 #include "../block/FaceDirection.h"
 #include "../block/BlockShape.h"
-#include "DataBuffer.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/vec3.hpp"
 #include "glm/gtx/hash.hpp"
@@ -28,15 +28,15 @@ namespace pixelexplorer::game::chunk {
 	class ChunkManager : public RefCount
 	{
 	public:
-		inline ChunkManager(rendering::RenderWindow* window, block::BlockManifest* blockManifest) {
+		inline ChunkManager(engine::rendering::RenderWindow* window, block::BlockManifest* blockManifest) {
 			window->grab();
 			_renderWindow = window;
 			blockManifest->grab();
 			_blockManifest = blockManifest;
-			_chunkMaterial = new rendering::Material();
+			_chunkMaterial = new engine::rendering::Material();
 			_chunkMaterial->setProperty("u_Color", glm::vec4(0, 1, 0, 1));
 			_renderWindow->registerGLObject(_chunkMaterial);
-			rendering::Shader* chunkShader = _renderWindow->getShader("./assets/shaders/cube.shader");
+			engine::rendering::Shader* chunkShader = _renderWindow->getShader("./assets/shaders/cube.shader");
 			_chunkMaterial->addDependency(chunkShader);
 			chunkShader->drop();
 			chunkShader = nullptr;
@@ -213,9 +213,9 @@ namespace pixelexplorer::game::chunk {
 		}
 
 	private:
-		rendering::RenderWindow* _renderWindow;
+		engine::rendering::RenderWindow* _renderWindow;
 		block::BlockManifest* _blockManifest;
-		rendering::Material* _chunkMaterial;
+		engine::rendering::Material* _chunkMaterial;
 		std::unordered_map<glm::i32vec3, Chunk*> _loadedChunks;
 		std::queue<ChunkRenderMesh*> _unusedRenderMeshes;
 		std::recursive_mutex _chunkMutex;

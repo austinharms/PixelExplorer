@@ -1,11 +1,11 @@
 #include <stdint.h>
 
-#include "RefCount.h"
+#include "common/RefCount.h"
 #include "glm/mat4x4.hpp"
 
 #ifndef PIXELEXPLORER_RENDERING_CAMERAINTERFACE_H_
 #define PIXELEXPLORER_RENDERING_CAMERAINTERFACE_H_
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	class CameraInterface : public RefCount
 	{
 	public:

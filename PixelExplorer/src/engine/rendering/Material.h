@@ -9,9 +9,9 @@
 #include "glm/mat4x4.hpp"
 #include "MaterialProperties.h"
 
-#ifndef PIXELEXPLORE_RENDERING_MATERIAL_H_
-#define PIXELEXPLORE_RENDERING_MATERIAL_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORE_ENGINE_RENDERING_MATERIAL_H_
+#define PIXELEXPLORE_ENGINE_RENDERING_MATERIAL_H_
+namespace pixelexplorer::engine::rendering {
 	class Material : public GLObject
 	{
 	public:

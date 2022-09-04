@@ -3,9 +3,9 @@
 #include "GLRenderObject.h"
 #include "RenderWindow.h"
 
-#ifndef PIXELEXPLORE_RENDERING_GUIELEMENT_H_
-#define PIXELEXPLORE_RENDERING_GUIELEMENT_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORE_ENGINE_RENDERING_GUIELEMENT_H_
+#define PIXELEXPLORE_ENGINE_RENDERING_GUIELEMENT_H_
+namespace pixelexplorer::engine::rendering {
 	class GUIElement : public GLRenderObject
 	{
 	public:

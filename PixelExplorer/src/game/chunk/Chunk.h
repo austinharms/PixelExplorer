@@ -1,12 +1,12 @@
 #include <stdint.h>
 
-#include "RefCount.h"
+#include "common/RefCount.h"
 #include "game/block/Block.h"
 #include "ChunkRenderMesh.h"
 #include "glm/vec3.hpp"
 
-#ifndef PIXELEXPLORER_GAME_CHUNK_H_
-#define PIXELEXPLORER_GAME_CHUNK_H_
+#ifndef PIXELEXPLORER_GAME_CHUNK_CHUNK_H_
+#define PIXELEXPLORER_GAME_CHUNK_CHUNK_H_
 namespace pixelexplorer::game::chunk {
 	class Chunk : public RefCount
 	{

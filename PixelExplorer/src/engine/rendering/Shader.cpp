@@ -5,12 +5,12 @@
 #include <sstream>
 #include <vector>
 
-#include "Logger.h"
+#include "common/Logger.h"
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "RenderWindow.h"
 
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	// defaults to -10000 priority (pre onUpdate)
 	Shader::Shader(const std::string& path) : GLObject(-10000), _path(path), _glId(0) {}
 

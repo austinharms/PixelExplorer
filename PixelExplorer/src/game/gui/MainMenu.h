@@ -2,16 +2,16 @@
 #include <string>
 #include <math.h>
 
-#include "Logger.h"
+#include "common/Logger.h"
 #include "imgui.h"
-#include "rendering/RenderWindow.h"
-#include "rendering/GUIElement.h"
-#include "rendering/GLTexture.h"
+#include "engine/rendering/RenderWindow.h"
+#include "engine/rendering/GUIElement.h"
+#include "engine/rendering/GLTexture.h"
 
 #ifndef PIXELEXPLORE_GAME_GUI_MAINMENU_H_
 #define PIXELEXPLORE_GAME_GUI_MAINMENU_H_
 namespace pixelexplorer::game::gui {
-	class MainMenu : public rendering::GUIElement
+	class MainMenu : public engine::rendering::GUIElement
 	{
 	public:
 		inline MainMenu() {
@@ -35,7 +35,7 @@ namespace pixelexplorer::game::gui {
 
 		inline void onInitialize() override {
 			_font = getRenderWindow()->getFont("./assets/fonts/roboto.ttf");
-			_backgroundTexture = new rendering::GLTexture("./assets/textures/main_menu_background.png");
+			_backgroundTexture = new engine::rendering::GLTexture("./assets/textures/main_menu_background.png");
 			getRenderWindow()->registerGLObject(_backgroundTexture);
 		}
 
@@ -83,7 +83,7 @@ namespace pixelexplorer::game::gui {
 		inline bool getShouldClose() const { return _shouldClose; }
 
 	private:
-		rendering::GLTexture* _backgroundTexture;
+		engine::rendering::GLTexture* _backgroundTexture;
 		ImFont* _font;
 		ImGuiWindowFlags _windowFlags;
 		bool _shouldClose;

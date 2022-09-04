@@ -4,12 +4,12 @@
 
 #include "RenderWindow.h"
 #include "GL/glew.h"
-#include "Logger.h"
+#include "common/Logger.h"
 #include "glm/mat4x4.hpp"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/vec4.hpp"
 
-namespace pixelexplorer::rendering {
+namespace pixelexplorer::engine::rendering {
 	ExampleRenderMesh::ExampleRenderMesh()
 	{
 		_vertexArrayGlId = 0;

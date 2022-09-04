@@ -5,9 +5,9 @@
 #include "Material.h"
 #include "glm/mat4x4.hpp"
 
-#ifndef PIXELEXPLORE_RENDERING_EXAMPLERENDERMESH_H_
-#define  PIXELEXPLORE_RENDERING_EXAMPLERENDERMESH_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORE_ENGINE_RENDERING_EXAMPLERENDERMESH_H_
+#define  PIXELEXPLORE_ENGINE_RENDERING_EXAMPLERENDERMESH_H_
+namespace pixelexplorer::engine::rendering {
 	class ExampleRenderMesh : public GLRenderObject
 	{
 	public:

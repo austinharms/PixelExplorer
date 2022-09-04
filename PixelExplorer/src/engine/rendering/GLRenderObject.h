@@ -1,10 +1,10 @@
 #include "GLNode.h"
 #include "GLObject.h"
-#include "Logger.h"
+#include "common/Logger.h"
 
-#ifndef PIXELEXPLORER_RENDERING_GLRENDEROBJECT_H_
-#define PIXELEXPLORER_RENDERING_GLRENDEROBJECT_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORER_ENGINE_RENDERING_GLRENDEROBJECT_H_
+#define PIXELEXPLORER_ENGINE_RENDERING_GLRENDEROBJECT_H_
+namespace pixelexplorer::engine::rendering {
 	class GLRenderObject : private GLNode<GLRenderObject>, public GLObject
 	{
 	public:

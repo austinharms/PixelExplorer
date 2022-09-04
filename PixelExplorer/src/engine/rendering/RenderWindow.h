@@ -10,7 +10,7 @@
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "CameraInterface.h"
-#include "RefCount.h"
+#include "common/RefCount.h"
 #include "RenderWindow.fwd.h"
 #include "GLNode.h"
 #include "GLObject.fwd.h"
@@ -18,9 +18,9 @@
 #include "Shader.h"
 #include "glm/mat4x4.hpp"
 
-#ifndef PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
-#define PIXELEXPLORE_RENDERING_RENDERWINDOW_H_
-namespace pixelexplorer::rendering {
+#ifndef PIXELEXPLORE_ENGINE_RENDERING_RENDERWINDOW_H_
+#define PIXELEXPLORE_ENGINE_RENDERING_RENDERWINDOW_H_
+namespace pixelexplorer::engine::rendering {
 	class RenderWindow : public RefCount
 	{
 	public:

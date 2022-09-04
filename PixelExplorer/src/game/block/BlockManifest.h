@@ -2,11 +2,11 @@
 #include <unordered_map>
 #include <string>
 
-#include "RefCount.h"
+#include "common/RefCount.h"
+#include "common/Logger.h"
+#include "common/Color.h"
 #include "BlockDefinition.h"
 #include "BlockFaceDefinition.h"
-#include "Color.h"
-#include "Logger.h"
 
 #ifndef PIXELEXPLORER_GAME_BLOCK_BLOCKMANIFEST_H_
 #define PIXELEXPLORER_GAME_BLOCK_BLOCKMANIFEST_H_
