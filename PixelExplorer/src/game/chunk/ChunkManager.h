@@ -168,8 +168,8 @@ namespace pixelexplorer::game::chunk {
 			uint32_t loadedFaceCount = 0;
 			uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;
-			DataBuffer<float>* vertextBuffer = new DataBuffer<float>(faceCount * block::BlockShape::getFaceFloatCount());
-			DataBuffer<uint32_t>* indexBuffer = new DataBuffer<uint32_t>(faceCount * block::BlockShape::getFaceIndexCount());
+			DataBuffer<float>* vertextBuffer = new DataBuffer<float>((uint64_t)faceCount * block::BlockShape::getFaceFloatCount());
+			DataBuffer<uint32_t>* indexBuffer = new DataBuffer<uint32_t>((uint64_t)faceCount * block::BlockShape::getFaceIndexCount());
 			bool buildError = false;
 
 			x = 0;

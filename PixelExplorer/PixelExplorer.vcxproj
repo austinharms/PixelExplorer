@@ -151,9 +151,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\input\InputManager.cpp" />
     <ClCompile Include="src\game\block\BlockShape.cpp" />
     <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
+    <ClCompile Include="src\game\gui\MainMenu.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\engine\rendering\GLObject.cpp" />
     <ClCompile Include="src\engine\rendering\Material.cpp" />
@@ -174,6 +176,9 @@
   <ItemGroup>
     <ClInclude Include="src\common\Color.h" />
     <ClInclude Include="src\common\DataBuffer.h" />
+    <ClInclude Include="src\common\Timer.h" />
+    <ClInclude Include="src\engine\input\InputAction.h" />
+    <ClInclude Include="src\engine\input\InputSource.h" />
     <ClInclude Include="src\game\block\Block.h" />
     <ClInclude Include="src\game\block\BlockDefinition.h" />
     <ClInclude Include="src\game\block\BlockFaceDefinition.h" />
@@ -183,6 +188,7 @@
     <ClInclude Include="src\game\chunk\Chunk.h" />
     <ClInclude Include="src\game\chunk\ChunkManager.h" />
     <ClInclude Include="src\game\chunk\ChunkRenderMesh.h" />
+    <ClInclude Include="src\game\FPSCamera.h" />
     <ClInclude Include="src\game\Game.h" />
     <ClInclude Include="src\engine\Camera.h" />
     <ClInclude Include="src\engine\rendering\CameraInterface.h" />
@@ -194,7 +200,7 @@
     <ClInclude Include="src\engine\rendering\GLObject.h" />
     <ClInclude Include="src\engine\rendering\GLNode.h" />
     <ClInclude Include="src\engine\rendering\GUIElement.h" />
-    <ClInclude Include="src\engine\InputManager.h" />
+    <ClInclude Include="src\engine\input\InputManager.h" />
     <ClInclude Include="src\engine\rendering\Material.h" />
     <ClInclude Include="src\engine\rendering\MaterialProperties.h" />
     <ClInclude Include="src\engine\rendering\RenderGlobal.h" />

@@ -1,12 +1,10 @@
-#define LOG_RENDER_FPS
+//#define LOG_RENDER_FPS
 
 #include "RenderWindow.h"
 
 #include <assert.h>
 #include <algorithm>
-#ifdef LOG_RENDER_FPS
 #include <chrono>
-#endif
 
 #include "GLObject.h"
 #include "RenderGlobal.h"
@@ -29,6 +27,8 @@ namespace pixelexplorer::engine::rendering {
 		_activatedGuiContext = false;
 		_activeShader = nullptr;
 		_camera = nullptr;
+		_inputManager = nullptr;
+		_deltaTime = 0;
 		global::windowCreationLock.lock();
 		_spawnThreadId = std::this_thread::get_id();
 		glfwSetErrorCallback(global::glfwErrorCallback);
@@ -58,6 +58,10 @@ namespace pixelexplorer::engine::rendering {
 		glfwMakeContextCurrent(_window);
 		glfwSetWindowSizeCallback(_window, glfwStaticResizeCallback);
 		glfwSetWindowFocusCallback(_window, glfwStaticFocusCallback);
+		glfwSetCursorPosCallback(_window, glfwStaticCursorPosCallback);
+		glfwSetScrollCallback(_window, glfwStaticMouseScrollCallback);
+		glfwSetMouseButtonCallback(_window, glfwStaticMouseButtonCallback);
+		glfwSetKeyCallback(_window, glfwStaticKeyCallback);
 		glfwSwapInterval(0);
 
 		GLenum initCode = glewInit();
@@ -66,6 +70,7 @@ namespace pixelexplorer::engine::rendering {
 			Logger::fatal(__FUNCTION__" Failed to Init GLEW");
 		}
 
+		_inputManager = new input::InputManager(_window);
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(global::glErrorCallback, 0);
 		glEnable(GL_DEPTH_TEST);
@@ -97,6 +102,12 @@ namespace pixelexplorer::engine::rendering {
 	{
 		if (std::this_thread::get_id() != _spawnThreadId)
 			Logger::fatal(__FUNCTION__ " Render window destructor must be called from the thread that created the window");
+
+		if (_inputManager != nullptr) {
+			_inputManager->setWindow(nullptr);
+			_inputManager->drop();
+			_inputManager = nullptr;
+		}
 
 		glfwMakeContextCurrent(_window);
 		_glRenderObjectsMutex.lock();
@@ -141,6 +152,8 @@ namespace pixelexplorer::engine::rendering {
 			}
 		}
 
+		_staticGLObjectsMutex.unlock();
+		_glRenderObjectsMutex.unlock();
 		ImGui::SetCurrentContext(_guiContext);
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
@@ -155,8 +168,6 @@ namespace pixelexplorer::engine::rendering {
 		}
 
 		global::windowCreationLock.unlock();
-		_staticGLObjectsMutex.unlock();
-		_glRenderObjectsMutex.unlock();
 		Logger::debug("Window closed");
 	}
 
@@ -165,23 +176,39 @@ namespace pixelexplorer::engine::rendering {
 		return glfwWindowShouldClose(_window);
 	}
 
+	void RenderWindow::setShouldClose() const
+	{
+		glfwSetWindowShouldClose(_window, true);
+	}
+
+	void RenderWindow::resetShouldClose() const
+	{
+		glfwSetWindowShouldClose(_window, false);
+	}
+
 	void RenderWindow::drawFrame()
 	{
 #ifdef LOG_RENDER_FPS
-		auto start = std::chrono::high_resolution_clock::now();
+		Timer frameTimer;
 #endif
 		MAINTHREADCHECK();
 		glfwMakeContextCurrent(_window);
 		updateGLQueues();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glfwPollEvents();
 		drawRenderObjects();
 		glfwSwapBuffers(_window);
+		glfwPollEvents();
+		_inputManager->updatePositions();
+		_deltaTime = _deltaTimer.elapsed();
+		if (_deltaTime >= 1.0) {
+			_deltaTime = 1;
+			Logger::warn(__FUNCTION__" delta time over 1, limiting delta time to 1");
+		}
+
+		_deltaTimer.reset();
 #ifdef LOG_RENDER_FPS
-		auto stop = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-		float ms = ((float)duration.count()) / 1000.0f;
-		Logger::debug("Frame took: " + std::to_string(ms) + "ms, FPS: " + std::to_string((1.0f / ms) * 1000));
+		double frameTime = frameTimer.elapsed() * 1000.0;
+		Logger::debug("Frame took: " + std::to_string(frameTime) + "ms, FPS: " + std::to_string((1.0f / frameTime) * 1000));
 #endif
 	}
 
@@ -300,6 +327,11 @@ namespace pixelexplorer::engine::rendering {
 		}
 	}
 
+	void rendering::RenderWindow::resetDeltaTimer()
+	{
+		_deltaTimer.reset();
+	}
+
 	bool RenderWindow::terminateGLObject(GLObject* glObject)
 	{
 		if (glObject->getRenderWindow() != this) {
@@ -381,6 +413,34 @@ namespace pixelexplorer::engine::rendering {
 	void RenderWindow::glfwStaticFocusCallback(GLFWwindow* window, int focused)
 	{
 		((RenderWindow*)glfwGetWindowUserPointer(window))->glfwFocusCallback(focused);
+	}
+
+	void RenderWindow::glfwStaticKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		input::InputManager * inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		if (inputManager != nullptr)
+			inputManager->keyCallback(key, scancode, action, mods);
+	}
+
+	void rendering::RenderWindow::glfwStaticCursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+	{
+		input::InputManager* inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		if (inputManager != nullptr)
+			inputManager->cursorPositionCallback(xpos, ypos);
+	}
+
+	void RenderWindow::glfwStaticMouseScrollCallback(GLFWwindow* window, double xpos, double ypos)
+	{
+		input::InputManager* inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		if (inputManager != nullptr)
+			inputManager->mouseScrollCallback(xpos, ypos);
+	}
+
+	void RenderWindow::glfwStaticMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+	{
+		input::InputManager* inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		if (inputManager != nullptr)
+			inputManager->mouseButtonCallback(button, action, mods);
 	}
 
 	void RenderWindow::glfwResizeCallback(uint32_t width, uint32_t height)

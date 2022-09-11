@@ -9,7 +9,7 @@
 
 void playGame() {
 	pixelexplorer::game::Game* game = new pixelexplorer::game::Game();
-	game->start();
+	game->play();
 	game->drop();
 }
 
