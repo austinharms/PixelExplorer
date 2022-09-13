@@ -2,8 +2,10 @@
 
 #include <string>
 #include <math.h>
+#include <filesystem>
 
 #include "common/Logger.h"
+#include "common/OSHelpers.h"
 #include "engine/rendering/RenderWindow.h"
 
 namespace pixelexplorer::game::gui {
@@ -27,8 +29,8 @@ namespace pixelexplorer::game::gui {
 	MainMenu::~MainMenu() {}
 
 	void MainMenu::onInitialize() {
-		_font = getRenderWindow()->getFont("./assets/fonts/roboto.ttf");
-		_backgroundTexture = new engine::rendering::GLTexture("./assets/textures/main_menu_background.png");
+		_font = getRenderWindow()->getFont( OSHelper::getAssetPath(std::filesystem::path("fonts")) / "roboto.ttf");
+		_backgroundTexture = new engine::rendering::GLTexture(OSHelper::getAssetPath(std::filesystem::path("textures")) / "main_menu_background.png");
 		getRenderWindow()->registerGLObject(_backgroundTexture);
 	}
 

@@ -88,7 +88,7 @@ namespace pixelexplorer::game {
 					chunkManager->loadChunk(glm::i32vec3(x, y, z));
 
 		camera->setPosition(glm::vec3(0, 0, -50));
-		// reset delta timer as we just loaded in lots of data the presumably took a long time
+		// reset delta timer as we just loaded in lots of data that presumably took a long time
 		_window->resetDeltaTimer();
 		while (!_window->shouldClose())
 		{

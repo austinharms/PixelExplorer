@@ -221,6 +221,9 @@
     <ClInclude Include="src\game\FPSCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\OSHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\common\Logger.inl">
@@ -231,5 +234,6 @@
     </None>
     <None Include="assets\shaders\base.shader" />
     <None Include="assets\shaders\cube.shader" />
+    <None Include="assets\blocks\faces\GREEN_FACE.pxface" />
   </ItemGroup>
 </Project>

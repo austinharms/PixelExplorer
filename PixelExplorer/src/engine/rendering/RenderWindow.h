@@ -5,6 +5,7 @@
 #include <list>
 #include <mutex>
 #include <math.h>
+#include <filesystem>
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
@@ -32,8 +33,8 @@ namespace pixelexplorer::engine::rendering {
 		void setShouldClose() const;
 		void resetShouldClose() const;
 		void drawFrame();
-		Shader* getShader(std::string path);
-		ImFont* getFont(const std::string& path);
+		Shader* getShader(const std::filesystem::path& path);
+		ImFont* getFont(const std::filesystem::path& path);
 		void registerGLObject(GLObject* obj);
 		void addGLRenderObject(GLRenderObject* renderObject);
 		void removeGLRenderObject(GLRenderObject* renderObject);

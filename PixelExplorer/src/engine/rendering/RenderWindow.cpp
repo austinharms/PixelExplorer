@@ -212,18 +212,18 @@ namespace pixelexplorer::engine::rendering {
 #endif
 	}
 
-	Shader* RenderWindow::getShader(std::string path)
+	Shader* RenderWindow::getShader(const std::filesystem::path& path)
 	{
-		auto it = _loadedShaders.find(path);
+		auto it = _loadedShaders.find(path.string());
 		if (it != _loadedShaders.end()) {
 			it->second->grab();
 			return it->second;
 		}
 
-		Shader* shader = new Shader(path);
+		Shader* shader = new Shader(path.string());
 		_staticGLObjectsMutex.lock();
 		registerGLObject(shader);
-		_loadedShaders.insert({ path, shader });
+		_loadedShaders.emplace(path.string(), shader);
 		_staticGLObjectsMutex.unlock();
 		return shader;
 	}
@@ -365,14 +365,14 @@ namespace pixelexplorer::engine::rendering {
 		_staticGLObjectsMutex.unlock();
 	}
 
-	ImFont* RenderWindow::getFont(const std::string& path)
+	ImFont* RenderWindow::getFont(const std::filesystem::path& path)
 	{
 		if (std::this_thread::get_id() != _spawnThreadId) {
 			Logger::warn(__FUNCTION__ " must be called from the thread that created the window");
 			return nullptr;
 		}
 
-		auto it = _loadedFonts.find(path);
+		auto it = _loadedFonts.find(path.string());
 		if (it != _loadedFonts.end())
 			return it->second;
 
@@ -382,11 +382,11 @@ namespace pixelexplorer::engine::rendering {
 		config.OversampleH = 3;
 		config.OversampleV = 3;
 		config.GlyphExtraSpacing.x = 1.0f;
-		ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), 30, &config);
+		ImFont* font = io.Fonts->AddFontFromFileTTF(path.string().c_str(), 30, &config);
 		if (font == nullptr)
-			Logger::error(__FUNCTION__" Failed to load font " + path);
+			Logger::error(__FUNCTION__" Failed to load font " + path.string());
 
-		_loadedFonts.emplace(path, font);
+		_loadedFonts.emplace(path.string(), font);
 		return font;
 	}
 

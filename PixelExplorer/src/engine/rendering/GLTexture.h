@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <string>
+#include <filesystem>
 
 #include "common/RefCount.h"
 #include "GLObject.h"
@@ -12,7 +12,7 @@ namespace pixelexplorer::engine::rendering {
 	{
 	public:
 		GLTexture(uint32_t width, uint32_t height);
-		GLTexture(const std::string& path);
+		GLTexture(const std::filesystem::path& path);
 		virtual ~GLTexture();
 		void bind(uint8_t slot = 0);
 		inline uint32_t getGlId() const { return _glTextureId; }

@@ -189,7 +189,7 @@ namespace pixelexplorer::game::chunk {
 									break;
 								}
 
-								block::BlockShape::loadFaceMesh((block::FaceDirection)faceIndex, glm::vec3(x, y, z), indexCount, vertexCount, *indexBuffer, *vertextBuffer);
+								block::BlockShape::loadFaceMesh((block::FaceDirection)faceIndex, *blockFace, glm::vec3(x, y, z), indexCount, vertexCount, *indexBuffer, *vertextBuffer);
 							}
 						}
 					}

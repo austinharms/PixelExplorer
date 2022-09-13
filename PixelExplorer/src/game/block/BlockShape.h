@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include "BlockFaceDefinition.h"
 #include "FaceDirection.h"
 #include "glm/vec3.hpp"
 #include "common/DataBuffer.h"
@@ -11,7 +12,7 @@ namespace pixelexplorer::game::block {
 	{
 	public:
 
-		static void loadFaceMesh(const FaceDirection dir, const glm::vec3& positionOffset, uint32_t& indexOffset, uint32_t& vertexFloatOffset, const DataBuffer<uint32_t>& indexBuffer, const DataBuffer<float>& vertexBuffer);
+		static void loadFaceMesh(const FaceDirection dir, const BlockFaceDefinition& blockFace, const glm::vec3& positionOffset, uint32_t& indexOffset, uint32_t& vertexFloatOffset, const DataBuffer<uint32_t>& indexBuffer, const DataBuffer<float>& vertexBuffer);
 
 		inline static const uint32_t getFloatsPerVertex() { return 3; }
 

@@ -1,6 +1,7 @@
 #include "GLTexture.h"
 
 #include <malloc.h>
+#include <string>
 
 #include "GL/glew.h"
 #include "common/Logger.h"
@@ -15,14 +16,14 @@ namespace pixelexplorer::engine::rendering {
 		_glTextureId = 0;
 	}
 
-	GLTexture::GLTexture(const std::string& path)
+	GLTexture::GLTexture(const std::filesystem::path& path)
 	{
 		int width = 0;
 		int height = 0;
 		int channels = 0;
-		_pixelBuffer = stbi_load(path.c_str(), &width, &height, &channels, 4);
+		_pixelBuffer = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
 		if (_pixelBuffer == nullptr)
-			Logger::warn("Failed to load image from " + path);
+			Logger::warn("Failed to load image from " + path.string());
 
 		_width = width;
 		_height = height;

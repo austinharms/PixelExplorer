@@ -78,7 +78,7 @@ namespace pixelexplorer::game::block {
 		}
 	};
 
-	void BlockShape::loadFaceMesh(const FaceDirection dir, const glm::vec3& positionOffset, uint32_t& indexOffset, uint32_t& vertexFloatOffset, const DataBuffer<uint32_t>& indexBuffer, const DataBuffer<float>& vertexBuffer) {
+	void BlockShape::loadFaceMesh(const FaceDirection dir, const BlockFaceDefinition& blockFace, const glm::vec3& positionOffset, uint32_t& indexOffset, uint32_t& vertexFloatOffset, const DataBuffer<uint32_t>& indexBuffer, const DataBuffer<float>& vertexBuffer) {
 		if (dir == FaceDirection::NONE) return;
 		uint8_t faceInt = (uint8_t)dir;
 

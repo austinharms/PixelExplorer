@@ -5,6 +5,7 @@
 #include "common/RefCount.h"
 #include "common/Logger.h"
 #include "common/Color.h"
+#include "common/OSHelpers.h"
 #include "BlockDefinition.h"
 #include "BlockFaceDefinition.h"
 
@@ -36,8 +37,16 @@ namespace pixelexplorer::game::block {
 
 		inline void loadBlockFaces() {
 			unloadBlockFaces();
-			BlockFaceDefinition* face = new BlockFaceDefinition("TEST_FACE", Color(0,255,0,255));
-			_blockFaceDefinitions.emplace(face->getName(), face);
+			std::filesystem::path blockFacePath(OSHelper::getAssetPath(std::filesystem::path("blocks") / "faces"));
+			for (const auto& entry : std::filesystem::directory_iterator(blockFacePath)) {
+				if (entry.is_regular_file() && entry.path().extension() == ".pxface") {
+					BlockFaceDefinition* face = new BlockFaceDefinition(entry.path());
+					_blockFaceDefinitions.emplace(face->getName(), face);
+				}
+			}
+
+			BlockFaceDefinition* defaultFace = new BlockFaceDefinition("DEFAULT", Color(255, 0, 255, 255));
+			_blockFaceDefinitions.emplace(defaultFace->getName(), defaultFace);
 			_loadedBlockFaces = true;
 			Logger::debug(__FUNCTION__" loaded block faces");
 		}
@@ -47,7 +56,7 @@ namespace pixelexplorer::game::block {
 			if (!_loadedBlockFaces)
 				loadBlockFaces();
 			_blockDefinitions = (BlockDefinition**)calloc(1, sizeof(BlockDefinition*));
-			BlockFaceDefinition* face = getBlockFace("TEST_FACE");
+			BlockFaceDefinition* face = getBlockFace("GREEN_FACE");
 			BlockFaceDefinition* faces[6];
 			for (uint8_t i = 0; i < 6; ++i)
 				faces[i] = face;

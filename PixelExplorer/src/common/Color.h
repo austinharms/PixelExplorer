@@ -6,7 +6,7 @@ namespace pixelexplorer {
 	struct Color
 	{
 	public:
-		Color(uint32_t color) {
+		Color(uint32_t color = 0) {
 			setColor(color);
 		}
 
