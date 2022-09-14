@@ -23,6 +23,10 @@ namespace pixelexplorer {
 
 		inline T* getBufferPtr() const { return _buffer; }
 
+		inline T operator [] (int i) const { return _buffer[i]; }
+
+		inline T& operator [] (int i) { return _buffer[i]; }
+
 	private:
 		const uint64_t _length;
 		T* _buffer;

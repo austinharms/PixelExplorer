@@ -72,8 +72,10 @@ namespace pixelexplorer::game::chunk {
 		glBindVertexArray(_vertexArrayGlId);
 		glGenBuffers(1, &_vertexBufferGlId);
 		glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferGlId);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+		glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(float) * 4, (void*)(sizeof(float) * 3));
 		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 

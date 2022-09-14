@@ -3,6 +3,7 @@
 #include <queue>
 #include <mutex>
 
+#include "common/OSHelpers.h"
 #include "common/Logger.h"
 #include "common/RefCount.h"
 #include "common/DataBuffer.h"
@@ -34,9 +35,8 @@ namespace pixelexplorer::game::chunk {
 			blockManifest->grab();
 			_blockManifest = blockManifest;
 			_chunkMaterial = new engine::rendering::Material();
-			_chunkMaterial->setProperty("u_Color", glm::vec4(0, 1, 0, 1));
 			_renderWindow->registerGLObject(_chunkMaterial);
-			engine::rendering::Shader* chunkShader = _renderWindow->getShader("./assets/shaders/cube.shader");
+			engine::rendering::Shader* chunkShader = _renderWindow->getShader(OSHelper::getAssetPath("shaders") / "chunk.shader");
 			_chunkMaterial->addDependency(chunkShader);
 			chunkShader->drop();
 			chunkShader = nullptr;
@@ -126,6 +126,7 @@ namespace pixelexplorer::game::chunk {
 		}
 
 		inline void remeshChunk(Chunk* chunk) {
+			using namespace block;
 			if (chunk == nullptr) {
 				Logger::warn(__FUNCTION__" attempted to remesh null chunk");
 				return;
@@ -148,14 +149,14 @@ namespace pixelexplorer::game::chunk {
 			for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
 				const block::Block& block = chunk->getBlock(i);
 				if (block.Id != 0) {
-					block::BlockDefinition* blockDef = _blockManifest->getBlock(block.Id);
-					if (blockDef != nullptr) {
+					block::BlockDefinition* blockDef;
+					if ((blockDef = _blockManifest->getBlock(block.Id)) != nullptr) {
 						for (uint8_t faceIndex = 0; faceIndex < 6; ++faceIndex) {
 							if (blockDef->getBlockFace((block::FaceDirection)faceIndex)) ++faceCount;
 						}
 					}
 				}
-				
+
 				if (++x == Chunk::CHUNK_SIZE) {
 					x = 0;
 					if (++z == Chunk::CHUNK_SIZE) {
@@ -168,8 +169,10 @@ namespace pixelexplorer::game::chunk {
 			uint32_t loadedFaceCount = 0;
 			uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;
-			DataBuffer<float>* vertextBuffer = new DataBuffer<float>((uint64_t)faceCount * block::BlockShape::getFaceFloatCount());
-			DataBuffer<uint32_t>* indexBuffer = new DataBuffer<uint32_t>((uint64_t)faceCount * block::BlockShape::getFaceIndexCount());
+			// Add FACE_VERTEX_COUNT here to server as our color per vertex (sizeof(color) == sizeof(float))
+			static_assert(sizeof(Color) == sizeof(float));
+			DataBuffer<float>* vertextBuffer = new DataBuffer<float>((uint64_t)faceCount * (BlockShape::FACE_FLOAT_COUNT + BlockShape::FACE_VERTEX_COUNT));
+			DataBuffer<uint32_t>* indexBuffer = new DataBuffer<uint32_t>((uint64_t)faceCount * BlockShape::FACE_INDEX_COUNT);
 			bool buildError = false;
 
 			x = 0;
@@ -178,18 +181,31 @@ namespace pixelexplorer::game::chunk {
 			for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
 				const block::Block& block = chunk->getBlock(i);
 				if (block.Id != 0) {
-					block::BlockDefinition* blockDef = _blockManifest->getBlock(block.Id);
-					if (blockDef != nullptr) {
-						const block::BlockFaceDefinition* blockFace;
+					BlockDefinition* blockDef;
+					if ((blockDef = _blockManifest->getBlock(block.Id)) != nullptr) {
+						const BlockFaceDefinition* blockFace;
 						for (uint8_t faceIndex = 0; faceIndex < 6; ++faceIndex) {
-							if ((blockFace = blockDef->getBlockFace(block::FaceDirection::FRONT))) {
+							if ((blockFace = blockDef->getBlockFace((FaceDirection)faceIndex))) {
 								if (++loadedFaceCount > faceCount) {
 									buildError = true;
 									Logger::error(__FUNCTION__" failed to build chunk mesh, chunk face count overrun");
 									break;
 								}
 
-								block::BlockShape::loadFaceMesh((block::FaceDirection)faceIndex, *blockFace, glm::vec3(x, y, z), indexCount, vertexCount, *indexBuffer, *vertextBuffer);
+								uint32_t* rawIndexBuffer = indexBuffer->getBufferPtr();
+								uint32_t indexOffset = vertexCount / (BlockShape::VERTEX_FLOAT_COUNT + 1);
+								for (uint32_t j = 0; j < BlockShape::FACE_INDEX_COUNT; ++j)
+									rawIndexBuffer[indexCount++] = BlockShape::BLOCK_FACE_INDICES[faceIndex][j] + indexOffset;
+
+								float* rawVertexBuffer = vertextBuffer->getBufferPtr();
+								for (uint32_t j = 0; j < BlockShape::FACE_VERTEX_COUNT; ++j) {
+									// we assume that there are 3 floats per vertex (x,y,z)
+									static_assert(BlockShape::VERTEX_FLOAT_COUNT == 3);
+									rawVertexBuffer[vertexCount++] = BlockShape::BLOCK_FACE_VERTICES[faceIndex][(j * BlockShape::VERTEX_FLOAT_COUNT) + 0] + x;
+									rawVertexBuffer[vertexCount++] = BlockShape::BLOCK_FACE_VERTICES[faceIndex][(j * BlockShape::VERTEX_FLOAT_COUNT) + 1] + y;
+									rawVertexBuffer[vertexCount++] = BlockShape::BLOCK_FACE_VERTICES[faceIndex][(j * BlockShape::VERTEX_FLOAT_COUNT) + 2] + z;
+									((uint32_t*)rawVertexBuffer)[vertexCount++] = blockFace->getColor().getColorABGR();
+								}
 							}
 						}
 					}

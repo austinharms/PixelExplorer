@@ -48,6 +48,17 @@ namespace pixelexplorer {
 			setColor(getColorR(), getColorG(), getColorB(), alpha);
 		}
 
+		uint32_t getColorABGR() const {
+			uint32_t value = 0;
+			uint8_t* valuePtr = (uint8_t*)&value;
+			uint8_t* colorPtr = (uint8_t*)&color;
+			valuePtr[0] = colorPtr[3];
+			valuePtr[1] = colorPtr[2];
+			valuePtr[2] = colorPtr[1];
+			valuePtr[3] = colorPtr[0];
+			return value;
+		}
+
 		uint32_t color;
 	};
 }

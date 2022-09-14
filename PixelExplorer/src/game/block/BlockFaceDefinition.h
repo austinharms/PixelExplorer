@@ -20,7 +20,7 @@ namespace pixelexplorer::game::block {
 			while (getline(stream, line))
 			{
 				if (line.find("color=#") == 0 && line.find(";") == 15) {
-					_color.setColor(std::stoi(line.c_str() + 7, nullptr, 16));
+					_color.setColor(std::stoul(line.c_str() + 7, nullptr, 16));
 				}
 				else if (!line.empty()) {
 					Logger::warn(__FUNCTION__" malformed line \"" + line + "\" in block face definition " + _name);
@@ -34,7 +34,7 @@ namespace pixelexplorer::game::block {
 
 		inline virtual ~BlockFaceDefinition() {}
 
-		const Color getColor() const { return _color; }
+		const Color& getColor() const { return _color; }
 
 		const std::string getName() const { return _name; }
 

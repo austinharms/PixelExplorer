@@ -41,6 +41,12 @@ namespace pixelexplorer::game::block {
 			for (const auto& entry : std::filesystem::directory_iterator(blockFacePath)) {
 				if (entry.is_regular_file() && entry.path().extension() == ".pxface") {
 					BlockFaceDefinition* face = new BlockFaceDefinition(entry.path());
+					if (face->getName() == "NONE") {
+						Logger::warn(__FUNCTION__" found block face definition with reserved name NONE, block face definition not loaded");
+						face->drop();
+						continue;
+					}
+
 					_blockFaceDefinitions.emplace(face->getName(), face);
 				}
 			}

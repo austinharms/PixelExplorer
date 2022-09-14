@@ -226,6 +226,7 @@
   <ItemGroup>
     <None Include="assets\blocks\faces\GREEN_FACE.pxface" />
     <None Include="assets\shaders\base.shader" />
+    <None Include="assets\shaders\chunk.shader" />
     <None Include="assets\shaders\cube.shader" />
     <None Include="src\common\Logger.inl" />
     <None Include="src\common\RefCount.inl" />

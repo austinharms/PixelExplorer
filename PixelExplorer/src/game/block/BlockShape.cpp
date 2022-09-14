@@ -1,6 +1,6 @@
 #include "BlockShape.h"
 namespace pixelexplorer::game::block {
-	const float BlockShape::s_blockFaceVertices[6][12] = {
+	const float BlockShape::BLOCK_FACE_VERTICES[FACE_COUNT][FACE_FLOAT_COUNT] = {
 		// front
 		{
 			-0.5f, -0.5f,  0.5f,
@@ -45,7 +45,7 @@ namespace pixelexplorer::game::block {
 		},
 	};
 
-	const uint32_t BlockShape::s_blockFaceIndices[6][6] = {
+	const uint32_t BlockShape::BLOCK_FACE_INDICES[FACE_COUNT][FACE_INDEX_COUNT] = {
 		// front
 		{
 			0, 2, 1,
@@ -78,20 +78,22 @@ namespace pixelexplorer::game::block {
 		}
 	};
 
-	void BlockShape::loadFaceMesh(const FaceDirection dir, const BlockFaceDefinition& blockFace, const glm::vec3& positionOffset, uint32_t& indexOffset, uint32_t& vertexFloatOffset, const DataBuffer<uint32_t>& indexBuffer, const DataBuffer<float>& vertexBuffer) {
-		if (dir == FaceDirection::NONE) return;
-		uint8_t faceInt = (uint8_t)dir;
+	//void BlockShape::loadFaceMesh(const FaceDirection dir, const BlockFaceDefinition& blockFace, const glm::vec3& positionOffset, uint32_t& indexOffset, uint32_t& vertexFloatOffset, const DataBuffer<uint32_t>& indexBuffer, const DataBuffer<float>& vertexBuffer) {
+	//	if (dir == FaceDirection::NONE) return;
+	//	uint8_t faceInt = (uint8_t)dir;
 
-		uint32_t* indexBuf = indexBuffer.getBufferPtr();
-		for (uint8_t index = 0; index < getFaceIndexCount(); ++index) {
-			indexBuf[indexOffset++] = s_blockFaceIndices[faceInt][index] + (vertexFloatOffset / getFloatsPerVertex());
-		}
+	//	uint32_t* indexBuf = indexBuffer.getBufferPtr();
+	//	for (uint8_t index = 0; index < getFaceIndexCount(); ++index) {
+	//		indexBuf[indexOffset++] = s_blockFaceIndices[faceInt][index] + (vertexFloatOffset / getFloatsPerVertex());
+	//	}
 
-		float* vertexBuf = vertexBuffer.getBufferPtr();
-		for (uint8_t vertex = 0; vertex < getFaceVertexCount(); ++vertex) {
-			vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 0] + positionOffset.x;
-			vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 1] + positionOffset.y;
-			vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 2] + positionOffset.z;
-		}
-	}
+	//	float* vertexBuf = vertexBuffer.getBufferPtr();
+	//	for (uint8_t vertex = 0; vertex < getFaceVertexCount(); ++vertex) {
+	//		vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 0] + positionOffset.x;
+	//		vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 1] + positionOffset.y;
+	//		vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 2] + positionOffset.z;
+	//		vertexBuf[vertexFloatOffset++] = s_blockFaceVertices[faceInt][(vertex * getFloatsPerVertex()) + 0] + positionOffset.x;
+
+	//	}
+	//}
 }

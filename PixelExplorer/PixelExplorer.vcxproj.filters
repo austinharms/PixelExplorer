@@ -235,5 +235,6 @@
     <None Include="assets\shaders\base.shader" />
     <None Include="assets\shaders\cube.shader" />
     <None Include="assets\blocks\faces\GREEN_FACE.pxface" />
+    <None Include="assets\shaders\chunk.shader" />
   </ItemGroup>
 </Project>
