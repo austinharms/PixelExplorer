@@ -93,7 +93,7 @@ namespace pixelexplorer::game::block {
 		{
 			// allow comments using ;
 			if (line.rfind(";", 0) == 0) continue;
-			bool newBlockFace = false;
+			bool foundFace = false;
 			std::string faceName;
 			if (line.rfind("frontFace=", 0) == 0 && line.find(";") > 11) {
 				if (hasFaces[(uint32_t)FaceDirection::FRONT]) {
@@ -103,8 +103,7 @@ namespace pixelexplorer::game::block {
 
 				hasFaces[(uint32_t)FaceDirection::FRONT] = true;
 				faceName = line.substr(10, line.find(";") - 10);
-				if ((faces[(uint32_t)FaceDirection::FRONT] = getBlockFace(faceName, &newBlockFace)))
-					faces[(uint32_t)FaceDirection::FRONT]->grab();
+				faces[(uint32_t)FaceDirection::FRONT] = getBlockFace(faceName, &foundFace);
 			}
 			else if (line.rfind("backFace=", 0) == 0 && line.find(";") > 10) {
 				if (hasFaces[(uint32_t)FaceDirection::BACK]) {
@@ -113,9 +112,8 @@ namespace pixelexplorer::game::block {
 				}
 
 				hasFaces[(uint32_t)FaceDirection::BACK] = true;
-				faceName = line.substr(10, line.find(";") - 9);
-				if ((faces[(uint32_t)FaceDirection::BACK] = getBlockFace(faceName, &newBlockFace)))
-					faces[(uint32_t)FaceDirection::BACK]->grab();
+				faceName = line.substr(9, line.find(";") - 9);
+				faces[(uint32_t)FaceDirection::BACK] = getBlockFace(faceName, &foundFace);
 			}
 			else if (line.rfind("leftFace=", 0) == 0 && line.find(";") > 10) {
 				if (hasFaces[(uint32_t)FaceDirection::LEFT]) {
@@ -124,9 +122,8 @@ namespace pixelexplorer::game::block {
 				}
 
 				hasFaces[(uint32_t)FaceDirection::LEFT] = true;
-				faceName = line.substr(10, line.find(";") - 9);
-				if ((faces[(uint32_t)FaceDirection::LEFT] = getBlockFace(faceName, &newBlockFace)))
-					faces[(uint32_t)FaceDirection::LEFT]->grab();
+				faceName = line.substr(9, line.find(";") - 9);
+				faces[(uint32_t)FaceDirection::LEFT] = getBlockFace(faceName, &foundFace);
 			}
 			else if (line.rfind("rightFace=", 0) == 0 && line.find(";") > 11) {
 				if (hasFaces[(uint32_t)FaceDirection::RIGHT]) {
@@ -136,8 +133,7 @@ namespace pixelexplorer::game::block {
 
 				hasFaces[(uint32_t)FaceDirection::RIGHT] = true;
 				faceName = line.substr(10, line.find(";") - 10);
-				if ((faces[(uint32_t)FaceDirection::RIGHT] = getBlockFace(faceName, &newBlockFace)))
-					faces[(uint32_t)FaceDirection::RIGHT]->grab();
+				faces[(uint32_t)FaceDirection::RIGHT] = getBlockFace(faceName, &foundFace);
 			}
 			else if (line.rfind("topFace=", 0) == 0 && line.find(";") > 9) {
 				if (hasFaces[(uint32_t)FaceDirection::TOP]) {
@@ -146,27 +142,24 @@ namespace pixelexplorer::game::block {
 				}
 
 				hasFaces[(uint32_t)FaceDirection::TOP] = true;
-				faceName = line.substr(10, line.find(";") - 8);
-				if ((faces[(uint32_t)FaceDirection::TOP] = getBlockFace(faceName, &newBlockFace)))
-					faces[(uint32_t)FaceDirection::TOP]->grab();
-			}
-			else if (line.rfind("bottomFace=", 0) == 0 && line.find(";") > 12) {
+				faceName = line.substr(8, line.find(";") - 8);
+				faces[(uint32_t)FaceDirection::TOP] = getBlockFace(faceName, &foundFace);
+			} else if (line.rfind("bottomFace=", 0) == 0 && line.find(";") > 12) {
 				if (hasFaces[(uint32_t)FaceDirection::BOTTOM]) {
 					Logger::warn(__FUNCTION__" bottomFace was reassigned in pxblock file " + path.string() + " using original face");
 					continue;
 				}
 
 				hasFaces[(uint32_t)FaceDirection::BOTTOM] = true;
-				faceName = line.substr(10, line.find(";") - 11);
-				if ((faces[(uint32_t)FaceDirection::BOTTOM] = getBlockFace(faceName, &newBlockFace)))
-					faces[(uint32_t)FaceDirection::BOTTOM]->grab();
+				faceName = line.substr(11, line.find(";") - 11);
+				faces[(uint32_t)FaceDirection::BOTTOM] = getBlockFace(faceName, &foundFace);
 			}
 			else if (!line.empty()) {
 				Logger::warn(__FUNCTION__" malformed line \"" + line + "\" in pxblock file " + path.string() + " file not loaded");
 				return nullptr;
 			}
 
-			if (newBlockFace)
+			if (!foundFace)
 				Logger::warn(__FUNCTION__" failed to find block face \"" + faceName + "\", created default face");
 		}
 

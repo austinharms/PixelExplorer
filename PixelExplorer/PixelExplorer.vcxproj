@@ -157,6 +157,7 @@
     <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
     <ClCompile Include="src\game\gui\MainMenu.cpp" />
+    <ClCompile Include="src\game\world\World.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\engine\rendering\GLObject.cpp" />
     <ClCompile Include="src\engine\rendering\Material.cpp" />
@@ -211,6 +212,8 @@
     <ClInclude Include="src\engine\rendering\RenderWindow.h" />
     <ClInclude Include="src\engine\rendering\Shader.h" />
     <ClInclude Include="src\engine\rendering\GLTexture.h" />
+    <ClInclude Include="src\game\world\World.h" />
+    <ClInclude Include="src\game\world\WorldDetails.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3_loader.h" />
