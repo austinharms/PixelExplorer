@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\engine\input\InputManager.cpp" />
+    <ClCompile Include="src\game\block\BlockManifest.cpp" />
     <ClCompile Include="src\game\block\BlockShape.cpp" />
     <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp" />
     <ClCompile Include="src\game\Game.cpp" />

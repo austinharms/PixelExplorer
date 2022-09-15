@@ -13,13 +13,13 @@ namespace pixelexplorer::game::block {
 	public:
 		inline BlockDefinition(BlockFaceDefinition* faces[6], uint32_t id, const std::string& name) : _name(name), _id(id) {
 			for (uint8_t i = 0; i < 6; ++i) {
-				faces[i]->grab();
-				_faces[i] = faces[i];
+				if ((_faces[i] = faces[i])) faces[i]->grab();
 			}
 		}
 
 		inline virtual ~BlockDefinition() {
-			for (uint8_t i = 0; i < 6; ++i) _faces[i]->drop();
+			for (uint8_t i = 0; i < 6; ++i)
+				if (_faces[i]) _faces[i]->drop();
 		}
 
 		inline const uint32_t getId() const { return _id; }

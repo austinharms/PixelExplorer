@@ -204,7 +204,7 @@ namespace pixelexplorer::game::chunk {
 									rawVertexBuffer[vertexCount++] = BlockShape::BLOCK_FACE_VERTICES[faceIndex][(j * BlockShape::VERTEX_FLOAT_COUNT) + 0] + x;
 									rawVertexBuffer[vertexCount++] = BlockShape::BLOCK_FACE_VERTICES[faceIndex][(j * BlockShape::VERTEX_FLOAT_COUNT) + 1] + y;
 									rawVertexBuffer[vertexCount++] = BlockShape::BLOCK_FACE_VERTICES[faceIndex][(j * BlockShape::VERTEX_FLOAT_COUNT) + 2] + z;
-									((uint32_t*)rawVertexBuffer)[vertexCount++] = blockFace->getColor().getColorABGR();
+									((uint32_t*)rawVertexBuffer)[vertexCount++] = blockFace->Color.getColorABGR();
 								}
 							}
 						}
