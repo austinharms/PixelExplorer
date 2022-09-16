@@ -9,27 +9,19 @@ namespace pixelexplorer {
 	class DataBuffer : public RefCount
 	{
 	public:
-		inline DataBuffer(uint64_t length) : _length(length) {
-			_buffer = (T*)malloc(length * sizeof(T));
-		}
-
-		inline virtual ~DataBuffer() {
-			free(_buffer);
-		}
-
-		inline uint64_t getLength() const { return _length; }
-
-		inline uint64_t getSize() const { return _length * sizeof(T); }
-
-		inline T* getBufferPtr() const { return _buffer; }
-
-		inline T operator [] (int i) const { return _buffer[i]; }
-
-		inline T& operator [] (int i) { return _buffer[i]; }
+		inline DataBuffer(uint64_t length);
+		inline virtual ~DataBuffer();
+		inline uint64_t getLength() const;
+		inline uint64_t getSize() const;
+		inline T* getBufferPtr() const;
+		inline T operator [] (int i) const;
+		inline T& operator [] (int i);
 
 	private:
 		const uint64_t _length;
 		T* _buffer;
 	};
 }
+
+#include "DataBuffer.inl"
 #endif // !PIXELEXPLORER_DATABUFFER_H_

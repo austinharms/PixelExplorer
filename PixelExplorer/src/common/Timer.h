@@ -8,11 +8,9 @@ namespace pixelexplorer {
     class Timer
     {
     public:
-        inline Timer() : _startTime(ClockType::now()) {}
-        inline void reset() { _startTime = ClockType::now(); }
-        double elapsed() const {
-            return std::chrono::duration_cast<SecondDuration>(ClockType::now() - _startTime).count();
-        }
+        inline Timer();
+        inline void reset();
+        inline double elapsed() const;
 
     private:
         typedef std::chrono::high_resolution_clock ClockType;
@@ -20,4 +18,6 @@ namespace pixelexplorer {
         std::chrono::time_point<ClockType> _startTime;
     };
 }
+
+#include "Timer.inl"
 #endif // !PIXELEXPLORER_TIMER_H_
