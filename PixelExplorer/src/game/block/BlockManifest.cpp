@@ -3,24 +3,17 @@
 #include <forward_list>
 
 namespace pixelexplorer::game::block {
-	BlockManifest::BlockManifest() {
+	BlockManifest::BlockManifest(const std::filesystem::path& externalResourcePath) : _resourcePath(externalResourcePath) {
 		_blockDefinitions = nullptr;
 		_loadedBlocks = false;
 		_loadedBlockFaces = false;
 		_lastBlockId = 0;
-	}
-
-	BlockManifest::~BlockManifest() {
-		unload();
-	}
-
-	void BlockManifest::load() {
 		loadBlockIdMap();
 		loadBlockFaces();
 		loadBlocks();
 	}
 
-	void BlockManifest::unload() {
+	BlockManifest::~BlockManifest() {
 		unloadBlocks();
 		unloadBlockFaces();
 		unloadBlockIdMap();
@@ -318,6 +311,7 @@ namespace pixelexplorer::game::block {
 	void BlockManifest::loadBlockIdMap()
 	{
 		_lastBlockId = 0;
+		if (_resourcePath == "") return;
 	}
 
 	void BlockManifest::unloadBlockFaces() {
@@ -336,6 +330,7 @@ namespace pixelexplorer::game::block {
 	{
 		_blockIdMap.clear();
 		_lastBlockId = 0;
+		if (_resourcePath == "") return;
 	}
 
 	BlockFaceDefinition* BlockManifest::createDefaultBlockFace(const std::string& name) {

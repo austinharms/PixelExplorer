@@ -248,5 +248,17 @@
     <None Include="assets\shaders\cube.shader" />
     <None Include="assets\blocks\faces\GREEN_FACE.pxface" />
     <None Include="assets\shaders\chunk.shader" />
+    <None Include="src\common\Color.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="src\common\DataBuffer.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="src\common\Timer.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="src\common\OSHelpers.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

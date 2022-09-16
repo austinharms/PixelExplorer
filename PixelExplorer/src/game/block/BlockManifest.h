@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <unordered_map>
 #include <string>
+#include <filesystem>
 
 #include "common/RefCount.h"
 #include "common/Logger.h"
@@ -15,10 +16,10 @@ namespace pixelexplorer::game::block {
 	class BlockManifest : public RefCount
 	{
 	public:
-		BlockManifest();
+		// externalResourcePath is used to save the block id mapping and it will also attempt to load pxblock and pxface files
+		// if externalResourcePath is empty the block id map will not be loaded/saved
+		BlockManifest(const std::filesystem::path& externalResourcePath);
 		virtual ~BlockManifest();
-		void load();
-		void unload();
 		BlockDefinition* getBlock(uint32_t id) const;
 		uint32_t getBlockId(const std::string& name) const;
 		BlockDefinition* getBlockByName(const std::string& name);
@@ -29,6 +30,7 @@ namespace pixelexplorer::game::block {
 		BlockDefinition** _blockDefinitions;
 		std::unordered_map<std::string, BlockFaceDefinition*> _blockFaceDefinitions;
 		std::unordered_map<std::string, uint32_t> _blockIdMap;
+		const std::filesystem::path _resourcePath;
 		uint32_t _lastBlockId;
 		bool _loadedBlocks;
 		bool _loadedBlockFaces;
