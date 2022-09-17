@@ -21,7 +21,7 @@ namespace pixelexplorer::engine::rendering {
 	private:
 		inline void onUpdate() override {
 			RenderWindow* window = getRenderWindow();
-			window->loadImGuiContext();
+			window->setImGuiContexCurrent();
 			onRenderGui(window->getWindowWidth(), window->getWindowHeight(), window->getWindowScale());
 		}
 	};

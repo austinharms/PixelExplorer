@@ -13,10 +13,10 @@ namespace pixelexplorer::game::chunk {
 	class ChunkRenderMesh : public engine::rendering::GLRenderObject
 	{
 	public:
-		ChunkRenderMesh(engine::rendering::Material* material, engine::rendering::RenderWindow* window = nullptr, const glm::vec3& pos = glm::vec3(0));
+		ChunkRenderMesh(engine::rendering::Material& material, engine::rendering::RenderWindow* window = nullptr, const glm::vec3& pos = glm::vec3(0));
 		virtual ~ChunkRenderMesh();
 
-		void updateMesh(DataBuffer<uint32_t>* indices, DataBuffer<float>* vertices);
+		void updateMesh(DataBuffer<uint32_t>& indices, DataBuffer<float>& vertices);
 		void setPosition(const glm::vec3& pos);
 
 	protected:

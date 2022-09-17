@@ -260,5 +260,8 @@
     <None Include="src\common\OSHelpers.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="src\engine\rendering\GLNode.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

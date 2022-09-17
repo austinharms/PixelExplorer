@@ -13,7 +13,9 @@ namespace pixelexplorer::game::world {
 
 		inline virtual ~WorldDetails() {}
 
-		inline WorldDetails* loadDetails(const std::filesystem::path& path) {
+		// load WorldDetails object from folder
+		// note this function expects path to point to a world folder
+		static WorldDetails* loadDetails(const std::filesystem::path& path) {
 			// validate path is valid
 			if (path.has_filename()) return nullptr;
 			if (!std::filesystem::exists(path)) return nullptr;

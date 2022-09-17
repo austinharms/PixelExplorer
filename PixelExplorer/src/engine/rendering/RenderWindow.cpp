@@ -1,5 +1,3 @@
-//#define LOG_RENDER_FPS
-
 #include "RenderWindow.h"
 
 #include <assert.h>
@@ -12,25 +10,47 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-#define MAINTHREADCHECK() { \
-							if(std::this_thread::get_id() != _spawnThreadId) { \
-								Logger::error(__FUNCTION__ " must be called from the thread that created the window"); \
-								return; \
-							}\
-						}
+#ifdef PX_CHECK_CALLING_THREAD
+#define PX_RENDERER_CHECK_THREAD_DEFAULT_RETURN() do { if(!usingRenderThread()) { Logger::error(__FUNCTION__ " must be called from the thread that created the window"); return; }} while(0)
+#define PX_RENDERER_CHECK_THREAD_CUSTOM_RETURN(RETURN_VALUE) do { if(!usingRenderThread()) { Logger::error(__FUNCTION__ " must be called from the thread that created the window"); return RETURN_VALUE; }} while(0)
+#define PX_RENDERER_CHECK_THREAD_X(A,FUNC, ...)  FUNC
+#define PX_RENDERER_CHECK_THREAD(...)  PX_RENDERER_CHECK_THREAD_X(,##__VA_ARGS__,\
+                                          PX_RENDERER_CHECK_THREAD_CUSTOM_RETURN(__VA_ARGS__),\
+                                          PX_RENDERER_CHECK_THREAD_DEFAULT_RETURN(__VA_ARGS__)\
+                                         ) 
+#define PX_RENDERER_CHECK_THREAD_FATAL() do { if(!usingRenderThread()) Logger::fatal(__FUNCTION__" must be called from the thread that created the window"); } while(0)
+#else
+#define PX_RENDERER_CHECK_THREAD(...) do {} while(0)
+#define PX_RENDERER_CHECK_THREAD_FATAL() do {} while(0)
+#endif // PX_CHECK_CALLING_THREAD
+
+
+//#define MAINTHREADCHECK() { \
+//							if(std::this_thread::get_id() != _spawnThreadId) { \
+//								Logger::error(__FUNCTION__ " must be called from the thread that created the window"); \
+//								return; \
+//							}\
+//						}
 
 thread_local ImGuiContext* MyImGuiTLS;
 
 namespace pixelexplorer::engine::rendering {
-	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title, CameraInterface* camera)
+	RenderWindow::RenderWindow(int32_t width, int32_t height, const char* title, CameraInterface* camera) : _inputManager(*(new input::InputManager()))
 	{
-		_activatedGuiContext = false;
+		_spawnThreadId = std::this_thread::get_id();
 		_activeShader = nullptr;
 		_camera = nullptr;
-		_inputManager = nullptr;
+		_activatedGuiContext = false;
 		_deltaTime = 0;
+		_windowWidth = width;
+		_windowHeight = height;
+
+		// this causes divide by 0 errors in the projection matrix and should just never happen
+		if (width == 0 || height == 0)
+			Logger::fatal(__FUNCTION__" attempted to create with 0 width or height");
+
+		// register window with global object
 		global::windowCreationLock.lock();
-		_spawnThreadId = std::this_thread::get_id();
 		glfwSetErrorCallback(global::glfwErrorCallback);
 		global::glfwInit = glfwInit();
 		if (!global::glfwInit) {
@@ -40,6 +60,7 @@ namespace pixelexplorer::engine::rendering {
 			Logger::fatal(__FUNCTION__" Failed to Init GLFW");
 		}
 
+		// create glfw window object
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
@@ -54,6 +75,8 @@ namespace pixelexplorer::engine::rendering {
 		++global::windowCount;
 		global::windowCreationLock.unlock();
 		Logger::debug(__FUNCTION__" Window Created");
+
+		// setup glfw callbacks
 		glfwSetWindowUserPointer(_window, this);
 		glfwMakeContextCurrent(_window);
 		glfwSetWindowSizeCallback(_window, glfwStaticResizeCallback);
@@ -62,15 +85,19 @@ namespace pixelexplorer::engine::rendering {
 		glfwSetScrollCallback(_window, glfwStaticMouseScrollCallback);
 		glfwSetMouseButtonCallback(_window, glfwStaticMouseButtonCallback);
 		glfwSetKeyCallback(_window, glfwStaticKeyCallback);
+		// set window on input manager now that callbacks are setup
+		_inputManager.setWindow(_window);
+		// disable vsync (not guaranteed)
 		glfwSwapInterval(0);
 
+		// init glew on the new openGL context created by glfwCreateWindow
 		GLenum initCode = glewInit();
 		if (initCode != GLEW_OK) {
 			Logger::error(std::to_string(initCode) + ": " + (const char*)glewGetErrorString(initCode));
 			Logger::fatal(__FUNCTION__" Failed to Init GLEW");
 		}
 
-		_inputManager = new input::InputManager(_window);
+		// set openGL settings? I don't think that is the right word
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(global::glErrorCallback, 0);
 		glEnable(GL_DEPTH_TEST);
@@ -80,9 +107,8 @@ namespace pixelexplorer::engine::rendering {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		// this sets up the glViewport
 		glfwResizeCallback(width, height);
-		// needs to happen after glfwResizeCallback due to setCamera using _windowHeight and _windowWidth, (_windowWidth and _windowHeight are set in glfwResizeCallback)
-		setCamera(camera);
 
 		// Init imgui
 		IMGUI_CHECKVERSION();
@@ -93,21 +119,20 @@ namespace pixelexplorer::engine::rendering {
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		ImGui::StyleColorsDark();
 		//ImGui::StyleColorsClassic();
+		// this must be done after setting callbacks as this will override them (callbacks are called/forwarded by ImGUI)
 		ImGui_ImplGlfw_InitForOpenGL(_window, true);
 		// TODO fix hard coding the version
 		ImGui_ImplOpenGL3_Init("#version 150");
+
+		// needs to happen after _windowWidth and _windowHeight and set and are not 0
+		setCamera(camera);
 	}
 
 	RenderWindow::~RenderWindow()
 	{
-		if (std::this_thread::get_id() != _spawnThreadId)
-			Logger::fatal(__FUNCTION__ " Render window destructor must be called from the thread that created the window");
-
-		if (_inputManager != nullptr) {
-			_inputManager->setWindow(nullptr);
-			_inputManager->drop();
-			_inputManager = nullptr;
-		}
+		PX_RENDERER_CHECK_THREAD_FATAL();
+		// this prevents the input manager from changing window properties
+		_inputManager.setWindow(nullptr);
 
 		glfwMakeContextCurrent(_window);
 		_glRenderObjectsMutex.lock();
@@ -126,29 +151,29 @@ namespace pixelexplorer::engine::rendering {
 		}
 
 		{
-			GLNode<GLRenderObject>* currentNode = _glRenderObjects.next;
+			GLNode<GLRenderObject>* currentNode = _glRenderObjects.Next;
 			while (currentNode != nullptr) {
 				GLRenderObject* renderObject = static_cast<GLRenderObject*>(currentNode);
-				currentNode = currentNode->next;
-				removeGLRenderObject(renderObject);
+				currentNode = currentNode->Next;
+				removeGLRenderObject(*renderObject);
 			}
 		}
 
 		{
-			GLNode<GLObject>* currentNode = _staticGLObjects.next;
+			GLNode<GLObject>* currentNode = _staticGLObjects.Next;
 			while (currentNode != nullptr) {
 				GLObject* glObj = static_cast<GLObject*>(currentNode);
-				currentNode = currentNode->next;
-				terminateGLObjectUnsafe(glObj);
+				currentNode = currentNode->Next;
+				terminateGLObjectUnsafe(*glObj);
 			}
 		}
 
 		{
-			GLNode<GLObject>* currentNode = _staticGLObjectsRemoveQueue.next;
+			GLNode<GLObject>* currentNode = _staticGLObjectsRemoveQueue.Next;
 			while (currentNode != nullptr) {
 				GLObject* glObj = static_cast<GLObject*>(currentNode);
-				currentNode = currentNode->next;
-				terminateGLObjectUnsafe(glObj);
+				currentNode = currentNode->Next;
+				terminateGLObjectUnsafe(*glObj);
 			}
 		}
 
@@ -161,6 +186,8 @@ namespace pixelexplorer::engine::rendering {
 		_guiContext = nullptr;
 
 		glfwDestroyWindow(_window);
+		// this must not happen before glfw callbacks are removed
+		_inputManager.drop();
 		global::windowCreationLock.lock();
 		if (--global::windowCount == 0) {
 			glfwTerminate();
@@ -188,17 +215,17 @@ namespace pixelexplorer::engine::rendering {
 
 	void RenderWindow::drawFrame()
 	{
-#ifdef LOG_RENDER_FPS
+		PX_RENDERER_CHECK_THREAD();
+#ifdef PX_LOG_RENDER_FPS
 		Timer frameTimer;
 #endif
-		MAINTHREADCHECK();
 		glfwMakeContextCurrent(_window);
 		updateGLQueues();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawRenderObjects();
 		glfwSwapBuffers(_window);
 		glfwPollEvents();
-		_inputManager->updatePositions();
+		_inputManager.updatePositions();
 		_deltaTime = _deltaTimer.elapsed();
 		if (_deltaTime >= 1.0) {
 			_deltaTime = 1;
@@ -206,14 +233,15 @@ namespace pixelexplorer::engine::rendering {
 		}
 
 		_deltaTimer.reset();
-#ifdef LOG_RENDER_FPS
+#ifdef PX_LOG_RENDER_FPS
 		double frameTime = frameTimer.elapsed() * 1000.0;
 		Logger::debug("Frame took: " + std::to_string(frameTime) + "ms, FPS: " + std::to_string((1.0f / frameTime) * 1000));
 #endif
 	}
 
-	Shader* RenderWindow::getShader(const std::filesystem::path& path)
+	Shader* RenderWindow::loadShader(const std::filesystem::path& path)
 	{
+		std::lock_guard<std::recursive_mutex> lock(_staticGLObjectsMutex);
 		auto it = _loadedShaders.find(path.string());
 		if (it != _loadedShaders.end()) {
 			it->second->grab();
@@ -221,18 +249,20 @@ namespace pixelexplorer::engine::rendering {
 		}
 
 		Shader* shader = new Shader(path.string());
-		_staticGLObjectsMutex.lock();
-		registerGLObject(shader);
+		// this should only happen if there is memory allocation issues, should this be a fatal log?
+		if (shader == nullptr) Logger::error(__FUNCTION__" failed to create shader object");
+		if (shader != nullptr) registerGLObject(*shader);
 		_loadedShaders.emplace(path.string(), shader);
-		_staticGLObjectsMutex.unlock();
 		return shader;
 	}
 
-	void RenderWindow::addGLRenderObject(GLRenderObject* renderObject)
+	void RenderWindow::addGLRenderObject(GLRenderObject& renderObject)
 	{
-		if (renderObject->getAttached()) {
-			if (renderObject->getRenderWindow() != this) {
+		renderObject.grab();
+		if (renderObject.getAttached()) {
+			if (renderObject.getRenderWindow() != this) {
 				Logger::error(__FUNCTION__" Attempted to add GLRenderObject already attached to different Window, GLRenderObject not added");
+				renderObject.drop();
 				return;
 			}
 		}
@@ -240,27 +270,27 @@ namespace pixelexplorer::engine::rendering {
 			registerGLObject(renderObject);
 		}
 
-		if (renderObject->inRenderQueue()) {
+		if (renderObject.inRenderQueue()) {
 			Logger::warn(__FUNCTION__" Attempted to add GLRenderObject already in render queue to render queue");
+			renderObject.drop();
 			return;
 		}
 
-		renderObject->grab();
 		_glRenderObjectsMutex.lock();
 		GLNode<GLRenderObject>* lastNode = &_glRenderObjects;
-		GLNode<GLRenderObject>* node = _glRenderObjects.next;
-		while (node != nullptr && static_cast<GLRenderObject*>(node)->getPriority() < renderObject->getPriority()) {
+		GLNode<GLRenderObject>* node = _glRenderObjects.Next;
+		while (node != nullptr && static_cast<GLRenderObject*>(node)->getPriority() < renderObject.getPriority()) {
 			lastNode = node;
-			node = node->next;
+			node = node->Next;
 		}
 
-		static_cast<GLNode<GLRenderObject>*>(renderObject)->insertNodeAfter<GLRenderObject>(lastNode);
+		static_cast<GLNode<GLRenderObject>&>(renderObject).insertNodeAfter(lastNode);
 		_glRenderObjectsMutex.unlock();
 	}
 
-	void RenderWindow::removeGLRenderObject(GLRenderObject* renderObject) {
-		if (renderObject->getAttached()) {
-			if (renderObject->getRenderWindow() != this) {
+	void RenderWindow::removeGLRenderObject(GLRenderObject& renderObject) {
+		if (renderObject.getAttached()) {
+			if (renderObject.getRenderWindow() != this) {
 				Logger::error(__FUNCTION__" Attempted to remove GLRenderObject attached to different Window, GLRenderObject not removed");
 				return;
 			}
@@ -270,20 +300,20 @@ namespace pixelexplorer::engine::rendering {
 			return;
 		}
 
-		if (!renderObject->inRenderQueue()) {
+		if (!renderObject.inRenderQueue()) {
 			Logger::warn(__FUNCTION__" Attempted to remove GLRenderObject not in render queue, GLRenderObject not removed");
 			return;
 		}
 
 		_glRenderObjectsMutex.lock();
-		static_cast<GLNode<GLRenderObject>*>(renderObject)->removeNode<GLRenderObject>();
+		static_cast<GLNode<GLRenderObject>&>(renderObject).removeNode();
 		_glRenderObjectsMutex.unlock();
-		renderObject->drop();
+		renderObject.drop();
 	}
 
-	void RenderWindow::loadImGuiContext()
+	void RenderWindow::setImGuiContexCurrent()
 	{
-		MAINTHREADCHECK();
+		PX_RENDERER_CHECK_THREAD();
 		if (!_activatedGuiContext) {
 			_activatedGuiContext = true;
 			ImGui::SetCurrentContext(_guiContext);
@@ -293,25 +323,33 @@ namespace pixelexplorer::engine::rendering {
 		}
 	}
 
-	void RenderWindow::setActiveShader(const Shader* shader)
+	void RenderWindow::setActiveShader(const Shader& shader)
 	{
-		MAINTHREADCHECK();
-		if (shader == nullptr) {
-			Logger::error("Failed to set RenderWindow shader, shader was NULL");
-			return;
-		}
-
-		_activeShader = (Shader*)shader;
-		_activeShader->bind();
+		PX_RENDERER_CHECK_THREAD();
+		// we are not grabbing the shader here for performance
+		// also the shader should be grabbed by the windows shader cache
+		_activeShader = (Shader*)&shader;
+		shader.bind();
 		if (_camera != nullptr)
 			_activeShader->setUniformm4fv("u_ViewProjectionMatrix", _camera->getVPMatrix());
 	}
 
-	void RenderWindow::setModelMatrix(const glm::mat4& mtx)
+	void rendering::RenderWindow::clearActiveShader(const Shader& shader)
 	{
-		MAINTHREADCHECK();
-		if (_activeShader != nullptr)
-			_activeShader->setUniformm4fv("u_ModelMatrix", mtx);
+		PX_RENDERER_CHECK_THREAD();
+		if (_activeShader && _activeShader == &shader) {
+			_activeShader->unbind();
+			// we don't grab the shader, so we don't drop it here
+			_activeShader = nullptr;
+		}
+	}
+
+	bool RenderWindow::setModelMatrix(const glm::mat4& mtx)
+	{
+		PX_RENDERER_CHECK_THREAD();
+		if (_activeShader == nullptr) return false;
+		_activeShader->setUniformm4fv("u_ModelMatrix", mtx);
+		return true;
 	}
 
 	void RenderWindow::setCamera(CameraInterface* camera) {
@@ -332,46 +370,44 @@ namespace pixelexplorer::engine::rendering {
 		_deltaTimer.reset();
 	}
 
-	bool RenderWindow::terminateGLObject(GLObject* glObject)
+	bool RenderWindow::terminateGLObject(GLObject& glObject)
 	{
-		if (glObject->getRenderWindow() != this) {
-			Logger::error("Attempted to remove RenderObject that is not in the RenderWindow");
+		if (glObject.getRenderWindow() != this) {
+			Logger::error(__FUNCTION__" Attempted to remove RenderObject that is not in the RenderWindow");
 			return false;
 		}
 
 		std::lock_guard<std::recursive_mutex> lock(_staticGLObjectsMutex);
-		glObject->removeNode<GLObject>();
-		if (std::this_thread::get_id() == _spawnThreadId) {
+		glObject.removeNode();
+		if (usingRenderThread()) {
 			return terminateGLObjectUnsafe(glObject);
 		}
 		else {
-			glObject->insertNodeAfter(&_staticGLObjectsRemoveQueue);
+			glObject.insertNodeAfter(&_staticGLObjectsRemoveQueue);
 			return false;
 		}
 	}
 
-	bool RenderWindow::terminateGLObjectUnsafe(GLObject* glObject)
+	bool RenderWindow::terminateGLObjectUnsafe(GLObject& glObject)
 	{
-		glObject->removeNode<GLObject>();
-		glObject->terminate();
-		return glObject->drop();
+		PX_RENDERER_CHECK_THREAD();
+		glObject.removeNode();
+		glObject.terminate();
+		return glObject.drop();
 	}
 
-	void RenderWindow::removeShaderFromCache(Shader* shader)
+	void RenderWindow::removeShaderFromCache(Shader& shader)
 	{
 		_staticGLObjectsMutex.lock();
-		if (_loadedShaders.erase(shader->_path) == 0)
-			Logger::warn("Failed to remove " + shader->_path + " from RenderWindow Shader cache");
+		if (_loadedShaders.erase(shader._path) == 0)
+			Logger::warn(__FUNCTION__" failed to remove " + shader._path + " from window Shader cache");
 		_staticGLObjectsMutex.unlock();
 	}
 
-	ImFont* RenderWindow::getFont(const std::filesystem::path& path)
+	ImFont* RenderWindow::loadFont(const std::filesystem::path& path)
 	{
-		if (std::this_thread::get_id() != _spawnThreadId) {
-			Logger::warn(__FUNCTION__ " must be called from the thread that created the window");
-			return nullptr;
-		}
-
+		PX_RENDERER_CHECK_THREAD(nullptr);
+		std::lock_guard<std::recursive_mutex> lock(_staticGLObjectsMutex);
 		auto it = _loadedFonts.find(path.string());
 		if (it != _loadedFonts.end())
 			return it->second;
@@ -383,25 +419,24 @@ namespace pixelexplorer::engine::rendering {
 		config.OversampleV = 3;
 		config.GlyphExtraSpacing.x = 1.0f;
 		ImFont* font = io.Fonts->AddFontFromFileTTF(path.string().c_str(), 30, &config);
-		if (font == nullptr)
-			Logger::error(__FUNCTION__" Failed to load font " + path.string());
-
+		if (font == nullptr) Logger::error(__FUNCTION__" Failed to load font " + path.string());
 		_loadedFonts.emplace(path.string(), font);
 		return font;
 	}
 
-	void RenderWindow::registerGLObject(GLObject* obj)
+	void RenderWindow::registerGLObject(GLObject& obj)
 	{
-		if (obj->getAttached()) {
-			if (obj->getRenderWindow() != this)
+		obj.grab();
+		if (obj.getAttached()) {
+			if (obj.getRenderWindow() != this)
 				Logger::error(__FUNCTION__" Attempted to register GLObject already attached to different Window, GLObject not register");
+			obj.drop();
 			return;
 		}
 
-		obj->grab();
-		obj->attach(this);
+		obj.attach(*this);
 		_staticGLObjectsMutex.lock();
-		obj->insertNodeAfter<GLObject>(&_staticGLObjects);
+		obj.insertNodeAfter(&_staticGLObjects);
 		_staticGLObjectsMutex.unlock();
 	}
 
@@ -417,34 +452,32 @@ namespace pixelexplorer::engine::rendering {
 
 	void RenderWindow::glfwStaticKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		input::InputManager * inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
-		if (inputManager != nullptr)
-			inputManager->keyCallback(key, scancode, action, mods);
+		input::InputManager& inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		inputManager.keyCallback(key, scancode, action, mods);
 	}
 
 	void rendering::RenderWindow::glfwStaticCursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 	{
-		input::InputManager* inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
-		if (inputManager != nullptr)
-			inputManager->cursorPositionCallback(xpos, ypos);
+		input::InputManager& inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		inputManager.cursorPositionCallback(xpos, ypos);
 	}
 
 	void RenderWindow::glfwStaticMouseScrollCallback(GLFWwindow* window, double xpos, double ypos)
 	{
-		input::InputManager* inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
-		if (inputManager != nullptr)
-			inputManager->mouseScrollCallback(xpos, ypos);
+		input::InputManager& inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		inputManager.mouseScrollCallback(xpos, ypos);
 	}
 
 	void RenderWindow::glfwStaticMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
-		input::InputManager* inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
-		if (inputManager != nullptr)
-			inputManager->mouseButtonCallback(button, action, mods);
+		input::InputManager& inputManager = static_cast<RenderWindow*>(glfwGetWindowUserPointer(window))->_inputManager;
+		inputManager.mouseButtonCallback(button, action, mods);
 	}
 
 	void RenderWindow::glfwResizeCallback(uint32_t width, uint32_t height)
 	{
+		// will this ever fail? this should only ever be called by glfw
+		PX_RENDERER_CHECK_THREAD();
 		Logger::debug(__FUNCTION__" Window resized: " + std::to_string(width) + "X" + std::to_string(height));
 		if (width != 0 && height != 0) {
 			_windowHeight = height;
@@ -463,13 +496,14 @@ namespace pixelexplorer::engine::rendering {
 
 	void RenderWindow::updateGLQueues()
 	{
-		if (_staticGLObjectsRemoveQueue.next != nullptr) {
+		PX_RENDERER_CHECK_THREAD();
+		if (_staticGLObjectsRemoveQueue.Next != nullptr) {
 			_staticGLObjectsMutex.lock();
-			GLNode<GLObject>* currentNode = _staticGLObjectsRemoveQueue.next;
+			GLNode<GLObject>* currentNode = _staticGLObjectsRemoveQueue.Next;
 			while (currentNode != nullptr) {
 				GLObject* glObj = static_cast<GLObject*>(currentNode);
-				currentNode = currentNode->next;
-				terminateGLObjectUnsafe(glObj);
+				currentNode = currentNode->Next;
+				terminateGLObjectUnsafe(*glObj);
 			}
 
 			_staticGLObjectsMutex.unlock();
@@ -478,16 +512,17 @@ namespace pixelexplorer::engine::rendering {
 
 	void RenderWindow::drawRenderObjects()
 	{
+		PX_RENDERER_CHECK_THREAD();
 		if (_camera == nullptr) {
 			Logger::warn(__FUNCTION__" attempted to render with null camera, frame not rendered");
 			return;
 		}
 
-		GLNode<GLRenderObject>* node = _glRenderObjects.next;
+		GLNode<GLRenderObject>* node = _glRenderObjects.Next;
 		while (node != nullptr)
 		{
 			static_cast<GLRenderObject*>(node)->update();
-			node = node->next;
+			node = node->Next;
 		}
 
 		if (_activatedGuiContext) {

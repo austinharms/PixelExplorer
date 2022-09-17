@@ -15,7 +15,7 @@ namespace pixelexplorer::game {
 	class FPSCamera : public engine::rendering::CameraInterface
 	{
 	public:
-		inline FPSCamera(engine::input::InputManager* inputManager) {
+		inline FPSCamera(engine::input::InputManager& inputManager) {
 			using namespace engine::input;
 			_position = glm::vec3(0, 0, -5);
 			_rotationRad = glm::vec3(0, glm::pi<float>(), glm::half_pi<float>());
@@ -146,22 +146,22 @@ namespace pixelexplorer::game {
 			}
 		}
 
-		inline void registerActions(engine::input::InputManager* inputManager) {
+		inline void registerActions(engine::input::InputManager& inputManager) {
 			using namespace engine::input;
-			inputManager->grab();
+			inputManager.grab();
 			dropActions();
-			_inputActions[0] = inputManager->getOrCreateAction("look up", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_Y_AXIS, false, false });
-			_inputActions[1] = inputManager->getOrCreateAction("look down", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_Y_AXIS, true, false });
-			_inputActions[2] = inputManager->getOrCreateAction("look left", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_X_AXIS, false, false });
-			_inputActions[3] = inputManager->getOrCreateAction("look right", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_X_AXIS, true, false });
-			_inputActions[4] = inputManager->getOrCreateAction("look counterclockwise", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_Q) });
-			_inputActions[5] = inputManager->getOrCreateAction("look clockwise", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_E) });
-			_inputActions[6] = inputManager->getOrCreateAction("move forward", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_W) });
-			_inputActions[7] = inputManager->getOrCreateAction("move backward", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_S) });
-			_inputActions[8] = inputManager->getOrCreateAction("move left", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_A) });
-			_inputActions[9] = inputManager->getOrCreateAction("move right", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_D) });
+			_inputActions[0] = inputManager.getOrCreateAction("look up", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_Y_AXIS, false, false });
+			_inputActions[1] = inputManager.getOrCreateAction("look down", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_Y_AXIS, true, false });
+			_inputActions[2] = inputManager.getOrCreateAction("look left", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_X_AXIS, false, false });
+			_inputActions[3] = inputManager.getOrCreateAction("look right", InputSource{ InputSource::InputSourceType::CURSORPOS, PX_X_AXIS, true, false });
+			_inputActions[4] = inputManager.getOrCreateAction("look counterclockwise", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_Q) });
+			_inputActions[5] = inputManager.getOrCreateAction("look clockwise", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_E) });
+			_inputActions[6] = inputManager.getOrCreateAction("move forward", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_W) });
+			_inputActions[7] = inputManager.getOrCreateAction("move backward", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_S) });
+			_inputActions[8] = inputManager.getOrCreateAction("move left", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_A) });
+			_inputActions[9] = inputManager.getOrCreateAction("move right", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_D) });
 			for (uint32_t i = 0; i < 10; ++i)	_inputActions[i]->grab();
-			inputManager->drop();
+			inputManager.drop();
 		}
 	};
 }

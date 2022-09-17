@@ -159,18 +159,14 @@ namespace pixelexplorer::engine::rendering {
 	}
 
 	void Shader::onUpdate() {
-		getRenderWindow()->setActiveShader(this);
+		getRenderWindow()->setActiveShader(*this);
 	}
 
 	void Shader::onTerminate()
 	{
 		RenderWindow* window = getRenderWindow();
-		window->removeShaderFromCache(this);
-		if (window->getActiveShader() == this) {
-			window->setActiveShader(nullptr);
-			unbind();
-		}
-
+		window->removeShaderFromCache(*this);
+		window->clearActiveShader(*this);
 		glDeleteProgram(_glId);
 		_glId = 0;
 	}

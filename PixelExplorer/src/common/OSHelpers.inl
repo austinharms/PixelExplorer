@@ -34,6 +34,7 @@ namespace pixelexplorer::OSHelper {
 			if (pathBuf != nullptr) free(pathBuf);
 			bufferSize *= 2;
 			pathBuf = (char*)calloc(bufferSize, sizeof(char));
+			if (pathBuf == nullptr) Logger::fatal(__FUNCTION__" failed to allocate executable path buffer");
 			result = GetModuleFileNameA(nullptr, pathBuf, bufferSize);
 			lastError = GetLastError();
 		} while (result == 0 || result == bufferSize && (lastError == ERROR_INSUFFICIENT_BUFFER || lastError == ERROR_SUCCESS));

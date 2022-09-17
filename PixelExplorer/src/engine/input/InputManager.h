@@ -22,7 +22,7 @@ namespace pixelexplorer::engine::input {
 		// Create and return a new InputAction, if an action with the same name is found that action will be returned instead, this should not be called every frame due to high overhead
 		InputAction* getOrCreateAction(const std::string& name, const InputSource& defaultSource);
 		// Set an action's source, this should not be called every frame due to high overhead
-		void setActionSource(InputAction* action, const InputSource& source);
+		void setActionSource(InputAction& action, const InputSource& source);
 
 		inline const glm::dvec2& getCursorPos() const { return _cursorPosition; }
 
@@ -53,9 +53,9 @@ namespace pixelexplorer::engine::input {
 		void mouseButtonCallback(int button, int action, int mods);
 		void setActionValue(const InputSource& source, double value);
 		// Warning this function does NOT grab the action
-		void insertAction(InputAction* action);
+		void insertAction(const InputAction& action);
 		// Warning this function does NOT drop the action
-		void removeAction(InputAction* action);
+		void removeAction(const InputAction& action);
 	};
 }
 #endif // !PIXELEXPLORER_ENGINE_INPUTMANAGER_H_

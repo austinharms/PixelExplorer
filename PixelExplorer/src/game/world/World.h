@@ -17,6 +17,8 @@ namespace pixelexplorer::game::world {
 	public:
 		World(WorldDetails& details, engine::rendering::RenderWindow& window);
 		virtual ~World();
+		// returns the ChunkManager associated with the dimensionId or null if there is not one
+		chunk::ChunkManager* getChunkManager(uint32_t dimensionId) const;
 
 	private:
 		WorldDetails& _details;

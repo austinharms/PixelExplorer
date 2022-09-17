@@ -26,15 +26,14 @@ namespace pixelexplorer::engine::rendering {
 
 	protected:
 		// add dependency and override the priority
-		void addDependency(GLObject* dependency, int16_t priority);
-		void removeDependency(GLObject* dependency);
+		void addDependency(GLObject& dependency, int16_t priority);
+		void removeDependency(GLObject& dependency);
 		// check if this object is dependent on dependency, recursive checks all dependencies for dependency as well
-		bool hasDependency(GLObject* dependency, bool recursive = false) const;
+		bool hasDependency(const GLObject& dependency, bool recursive = false) const;
 		void clearDependencies();
 
-		inline void addDependency(GLObject* dependency) { 
-			if (dependency == nullptr) return; 
-			addDependency(dependency, dependency->_priority);
+		inline void addDependency(GLObject& dependency) { 
+			addDependency(dependency, dependency._priority);
 		}
 
 		// get the dirty flag (dirty flag unused by GLObject methods)
@@ -72,7 +71,7 @@ namespace pixelexplorer::engine::rendering {
 		int16_t _priority;
 		bool _initialized;
 		bool _dirty;
-		void attach(RenderWindow* window);
+		void attach(RenderWindow& window);
 		void initialize();
 		void terminate();
 		void update();

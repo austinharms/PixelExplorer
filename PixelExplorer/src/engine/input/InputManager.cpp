@@ -69,26 +69,26 @@ namespace pixelexplorer::engine::input {
 	}
 
 	// Warning this function does NOT grab the action
-	void InputManager::insertAction(InputAction* action) {
+	void InputManager::insertAction(const InputAction& action) {
 		_actionMutex.lock();
-		auto foundActionSet = _actions.find(action->getSource().getHash());
+		auto foundActionSet = _actions.find(action.getSource().getHash());
 		if (foundActionSet == _actions.end())
-			foundActionSet = _actions.emplace(action->getSource().getHash(), new std::set<InputAction*>()).first;
-		foundActionSet->second->emplace(action);
+			foundActionSet = _actions.emplace(action.getSource().getHash(), new std::set<InputAction*>()).first;
+		foundActionSet->second->emplace((InputAction*)&action);
 		_actionMutex.unlock();
 	}
 
 	// Warning this function does NOT drop the action
-	void InputManager::removeAction(InputAction* action) {
+	void InputManager::removeAction(const InputAction& action) {
 		_actionMutex.lock();
-		auto foundActionSet = _actions.find(action->getSource().getHash());
+		auto foundActionSet = _actions.find(action.getSource().getHash());
 		if (foundActionSet == _actions.end()) {
 			_actionMutex.unlock();
 			return;
 		}
 
 		std::set<InputAction*>* actionList = foundActionSet->second;
-		actionList->erase(action);
+		actionList->erase((InputAction*)&action);
 		if (actionList->empty()) {
 			delete actionList;
 			_actions.erase(foundActionSet);
@@ -99,7 +99,7 @@ namespace pixelexplorer::engine::input {
 
 	InputAction* InputManager::findAction(const std::string& name) {
 		_actionMutex.lock_shared();
-		for (auto actionPair : _actions) {
+		for (auto& actionPair : _actions) {
 			for (InputAction* action : *(actionPair.second)) {
 				if (action->getName() == name) {
 					_actionMutex.unlock_shared();
@@ -116,17 +116,17 @@ namespace pixelexplorer::engine::input {
 		InputAction* action = findAction(name);
 		if (!action) {
 			action = new InputAction(name, defaultSource);
-			insertAction(action);
+			insertAction(*action);
 			Logger::debug(__FUNCTION__" created new action " + name);
 		}
 
 		return action;
 	}
 
-	void InputManager::setActionSource(InputAction* action, const InputSource& source) {
-		if (action->getSource().getFullHash() == source.getFullHash()) return;
+	void InputManager::setActionSource(InputAction& action, const InputSource& source) {
+		if (action.getSource().getFullHash() == source.getFullHash()) return;
 		removeAction(action);
-		action->_source = source;
+		action._source = source;
 		insertAction(action);
 	}
 }

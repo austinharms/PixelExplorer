@@ -238,6 +238,7 @@
     <None Include="src\common\OSHelpers.inl" />
     <None Include="src\common\RefCount.inl" />
     <None Include="src\common\Timer.inl" />
+    <None Include="src\engine\rendering\GLNode.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

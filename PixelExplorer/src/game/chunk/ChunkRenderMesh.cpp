@@ -7,10 +7,9 @@
 #include "engine/rendering/RenderWindow.h"
 
 namespace pixelexplorer::game::chunk {
-	ChunkRenderMesh::ChunkRenderMesh(engine::rendering::Material* material, engine::rendering::RenderWindow* window, const glm::vec3& pos)
+	ChunkRenderMesh::ChunkRenderMesh(engine::rendering::Material& material, engine::rendering::RenderWindow* window, const glm::vec3& pos)
 	{
-		if (window != nullptr)
-			window->registerGLObject(this);
+		if (window != nullptr) window->registerGLObject(*this);
 		addDependency(material);
 		_vertextDataBuffer = nullptr;
 		_indexDataBuffer = nullptr;
@@ -38,24 +37,18 @@ namespace pixelexplorer::game::chunk {
 		_dataBufferMutex.unlock();
 	}
 
-	void ChunkRenderMesh::updateMesh(DataBuffer<uint32_t>* indices, DataBuffer<float>* vertices)
+	void ChunkRenderMesh::updateMesh(DataBuffer<uint32_t>& indices, DataBuffer<float>& vertices)
 	{
-		if (indices == nullptr || vertices == nullptr) {
-			Logger::warn(__FUNCTION__" indices and or vertices was null, ChunkRenderMesh not updated");
-			return;
-		}
-
-		indices->grab();
-		vertices->grab();
-
+		indices.grab();
+		vertices.grab();
 		_dataBufferMutex.lock();
 		if (_vertextDataBuffer != nullptr)
 			_vertextDataBuffer->drop();
-		_vertextDataBuffer = vertices;
+		_vertextDataBuffer = &vertices;
 
 		if (_indexDataBuffer != nullptr)
 			_indexDataBuffer->drop();
-		_indexDataBuffer = indices;
+		_indexDataBuffer = &indices;
 		_dataBufferMutex.unlock();
 		setDirty();
 	}

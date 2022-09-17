@@ -15,9 +15,8 @@ namespace pixelexplorer::game::chunk {
 		static const uint32_t LAYER_SIZE = CHUNK_SIZE * CHUNK_SIZE;
 		static const uint32_t BLOCK_COUNT = LAYER_SIZE * CHUNK_SIZE;
 
-		inline Chunk(ChunkRenderMesh* renderMesh, const glm::i32vec3& position) {
-			renderMesh->grab();
-			_renderMesh = renderMesh;
+		inline Chunk(ChunkRenderMesh& renderMesh, const glm::i32vec3& position) : _renderMesh(renderMesh) {
+			_renderMesh.grab();
 			_position = position;
 			for (uint32_t i = 0; i < BLOCK_COUNT; ++i) {
 				_blocks[i].Id = 1;
@@ -27,20 +26,19 @@ namespace pixelexplorer::game::chunk {
 			//	_blocks[i].Id = 1;
 			//}
 
-			_renderMesh->setPosition(glm::vec3(_position.x * CHUNK_SIZE, _position.y * CHUNK_SIZE, _position.z * CHUNK_SIZE));
+			_renderMesh.setPosition(glm::vec3(_position.x * CHUNK_SIZE, _position.y * CHUNK_SIZE, _position.z * CHUNK_SIZE));
 		}
 
 		inline virtual ~Chunk() {
-			_renderMesh->drop();
-			_renderMesh = nullptr;
+			_renderMesh.drop();
 		}
 
-		inline ChunkRenderMesh* getRenderMesh() const { return _renderMesh; }
+		inline ChunkRenderMesh& getRenderMesh() const { return _renderMesh; }
 
 		inline const block::Block& getBlock(uint32_t blockIndex) const { return _blocks[blockIndex]; }
 
 	private:
-		ChunkRenderMesh* _renderMesh;
+		ChunkRenderMesh& _renderMesh;
 		block::Block _blocks[BLOCK_COUNT];
 		glm::i32vec3 _position;
 	};

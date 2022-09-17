@@ -29,9 +29,15 @@ namespace pixelexplorer::game::gui {
 	MainMenu::~MainMenu() {}
 
 	void MainMenu::onInitialize() {
-		_font = getRenderWindow()->getFont( OSHelper::getAssetPath(std::filesystem::path("fonts")) / "roboto.ttf");
-		_backgroundTexture = new engine::rendering::GLTexture(OSHelper::getAssetPath(std::filesystem::path("textures")) / "main_menu_background.png");
-		getRenderWindow()->registerGLObject(_backgroundTexture);
+		_font = getRenderWindow()->loadFont(OSHelper::getAssetPath(std::filesystem::path("fonts")) / "roboto.ttf");
+		_backgroundTexture = new(std::nothrow) engine::rendering::GLTexture(OSHelper::getAssetPath(std::filesystem::path("textures")) / "main_menu_background.png");
+		if (_backgroundTexture != nullptr)
+		{
+			getRenderWindow()->registerGLObject(*_backgroundTexture);
+		}
+		else {
+			Logger::warn(__FUNCTION__" failed to load background texture");
+		}
 	}
 
 	void MainMenu::onTerminate() {

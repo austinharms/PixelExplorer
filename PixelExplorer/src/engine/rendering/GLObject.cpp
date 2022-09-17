@@ -26,28 +26,27 @@ namespace pixelexplorer::engine::rendering {
 	bool GLObject::drop() {
 		bool dropped = RefCount::drop();
 		if (!dropped && getRefCount() == 1 && _attachedWindow)
-			return _attachedWindow->terminateGLObject(this);
+			return _attachedWindow->terminateGLObject(*this);
 		return dropped;
 	}
 
-	void GLObject::addDependency(GLObject* dependency, int16_t priority)
+	void GLObject::addDependency(GLObject& dependency, int16_t priority)
 	{
-		if (dependency == nullptr) return;
-		dependency->grab();
+		dependency.grab();
 		if (hasDependency(dependency)) {
 			Logger::warn(__FUNCTION__" called with duplicate dependency");
-			dependency->drop();
+			dependency.drop();
 			return;
 		}
 
-		if (!dependency->getAttached()) {
+		if (!dependency.getAttached()) {
 			Logger::warn(__FUNCTION__" added unregistering dependency, registering dependency");
 			getRenderWindow()->registerGLObject(dependency);
 		}
-		else if (dependency->getRenderWindow() != getRenderWindow()) {
+		else if (dependency.getRenderWindow() != getRenderWindow()) {
 			if (getAttached()) {
 				Logger::error(__FUNCTION__" called with dependency registered to a different RenderWindow, dependency not added");
-				dependency->drop();
+				dependency.drop();
 				return;
 			}
 			else {
@@ -55,15 +54,14 @@ namespace pixelexplorer::engine::rendering {
 			}
 		}
 
-		std::list<GLObject*>::iterator it = _dependencies.begin();
+		auto it = _dependencies.begin();
 		while (it != _dependencies.end() && (*it)->_priority < priority) ++it;
-		_dependencies.emplace(it, dependency);
+		_dependencies.emplace(it, &dependency);
 	}
 
-	void GLObject::removeDependency(GLObject* dependency) {
-		if (dependency == nullptr) return;
+	void GLObject::removeDependency(GLObject& dependency) {
 		for (auto it = _dependencies.begin(); it != _dependencies.end(); ++it) {
-			if ((*it) == dependency) {
+			if ((*it) == &dependency) {
 				(*it)->drop();
 				_dependencies.erase(it);
 				return;
@@ -82,9 +80,9 @@ namespace pixelexplorer::engine::rendering {
 		}
 	}
 
-	bool GLObject::hasDependency(GLObject* dependency, bool recursive) const {
+	bool GLObject::hasDependency(const GLObject& dependency, bool recursive) const {
 		for (const GLObject* dep : _dependencies) {
-			if (dep == dependency) return true;
+			if (dep == &dependency) return true;
 		}
 
 		if (recursive) {
@@ -96,8 +94,8 @@ namespace pixelexplorer::engine::rendering {
 		return false;
 	}
 
-	void GLObject::attach(RenderWindow* window) {
-		_attachedWindow = window;
+	void GLObject::attach(RenderWindow& window) {
+		_attachedWindow = &window;
 		onAttach();
 	}
 
@@ -144,7 +142,7 @@ namespace pixelexplorer::engine::rendering {
 			return;
 		}
 
-		std::list<GLObject*>::iterator it = _dependencies.begin();
+		auto it = _dependencies.begin();
 		while (it != _dependencies.end() && (*it)->_priority < 0)
 		{
 			(*it)->update();

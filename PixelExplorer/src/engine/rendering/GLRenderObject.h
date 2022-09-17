@@ -8,7 +8,7 @@ namespace pixelexplorer::engine::rendering {
 	class GLRenderObject : private GLNode<GLRenderObject>, public GLObject
 	{
 	public:
-		inline bool inRenderQueue() const { return GLNode<GLRenderObject>::prev != nullptr; }
+		inline bool inRenderQueue() const { return GLNode<GLRenderObject>::Prev != nullptr; }
 		inline bool drop() override {
 
 			bool dropped = GLObject::drop();

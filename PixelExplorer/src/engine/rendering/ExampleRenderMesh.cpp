@@ -88,10 +88,10 @@ namespace pixelexplorer::engine::rendering {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		_material = new Material();
-		addDependency(_material);
-		Shader* shader = getRenderWindow()->getShader("./assets/shaders/cube.shader");
+		addDependency(*_material);
+		Shader* shader = getRenderWindow()->loadShader("./assets/shaders/cube.shader");
 		if (shader != nullptr) {
-			addDependency(shader);
+			addDependency(*shader);
 			shader->drop();
 			shader = nullptr;
 		}

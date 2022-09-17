@@ -29,15 +29,13 @@ namespace pixelexplorer::game::chunk {
 	class ChunkManager : public RefCount
 	{
 	public:
-		inline ChunkManager(engine::rendering::RenderWindow* window, block::BlockManifest* blockManifest) {
-			window->grab();
-			_renderWindow = window;
-			blockManifest->grab();
-			_blockManifest = blockManifest;
-			_chunkMaterial = new engine::rendering::Material();
-			_renderWindow->registerGLObject(_chunkMaterial);
-			engine::rendering::Shader* chunkShader = _renderWindow->getShader(OSHelper::getAssetPath("shaders") / "chunk.shader");
-			_chunkMaterial->addDependency(chunkShader);
+		inline ChunkManager(engine::rendering::RenderWindow& window, block::BlockManifest& blockManifest) : _renderWindow(window), _blockManifest(blockManifest), _chunkMaterial(*(new engine::rendering::Material())) {
+			_renderWindow.grab();
+			_blockManifest.grab();
+			_renderWindow.registerGLObject(_chunkMaterial);
+			// TODO add check that shader is not null
+			engine::rendering::Shader* chunkShader = _renderWindow.loadShader(OSHelper::getAssetPath("shaders") / "chunk.shader");
+			_chunkMaterial.addDependency(*chunkShader);
 			chunkShader->drop();
 			chunkShader = nullptr;
 		}
@@ -47,38 +45,50 @@ namespace pixelexplorer::game::chunk {
 			unloadAllChunks();
 			dropUnusedRenderMeshes();
 			_chunkMutex.unlock();
-			_chunkMaterial->drop();
-			_renderWindow->drop();
-			_blockManifest->drop();
+			_chunkMaterial.drop();
+			_renderWindow.drop();
+			_blockManifest.drop();
 		}
 
 		inline Chunk* getChunk(const glm::i32vec3& pos, bool forceLoad = false) {
 			std::lock_guard<std::recursive_mutex> lock(_chunkMutex);
 			auto chunk = _loadedChunks.find(pos);
-			if (chunk != _loadedChunks.end())
-				return chunk->second;
-			if (forceLoad)
-				return loadChunk(pos);
+			if (chunk != _loadedChunks.end()) return chunk->second;
+			if (forceLoad) return loadChunk(pos);
 			return nullptr;
 		}
 
 		inline Chunk* loadChunk(const glm::i32vec3& pos) {
 			ChunkRenderMesh* renderMesh;
-			_chunkMutex.lock();
-			if (_unusedRenderMeshes.empty()) {
-				renderMesh = new ChunkRenderMesh(_chunkMaterial, _renderWindow);
-			}
-			else {
-				renderMesh = _unusedRenderMeshes.front();
-				_unusedRenderMeshes.pop();
+			Chunk* chunk;
+			// change the scope for the lock guard
+			{
+				std::lock_guard<std::recursive_mutex> lock(_chunkMutex);
+				if (_unusedRenderMeshes.empty()) {
+					renderMesh = new ChunkRenderMesh(_chunkMaterial, &_renderWindow);
+					if (renderMesh == nullptr) {
+						Logger::error(__FUNCTION__" failed to allocate ChunkRenderMesh object");
+						return nullptr;
+					}
+				}
+				else {
+					renderMesh = _unusedRenderMeshes.front();
+					_unusedRenderMeshes.pop();
+				}
+
+				chunk = new Chunk(*renderMesh, pos);
+				renderMesh->drop();
+				// should this be a fatal log?
+				if (chunk == nullptr) {
+					Logger::error(__FUNCTION__" failed to allocate chunk object");
+					return nullptr;
+				}
+
+				_loadedChunks.emplace(pos, chunk);
 			}
 
-			Chunk* chunk = new Chunk(renderMesh, pos);
-			_loadedChunks.insert({ glm::i32vec3(pos), chunk });
-			_chunkMutex.unlock();
-			remeshChunk(chunk);
-			_chunkMaterial->getRenderWindow()->addGLRenderObject(renderMesh);
-			renderMesh->drop();
+			remeshChunk(*chunk);
+			_renderWindow.addGLRenderObject(*renderMesh);
 			return chunk;
 		}
 
@@ -93,13 +103,12 @@ namespace pixelexplorer::game::chunk {
 
 			Chunk* chunk = chunkIterator->second;
 			_loadedChunks.erase(chunkIterator);
-			ChunkRenderMesh* renderMesh = chunk->getRenderMesh();
-			renderMesh->grab();
-			_renderWindow->removeGLRenderObject(renderMesh);
-			_unusedRenderMeshes.emplace(renderMesh);
+			ChunkRenderMesh& renderMesh = chunk->getRenderMesh();
+			renderMesh.grab();
+			_renderWindow.removeGLRenderObject(renderMesh);
+			_unusedRenderMeshes.emplace(&renderMesh);
 			_chunkMutex.unlock();
-			if (!chunk->drop())
-				Logger::warn(__FUNCTION__" loaded chunk not dropped");
+			if (!chunk->drop()) Logger::warn(__FUNCTION__" loaded chunk not dropped");
 			chunk = nullptr;
 		}
 
@@ -125,32 +134,19 @@ namespace pixelexplorer::game::chunk {
 			_chunkMutex.unlock();
 		}
 
-		inline void remeshChunk(Chunk* chunk) {
+		inline void remeshChunk(Chunk& chunk) {
 			using namespace block;
-			if (chunk == nullptr) {
-				Logger::warn(__FUNCTION__" attempted to remesh null chunk");
-				return;
-			}
-
-			chunk->grab();
-			ChunkRenderMesh* renderMesh = chunk->getRenderMesh();
-			if (renderMesh == nullptr) {
-				Logger::warn(__FUNCTION__" attempted to remesh chunk with null render mesh");
-				chunk->drop();
-				return;
-			}
-
-			renderMesh->grab();
+			chunk.grab();
 			// remesh chunk
 			uint32_t faceCount = 0;
 			uint32_t x = 0;
 			uint32_t y = 0;
 			uint32_t z = 0;
 			for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
-				const block::Block& block = chunk->getBlock(i);
+				const block::Block& block = chunk.getBlock(i);
 				if (block.Id != 0) {
 					block::BlockDefinition* blockDef;
-					if ((blockDef = _blockManifest->getBlock(block.Id)) != nullptr) {
+					if ((blockDef = _blockManifest.getBlock(block.Id)) != nullptr) {
 						for (uint8_t faceIndex = 0; faceIndex < 6; ++faceIndex) {
 							if (blockDef->getBlockFace((block::FaceDirection)faceIndex)) ++faceCount;
 						}
@@ -171,18 +167,30 @@ namespace pixelexplorer::game::chunk {
 			uint32_t indexCount = 0;
 			// Add FACE_VERTEX_COUNT here to server as our color per vertex (sizeof(color) == sizeof(float))
 			static_assert(sizeof(Color) == sizeof(float));
-			DataBuffer<float>* vertextBuffer = new DataBuffer<float>((uint64_t)faceCount * (BlockShape::FACE_FLOAT_COUNT + BlockShape::FACE_VERTEX_COUNT));
-			DataBuffer<uint32_t>* indexBuffer = new DataBuffer<uint32_t>((uint64_t)faceCount * BlockShape::FACE_INDEX_COUNT);
+			DataBuffer<float>* vertextBuffer = new(std::nothrow) DataBuffer<float>((uint64_t)faceCount * (BlockShape::FACE_FLOAT_COUNT + BlockShape::FACE_VERTEX_COUNT));
+			DataBuffer<uint32_t>* indexBuffer = new(std::nothrow) DataBuffer<uint32_t>(((uint64_t)faceCount) * BlockShape::FACE_INDEX_COUNT);
+			if (vertextBuffer == nullptr || vertextBuffer->getBufferPtr() == nullptr) {
+				Logger::error(__FUNCTION__" failed to allocate chunk vertex buffer");
+				chunk.drop();
+				return;
+			}
+
+			if (indexBuffer == nullptr || indexBuffer->getBufferPtr() == nullptr) {
+				Logger::error(__FUNCTION__" failed to allocate chunk index buffer");
+				chunk.drop();
+				return;
+			}
+
 			bool buildError = false;
 
 			x = 0;
 			y = 0;
 			z = 0;
 			for (uint32_t i = 0; i < Chunk::BLOCK_COUNT; ++i) {
-				const block::Block& block = chunk->getBlock(i);
+				const block::Block& block = chunk.getBlock(i);
 				if (block.Id != 0) {
 					BlockDefinition* blockDef;
-					if ((blockDef = _blockManifest->getBlock(block.Id)) != nullptr) {
+					if ((blockDef = _blockManifest.getBlock(block.Id)) != nullptr) {
 						const BlockFaceDefinition* blockFace;
 						for (uint8_t faceIndex = 0; faceIndex < 6; ++faceIndex) {
 							if ((blockFace = blockDef->getBlockFace((FaceDirection)faceIndex))) {
@@ -220,18 +228,16 @@ namespace pixelexplorer::game::chunk {
 				}
 			}
 
-			if (!buildError)
-				renderMesh->updateMesh(indexBuffer, vertextBuffer);
+			if (!buildError) chunk.getRenderMesh().updateMesh(*indexBuffer, *vertextBuffer);
 			vertextBuffer->drop();
 			indexBuffer->drop();
-			renderMesh->drop();
-			chunk->drop();
+			chunk.drop();
 		}
 
 	private:
-		engine::rendering::RenderWindow* _renderWindow;
-		block::BlockManifest* _blockManifest;
-		engine::rendering::Material* _chunkMaterial;
+		engine::rendering::RenderWindow& _renderWindow;
+		block::BlockManifest& _blockManifest;
+		engine::rendering::Material& _chunkMaterial;
 		std::unordered_map<glm::i32vec3, Chunk*> _loadedChunks;
 		std::queue<ChunkRenderMesh*> _unusedRenderMeshes;
 		std::recursive_mutex _chunkMutex;
