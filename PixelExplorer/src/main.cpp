@@ -6,7 +6,6 @@
 #include <thread>
 
 #include "game/Game.h"
-#include "common/OSHelpers.h"
 
 void playGame() {
 	pixelexplorer::game::Game* game = new pixelexplorer::game::Game();

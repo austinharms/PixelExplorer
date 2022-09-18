@@ -92,10 +92,11 @@ namespace pixelexplorer::OSHelper {
 #endif
 
 		userPath /= "PX_DATA";
+		userPath /= subpath;
 		// should add check for file write permissions
 		std::error_code errorCode;
 		std::filesystem::create_directories(userPath, errorCode);
 		if (errorCode.value() != 0) Logger::error(__FUNCTION__" failed to create persistent path " + errorCode.message());
-		return "";
+		return userPath;
 	}
 }

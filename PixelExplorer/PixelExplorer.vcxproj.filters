@@ -84,6 +84,12 @@
     <ClCompile Include="src\game\world\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\chunk\ChunkRenderMeshFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\chunk\ChunkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\Logger.h">
@@ -236,6 +242,9 @@
     <ClInclude Include="src\game\world\WorldDetails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\chunk\ChunkRenderMeshFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\common\Logger.inl">
@@ -244,10 +253,6 @@
     <None Include="src\common\RefCount.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="assets\shaders\base.shader" />
-    <None Include="assets\shaders\cube.shader" />
-    <None Include="assets\blocks\faces\GREEN_FACE.pxface" />
-    <None Include="assets\shaders\chunk.shader" />
     <None Include="src\common\Color.inl">
       <Filter>Header Files</Filter>
     </None>

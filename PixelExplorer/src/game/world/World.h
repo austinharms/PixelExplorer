@@ -6,6 +6,7 @@
 
 #include "WorldDetails.h"
 #include "../block/BlockManifest.h"
+#include "../chunk/ChunkRenderMeshFactory.h"
 #include "../chunk/ChunkManager.h"
 #include "engine/rendering/RenderWindow.h"
 
@@ -17,14 +18,19 @@ namespace pixelexplorer::game::world {
 	public:
 		World(WorldDetails& details, engine::rendering::RenderWindow& window);
 		virtual ~World();
+
 		// returns the ChunkManager associated with the dimensionId or null if there is not one
 		chunk::ChunkManager* getChunkManager(uint32_t dimensionId) const;
+
+		// returns the BlockManifest for the world
+		block::BlockManifest& getBlockManifest() const;
 
 	private:
 		WorldDetails& _details;
 		engine::rendering::RenderWindow& _window;
-		block::BlockManifest& _blockManifest;
+		block::BlockManifest* _blockManifest;
 		chunk::ChunkManager** _dimensionChunkManagers;
+		chunk::ChunkRenderMeshFactory* _renderMeshFactory;
 		uint32_t _dimensionCount;
 	};
 }
