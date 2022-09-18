@@ -1,16 +1,31 @@
 #include "BlockManifest.h"
 
-#include <forward_list>
+#include "common/Logger.h"
+#include "common/Color.h"
+#include "common/OSHelpers.h"
 
 namespace pixelexplorer::game::block {
 	BlockManifest::BlockManifest(const std::filesystem::path& externalResourcePath) : _resourcePath(externalResourcePath) {
 		_blockDefinitions = nullptr;
-		_loadedBlocks = false;
-		_loadedBlockFaces = false;
 		_lastBlockId = 0;
+
+		std::filesystem::path externalBlockFacePath = externalResourcePath / "blocks" / "faces";
+		std::filesystem::create_directories(externalBlockFacePath);
+		loadBlockFaces(externalBlockFacePath);
+		loadBlockFaces(OSHelper::getAssetPath(std::filesystem::path("blocks") / "faces"));
+
 		loadBlockIdMap();
-		loadBlockFaces();
-		loadBlocks();
+
+		std::filesystem::path externalBlockPath = externalResourcePath / "blocks";
+		std::filesystem::create_directories(externalBlockFacePath);
+		std::forward_list<BlockDefinition*> newBlocks;
+		uint32_t allocatedBlockCount = 0;
+		allocateBlockArray(newBlocks, allocatedBlockCount);
+		loadBlocks(externalBlockPath, allocatedBlockCount, newBlocks);
+		loadBlocks(OSHelper::getAssetPath("blocks"), allocatedBlockCount, newBlocks);
+		allocateBlockArray(newBlocks, allocatedBlockCount);
+		createMissingBlocks();
+		saveBlockIdMap();
 	}
 
 	BlockManifest::~BlockManifest() {
@@ -19,18 +34,18 @@ namespace pixelexplorer::game::block {
 		unloadBlockIdMap();
 	}
 
-	void BlockManifest::loadBlockFaces() {
-		unloadBlockFaces();
-		std::filesystem::path blockFacePath(OSHelper::getAssetPath(std::filesystem::path("blocks") / "faces"));
-		for (const auto& entry : std::filesystem::directory_iterator(blockFacePath)) {
+	void BlockManifest::loadBlockFaces(const std::filesystem::path& faceFolderPath) {
+		for (const auto& entry : std::filesystem::directory_iterator(faceFolderPath)) {
 			if (entry.is_regular_file() && entry.path().extension() == ".pxface") {
 				BlockFaceDefinition* face = parseBlockFaceFile(entry);
-				if (face) _blockFaceDefinitions.emplace(face->Name, face);
+				if (face) {
+					if (!_blockFaceDefinitions.emplace(face->Name, face).second) {
+						Logger::warn(__FUNCTION__" Face with name \"" + face->Name + "\" already loaded, new Face not loaded");
+						face->drop();
+					}
+				}
 			}
 		}
-
-		_loadedBlockFaces = true;
-		Logger::debug(__FUNCTION__" loaded all Block Face Definitions");
 	}
 
 	BlockFaceDefinition* BlockManifest::parseBlockFaceFile(const std::filesystem::path& path)
@@ -59,10 +74,12 @@ namespace pixelexplorer::game::block {
 			}
 			else if (!line.empty()) {
 				Logger::warn(__FUNCTION__" malformed line \"" + line + "\" in pxface file " + path.string() + " file not loaded");
+				stream.close();
 				return nullptr;
 			}
 		}
 
+		stream.close();
 		if (!hasColor) {
 			Logger::warn(__FUNCTION__" missing color property (color=#FFFFFFFF; or any hex color with alpha) pxface file " + path.string() + " file not loaded");
 			return nullptr;
@@ -137,7 +154,8 @@ namespace pixelexplorer::game::block {
 				hasFaces[(uint32_t)FaceDirection::TOP] = true;
 				faceName = line.substr(8, line.find(";") - 8);
 				faces[(uint32_t)FaceDirection::TOP] = getBlockFace(faceName, &foundFace);
-			} else if (line.rfind("bottomFace=", 0) == 0 && line.find(";") > 12) {
+			}
+			else if (line.rfind("bottomFace=", 0) == 0 && line.find(";") > 12) {
 				if (hasFaces[(uint32_t)FaceDirection::BOTTOM]) {
 					Logger::warn(__FUNCTION__" bottomFace was reassigned in pxblock file " + path.string() + " using original face");
 					continue;
@@ -205,32 +223,37 @@ namespace pixelexplorer::game::block {
 		return new BlockDefinition(faces, id, name);
 	}
 
-	void BlockManifest::loadBlocks() {
-		unloadBlocks();
-		uint32_t allocatedBlockCount = _lastBlockId;
-		std::forward_list<BlockDefinition*> newBlockList;
-		if (_lastBlockId != 0) {
-			_blockDefinitions = (BlockDefinition**)calloc(_lastBlockId, sizeof(BlockDefinition*));
-			if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to allocate Block Definitions Array");
-		}
-
-		std::filesystem::path blockPath(OSHelper::getAssetPath("blocks"));
-		for (const auto& entry : std::filesystem::directory_iterator(blockPath)) {
+	void BlockManifest::loadBlocks(const std::filesystem::path& blockFolderPath, uint32_t allocatedBlockCount, std::forward_list<BlockDefinition*>& newBlockList) {
+		for (const auto& entry : std::filesystem::directory_iterator(blockFolderPath)) {
 			if (entry.is_regular_file() && entry.path().extension() == ".pxblock") {
 				BlockDefinition* block = parseBlockFile(entry);
 				if (block) {
 					if (block->getId() <= allocatedBlockCount) {
-						_blockDefinitions[block->getId()] = block;
+						if (_blockDefinitions[block->getId() - 1] == nullptr) {
+							_blockDefinitions[block->getId() - 1] = block;
+						}
+						else {
+							Logger::warn(__FUNCTION__" Block with name \"" + block->getName() + "\" already loaded, new Block not loaded");
+							block->drop();
+						}
 					}
 					else {
-						newBlockList.emplace_front(block);
-						_blockIdMap.emplace(block->getName(), block->getId());
+						if (_blockIdMap.emplace(block->getName(), block->getId()).second) {
+							newBlockList.emplace_front(block);
+						}
+						else {
+							Logger::warn(__FUNCTION__" Block with name \"" + block->getName() + "\" already loaded, new Block not loaded");
+							block->drop();
+						}
 					}
 				}
 			}
 		}
+	}
 
-		for (uint32_t i = 0; i < allocatedBlockCount; ++i) {
+	void BlockManifest::createMissingBlocks()
+	{
+		for (uint32_t i = 0; i < _lastBlockId; ++i) {
 			if (_blockDefinitions[i] == nullptr) {
 				std::string name;
 				for (auto it = _blockIdMap.begin(); it != _blockIdMap.end(); ++it) {
@@ -244,30 +267,6 @@ namespace pixelexplorer::game::block {
 				_blockDefinitions[i] = createMissingBlock(name, i + 1);
 			}
 		}
-
-		if (allocatedBlockCount != _lastBlockId) {
-			Logger::debug(__FUNCTION__" new Block Definitions loaded resizing block array");
-			_blockDefinitions = (BlockDefinition**)realloc(_blockDefinitions, _lastBlockId * sizeof(BlockDefinition*));
-			if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to reallocate Block Definitions Array");
-			for (uint32_t i = _lastBlockId; i > allocatedBlockCount; --i) {
-				_blockDefinitions[i - 1] = newBlockList.front();
-				newBlockList.pop_front();
-			}
-
-			assert(newBlockList.empty());
-		}
-
-		_loadedBlocks = true;
-		Logger::debug(__FUNCTION__" loaded all Block Definitions");
-		//_blockDefinitions = (BlockDefinition**)calloc(1, sizeof(BlockDefinition*));
-		//BlockFaceDefinition* face = getBlockFace("GREEN_FACE");
-		//BlockFaceDefinition* faces[6];
-		//for (uint8_t i = 0; i < 6; ++i)
-		//	faces[i] = face;
-		//_blockDefinitions[0] = new BlockDefinition(faces, 1, "TEST_BLOCK");
-		//_blockIdMap.emplace(_blockDefinitions[0]->getName(), 1);
-		//_loadedBlocks = true;
-		//Logger::debug(__FUNCTION__" loaded blocks");
 	}
 
 	BlockDefinition* BlockManifest::getBlock(uint32_t id) const {
@@ -294,17 +293,14 @@ namespace pixelexplorer::game::block {
 	}
 
 	void BlockManifest::unloadBlocks() {
-		if (_loadedBlocks) {
-			_loadedBlocks = false;
-			if (_blockDefinitions != nullptr) {
-				for (uint32_t i = 0; i < _lastBlockId; ++i) {
-					_blockDefinitions[i]->drop();
-					_blockDefinitions[i] = nullptr;
-				}
-
-				free(_blockDefinitions);
-				_blockDefinitions = nullptr;
+		if (_blockDefinitions != nullptr) {
+			for (uint32_t i = 0; i < _lastBlockId; ++i) {
+				_blockDefinitions[i]->drop();
+				_blockDefinitions[i] = nullptr;
 			}
+
+			free(_blockDefinitions);
+			_blockDefinitions = nullptr;
 		}
 	}
 
@@ -312,17 +308,48 @@ namespace pixelexplorer::game::block {
 	{
 		_lastBlockId = 0;
 		if (_resourcePath == "") return;
+		std::ifstream stream(_resourcePath / "blocks.map");
+		std::string line;
+		while (getline(stream, line)) {
+			if (line.length() < sizeof(uint32_t) / sizeof(char) + sizeof(char)) {
+				Logger::warn(__FUNCTION__" found invalid line in block id map file " + (_resourcePath / "blocks.map").string());
+				continue;
+			}
+
+			_blockIdMap.emplace(line.substr(sizeof(uint32_t) / sizeof(char)), ((uint32_t*)line.c_str())[0]);
+		}
+
+		_lastBlockId = _blockIdMap.size();
+		stream.close();
+	}
+
+	void BlockManifest::allocateBlockArray(std::forward_list<BlockDefinition*>& newBlockList, uint32_t& allocatedBlockCount)
+	{
+		if (allocatedBlockCount != _lastBlockId) {
+			if (_blockDefinitions == nullptr) {
+				_blockDefinitions = (BlockDefinition**)calloc(_lastBlockId, sizeof(BlockDefinition*));
+				if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to allocate Block Definitions array");
+			}
+			else {
+				_blockDefinitions = (BlockDefinition**)realloc(_blockDefinitions, _lastBlockId * sizeof(BlockDefinition*));
+				if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to allocate Block Definitions array");
+				for (uint32_t i = _lastBlockId; i > allocatedBlockCount; --i) {
+					_blockDefinitions[i - 1] = newBlockList.front();
+					newBlockList.pop_front();
+				}
+			}
+
+			allocatedBlockCount = _lastBlockId;
+			assert(newBlockList.empty());
+		}
 	}
 
 	void BlockManifest::unloadBlockFaces() {
-		if (_loadedBlockFaces) {
-			_loadedBlockFaces = false;
-			auto it = _blockFaceDefinitions.begin();
-			while (it != _blockFaceDefinitions.end()) {
-				if (it->second != nullptr)
-					it->second->drop();
-				it = _blockFaceDefinitions.erase(it);
-			}
+		auto it = _blockFaceDefinitions.begin();
+		while (it != _blockFaceDefinitions.end()) {
+			if (it->second != nullptr)
+				it->second->drop();
+			it = _blockFaceDefinitions.erase(it);
 		}
 	}
 
@@ -330,7 +357,20 @@ namespace pixelexplorer::game::block {
 	{
 		_blockIdMap.clear();
 		_lastBlockId = 0;
+	}
+
+	void BlockManifest::saveBlockIdMap()
+	{
 		if (_resourcePath == "") return;
+		std::ofstream stream(_resourcePath / "blocks.map");
+		for (auto& idMapping : _blockIdMap) {
+			uint32_t id = idMapping.second;
+			stream.write((const char*)&(idMapping.second), sizeof(uint32_t));
+			stream.write(idMapping.first.c_str(), idMapping.first.size());
+			stream << std::endl;
+		}
+
+		stream.close();
 	}
 
 	BlockFaceDefinition* BlockManifest::createDefaultBlockFace(const std::string& name) {

@@ -2,11 +2,9 @@
 #include <unordered_map>
 #include <string>
 #include <filesystem>
+#include <forward_list>
 
 #include "common/RefCount.h"
-#include "common/Logger.h"
-#include "common/Color.h"
-#include "common/OSHelpers.h"
 #include "BlockDefinition.h"
 #include "BlockFaceDefinition.h"
 
@@ -32,15 +30,16 @@ namespace pixelexplorer::game::block {
 		std::unordered_map<std::string, uint32_t> _blockIdMap;
 		const std::filesystem::path _resourcePath;
 		uint32_t _lastBlockId;
-		bool _loadedBlocks;
-		bool _loadedBlockFaces;
 
-		void loadBlockFaces();
+		void loadBlockFaces(const std::filesystem::path& faceFolderPath);
 		void loadBlockIdMap();
-		void loadBlocks();
+		void allocateBlockArray(std::forward_list<BlockDefinition*>& newBlockList, uint32_t& allocatedBlockCount);
+		void loadBlocks(const std::filesystem::path& blockFolderPath, uint32_t allocatedBlockCount, std::forward_list<BlockDefinition*>& newBlockList);
+		void createMissingBlocks();
 		void unloadBlocks();
 		void unloadBlockFaces();
 		void unloadBlockIdMap();
+		void saveBlockIdMap();
 		BlockFaceDefinition* createDefaultBlockFace(const std::string& name);
 		BlockFaceDefinition* parseBlockFaceFile(const std::filesystem::path& path);
 		BlockDefinition* parseBlockFile(const std::filesystem::path& path);
