@@ -4,6 +4,7 @@
 #include "common/RefCount.h"
 #include "Chunk.h"
 #include "ChunkRenderMeshFactory.h"
+#include "ChunkGenerator.h"
 #include "../block/BlockManifest.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -17,7 +18,7 @@ namespace pixelexplorer::game::chunk {
 	{
 	public:
 		// TODO add description here
-		ChunkManager(ChunkRenderMeshFactory& chunkRenderMeshFactory, block::BlockManifest& blockManifest);
+		ChunkManager(ChunkRenderMeshFactory& chunkRenderMeshFactory, ChunkGenerator& chunkGenerator, block::BlockManifest& blockManifest);
 		virtual ~ChunkManager();
 
 		// returns the chunk at pos if the chunk is loaded
@@ -34,6 +35,7 @@ namespace pixelexplorer::game::chunk {
 
 	private:
 		block::BlockManifest& _blockManifest;
+		ChunkGenerator& _chunkGenerator;
 		ChunkRenderMeshFactory& _renderMeshFactory;
 		std::unordered_map<glm::i32vec3, Chunk*> _loadedChunks;
 		std::recursive_mutex _chunkMutex;

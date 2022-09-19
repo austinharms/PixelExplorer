@@ -154,6 +154,7 @@
     <ClCompile Include="src\engine\input\InputManager.cpp" />
     <ClCompile Include="src\game\block\BlockManifest.cpp" />
     <ClCompile Include="src\game\block\BlockShape.cpp" />
+    <ClCompile Include="src\game\chunk\FlatChunkGenerator.cpp" />
     <ClCompile Include="src\game\chunk\ChunkManager.cpp" />
     <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp" />
     <ClCompile Include="src\game\chunk\ChunkRenderMeshFactory.cpp" />
@@ -191,6 +192,8 @@
     <ClInclude Include="src\game\block\BlockShape.h" />
     <ClInclude Include="src\game\block\FaceDirection.h" />
     <ClInclude Include="src\game\chunk\Chunk.h" />
+    <ClInclude Include="src\game\chunk\ChunkGenerator.h" />
+    <ClInclude Include="src\game\chunk\FlatChunkGenerator.h" />
     <ClInclude Include="src\game\chunk\ChunkManager.h" />
     <ClInclude Include="src\game\chunk\ChunkRenderMesh.h" />
     <ClInclude Include="src\game\chunk\ChunkRenderMeshFactory.h" />

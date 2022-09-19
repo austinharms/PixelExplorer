@@ -1,5 +1,8 @@
 #include "World.h"
 
+#include "../chunk/ChunkGenerator.h"
+#include "../chunk/FlatChunkGenerator.h"
+
 namespace pixelexplorer::game::world {
 	World::World(WorldDetails& details, engine::rendering::RenderWindow& window) : _details(details), _window(window) {
 		_details.grab();
@@ -13,15 +16,22 @@ namespace pixelexplorer::game::world {
 		if (_renderMeshFactory == nullptr)
 			Logger::fatal(__FUNCTION__" failed to allocate world ChunkRenderMeshFactory");
 
+		chunk::ChunkGenerator* generator = new(std::nothrow) chunk::FlatChunkGenerator(_blockManifest->getBlockId("PX_TEST_BLOCK"), 10);
+		if (generator == nullptr)
+			Logger::fatal(__FUNCTION__" failed to allocate world ChunkGenerator");
+
 		_dimensionCount = 1;
 		_dimensionChunkManagers = (chunk::ChunkManager**)calloc(_dimensionCount, sizeof(chunk::ChunkManager*));
 		if (_dimensionChunkManagers == nullptr)
 			Logger::fatal(__FUNCTION__" failed to allocate world ChunkManager array");
 		for (uint32_t i = 0; i < _dimensionCount; ++i) {
-			_dimensionChunkManagers[i] = new(std::nothrow) chunk::ChunkManager(*_renderMeshFactory, *_blockManifest);
+			_dimensionChunkManagers[i] = new(std::nothrow) chunk::ChunkManager(*_renderMeshFactory, *generator, *_blockManifest);
 			if (_dimensionChunkManagers[i] == nullptr)
 				Logger::fatal(__FUNCTION__" failed to allocate world ChunkManager");
 		}
+
+		generator->drop();
+		generator = nullptr;
 	}
 
 	World::~World() {

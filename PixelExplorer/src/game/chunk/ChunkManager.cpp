@@ -11,8 +11,9 @@
 #include "../block/BlockDefinition.h"
 #include "../block/BlockFaceDefinition.h"
 namespace pixelexplorer::game::chunk {
-	ChunkManager::ChunkManager(ChunkRenderMeshFactory& chunkRenderMeshFactory, block::BlockManifest& blockManifest) : _renderMeshFactory(chunkRenderMeshFactory), _blockManifest(blockManifest) {
+	ChunkManager::ChunkManager(ChunkRenderMeshFactory& chunkRenderMeshFactory, ChunkGenerator& chunkGenerator, block::BlockManifest& blockManifest) : _renderMeshFactory(chunkRenderMeshFactory), _chunkGenerator(chunkGenerator), _blockManifest(blockManifest) {
 		_renderMeshFactory.grab();
+		_chunkGenerator.grab();
 		_blockManifest.grab();
 	}
 
@@ -21,6 +22,7 @@ namespace pixelexplorer::game::chunk {
 		unloadAllChunks();
 		_chunkMutex.unlock();
 		_renderMeshFactory.drop();
+		_chunkGenerator.drop();
 		_blockManifest.drop();
 	}
 
@@ -57,6 +59,7 @@ namespace pixelexplorer::game::chunk {
 			_loadedChunks.emplace(pos, chunk);
 		}
 
+		_chunkGenerator.generateChunk(*chunk);
 		remeshChunk(*chunk);
 		return chunk;
 	}
