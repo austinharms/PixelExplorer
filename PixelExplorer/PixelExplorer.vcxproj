@@ -160,6 +160,8 @@
     <ClCompile Include="src\game\chunk\ChunkRenderMeshFactory.cpp" />
     <ClCompile Include="src\game\Game.cpp" />
     <ClCompile Include="src\game\gui\MainMenu.cpp" />
+    <ClCompile Include="src\game\player\Player.cpp" />
+    <ClCompile Include="src\game\player\PlayerCamera.cpp" />
     <ClCompile Include="src\game\world\World.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\engine\rendering\GLObject.cpp" />
@@ -218,6 +220,8 @@
     <ClInclude Include="src\engine\rendering\RenderWindow.h" />
     <ClInclude Include="src\engine\rendering\Shader.h" />
     <ClInclude Include="src\engine\rendering\GLTexture.h" />
+    <ClInclude Include="src\game\player\Player.h" />
+    <ClInclude Include="src\game\player\PlayerCamera.h" />
     <ClInclude Include="src\game\world\World.h" />
     <ClInclude Include="src\game\world\WorldDetails.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h" />

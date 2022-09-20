@@ -32,6 +32,10 @@ namespace pixelexplorer::game::world {
 
 		generator->drop();
 		generator = nullptr;
+
+		_player = new(std::nothrow) player::Player(glm::vec3(0, 0, -20), window.getInputManager());
+		if (_player == nullptr)
+			Logger::fatal(__FUNCTION__" failed to allocate world Player");
 	}
 
 	World::~World() {
@@ -42,6 +46,9 @@ namespace pixelexplorer::game::world {
 		}
 
 		free(_dimensionChunkManagers);
+
+		if (!_player->drop())
+			Logger::warn(__FUNCTION__" world Player not dropped, make sure all other references to the Player are dropped");
 
 		if (!_renderMeshFactory->drop())
 			Logger::warn(__FUNCTION__" world ChunkRenderMeshFactory not dropped, make sure all other references to the ChunkRenderMeshFactory are dropped");
@@ -62,5 +69,10 @@ namespace pixelexplorer::game::world {
 	block::BlockManifest& game::world::World::getBlockManifest() const
 	{
 		return *_blockManifest;
+	}
+
+	player::Player& game::world::World::getPlayer() const
+	{
+		return *_player;
 	}
 }
