@@ -33,12 +33,20 @@ namespace pixelexplorer::game::chunk {
 		// calls unloadChunk on all of the loaded chunks tracked by this ChunkManager
 		void unloadAllChunks();
 
+		// update all loaded chunks tracked by this ChunkManager and unload expired chunks
+		void updateLoadedChunks(double deltaTime);
+
+		// load radius chunks around center
+		// note radius and center are in chunk coordinates
+		void loadChunksInRadius(const glm::i32vec3& center, uint16_t radius = 3, double durationSec = 10);
+
 	private:
 		block::BlockManifest& _blockManifest;
 		ChunkGenerator& _chunkGenerator;
 		ChunkRenderMeshFactory& _renderMeshFactory;
 		std::unordered_map<glm::i32vec3, Chunk*> _loadedChunks;
 		std::recursive_mutex _chunkMutex;
+		typedef std::unordered_map<glm::i32vec3, Chunk*>::iterator ChunkIterator;
 
 		// loads or generates a chunk at pos
 		// note this method dose not check if that chunk was already loaded
@@ -48,8 +56,9 @@ namespace pixelexplorer::game::chunk {
 		// rebuilds the chunk's ChunkRenderMesh mesh
 		void remeshChunk(Chunk& chunk);
 
-		// removes the chunk's ChunkRenderMesh and drops the chunk
-		void unloadChunk(Chunk& chunk);
+		// removes the chunk at pos from being tracked by this ChunkManager, removes the chunk's ChunkRenderMesh, and drops the chunk
+		// sets the ChunkIterator to the next loaded chunk
+		void unloadChunk(ChunkIterator& chunk);
 	};
 }
 #endif // !PIXELEXPLORER_GAME_CHUNK_CHUNKMANAGER_H_

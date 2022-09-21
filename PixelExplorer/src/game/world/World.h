@@ -29,6 +29,12 @@ namespace pixelexplorer::game::world {
 		// returns the worlds Player
 		player::Player& getPlayer() const;
 
+		// updates the Player and all ChunkManagers
+		void update();
+
+		// loads chunks around the player
+		void updatePlayerChunkLoading();
+
 	private:
 		WorldDetails& _details;
 		engine::rendering::RenderWindow& _window;

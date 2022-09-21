@@ -102,18 +102,13 @@ namespace pixelexplorer::game {
 		world::World* world = new world::World(*worldDetails, *_window);
 		worldDetails->drop();
 		worldDetails = nullptr;
-		chunk::ChunkManager* chunkManager = world->getChunkManager(0);
-		uint16_t chunkCount = 3;
-		for (int32_t x = -chunkCount; x < chunkCount; ++x)
-			for (int32_t y = -chunkCount; y < chunkCount; ++y)
-				for (int32_t z = -chunkCount; z < chunkCount; ++z)
-					chunkManager->getChunk(glm::i32vec3(x, y, z), true);
 		// reset delta timer as we just loaded in lots of data that presumably took a long time
 		_window->resetDeltaTimer();
 		while (!_window->shouldClose())
 		{
 			_window->drawFrame();
 			camera->update(_window->getDeltaTime());
+			world->update();
 		}
 
 		_window->resetShouldClose();

@@ -36,10 +36,26 @@ namespace pixelexplorer::game::chunk {
 
 		inline const glm::i32vec3& getPosition() const { return _position; }
 
+		// set the amount of time in seconds before the chunk should be unloaded
+		// note if time is less then the current timer it will not be set
+		inline void setExperationTime(double time) {
+			if (_experationTimeSec < time)
+				_experationTimeSec = time;
+		}
+
+		// reduce the amount of time in seconds before the chunk should be unloaded
+		inline void reduceExperationTime(double time) {
+			_experationTimeSec -= time;
+		}
+
+		// returns the amount of time in seconds before the chunk should be unloaded
+		inline double getExperationTime() const { return _experationTimeSec; }
+
 	private:
 		ChunkRenderMesh& _renderMesh;
 		block::Block _blocks[BLOCK_COUNT];
 		glm::i32vec3 _position;
+		double _experationTimeSec;
 	};
 }
 #endif // !PIXELEXPLORER_GAME_CHUNK_H_

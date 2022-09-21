@@ -11,15 +11,23 @@ namespace pixelexplorer::game::player {
 	public:
 		// TODO add description
 		// note this will not set it's own camera to be the active camera
-		Player(const glm::vec3& position, engine::input::InputManager& inputManager);
+		Player(const glm::vec3& position, uint32_t dimensionId, engine::input::InputManager& inputManager);
 		virtual ~Player();
 
 		// update the player inputs and camera using deltaTime
 		void update(double deltaTime);
 
+		// returns the id of the dimension the player is in
+		uint32_t getDimensionId() const;
+
+		const glm::vec3& getPosition() const;
+
+		void setPosition(const glm::vec3& position);
+
 	private:
 		glm::vec3 _position;
 		PlayerCamera* _camera;
+		uint32_t _dimensionId;
 	};
 }
 #endif // !PIXELEXPLOERE_GAME_PLAYER_PLAYER_H_

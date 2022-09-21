@@ -66,27 +66,56 @@ namespace pixelexplorer::game::chunk {
 
 	void ChunkManager::unloadChunk(const glm::i32vec3& pos) {
 		_chunkMutex.lock();
-		auto chunkIterator = _loadedChunks.find(pos);
+		ChunkIterator chunkIterator = _loadedChunks.find(pos);
 		if (chunkIterator == _loadedChunks.end()) {
 			_chunkMutex.unlock();
 			Logger::warn(__FUNCTION__" attempted to unload unloaded chunk");
 			return;
 		}
 
-		unloadChunk(*(chunkIterator->second));
-		_loadedChunks.erase(chunkIterator);
+		unloadChunk(chunkIterator);
 		_chunkMutex.unlock();
 	}
 
 	void ChunkManager::unloadAllChunks() {
 		_chunkMutex.lock();
 		auto it = _loadedChunks.begin();
+		while (it != _loadedChunks.end())
+			unloadChunk(it);
+		_chunkMutex.unlock();
+	}
+
+	void ChunkManager::updateLoadedChunks(double deltaTime)
+	{
+		_chunkMutex.lock();
+		auto it = _loadedChunks.begin();
 		while (it != _loadedChunks.end()) {
-			unloadChunk(*(it->second));
-			it = _loadedChunks.erase(it);
+			Chunk* chunk = (*it).second;
+			chunk->reduceExperationTime(deltaTime);
+			if (chunk->getExperationTime() <= 0) {
+				unloadChunk(it);
+			}
+			else {
+				++it;
+			}
 		}
 
 		_chunkMutex.unlock();
+	}
+
+	void ChunkManager::loadChunksInRadius(const glm::i32vec3& center, uint16_t radius, double durationSec)
+	{
+		Chunk* chunk;
+		int32_t signedRadius = (int32_t)radius;
+		for (int32_t x = -signedRadius; x < signedRadius; ++x) {
+			for (int32_t y = -signedRadius; y < signedRadius; ++y) {
+				for (int32_t z = -signedRadius; z < signedRadius; ++z) {
+					if ((chunk = getChunk(glm::i32vec3(x, y, z) + center, true)) != nullptr) {
+						chunk->setExperationTime(durationSec);
+					}
+				}
+			}
+		}
 	}
 
 	void ChunkManager::remeshChunk(Chunk& chunk) {
@@ -189,10 +218,18 @@ namespace pixelexplorer::game::chunk {
 		chunk.drop();
 	}
 
-	void ChunkManager::unloadChunk(Chunk& chunk)
+	void ChunkManager::unloadChunk(ChunkIterator& chunk)
 	{
-		_renderMeshFactory.addRenderMesh(chunk.getRenderMesh());
-		if (!chunk.drop())
+		std::lock_guard<std::recursive_mutex> lock(_chunkMutex);
+		if (chunk == _loadedChunks.end()) {
+			Logger::warn(__FUNCTION__" attempted to unload invalid ChunkIterator");
+			return;
+		}
+
+		Chunk* chunkPtr = (*chunk).second;
+		_renderMeshFactory.addRenderMesh(chunkPtr->getRenderMesh());
+		if (!chunkPtr->drop())
 			Logger::warn(__FUNCTION__" chunk manager Chunk not dropped, make sure all other references to the Chunk are dropped");
+		chunk = _loadedChunks.erase(chunk);
 	}
 }

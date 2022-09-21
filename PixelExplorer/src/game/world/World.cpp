@@ -33,7 +33,7 @@ namespace pixelexplorer::game::world {
 		generator->drop();
 		generator = nullptr;
 
-		_player = new(std::nothrow) player::Player(glm::vec3(0, 0, -20), window.getInputManager());
+		_player = new(std::nothrow) player::Player(glm::vec3(0), 0, window.getInputManager());
 		if (_player == nullptr)
 			Logger::fatal(__FUNCTION__" failed to allocate world Player");
 	}
@@ -62,7 +62,8 @@ namespace pixelexplorer::game::world {
 
 	chunk::ChunkManager* World::getChunkManager(uint32_t dimensionId) const
 	{
-		if (dimensionId >= _dimensionCount || _dimensionChunkManagers == nullptr)	return nullptr;
+		if (dimensionId >= _dimensionCount || _dimensionChunkManagers == nullptr)
+			return nullptr;
 		return _dimensionChunkManagers[dimensionId];
 	}
 
@@ -71,8 +72,37 @@ namespace pixelexplorer::game::world {
 		return *_blockManifest;
 	}
 
-	player::Player& game::world::World::getPlayer() const
+	player::Player& World::getPlayer() const
 	{
 		return *_player;
+	}
+
+	void World::updatePlayerChunkLoading()
+	{
+		uint32_t playerDimension = _player->getDimensionId();
+		chunk::ChunkManager* chunkMgr;
+		for (uint32_t i = 0; i < _dimensionCount; ++i) {
+			if ((chunkMgr = getChunkManager(i)) != nullptr) {
+				if (i != playerDimension) {
+					chunkMgr->unloadAllChunks();
+				}
+				else {
+					chunkMgr->loadChunksInRadius(glm::i32vec3(_player->getPosition()) / glm::i32vec3((int32_t)chunk::Chunk::CHUNK_SIZE));
+				}
+			}
+		}
+	}
+
+	void World::update()
+	{
+		_player->setPosition(_player->getPosition() + glm::vec3(0, 0, _window.getDeltaTime() * 10));
+		_player->update(_window.getDeltaTime());
+		updatePlayerChunkLoading();
+		chunk::ChunkManager* chunkMgr;
+		for (uint32_t i = 0; i < _dimensionCount; ++i) {
+			if ((chunkMgr = getChunkManager(i)) != nullptr) {
+				chunkMgr->updateLoadedChunks(_window.getDeltaTime());
+			}
+		}
 	}
 }
