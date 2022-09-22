@@ -285,7 +285,11 @@ namespace pixelexplorer::game::block {
 	}
 
 	BlockFaceDefinition* BlockManifest::getBlockFace(const std::string& name, bool* exist) {
-		if (name == "NONE") return nullptr;
+		if (name == "NONE") {
+			if (exist) *exist = true;
+			return nullptr;
+		}
+
 		auto it = _blockFaceDefinitions.find(name);
 		if (it == _blockFaceDefinitions.end()) return createDefaultBlockFace(name);
 		if (exist) *exist = true;
@@ -328,11 +332,13 @@ namespace pixelexplorer::game::block {
 		if (allocatedBlockCount != _lastBlockId) {
 			if (_blockDefinitions == nullptr) {
 				_blockDefinitions = (BlockDefinition**)calloc(_lastBlockId, sizeof(BlockDefinition*));
-				if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to allocate Block Definitions array");
 			}
 			else {
 				_blockDefinitions = (BlockDefinition**)realloc(_blockDefinitions, _lastBlockId * sizeof(BlockDefinition*));
-				if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to allocate Block Definitions array");
+			}
+
+			if (_blockDefinitions == nullptr) Logger::fatal(__FUNCTION__" failed to allocate Block Definitions array");
+			if (!newBlockList.empty()) {
 				for (uint32_t i = _lastBlockId; i > allocatedBlockCount; --i) {
 					_blockDefinitions[i - 1] = newBlockList.front();
 					newBlockList.pop_front();

@@ -5,12 +5,18 @@
 #include <stdint.h>
 #include <thread>
 
+#include "common/Logger.h"
 #include "game/Game.h"
 
 void playGame() {
-	pixelexplorer::game::Game* game = new pixelexplorer::game::Game();
+	using namespace pixelexplorer;
+	using namespace pixelexplorer::game;
+	Game* game = new(std::nothrow) Game();
+	if (game == nullptr)
+		Logger::fatal(__FUNCTION__" failed to allocate Game");
 	game->play();
-	game->drop();
+	if (!game->drop())
+		Logger::warn(__FUNCTION__" Game not dropped, make sure all other references to the Game are dropped");
 }
 
 int main(void) {
