@@ -12,7 +12,11 @@
 #include "world/WorldDetails.h"
 #include "world/World.h"
 #include "engine/Camera.h"
+#include "player/Player.h"
 #include "GLFW/glfw3.h"
+#include "engine/input/InputAction.h"
+#include "engine/input/InputSource.h"
+#include "engine/input/InputManager.h"
 
 namespace pixelexplorer::game {
 	Game::Game()
@@ -75,38 +79,52 @@ namespace pixelexplorer::game {
 		using namespace engine::input;
 		Logger::debug(__FUNCTION__" Playing Game");
 
-		// store the current window camera to restore it later
-		engine::rendering::CameraInterface* oldCamera = _window->getCamera();
-		if (oldCamera) oldCamera->grab();
-		FPSCamera* camera = new FPSCamera(_window->getInputManager());
-		camera->setPosition(glm::vec3(0, 0, -50));
-		_window->setCamera(camera);
 
 		// create world details, this should be updated to load from files
 		std::filesystem::path worldPath = OSHelper::getPersistentPath("TEST_WORLD");
 		world::WorldDetails* worldDetails = new(std::nothrow) world::WorldDetails(worldPath, "TEST_WORLD");
 		if (worldDetails == nullptr) {
 			Logger::error(__FUNCTION__" failed to load world details");
-			_window->setCamera(oldCamera);
-			if (oldCamera) {
-				oldCamera->drop();
-				oldCamera = nullptr;
-			}
-
-			camera->drop();
-			camera = nullptr;
 			return;
 		}
 
 		// load world from details
-		world::World* world = new world::World(*worldDetails, *_window);
+		world::World* world = new(std::nothrow) world::World(*worldDetails, *_window);
 		worldDetails->drop();
 		worldDetails = nullptr;
+		if (world == nullptr) {
+			// should this be fatal, we can technicaly just return to main menu
+			Logger::error(__FUNCTION__" failed to allocate world");
+			return;
+		}
+
+		// store the current window camera to restore it later
+		engine::rendering::CameraInterface* oldCamera = _window->getCamera();
+		if (oldCamera) oldCamera->grab();
+		FPSCamera* freeViewCam = new(std::nothrow) FPSCamera(_window->getInputManager());
+		bool freeViewCamActive = false;
+		InputAction* switchCameraAction = _window->getInputManager().getOrCreateAction("switch camera", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_C), false, false });
+		//camera->setPosition(glm::vec3(0, 0, -50));
+		//_window->setCamera(camera);
+
 		// reset delta timer as we just loaded in lots of data that presumably took a long time
 		_window->resetDeltaTimer();
 		while (!_window->shouldClose())
 		{
 			_window->drawFrame();
+			if (switchCameraAction->getValue()) {
+				freeViewCamActive = !freeViewCamActive;
+				if (freeViewCamActive && freeViewCam == nullptr)
+					freeViewCamActive = false;
+
+				if (freeViewCamActive) {
+					_window->setCamera(freeViewCam);
+				}
+				else {
+					_window
+				}
+			}
+
 			camera->update(_window->getDeltaTime());
 			world->update();
 		}

@@ -95,8 +95,6 @@ namespace pixelexplorer::game::world {
 
 	void World::update()
 	{
-		_player->setPosition(_player->getPosition() + glm::vec3(0, 0, _window.getDeltaTime() * 10));
-		_player->update(_window.getDeltaTime());
 		updatePlayerChunkLoading();
 		chunk::ChunkManager* chunkMgr;
 		for (uint32_t i = 0; i < _dimensionCount; ++i) {
