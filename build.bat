@@ -12,3 +12,6 @@ mv "./glfw/build/Win32/src/glfw.vcxproj" "./glfw/build/Win32/src/glfw-Win32.vcxp
 mv "./glfw/build/Win32/src/glfw.vcxproj.filters" "./glfw/build/Win32/src/glfw-Win32.vcxproj.filters"
 mv "./glfw/build/x64/src/glfw.vcxproj" "./glfw/build/x64/src/glfw-x64.vcxproj"
 mv "./glfw/build/x64/src/glfw.vcxproj.filters" "./glfw/build/x64/src/glfw-x64.vcxproj.filters"
+cp ./PhysXPresetOverrides/* ./PhysX/physx/buildtools/presets/public/
+./PhysX/physx/generate_projects.bat vc16win64s
+./PhysX/physx/generate_projects.bat vc16win32s

@@ -10,3 +10,6 @@
 [submodule "PixelExplorer/src/vendor/imgui"]
 	path = PixelExplorer/src/vendor/imgui-temp
 	url = https://github.com/ocornut/imgui.git
+[submodule "PhysX"]
+	path = PhysX
+	url = https://github.com/NVIDIAGameWorks/PhysX.git
