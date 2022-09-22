@@ -35,4 +35,8 @@ namespace pixelexplorer::game::player {
 	{
 		_position = position;
 	}
+	PlayerCamera& Player::getCamera() const
+	{
+		return *_camera;
+	}
 }

@@ -24,6 +24,8 @@ namespace pixelexplorer::game::player {
 
 		void setPosition(const glm::vec3& position);
 
+		PlayerCamera& getCamera() const;
+
 	private:
 		glm::vec3 _position;
 		PlayerCamera* _camera;

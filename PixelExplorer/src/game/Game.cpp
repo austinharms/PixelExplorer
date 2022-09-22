@@ -98,14 +98,15 @@ namespace pixelexplorer::game {
 			return;
 		}
 
+		player::PlayerCamera* playerCamera = &(world->getPlayer().getCamera());
+		playerCamera->grab();
+
 		// store the current window camera to restore it later
 		engine::rendering::CameraInterface* oldCamera = _window->getCamera();
 		if (oldCamera) oldCamera->grab();
 		FPSCamera* freeViewCam = new(std::nothrow) FPSCamera(_window->getInputManager());
 		bool freeViewCamActive = false;
 		InputAction* switchCameraAction = _window->getInputManager().getOrCreateAction("switch camera", InputSource{ InputSource::InputSourceType::KEYBOARD, glfwGetKeyScancode(GLFW_KEY_C), false, false });
-		//camera->setPosition(glm::vec3(0, 0, -50));
-		//_window->setCamera(camera);
 
 		// reset delta timer as we just loaded in lots of data that presumably took a long time
 		_window->resetDeltaTimer();
@@ -118,20 +119,26 @@ namespace pixelexplorer::game {
 					freeViewCamActive = false;
 
 				if (freeViewCamActive) {
+					freeViewCam->setPosition(playerCamera->getPosition());
+					freeViewCam->setRotation(playerCamera->getRotation());
 					_window->setCamera(freeViewCam);
 				}
 				else {
-					_window
+					_window->setCamera(playerCamera);
 				}
 			}
 
-			camera->update(_window->getDeltaTime());
+			if (freeViewCamActive) {
+				freeViewCam->update(_window->getDeltaTime());
+			}
+			else {
+				playerCamera->update(_window->getDeltaTime());
+			}
+
 			world->update();
 		}
 
 		_window->resetShouldClose();
-		world->drop();
-		world = nullptr;
 		// draw one more frame to terminate/free all the now unloaded chunk render meshes, (currently not needed as chunks are removed on the main thread)
 		_window->drawFrame();
 
@@ -142,8 +149,13 @@ namespace pixelexplorer::game {
 			oldCamera = nullptr;
 		}
 
-		camera->drop();
-		camera = nullptr;
+		freeViewCam->drop();
+		freeViewCam = nullptr;
+		playerCamera->drop();
+		playerCamera = nullptr;
+
+		world->drop();
+		world = nullptr;
 	}
 
 	Game::~Game()
