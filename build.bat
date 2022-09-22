@@ -1,5 +1,6 @@
 wsl.exe git submodule init
 wsl.exe git submodule update
+wsl.exe sed -i -e 's/\r$//' ./buildGLEW.sh
 wsl.exe ./buildGLEW.sh
 rm -rf "./glfw/build"
 mkdir "./glfw/build"
