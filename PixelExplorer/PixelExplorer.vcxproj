@@ -77,16 +77,16 @@
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
-      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)glew\lib\Debug\Win32;$(SolutionDir)glfw\build\Win32\src\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32sd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,8 +98,8 @@
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard_C>Default</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,7 +107,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)glew\lib\Release\Win32;$(SolutionDir)glfw\build\Win32\src\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -117,16 +117,16 @@
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
-      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)glew\lib\Debug\x64;$(SolutionDir)glfw\build\x64\src\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32sd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,8 +138,8 @@
       <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)glfw\include;$(SolutionDir)PixelExplorer\src\vendor\glm;$(SolutionDir)PixelExplorer\src\vendor;$(SolutionDir)PixelExplorer\src\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard_C>Default</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,11 +147,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)glew\lib\Release\x64;$(SolutionDir)glfw\build\x64\src\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\engine\input\InputManager.cpp" />
     <ClCompile Include="src\game\block\BlockManifest.cpp" />
     <ClCompile Include="src\game\block\BlockShape.cpp" />
     <ClCompile Include="src\game\chunk\FlatChunkGenerator.cpp" />
@@ -164,12 +163,6 @@
     <ClCompile Include="src\game\player\PlayerCamera.cpp" />
     <ClCompile Include="src\game\world\World.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\engine\rendering\GLObject.cpp" />
-    <ClCompile Include="src\engine\rendering\Material.cpp" />
-    <ClCompile Include="src\engine\rendering\ExampleRenderMesh.cpp" />
-    <ClCompile Include="src\engine\rendering\RenderWindow.cpp" />
-    <ClCompile Include="src\engine\rendering\Shader.cpp" />
-    <ClCompile Include="src\engine\rendering\GlTexture.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
@@ -185,8 +178,6 @@
     <ClInclude Include="src\common\DataBuffer.h" />
     <ClInclude Include="src\common\OSHelpers.h" />
     <ClInclude Include="src\common\Timer.h" />
-    <ClInclude Include="src\engine\input\InputAction.h" />
-    <ClInclude Include="src\engine\input\InputSource.h" />
     <ClInclude Include="src\game\block\Block.h" />
     <ClInclude Include="src\game\block\BlockDefinition.h" />
     <ClInclude Include="src\game\block\BlockFaceDefinition.h" />
@@ -202,24 +193,9 @@
     <ClInclude Include="src\game\FPSCamera.h" />
     <ClInclude Include="src\game\Game.h" />
     <ClInclude Include="src\engine\Camera.h" />
-    <ClInclude Include="src\engine\rendering\CameraInterface.h" />
-    <ClInclude Include="src\engine\rendering\GLRenderObject.h" />
     <ClInclude Include="src\game\gui\MainMenu.h" />
     <ClInclude Include="src\common\Logger.h" />
     <ClInclude Include="src\common\RefCount.h" />
-    <ClInclude Include="src\engine\rendering\GLObject.fwd.h" />
-    <ClInclude Include="src\engine\rendering\GLObject.h" />
-    <ClInclude Include="src\engine\rendering\GLNode.h" />
-    <ClInclude Include="src\engine\rendering\GUIElement.h" />
-    <ClInclude Include="src\engine\input\InputManager.h" />
-    <ClInclude Include="src\engine\rendering\Material.h" />
-    <ClInclude Include="src\engine\rendering\MaterialProperties.h" />
-    <ClInclude Include="src\engine\rendering\RenderGlobal.h" />
-    <ClInclude Include="src\engine\rendering\ExampleRenderMesh.h" />
-    <ClInclude Include="src\engine\rendering\RenderWindow.fwd.h" />
-    <ClInclude Include="src\engine\rendering\RenderWindow.h" />
-    <ClInclude Include="src\engine\rendering\Shader.h" />
-    <ClInclude Include="src\engine\rendering\GLTexture.h" />
     <ClInclude Include="src\game\player\Player.h" />
     <ClInclude Include="src\game\player\PlayerCamera.h" />
     <ClInclude Include="src\game\world\World.h" />
@@ -244,7 +220,6 @@
     <None Include="src\common\OSHelpers.inl" />
     <None Include="src\common\RefCount.inl" />
     <None Include="src\common\Timer.inl" />
-    <None Include="src\engine\rendering\GLNode.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

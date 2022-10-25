@@ -1,15 +1,15 @@
 [submodule "glew"]
 	path = glew
 	url = https://github.com/nigels-com/glew.git
-[submodule "glfw"]
-	path = glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "PixelExplorer/src/vendor/glm"]
-	path = PixelExplorer/src/vendor/glm
-	url = https://github.com/g-truc/glm.git
-[submodule "PixelExplorer/src/vendor/imgui"]
-	path = PixelExplorer/src/vendor/imgui-temp
-	url = https://github.com/ocornut/imgui.git
 [submodule "PhysX"]
 	path = PhysX
 	url = https://github.com/NVIDIAGameWorks/PhysX.git
+[submodule "SDL2"]
+	path = SDL2
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "shared/glm"]
+	path = shared/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "shared/imgui"]
+	path = shared/imgui
+	url = https://github.com/ocornut/imgui.git
