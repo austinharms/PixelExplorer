@@ -14,6 +14,8 @@ namespace pxengine {
 		// TODO REMOVE THIS FUNCTION
 		virtual uint32_t testFn(uint32_t val) = 0;
 
+		virtual PxeWindow* createWindow();
+
 	protected:
 		virtual ~PxeEngineBase() {}
 	};

@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "PxeEngine.h"
+#include "SDL.h"
 
 class LogHandle : public pxengine::PxeLogHandler {
 public:
@@ -10,10 +11,11 @@ public:
 	}
 };
 
-int main(void) {
+int main(int argc, char* args[]) {
 	LogHandle h;
 	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
 	std::cout << engineBase->testFn(5) << std::endl;
+	SDL_Delay(5000);
 	engineBase->drop();
 	return 0;
 }

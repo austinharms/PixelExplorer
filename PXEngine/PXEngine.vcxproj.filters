@@ -24,6 +24,18 @@
     <ClCompile Include="src\PxeEngineBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PxeGLAsset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NpLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeRefCount.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NpWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PxeEngine.h">
@@ -50,16 +62,11 @@
     <ClInclude Include="src\NpLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\PxeRefCount.cpp">
+    <ClInclude Include="include\PxeWindow.h">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\PxeGLAsset.cpp">
+    </ClInclude>
+    <ClInclude Include="src\NpWindow.h">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\NpLogger.cpp">
-      <Filter>Header Files</Filter>
-    </None>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,11 +1,17 @@
+#include <mutex>
+
 #include "PxeEngineBase.h"
 #include "PxeLogger.h"
+#include "PxPhysicsAPI.h"
+#include "GL/glew.h"
+#include "SDL.h"
+#include "NpWindow.h"
 
 #ifndef PXENGINE_NONPUBLIC_ENGINEBASE_H_
 #define PXENGINE_NONPUBLIC_ENGINEBASE_H_
 namespace pxengine::nonpublic {
 	// TODO add NpEngineBase class description (copy EngineBase description)
-	class NpEngineBase : PxeEngineBase, PxeLogHandler
+	class NpEngineBase : public PxeEngineBase, PxeLogHandler, physx::PxAssertHandler, physx::PxErrorCallback
 	{
 	public:
 		// creates and returns an NpEngineBase instance
@@ -22,6 +28,14 @@ namespace pxengine::nonpublic {
 
 		uint32_t testFn(uint32_t val) override { return val + 10; }
 
+		void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line) override;
+
+		void operator()(const char* exp, const char* file, int line, bool& ignore) override;
+
+		void acquireGlContext(NpWindow& window);
+
+		void releaseGlContext(NpWindow& window);
+
 	protected:
 		void onDelete() override;
 
@@ -29,8 +43,25 @@ namespace pxengine::nonpublic {
 		static NpEngineBase* s_instance;
 
 		NpEngineBase(PxeLogHandler& logHandler);
+		void initPhys();
+		void deinitPhys();
+		void initSDL();
+		void deinitSDL();
 
+		std::mutex _glContextMutex;
+		NpWindow* _activeWindow;
 		PxeLogHandler& _logHandler;
+		physx::PxAssertHandler& _defaultPhysAssertHandler;
+		physx::PxFoundation* _physFoundation;
+		physx::PxPvd* _physPVD;
+		physx::PxPvdTransport* _physPVDTransport;
+		physx::PxPhysics* _physPhysics;
+		physx::PxCooking* _physCooking;
+		physx::PxDefaultAllocator _physAllocator;
+		physx::PxTolerancesScale _physScale;
+		SDL_GLContext _sdlGlContext;
+		bool _physInit;
+		bool _sdlInit;
 	};
 }
 #endif // !PXENGINE_NONPUBLIC_NPENGINEBASE_H_
