@@ -100,15 +100,16 @@ namespace pxengine::nonpublic {
 		// create a throwaway window used to create an OpenGl context
 		// TODO find a better way to do this
 		SDL_Window* tempWindow = SDL_CreateWindow("PXE_ENGINEBASE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
-		if (!tempWindow)
+		if (!tempWindow) {
+			PXE_ENGINEBASE_CHECKSDLERROR();
 			PXE_ENGINEBASE_FATAL("Failed to Create SDL Window");
-		PXE_ENGINEBASE_CHECKSDLERROR();
+		}
 
-		_sdlGlContext = SDL_GL_CreateContext(_sdlWindow);
-		PXE_ENGINEBASE_CHECKSDLERROR();
-
-		SDL_GL_MakeCurrent(_sdlWindow, _sdlGlContext);
-		PXE_ENGINEBASE_CHECKSDLERROR();
+		_sdlGlContext = SDL_GL_CreateContext(tempWindow);
+		if (!_sdlGlContext) {
+			PXE_ENGINEBASE_CHECKSDLERROR();
+			PXE_ENGINEBASE_FATAL("Failed to Create OpenGl Context");
+		}
 
 		if (glewInit() != GLEW_OK)
 			PXE_ENGINEBASE_FATAL("Failed to Init GLEW");
@@ -123,10 +124,12 @@ namespace pxengine::nonpublic {
 			PXE_ENGINEBASE_WARN("Attempted to deinitialize uninitialized SDL");
 			return;
 		}
+		if (_sdlGlContext) {
+			SDL_GL_DeleteContext(_sdlGlContext);
+			PXE_ENGINEBASE_CHECKSDLERROR();
+			_sdlGlContext = nullptr;
+		}
 
-		SDL_GL_DeleteContext(_sdlGlContext);
-		_sdlGlContext = nullptr;
-		PXE_ENGINEBASE_CHECKSDLERROR();
 		SDL_Quit();
 		_sdlInit = false;
 	}
@@ -137,6 +140,28 @@ namespace pxengine::nonpublic {
 		deinitPhys();
 		s_instance = nullptr;
 		PXE_ENGINEBASE_INFO("PxeEngineBase Destroyed");
+	}
+
+	PxeWindow* NpEngineBase::createWindow(uint32_t width, uint32_t height, const char* title)
+	{
+		SDL_Window* sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+		if (!sdlWindow) {
+			PXE_ENGINEBASE_ERROR("Failed to Create SDL Window");
+			PXE_ENGINEBASE_CHECKSDLERROR();
+			return nullptr;
+		}
+		
+		NpWindow* window = new(std::nothrow) NpWindow(*sdlWindow);
+		if (!window) {
+			PXE_ENGINEBASE_ERROR("Failed to Create Window");
+			SDL_DestroyWindow(sdlWindow);
+			PXE_ENGINEBASE_CHECKSDLERROR();
+			return nullptr;
+		}
+
+		window->setSwapInterval(1);
+		PXE_ENGINEBASE_INFO("Window Created");
+		return window;
 	}
 
 	void NpEngineBase::onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function)

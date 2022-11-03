@@ -1,7 +1,10 @@
 #include <iostream>
 
 #include "PxeEngine.h"
+#include "PxeWindow.h"
 #include "SDL.h"
+#include "GL/glew.h"
+
 
 class LogHandle : public pxengine::PxeLogHandler {
 public:
@@ -14,8 +17,20 @@ public:
 int main(int argc, char* args[]) {
 	LogHandle h;
 	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
-	std::cout << engineBase->testFn(5) << std::endl;
-	SDL_Delay(5000);
+	pxengine::PxeWindow* window = engineBase->createWindow(100, 100, "Test Window");
+	if (window) {
+		window->setSwapInterval(1);
+		for (uint32_t i = 0; i < 10000; ++i) {
+			window->acquireGlContext();
+			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			window->swapFrameBuffer();
+			window->releaseGlContext();
+		}
+
+		window->drop();
+	}
+
 	engineBase->drop();
 	return 0;
 }

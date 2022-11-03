@@ -2,6 +2,7 @@
 
 #include "PxeRefCount.h"
 #include "PxeLogger.h"
+#include "PxeWindow.h"
 
 #ifndef PXENGINE_ENGINEBASE_H_
 #define PXENGINE_ENGINEBASE_H_
@@ -10,11 +11,7 @@ namespace pxengine {
 	class PxeEngineBase : public PxeRefCount
 	{
 	public:
-		// Test Function
-		// TODO REMOVE THIS FUNCTION
-		virtual uint32_t testFn(uint32_t val) = 0;
-
-		virtual PxeWindow* createWindow();
+		virtual PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) = 0;
 
 	protected:
 		virtual ~PxeEngineBase() {}

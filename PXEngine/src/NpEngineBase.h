@@ -24,9 +24,9 @@ namespace pxengine::nonpublic {
 
 		virtual ~NpEngineBase();
 
-		void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) override;
+		PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
 
-		uint32_t testFn(uint32_t val) override { return val + 10; }
+		void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) override;
 
 		void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line) override;
 

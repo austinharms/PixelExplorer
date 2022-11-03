@@ -24,6 +24,7 @@ namespace pxengine {
 		virtual void swapFrameBuffer() = 0;
 
 		// sets the windows swap interval
+		// note this will only take effect after the next call to acquireGlContext
 		virtual void setSwapInterval(int8_t interval) = 0;
 
 		// returns the windows swap interval
