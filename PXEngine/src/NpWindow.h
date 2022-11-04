@@ -35,6 +35,13 @@ namespace pxengine::nonpublic {
 
 		int8_t getSwapInterval() override;
 
+		bool getShouldClose() const override;
+
+		void resetShouldClose() override;
+
+		// TODO add some sort of event system
+		void pollEvents() override;
+
 	protected:
 		void onDelete() override;
 
@@ -42,6 +49,7 @@ namespace pxengine::nonpublic {
 		SDL_Window& _sdlWindow;
 		int8_t _swapInterval;
 		bool _acquiredContext;
+		bool _shouldClose;
 	};
 }
 #endif // !PXENGINE_NONPUBLIC_WINDOW_H_

@@ -17,15 +17,17 @@ public:
 int main(int argc, char* args[]) {
 	LogHandle h;
 	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
-	pxengine::PxeWindow* window = engineBase->createWindow(100, 100, "Test Window");
+	pxengine::PxeWindow* window = engineBase->createWindow(1000, 1000, "Test Window");
 	if (window) {
 		window->setSwapInterval(1);
-		for (uint32_t i = 0; i < 10000; ++i) {
+		while (!window->getShouldClose())
+		{
 			window->acquireGlContext();
 			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			window->swapFrameBuffer();
 			window->releaseGlContext();
+			window->pollEvents();
 		}
 
 		window->drop();

@@ -29,6 +29,18 @@ namespace pxengine {
 
 		// returns the windows swap interval
 		virtual int8_t getSwapInterval() = 0;
+
+		// retruns true if the user wants to close the window aka presses the X, Alt-F4...
+		// this can be reset by calling resetShouldClose
+		virtual bool getShouldClose() const = 0;
+
+		// resets the internal window close flag to false
+		virtual void resetShouldClose() = 0;
+
+		// processes the windows event queue, this should be done every frame to allow for user interaction
+		// note not calling this will cause windows to think the application is not responding
+		// TODO add some sort of event system
+		virtual void pollEvents() = 0;
 	};
 }
 #endif

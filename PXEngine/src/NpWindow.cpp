@@ -1,13 +1,16 @@
 #include "NpWindow.h"
 
 #include "NpEngineBase.h"
+#include "SDL.h"
 
 namespace pxengine::nonpublic {
 	NpWindow::NpWindow(SDL_Window& window) : _sdlWindow(window)
 	{
+		_swapInterval = 1;
 		_acquiredContext = false;
+		_shouldClose = false;
 	}
-	
+
 	NpWindow::~NpWindow()
 	{
 		SDL_DestroyWindow(&_sdlWindow);
@@ -53,6 +56,31 @@ namespace pxengine::nonpublic {
 	int8_t NpWindow::getSwapInterval()
 	{
 		return _swapInterval;
+	}
+
+	bool NpWindow::getShouldClose() const
+	{
+		return _shouldClose;
+	}
+
+	void NpWindow::resetShouldClose()
+	{
+		_shouldClose = false;
+	}
+
+	void NpWindow::pollEvents()
+	{
+		SDL_Event e;
+		while (SDL_PollEvent(&e) != 0)
+		{
+			if (e.type == SDL_QUIT) {
+				_shouldClose = true;
+			}
+			else
+			{
+				// TODO manage other events
+			}
+		}
 	}
 
 	void NpWindow::onDelete()
