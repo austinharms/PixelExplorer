@@ -186,6 +186,7 @@
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\PxeLogger.h" />
     <ClInclude Include="include\PxeRefCount.h" />
+    <ClInclude Include="include\PxeScene.h" />
     <ClInclude Include="include\PxeWindow.h" />
     <ClInclude Include="src\NpEngineBase.h" />
     <ClInclude Include="src\NpLogger.h" />
