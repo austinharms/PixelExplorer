@@ -1,14 +1,19 @@
 #include <stdint.h>
 
 #include "PxeWindow.h"
+#include "PxeRingBuffer.h"
 #include "SDL.h"
 
 #ifndef PXENGINE_NONPUBLIC_WINDOW_H_
 #define PXENGINE_NONPUBLIC_WINDOW_H_
 namespace pxengine::nonpublic {
+	class NpEngineBase;
+
 	class NpWindow : public PxeWindow
 	{
 	public:
+		static const uint32_t WINDOW_EVENT_QUEUE_SIZE = 128;
+
 		NpWindow(SDL_Window& window);
 		virtual ~NpWindow();
 
@@ -39,17 +44,29 @@ namespace pxengine::nonpublic {
 
 		void resetShouldClose() override;
 
+		void setWindowHidden(bool hidden) override;
+
+		bool getWindowHidden() const override;
+
 		// TODO add some sort of event system
 		void pollEvents() override;
 
+		const PxeRingBuffer<SDL_Event, WINDOW_EVENT_QUEUE_SIZE>& getEventBuffer() const;
+
 	protected:
 		void onDelete() override;
+		PxeRingBuffer<SDL_Event, WINDOW_EVENT_QUEUE_SIZE>& getEventBuffer();
 
 	private:
+		friend class NpEngineBase;
+
 		SDL_Window& _sdlWindow;
+		NpEngineBase* _engineBase;
+		PxeRingBuffer<SDL_Event, WINDOW_EVENT_QUEUE_SIZE> _eventBuffer;
 		int8_t _swapInterval;
 		bool _acquiredContext;
 		bool _shouldClose;
+		bool _hidden;
 	};
 }
 #endif // !PXENGINE_NONPUBLIC_WINDOW_H_

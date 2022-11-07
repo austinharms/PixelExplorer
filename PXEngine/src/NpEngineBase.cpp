@@ -3,6 +3,7 @@
 #include <new>
 
 #include "NpLogger.h"
+#include "SDL.h"
 
 #define PXE_ENGINEBASE_INFO(msg) onLog(msg, (uint8_t)pxengine::LogLevel::INFO, __FILE__, __LINE__, __FUNCTION__)
 #define PXE_ENGINEBASE_WARN(msg) onLog(msg, (uint8_t)pxengine::LogLevel::WARN, __FILE__, __LINE__, __FUNCTION__)
@@ -38,6 +39,8 @@ namespace pxengine::nonpublic {
 		_sdlInit = false;
 		_sdlGlContext = nullptr;
 		_activeWindow = nullptr;
+		_activeKeyboardWindowId = 0;
+		_activeMouseWindowId = 0;
 		initSDL();
 		initPhys();
 	}
@@ -99,7 +102,7 @@ namespace pxengine::nonpublic {
 
 		// create a throwaway window used to create an OpenGl context
 		// TODO find a better way to do this
-		SDL_Window* tempWindow = SDL_CreateWindow("PXE_ENGINEBASE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
+		SDL_Window* tempWindow = SDL_CreateWindow("PXE_ENGINEBASE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
 		if (!tempWindow) {
 			PXE_ENGINEBASE_CHECKSDLERROR();
 			PXE_ENGINEBASE_FATAL("Failed to Create SDL Window");
@@ -113,6 +116,8 @@ namespace pxengine::nonpublic {
 
 		if (glewInit() != GLEW_OK)
 			PXE_ENGINEBASE_FATAL("Failed to Init GLEW");
+		SDL_GL_MakeCurrent(nullptr, nullptr);
+		PXE_ENGINEBASE_CHECKSDLERROR();
 		SDL_DestroyWindow(tempWindow);
 		PXE_ENGINEBASE_CHECKSDLERROR();
 		_sdlInit = true;
@@ -144,13 +149,17 @@ namespace pxengine::nonpublic {
 
 	PxeWindow* NpEngineBase::createWindow(uint32_t width, uint32_t height, const char* title)
 	{
-		SDL_Window* sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+		_glWaitMutex.lock();
+		std::lock_guard<std::recursive_mutex> lock(_glContextMutex);
+		_glWaitMutex.unlock();
+		SDL_Window* sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
 		if (!sdlWindow) {
 			PXE_ENGINEBASE_ERROR("Failed to Create SDL Window");
 			PXE_ENGINEBASE_CHECKSDLERROR();
 			return nullptr;
 		}
-		
+
+		//SDL_ShowWindow(sdlWindow);
 		NpWindow* window = new(std::nothrow) NpWindow(*sdlWindow);
 		if (!window) {
 			PXE_ENGINEBASE_ERROR("Failed to Create Window");
@@ -159,7 +168,10 @@ namespace pxengine::nonpublic {
 			return nullptr;
 		}
 
+		_eventWindows.emplace(SDL_GetWindowID(sdlWindow), window);
 		window->setSwapInterval(1);
+		SDL_GL_MakeCurrent(nullptr, nullptr);
+		PXE_ENGINEBASE_CHECKSDLERROR();
 		PXE_ENGINEBASE_INFO("Window Created");
 		return window;
 	}
@@ -181,7 +193,9 @@ namespace pxengine::nonpublic {
 
 	void NpEngineBase::acquireGlContext(NpWindow& window)
 	{
+		_glWaitMutex.lock();
 		_glContextMutex.lock();
+		_glWaitMutex.unlock();
 		_activeWindow = &window;
 		SDL_GL_MakeCurrent(&(window.getSDLWindow()), _sdlGlContext);
 		PXE_ENGINEBASE_CHECKSDLERROR();
@@ -196,11 +210,102 @@ namespace pxengine::nonpublic {
 			return;
 		}
 
+		SDL_GL_MakeCurrent(nullptr, nullptr);
 		_activeWindow = nullptr;
+		_glContextMutex.unlock();
+	}
+
+	void NpEngineBase::pollEvents()
+	{
+		//char buf[512] = "";
+		//sprintf_s(buf, "Window: %i, Event: %i", e.window.windowID, e.window.event);
+		//PXE_INFO(buf);
+		// TODO manage other events
+
+		SDL_Event e;
+		while (SDL_PollEvent(&e) != 0)
+		{
+			// is it a window event
+			if (e.type == SDL_WINDOWEVENT)
+			{
+				SDL_WindowEventID winEvent = (SDL_WindowEventID)e.window.event;
+				// check if we need to switch the active mouse or keyboard window
+				switch (winEvent)
+				{
+				case SDL_WINDOWEVENT_ENTER:
+					_activeMouseWindowId = e.window.windowID;
+					break;
+
+				case SDL_WINDOWEVENT_LEAVE:
+					if (_activeMouseWindowId == e.window.windowID)
+						_activeMouseWindowId = 0;
+					break;
+
+				case SDL_WINDOWEVENT_FOCUS_GAINED:
+					_activeKeyboardWindowId = e.window.windowID;
+					break;
+
+				case SDL_WINDOWEVENT_FOCUS_LOST:
+					if (_activeKeyboardWindowId == e.window.windowID)
+						_activeKeyboardWindowId = 0;
+					break;
+				}
+
+				auto winIt = _eventWindows.find(e.window.windowID);
+				if (winIt != _eventWindows.end()) {
+					if (!winIt->second->getEventBuffer().insert(e)) {
+						PXE_ENGINEBASE_WARN("Window event buffer overflow");
+					}
+				}
+			}
+			// is it a keyboard input event
+			else if (e.type >= SDL_KEYDOWN && e.type <= SDL_TEXTEDITING_EXT && e.type != SDL_KEYMAPCHANGED) {
+				if (_activeKeyboardWindowId) {
+					auto winIt = _eventWindows.find(_activeKeyboardWindowId);
+					if (winIt != _eventWindows.end()) {
+						if (!winIt->second->getEventBuffer().insert(e)) {
+							PXE_ENGINEBASE_WARN("Window event buffer overflow");
+						}
+					}
+				}
+			}
+			// is it a mouse/joystick/touch input event
+			else if (e.type >= SDL_MOUSEMOTION && e.type <= SDL_MULTIGESTURE) {
+				if (_activeMouseWindowId) {
+					auto winIt = _eventWindows.find(_activeMouseWindowId);
+					if (winIt != _eventWindows.end()) {
+						if (!winIt->second->getEventBuffer().insert(e)) {
+							PXE_ENGINEBASE_WARN("Window event buffer overflow");
+						}
+					}
+				}
+			}
+			// forward all other events to all windows
+			else
+			{
+				for (auto it = _eventWindows.begin(); it != _eventWindows.end(); ++it) {
+					if (!it->second->getEventBuffer().insert(e)) {
+						PXE_ENGINEBASE_WARN("Window event buffer overflow");
+					}
+				}
+			}
+		}
+	}
+
+	void NpEngineBase::removeWindowFromEventQueue(NpWindow& window)
+	{
+		_glContextMutex.lock();
+		uint32_t windowId = SDL_GetWindowID(&(window.getSDLWindow()));
+		_eventWindows.erase(windowId);
+		if (_activeKeyboardWindowId == windowId)
+			_activeKeyboardWindowId = 0;
+		if (_activeMouseWindowId == windowId)
+			_activeMouseWindowId = 0;
 		_glContextMutex.unlock();
 	}
 
 	void NpEngineBase::onDelete()
 	{
+
 	}
 }

@@ -1,4 +1,5 @@
 #include <mutex>
+#include <unordered_map>
 
 #include "PxeEngineBase.h"
 #include "PxeLogger.h"
@@ -36,6 +37,11 @@ namespace pxengine::nonpublic {
 
 		void releaseGlContext(NpWindow& window);
 
+		void pollEvents();
+
+		// this should only ever be called when a window is being destroyed
+		void removeWindowFromEventQueue(NpWindow& window);
+
 	protected:
 		void onDelete() override;
 
@@ -48,7 +54,11 @@ namespace pxengine::nonpublic {
 		void initSDL();
 		void deinitSDL();
 
-		std::mutex _glContextMutex;
+		// map of all the windows registered to receive events
+		// this will always be all windows that exist
+		std::unordered_map<uint32_t, NpWindow*> _eventWindows;
+		std::recursive_mutex _glContextMutex;
+		std::mutex _glWaitMutex;
 		NpWindow* _activeWindow;
 		PxeLogHandler& _logHandler;
 		physx::PxAssertHandler& _defaultPhysAssertHandler;
@@ -60,6 +70,8 @@ namespace pxengine::nonpublic {
 		physx::PxDefaultAllocator _physAllocator;
 		physx::PxTolerancesScale _physScale;
 		SDL_GLContext _sdlGlContext;
+		uint32_t _activeMouseWindowId;
+		uint32_t _activeKeyboardWindowId;
 		bool _physInit;
 		bool _sdlInit;
 	};

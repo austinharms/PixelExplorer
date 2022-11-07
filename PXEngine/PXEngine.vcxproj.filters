@@ -71,5 +71,8 @@
     <ClInclude Include="include\PxeScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PxeRingBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -38,9 +38,17 @@ namespace pxengine {
 		virtual void resetShouldClose() = 0;
 
 		// processes the windows event queue, this should be done every frame to allow for user interaction
+		// this MUST be called on the same thread that created the window
 		// note not calling this will cause windows to think the application is not responding
 		// TODO add some sort of event system
 		virtual void pollEvents() = 0;
+
+		// set if the window is hidden or not
+		// this is true by default
+		virtual void setWindowHidden(bool hidden) = 0;
+
+		// returns true if the window is hidden
+		virtual bool getWindowHidden() const = 0;
 	};
 }
 #endif
