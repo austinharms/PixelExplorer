@@ -1,9 +1,11 @@
 #include "NpEngineBase.h"
 
 #include <new>
+#include <thread>
 
 #include "NpLogger.h"
 #include "SDL.h"
+#include "NpScene.h"
 
 #define PXE_ENGINEBASE_INFO(msg) onLog(msg, (uint8_t)pxengine::LogLevel::INFO, __FILE__, __LINE__, __FUNCTION__)
 #define PXE_ENGINEBASE_WARN(msg) onLog(msg, (uint8_t)pxengine::LogLevel::WARN, __FILE__, __LINE__, __FUNCTION__)
@@ -41,6 +43,9 @@ namespace pxengine::nonpublic {
 		_activeWindow = nullptr;
 		_activeKeyboardWindowId = 0;
 		_activeMouseWindowId = 0;
+		if (std::thread::hardware_concurrency() <= 0)
+			PXE_ENGINEBASE_WARN("Failed to get hardware thread count");
+
 		initSDL();
 		initPhys();
 	}
@@ -60,6 +65,18 @@ namespace pxengine::nonpublic {
 		_physPVDTransport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
 		_physPVD->connect(*_physPVDTransport, physx::PxPvdInstrumentationFlag::eALL);
 		_physPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_physFoundation, _physScale, true, _physPVD);
+		uint32_t threadCount = std::thread::hardware_concurrency() / 2;
+		if (threadCount < 2) {
+			PXE_ENGINEBASE_WARN("Calculated physics thread count less then 2, using 2 threads");
+			threadCount = 2;
+		}
+		else {
+			char buf[128];
+			sprintf_s(buf, "Using %d threads for default physics simulation job pool", threadCount);
+			PXE_ENGINEBASE_INFO(buf);
+		}
+
+		_physDefaultDispatcher = physx::PxDefaultCpuDispatcherCreate(threadCount);
 		physx::PxCookingParams params(_physScale);
 		params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
 		params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
@@ -162,7 +179,7 @@ namespace pxengine::nonpublic {
 		//SDL_ShowWindow(sdlWindow);
 		NpWindow* window = new(std::nothrow) NpWindow(*sdlWindow);
 		if (!window) {
-			PXE_ENGINEBASE_ERROR("Failed to Create Window");
+			PXE_ENGINEBASE_ERROR("Failed to Allocate Window");
 			SDL_DestroyWindow(sdlWindow);
 			PXE_ENGINEBASE_CHECKSDLERROR();
 			return nullptr;
@@ -174,6 +191,27 @@ namespace pxengine::nonpublic {
 		PXE_ENGINEBASE_CHECKSDLERROR();
 		PXE_ENGINEBASE_INFO("Window Created");
 		return window;
+	}
+
+	PxeScene* NpEngineBase::createScene()
+	{
+		physx::PxSceneDesc desc(_physScale);
+		desc.gravity = physx::PxVec3(0, -9.81f, 0);
+		desc.cpuDispatcher = _physDefaultDispatcher;
+		desc.filterShader = physx::PxDefaultSimulationFilterShader;
+		physx::PxScene* physScene = _physPhysics->createScene(desc);
+		if (!physScene) {
+			PXE_ENGINEBASE_ERROR("Failed to create physics scene");
+			return nullptr;
+		}
+
+		NpScene* scene = new(std::nothrow) NpScene(physScene);
+		if (!scene) {
+			PXE_ENGINEBASE_ERROR("Failed to Allocate Scene");
+			return nullptr;
+		}
+
+		return scene;
 	}
 
 	void NpEngineBase::onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function)
@@ -228,27 +266,42 @@ namespace pxengine::nonpublic {
 			// is it a window event
 			if (e.type == SDL_WINDOWEVENT)
 			{
+				char buf[128];
 				SDL_WindowEventID winEvent = (SDL_WindowEventID)e.window.event;
 				// check if we need to switch the active mouse or keyboard window
 				switch (winEvent)
 				{
 				case SDL_WINDOWEVENT_ENTER:
+					sprintf_s(buf, "MOUSE ENTER Old Window: %i, New Window: %i", _activeMouseWindowId, e.window.windowID);
 					_activeMouseWindowId = e.window.windowID;
+					PXE_ENGINEBASE_INFO(buf);
 					break;
 
 				case SDL_WINDOWEVENT_LEAVE:
+				{
+					uint32_t oldMouse = _activeMouseWindowId;
 					if (_activeMouseWindowId == e.window.windowID)
 						_activeMouseWindowId = 0;
-					break;
+					sprintf_s(buf, "MOUSE LEAVE Old Window: %i, New Window: %i", oldMouse, _activeMouseWindowId);
+					PXE_ENGINEBASE_INFO(buf);
+				}
+				break;
 
 				case SDL_WINDOWEVENT_FOCUS_GAINED:
+					sprintf_s(buf, "KEYBOARD ENTER Old Window: %i, New Window: %i", _activeKeyboardWindowId, e.window.windowID);
 					_activeKeyboardWindowId = e.window.windowID;
+					PXE_ENGINEBASE_INFO(buf);
 					break;
 
 				case SDL_WINDOWEVENT_FOCUS_LOST:
+				{
+					uint32_t oldKeyboard = _activeKeyboardWindowId;
 					if (_activeKeyboardWindowId == e.window.windowID)
 						_activeKeyboardWindowId = 0;
-					break;
+					sprintf_s(buf, "KEYBOARD LEAVE Old Window: %i, New Window: %i", oldKeyboard, _activeKeyboardWindowId);
+					PXE_ENGINEBASE_INFO(buf);
+				}
+				break;
 				}
 
 				auto winIt = _eventWindows.find(e.window.windowID);

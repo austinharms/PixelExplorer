@@ -37,16 +37,21 @@ public:
 
 void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
 	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
+	pxengine::PxeScene* scene = engineBase->createScene();
 	assert(window);
-
+	assert(scene);
+	window->setScene(scene);
 	window->setSwapInterval(1);
 	while (!window->getShouldClose())
 	{
+		// 1 should be delta time
+		scene->simulatePhysics(1);
 		window->acquireGlContext();
 		window->setWindowHidden(false);
-		std::cout << title << " Draw" << std::endl;
+		//std::cout << title << " Draw" << std::endl;
 		glClearColor(r, g, b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		window->drawScene();
 		window->swapFrameBuffer();
 		window->pollEvents();
 		window->releaseGlContext();

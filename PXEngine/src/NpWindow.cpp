@@ -1,6 +1,7 @@
 #include "NpWindow.h"
 
 #include "NpEngineBase.h"
+#include "NpScene.h"
 #include "SDL.h"
 #include "NpLogger.h"
 
@@ -130,6 +131,47 @@ namespace pxengine::nonpublic {
 
 			// TODO manage other events
 		}
+	}
+
+	void NpWindow::setScene(PxeScene* scene)
+	{
+		if (scene) {
+			_scene = dynamic_cast<NpScene*>(scene);
+			if (!scene) {
+				PXE_WARN("Scene pass did not inherit from NpScene, Scene set to nullptr");
+			}
+		}
+		else {
+			_scene = nullptr;
+		}
+	}
+
+	void NpWindow::drawScene(PxeScene* scene)
+	{
+		NpScene* activeScene;
+		if (scene) {
+			activeScene = dynamic_cast<NpScene*>(scene);
+		}
+		else {
+			activeScene = _scene;
+		}
+
+		if (!activeScene) {
+			PXE_WARN("Attempted to draw null scene");
+			return;
+		}
+
+		activeScene->grab();
+		bool shouldReleaseContext = !_acquiredContext;
+		if (shouldReleaseContext) acquireGlContext();
+		//TODO implement this 
+		if (shouldReleaseContext) releaseGlContext();
+		activeScene->drop();
+	}
+
+	PxeScene* NpWindow::getScene() const
+	{
+		return _scene;
 	}
 
 	const PxeRingBuffer<SDL_Event, NpWindow::WINDOW_EVENT_QUEUE_SIZE>& NpWindow::getEventBuffer() const

@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "PxeRefCount.h"
+#include "PxeScene.h"
 
 #ifndef PXENGINE_WINDOW_H_
 #define PXENGINE_WINDOW_H_
@@ -49,6 +50,18 @@ namespace pxengine {
 
 		// returns true if the window is hidden
 		virtual bool getWindowHidden() const = 0;
+
+		// sets scene rendered when calling drawScene
+		// to clear the current scene pass nullptr as the scene
+		virtual void setScene(PxeScene* scene) = 0;
+
+		// draws the provided scene to the frame buffer
+		// if the provided scene is nullptr it will draw the scene set using setScene
+		// if that scene is also nullptr the call will throw a warning and draw nothing
+		virtual void drawScene(PxeScene* scene = nullptr) = 0;
+
+		// returns a pointer to the current scene
+		virtual PxeScene* getScene() const = 0;
 	};
 }
 #endif

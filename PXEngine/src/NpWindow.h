@@ -3,19 +3,20 @@
 #include "PxeWindow.h"
 #include "PxeRingBuffer.h"
 #include "SDL.h"
+#include "PxeScene.h"
 
 #ifndef PXENGINE_NONPUBLIC_WINDOW_H_
 #define PXENGINE_NONPUBLIC_WINDOW_H_
 namespace pxengine::nonpublic {
 	class NpEngineBase;
+	class NpScene;
 
 	class NpWindow : public PxeWindow
 	{
 	public:
 		static const uint32_t WINDOW_EVENT_QUEUE_SIZE = 128;
 
-		NpWindow(SDL_Window& window);
-		virtual ~NpWindow();
+		//############# PUBLIC API ##################
 
 		// blocks the calling thread until the OpenGl context is ready for use with this window on the calling thread
 		// note you MUST call releaseGlContext after you are done making OpenGl calls
@@ -51,6 +52,17 @@ namespace pxengine::nonpublic {
 		// TODO add some sort of event system
 		void pollEvents() override;
 
+		void setScene(PxeScene* scene) override;
+
+		void drawScene(PxeScene* scene) override;
+
+		PxeScene* getScene() const override;
+
+		//############# PRIVATE API ##################
+
+		NpWindow(SDL_Window& window);
+		virtual ~NpWindow();
+
 		const PxeRingBuffer<SDL_Event, WINDOW_EVENT_QUEUE_SIZE>& getEventBuffer() const;
 
 	protected:
@@ -62,6 +74,7 @@ namespace pxengine::nonpublic {
 
 		SDL_Window& _sdlWindow;
 		NpEngineBase* _engineBase;
+		NpScene* _scene;
 		PxeRingBuffer<SDL_Event, WINDOW_EVENT_QUEUE_SIZE> _eventBuffer;
 		int8_t _swapInterval;
 		bool _acquiredContext;

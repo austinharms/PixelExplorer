@@ -7,6 +7,7 @@
 #include "GL/glew.h"
 #include "SDL.h"
 #include "NpWindow.h"
+#include "PxeScene.h"
 
 #ifndef PXENGINE_NONPUBLIC_ENGINEBASE_H_
 #define PXENGINE_NONPUBLIC_ENGINEBASE_H_
@@ -15,6 +16,14 @@ namespace pxengine::nonpublic {
 	class NpEngineBase : public PxeEngineBase, PxeLogHandler, physx::PxAssertHandler, physx::PxErrorCallback
 	{
 	public:
+		//############# PUBLIC API ##################
+
+		PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
+
+		PxeScene* createScene() override;
+
+		//############# PRIVATE API ##################
+
 		// creates and returns an NpEngineBase instance
 		// there should only be one instance per process
 		// returns nullptr on error or if an NpEngineBase instance already exists
@@ -25,7 +34,8 @@ namespace pxengine::nonpublic {
 
 		virtual ~NpEngineBase();
 
-		PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
+		// this should only ever be called when a window is being destroyed
+		void removeWindowFromEventQueue(NpWindow& window);
 
 		void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) override;
 
@@ -38,9 +48,6 @@ namespace pxengine::nonpublic {
 		void releaseGlContext(NpWindow& window);
 
 		void pollEvents();
-
-		// this should only ever be called when a window is being destroyed
-		void removeWindowFromEventQueue(NpWindow& window);
 
 	protected:
 		void onDelete() override;
@@ -67,6 +74,7 @@ namespace pxengine::nonpublic {
 		physx::PxPvdTransport* _physPVDTransport;
 		physx::PxPhysics* _physPhysics;
 		physx::PxCooking* _physCooking;
+		physx::PxCpuDispatcher* _physDefaultDispatcher;
 		physx::PxDefaultAllocator _physAllocator;
 		physx::PxTolerancesScale _physScale;
 		SDL_GLContext _sdlGlContext;

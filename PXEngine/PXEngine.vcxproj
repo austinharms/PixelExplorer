@@ -172,6 +172,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\NpEngineBase.cpp" />
+    <ClCompile Include="src\NpScene.cpp" />
     <ClCompile Include="src\NpWindow.cpp" />
     <ClCompile Include="src\PxeEngineBase.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="include\PxeWindow.h" />
     <ClInclude Include="src\NpEngineBase.h" />
     <ClInclude Include="src\NpLogger.h" />
+    <ClInclude Include="src\NpScene.h" />
     <ClInclude Include="src\NpWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
