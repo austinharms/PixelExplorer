@@ -2,7 +2,7 @@
 
 #include "NpLogger.h"
 
-namespace pxengine::rendering {
+namespace pxengine {
 	PxeGLAsset::PxeGLAsset()
 	{
 		_initialized = false;
@@ -13,22 +13,57 @@ namespace pxengine::rendering {
 	{
 		if (_initialized) {
 			PXE_WARN("PxeGLAsset not uninitialized before destructor was called, uninitializing asset");
-			uninitialize(true);
+			uninitializeAsset(true);
 		}
 	}
 
-	void PxeGLAsset::setInitializedFlag()
-	{
-		_initialized = true;
-	}
-
-	const bool PxeGLAsset::getInitializedFlag()
+	bool PxeGLAsset::getInitialized() const
 	{
 		return _initialized;
 	}
 
+	bool PxeGLAsset::getQueuedForUninitialization() const
+	{
+		return _uninitializationQueued;
+	}
+
+	bool PxeGLAsset::uninitializeAsset(bool block)
+	{
+		if (!_initialized) {
+			PXE_WARN("uninitializeAsset called on uninitialized PxeGlAsset");
+			return true;
+		}
+
+		_uninitializationQueued = true;
+		
+		return false;
+	}
+
 	void PxeGLAsset::onDelete()
 	{
-		PXE_INFO("TODO implement this function");
+		if (_initialized)
+			uninitializeAsset(true);
+	}
+
+	void PxeGLAsset::initialize()
+	{
+		if (_initialized) {
+			PXE_WARN("initialize called on initialized PxeGlAsset");
+			return;
+		}
+
+		initializeGl();
+		_initialized = true;
+	}
+
+	void PxeGLAsset::uninitialize()
+	{
+		if (!_initialized) {
+			PXE_WARN("uninitialize called on uninitialized PxeGlAsset");
+			return;
+		}
+
+		uninitializeGl();
+		_uninitializationQueued = false;
 	}
 }

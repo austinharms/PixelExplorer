@@ -2,7 +2,7 @@
 
 #ifndef PXENGINE_GLASSET_H_
 #define PXENGINE_GLASSET_H_
-namespace pxengine::rendering {
+namespace pxengine {
 	class PxeGLAsset : public PxeRefCount
 	{
 	public:
@@ -32,13 +32,17 @@ namespace pxengine::rendering {
 		// requests the engine to "Uninitialize" the object aka call the uninitializeGl function
 		// if block is true the function will block the calling thread until the assets has been uninitialized (and this function will always return true)
 		// returns true if the object has be uninitialized, returns false if it is queued for uninitialization
-		bool uninitialize(bool block = false);
+		bool uninitializeAsset(bool block = false);
 
-	private: 
+		void onDelete() override;
+
+	private:
+		friend class NpEngineBase;
 		bool _initialized;
 		bool _uninitializationQueued;
 
-		void onDelete() override;
+		void initialize();
+		void uninitialize();
 	};
 }
 #endif // !PXENGINE_GLASSET_H_

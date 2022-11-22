@@ -7,6 +7,7 @@
 #include "PxeWindow.h"
 #include "SDL.h"
 #include "GL/glew.h"
+#include "PxeGLAsset.h"
 
 
 class LogHandle : public pxengine::PxeLogHandler {
