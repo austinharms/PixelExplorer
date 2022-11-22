@@ -189,6 +189,7 @@
     <ClInclude Include="include\PxeRefCount.h" />
     <ClInclude Include="include\PxeRingBuffer.h" />
     <ClInclude Include="include\PxeScene.h" />
+    <ClInclude Include="include\PxeShader.h" />
     <ClInclude Include="include\PxeWindow.h" />
     <ClInclude Include="src\NpEngineBase.h" />
     <ClInclude Include="src\NpLogger.h" />

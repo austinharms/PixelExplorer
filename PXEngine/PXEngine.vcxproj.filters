@@ -80,5 +80,8 @@
     <ClInclude Include="src\NpScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PxeShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

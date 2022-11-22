@@ -71,7 +71,7 @@ namespace pxengine::nonpublic {
 			threadCount = 2;
 		}
 		else {
-			char buf[128];
+			char buf[64];
 			sprintf_s(buf, "Using %d threads for default physics simulation job pool", threadCount);
 			PXE_ENGINEBASE_INFO(buf);
 		}

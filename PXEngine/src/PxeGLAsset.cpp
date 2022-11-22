@@ -6,12 +6,15 @@ namespace pxengine::rendering {
 	PxeGLAsset::PxeGLAsset()
 	{
 		_initialized = false;
+		_uninitializationQueued = false;
 	}
 
 	PxeGLAsset::~PxeGLAsset()
 	{
-		if (_initialized)
-			PXE_WARN("GLAsset not uninitialized, this can cause memory leaks");
+		if (_initialized) {
+			PXE_WARN("PxeGLAsset not uninitialized before destructor was called, uninitializing asset");
+			uninitialize(true);
+		}
 	}
 
 	void PxeGLAsset::setInitializedFlag()
