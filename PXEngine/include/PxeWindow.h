@@ -2,6 +2,7 @@
 
 #include "PxeRefCount.h"
 #include "PxeScene.h"
+#include "PxeGLAsset.h"
 
 #ifndef PXENGINE_WINDOW_H_
 #define PXENGINE_WINDOW_H_
@@ -62,6 +63,11 @@ namespace pxengine {
 
 		// returns a pointer to the current scene
 		virtual PxeScene* getScene() const = 0;
+
+		// initializes the asset useful to preload data
+		// note: requires an bound Gl context
+		// if no context is bound it will bind and unbind a valid context
+		virtual void initializeAsset(PxeGLAsset& asset) = 0;
 	};
 }
 #endif

@@ -9,6 +9,16 @@
 #include "GL/glew.h"
 #include "PxeGLAsset.h"
 
+class TestAsset : public pxengine::PxeGLAsset
+{
+public:
+	TestAsset() { std::cout << "Create" << std::endl; }
+	virtual ~TestAsset() { std::cout << "Destroy" << std::endl; }
+	void bind() { std::cout << "Bound" << std::endl; }
+	void unbind() { std::cout << "Unbound" << std::endl; }
+	void initializeGl() { std::cout << "Init" << std::endl; }
+	void uninitializeGl() { std::cout << "Uninit" << std::endl; }
+};
 
 class LogHandle : public pxengine::PxeLogHandler {
 public:
@@ -38,6 +48,8 @@ public:
 
 void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
 	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
+	TestAsset* t = new TestAsset();
+	window->initializeAsset(*t);
 	pxengine::PxeScene* scene = engineBase->createScene();
 	assert(window);
 	assert(scene);
@@ -58,6 +70,7 @@ void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t hei
 		window->releaseGlContext();
 	}
 
+	t->drop();
 	window->drop();
 }
 

@@ -1,5 +1,7 @@
 #include <mutex>
 #include <unordered_map>
+#include <thread>
+#include <list>
 
 #include "PxeEngineBase.h"
 #include "PxeLogger.h"
@@ -8,6 +10,7 @@
 #include "SDL.h"
 #include "NpWindow.h"
 #include "PxeScene.h"
+#include "PxeGLAsset.h"
 
 #ifndef PXENGINE_NONPUBLIC_ENGINEBASE_H_
 #define PXENGINE_NONPUBLIC_ENGINEBASE_H_
@@ -49,6 +52,10 @@ namespace pxengine::nonpublic {
 
 		void pollEvents();
 
+		bool uninitializeGlAsset(PxeGLAsset& asset, bool blocking = false);
+
+		void initializeGlAsset(PxeGLAsset& asset);
+
 	protected:
 		void onDelete() override;
 
@@ -60,13 +67,16 @@ namespace pxengine::nonpublic {
 		void deinitPhys();
 		void initSDL();
 		void deinitSDL();
+		void uninitializeAssets();
 
 		// map of all the windows registered to receive events
 		// this will always be all windows that exist
 		std::unordered_map<uint32_t, NpWindow*> _eventWindows;
+		std::list<PxeGLAsset*> _initializedAssets;
 		std::recursive_mutex _glContextMutex;
 		std::mutex _glWaitMutex;
 		NpWindow* _activeWindow;
+		std::thread::id _boundContextThread;
 		PxeLogHandler& _logHandler;
 		physx::PxAssertHandler& _defaultPhysAssertHandler;
 		physx::PxFoundation* _physFoundation;
@@ -80,6 +90,7 @@ namespace pxengine::nonpublic {
 		SDL_GLContext _sdlGlContext;
 		uint32_t _activeMouseWindowId;
 		uint32_t _activeKeyboardWindowId;
+		uint32_t _oldAssetCount;
 		bool _physInit;
 		bool _sdlInit;
 	};

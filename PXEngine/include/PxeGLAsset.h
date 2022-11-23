@@ -3,6 +3,10 @@
 #ifndef PXENGINE_GLASSET_H_
 #define PXENGINE_GLASSET_H_
 namespace pxengine {
+	namespace nonpublic {
+		class NpEngineBase;
+	}
+
 	class PxeGLAsset : public PxeRefCount
 	{
 	public:
@@ -37,7 +41,7 @@ namespace pxengine {
 		void onDelete() override;
 
 	private:
-		friend class NpEngineBase;
+		friend class pxengine::nonpublic::NpEngineBase;
 		bool _initialized;
 		bool _uninitializationQueued;
 

@@ -1,6 +1,7 @@
 #include "PxeGLAsset.h"
 
 #include "NpLogger.h"
+#include "NpEngineBase.h"
 
 namespace pxengine {
 	PxeGLAsset::PxeGLAsset()
@@ -35,8 +36,7 @@ namespace pxengine {
 		}
 
 		_uninitializationQueued = true;
-		
-		return false;
+		return nonpublic::NpEngineBase::getInstance().uninitializeGlAsset(*this, block);
 	}
 
 	void PxeGLAsset::onDelete()
@@ -65,5 +65,6 @@ namespace pxengine {
 
 		uninitializeGl();
 		_uninitializationQueued = false;
+		_initialized = false;
 	}
 }
