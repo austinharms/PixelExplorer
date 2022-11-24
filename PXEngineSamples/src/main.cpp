@@ -24,8 +24,8 @@ class LogHandle : public pxengine::PxeLogHandler {
 public:
 	virtual ~LogHandle() {}
 	void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) override {
-		pxengine::LogLevel l = (pxengine::LogLevel)level;
-		switch (l)
+		pxengine::LogLevel logLevel = (pxengine::LogLevel)level;
+		switch (logLevel)
 		{
 		case pxengine::LogLevel::INFO:
 			std::cout << "[INFO] ";
@@ -43,6 +43,7 @@ public:
 
 		//std::cout << "Log: " << msg << " Level: " << level << " File: " << file << " Function: " << function << " Line: " << line << std::endl;
 		std::cout << msg << std::endl;
+		assert(logLevel != pxengine::LogLevel::FATAL);
 	}
 };
 
@@ -71,6 +72,7 @@ void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t hei
 	}
 
 	t->drop();
+	scene->drop();
 	window->drop();
 }
 
@@ -79,9 +81,9 @@ int main(int argc, char* args[]) {
 	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
 	assert(engineBase);
 	std::thread win1(runWindow, engineBase, 500, 500, "Win 1", 1, 0, 0);
-	std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);
+	//std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);
 	win1.join();
-	win2.join();
-	engineBase->drop();
+	//win2.join();
+	engineBase->shutdown();
 	return 0;
 }

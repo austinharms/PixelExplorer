@@ -56,6 +56,8 @@ namespace pxengine::nonpublic {
 
 		void initializeGlAsset(PxeGLAsset& asset);
 
+		void shutdown() override;
+
 	protected:
 		void onDelete() override;
 
@@ -72,7 +74,7 @@ namespace pxengine::nonpublic {
 		// map of all the windows registered to receive events
 		// this will always be all windows that exist
 		std::unordered_map<uint32_t, NpWindow*> _eventWindows;
-		std::list<PxeGLAsset*> _initializedAssets;
+		std::list<PxeGLAsset*> _assetUninitializationQueue;
 		std::recursive_mutex _glContextMutex;
 		std::mutex _glWaitMutex;
 		NpWindow* _activeWindow;
@@ -90,9 +92,9 @@ namespace pxengine::nonpublic {
 		SDL_GLContext _sdlGlContext;
 		uint32_t _activeMouseWindowId;
 		uint32_t _activeKeyboardWindowId;
-		uint32_t _oldAssetCount;
 		bool _physInit;
 		bool _sdlInit;
+		bool _engineInit;
 	};
 }
 #endif // !PXENGINE_NONPUBLIC_NPENGINEBASE_H_

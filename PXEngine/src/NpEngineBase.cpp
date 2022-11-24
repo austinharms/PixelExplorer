@@ -39,13 +39,13 @@ namespace pxengine {
 
 		NpEngineBase::NpEngineBase(PxeLogHandler& logHandler) : _logHandler(logHandler), _defaultPhysAssertHandler(physx::PxGetAssertHandler())
 		{
+			_engineInit = true;
 			_physInit = false;
 			_sdlInit = false;
 			_sdlGlContext = nullptr;
 			_activeWindow = nullptr;
 			_activeKeyboardWindowId = 0;
 			_activeMouseWindowId = 0;
-			_oldAssetCount = 0;
 			_boundContextThread = std::thread::id();
 			if (std::thread::hardware_concurrency() <= 0)
 				PXE_ENGINEBASE_WARN("Failed to get hardware thread count");
@@ -161,18 +161,10 @@ namespace pxengine {
 			_sdlInit = false;
 		}
 
-		void NpEngineBase::uninitializeAssets()
-		{
-			PXE_ENGINEBASE_FATAL("Need to implement this");
-		}
-
 		NpEngineBase::~NpEngineBase()
 		{
-			if (!_initializedAssets.empty()) {
-				PXE_ENGINEBASE_WARN("PxeGlAssets still initialized, uninitializing assets");
-				uninitializeAssets();
-			}
-
+			if (_engineInit)
+				PXE_ENGINEBASE_FATAL("PxeEngineBase not shutdown correctly, you must use the shutdown method");
 			deinitSDL();
 			deinitPhys();
 			s_instance = nullptr;
@@ -255,13 +247,7 @@ namespace pxengine {
 			PXE_ENGINEBASE_CHECKSDLERROR();
 			SDL_GL_SetSwapInterval(window.getSwapInterval());
 			PXE_ENGINEBASE_CHECKSDLERROR();
-			while (_oldAssetCount > 0)
-			{
-				--_oldAssetCount;
-				PxeGLAsset* asset = _initializedAssets.back();
-				_initializedAssets.pop_back();
-				asset->uninitialize();
-			}
+			uninitializeAssets();
 		}
 
 		void NpEngineBase::releaseGlContext(NpWindow& window)
@@ -369,17 +355,23 @@ namespace pxengine {
 			}
 		}
 
+		void NpEngineBase::uninitializeAssets() {
+			while (!_assetUninitializationQueue.empty())
+			{
+				PxeGLAsset* asset = _assetUninitializationQueue.back();
+				_assetUninitializationQueue.pop_back();
+				asset->uninitialize();
+				asset->drop();
+			}
+		}
+
 		bool NpEngineBase::uninitializeGlAsset(PxeGLAsset& asset, bool blocking)
 		{
 			if (!asset.getInitialized()) {
 				PXE_ENGINEBASE_WARN("attempted to uninitialize uninitialized PxeGlAsset");
-				return true;
 			}
-
-			if (_boundContextThread == std::this_thread::get_id()) {
+			else if (_boundContextThread == std::this_thread::get_id()) {
 				asset.uninitialize();
-				_initializedAssets.remove(&asset);
-				return true;
 			}
 			else if (blocking) {
 				// Hack as we need a window to bind the Gl context
@@ -387,43 +379,49 @@ namespace pxengine {
 				window.grab();
 				acquireGlContext(window);
 				asset.uninitialize();
-				_initializedAssets.remove(&asset);
 				releaseGlContext(window);
 				window.drop();
-				return true;
 			}
 			else {
 				// TODO make this thread safe
-				auto it = std::find(_initializedAssets.begin(), _initializedAssets.end(), &asset);
-				if (it == _initializedAssets.end()) {
-					PXE_ENGINEBASE_ERROR("Failed to find GlAsset");
-					return true;
-				}
-
-				_initializedAssets.splice(_initializedAssets.end(), _initializedAssets, it);
-				_oldAssetCount += 1;
+				_assetUninitializationQueue.emplace_back(&asset);
 				asset.grab();
+				return false;
 			}
 
-			return false;
+			return true;
 		}
 
 		void NpEngineBase::initializeGlAsset(PxeGLAsset& asset)
 		{
 			if (_boundContextThread == std::this_thread::get_id()) {
 				asset.initialize();
-				_initializedAssets.emplace_front(&asset);
 			}
 			else {
+				if (_eventWindows.empty()) {
+					PXE_ENGINEBASE_ERROR("Failed to initialize PxeGlAsset, you must have at least one initialized window, asset not initialized");
+					return;
+				}
+
 				// Hack as we need a window to bind the Gl context
 				NpWindow& window = *(_eventWindows.begin()->second);
 				window.grab();
 				acquireGlContext(window);
 				asset.initialize();
-				_initializedAssets.emplace_front(&asset);
 				releaseGlContext(window);
 				window.drop();
 			}
+		}
+
+		void NpEngineBase::shutdown()
+		{
+			_engineInit = false;
+			if (getRefCount() > 1) {
+				char buf[128];
+				sprintf_s(buf, "PxeEngineBase still referenced, drop all references to the engine base before calling shutdown, still %i references", getRefCount() - 1);
+				PXE_ENGINEBASE_FATAL(buf);
+			}
+			drop();
 		}
 
 		void NpEngineBase::removeWindowFromEventQueue(NpWindow& window)

@@ -41,8 +41,11 @@ namespace pxengine {
 
 	void PxeGLAsset::onDelete()
 	{
-		if (_initialized)
+		if (_initialized) {
+			// DEBUG Log
+			PXE_INFO("Asset uninitialized on drop");
 			uninitializeAsset(true);
+		}
 	}
 
 	void PxeGLAsset::initialize()
@@ -52,6 +55,7 @@ namespace pxengine {
 			return;
 		}
 
+		nonpublic::NpEngineBase::getInstance().grab();
 		initializeGl();
 		_initialized = true;
 	}
@@ -66,5 +70,6 @@ namespace pxengine {
 		uninitializeGl();
 		_uninitializationQueued = false;
 		_initialized = false;
+		nonpublic::NpEngineBase::getInstance().drop();
 	}
 }

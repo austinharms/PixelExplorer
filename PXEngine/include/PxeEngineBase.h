@@ -18,6 +18,11 @@ namespace pxengine {
 		// returns a new PxeScene object or nullptr if there was an error 
 		virtual PxeScene* createScene() = 0;
 
+		// used to destroy the engine base
+		// this will log an error if resources are still in use
+		// this also drops the engine base so do not call drop after calling this function
+		virtual void shutdown() = 0;
+
 	protected:
 		virtual ~PxeEngineBase() {}
 	};
