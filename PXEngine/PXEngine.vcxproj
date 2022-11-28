@@ -174,17 +174,22 @@
     <ClCompile Include="src\NpEngineBase.cpp" />
     <ClCompile Include="src\NpScene.cpp" />
     <ClCompile Include="src\NpWindow.cpp" />
+    <ClCompile Include="src\PxeBuffer.cpp" />
     <ClCompile Include="src\PxeEngineBase.cpp" />
+    <ClCompile Include="src\PxeGlIndexBuffer.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
     <ClCompile Include="src\PxeGLAsset.cpp" />
     <ClCompile Include="src\NpLogger.cpp" />
     <ClCompile Include="src\PxeRefCount.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\PxeBuffer.h" />
     <ClInclude Include="include\PxeEngine.h" />
     <ClInclude Include="include\PxeEngineBase.h" />
     <ClInclude Include="include\PxeGLAsset.h" />
     <ClInclude Include="include\Logger.h" />
+    <ClInclude Include="include\PxeGlIndexBuffer.h" />
+    <ClInclude Include="include\PxeGlVertexBuffer.h" />
     <ClInclude Include="include\PxeLogger.h" />
     <ClInclude Include="include\PxeRefCount.h" />
     <ClInclude Include="include\PxeRingBuffer.h" />
