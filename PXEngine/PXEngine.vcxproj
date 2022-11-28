@@ -177,6 +177,7 @@
     <ClCompile Include="src\PxeBuffer.cpp" />
     <ClCompile Include="src\PxeEngineBase.cpp" />
     <ClCompile Include="src\PxeGlIndexBuffer.cpp" />
+    <ClCompile Include="src\PxeGlVertexBuffer.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
     <ClCompile Include="src\PxeGLAsset.cpp" />
     <ClCompile Include="src\NpLogger.cpp" />

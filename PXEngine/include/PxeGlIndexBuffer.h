@@ -44,6 +44,7 @@ namespace pxengine {
 		PxeBufferType* _currentBuffer;
 		PxeBufferType* _pendingBuffer;
 
+		// this function assumes the buffer is bound
 		void updateGlBuffer();
 	};
 }
