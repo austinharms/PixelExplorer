@@ -191,6 +191,7 @@
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\PxeGlIndexBuffer.h" />
     <ClInclude Include="include\PxeGlVertexBuffer.h" />
+    <ClInclude Include="include\PxeGlVertexBufferFormat.h" />
     <ClInclude Include="include\PxeLogger.h" />
     <ClInclude Include="include\PxeRefCount.h" />
     <ClInclude Include="include\PxeRingBuffer.h" />
