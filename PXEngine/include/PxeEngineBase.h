@@ -23,8 +23,11 @@ namespace pxengine {
 		// this also drops the engine base so do not call drop after calling this function
 		virtual void shutdown() = 0;
 
-	protected:
 		virtual ~PxeEngineBase() {}
+
+		PxeEngineBase() = default;
+		PxeEngineBase(const PxeEngineBase& other) = delete;
+		PxeEngineBase operator=(const PxeEngineBase& other) = delete;
 	};
 
 	// creates and returns an PxeEngineBase instance

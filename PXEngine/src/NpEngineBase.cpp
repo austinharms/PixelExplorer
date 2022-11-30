@@ -164,7 +164,7 @@ namespace pxengine {
 		NpEngineBase::~NpEngineBase()
 		{
 			if (_engineInit)
-				PXE_ENGINEBASE_FATAL("PxeEngineBase not shutdown correctly, you must use the shutdown method");
+				PXE_ENGINEBASE_ERROR("PxeEngineBase not shutdown correctly, you must use the shutdown method");
 			deinitSDL();
 			deinitPhys();
 			s_instance = nullptr;
@@ -419,7 +419,7 @@ namespace pxengine {
 			if (getRefCount() > 1) {
 				char buf[128];
 				sprintf_s(buf, "PxeEngineBase still referenced, drop all references to the engine base before calling shutdown, still %i references", getRefCount() - 1);
-				PXE_ENGINEBASE_FATAL(buf);
+				PXE_ENGINEBASE_ERROR(buf);
 			}
 			drop();
 		}

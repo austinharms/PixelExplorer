@@ -1,10 +1,10 @@
 #ifndef PXENGINE_GLVERTEXTBUFFERFORMAT_H_
 #define PXENGINE_GLVERTEXTBUFFERFORMAT_H_
-class PxeGlVertexBufferFormat
+class PxeVertexBufferFormat
 {
 public:
-	PxeGlVertexBufferFormat();
-	~PxeGlVertexBufferFormat();
+	PxeVertexBufferFormat();
+	~PxeVertexBufferFormat();
 
 private:
 

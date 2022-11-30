@@ -7,13 +7,13 @@
 #define PXENGINE_GLINDEXBUFFER_H_
 namespace pxengine {
 	template<typename DataType = uint8_t, typename LengthType = uint32_t>
-	class PxeGlIndexBuffer : public PxeGLAsset
+	class PxeIndexBuffer : public PxeGLAsset
 	{
 	public:
 		typedef PxeBuffer<DataType, LengthType> PxeBufferType;
 
-		PxeGlIndexBuffer(PxeBufferType* buffer = nullptr);
-		virtual ~PxeGlIndexBuffer();
+		PxeIndexBuffer(PxeBufferType* buffer = nullptr);
+		virtual ~PxeIndexBuffer();
 		void bind() override;
 		void unbind() override;
 		void bufferData(PxeBufferType& buffer);
@@ -34,6 +34,9 @@ namespace pxengine {
 
 		// returns true if the internal GlBuffer is allocated and valid
 		bool getGlBufferValid() const;
+
+		PxeIndexBuffer(const PxeIndexBuffer& other) = delete;
+		PxeIndexBuffer operator=(const PxeIndexBuffer& other) = delete;
 
 	protected:
 		void initializeGl() override;

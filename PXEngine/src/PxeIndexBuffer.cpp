@@ -1,11 +1,11 @@
-#include "PxeGlIndexBuffer.h"
+#include "PxeIndexBuffer.h"
 
 #include "GL/glew.h"
 #include "NpLogger.h"
 
 namespace pxengine {
 	template<typename DataType, typename LengthType>
-	PxeGlIndexBuffer<DataType, LengthType>::PxeGlIndexBuffer(PxeBufferType* buffer)
+	PxeIndexBuffer<DataType, LengthType>::PxeIndexBuffer(PxeBufferType* buffer)
 	{
 		_glBufferId = 0;
 		_currentBuffer = nullptr;
@@ -13,7 +13,7 @@ namespace pxengine {
 	}
 
 	template<typename DataType, typename LengthType>
-	PxeGlIndexBuffer<DataType, LengthType>::~PxeGlIndexBuffer()
+	PxeIndexBuffer<DataType, LengthType>::~PxeIndexBuffer()
 	{
 		if (_currentBuffer) {
 			_currentBuffer->drop();
@@ -29,22 +29,22 @@ namespace pxengine {
 	}
 
 	template<typename DataType, typename LengthType>
-	void PxeGlIndexBuffer<DataType, LengthType>::bind()
+	void PxeIndexBuffer<DataType, LengthType>::bind()
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _glBufferId);
 		updateGlBuffer();
 		if (_currentBuffer == nullptr)
-			PXE_WARN("Bound empty PxeGlIndexBuffer");
+			PXE_WARN("Bound empty PxeIndexBuffer");
 	}
 
 	template<typename DataType, typename LengthType>
-	void PxeGlIndexBuffer<DataType, LengthType>::unbind()
+	void PxeIndexBuffer<DataType, LengthType>::unbind()
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	template<typename DataType, typename LengthType>
-	void PxeGlIndexBuffer<DataType, LengthType>::bufferData(PxeBufferType& buffer)
+	void PxeIndexBuffer<DataType, LengthType>::bufferData(PxeBufferType& buffer)
 	{
 		buffer.grab();
 		if (_pendingBuffer)
@@ -53,37 +53,37 @@ namespace pxengine {
 	}
 
 	template<typename DataType, typename LengthType>
-	PxeGlIndexBuffer<DataType, LengthType>::PxeBufferType* PxeGlIndexBuffer<DataType, LengthType>::getBuffer() const
+	PxeIndexBuffer<DataType, LengthType>::PxeBufferType* PxeIndexBuffer<DataType, LengthType>::getBuffer() const
 	{
 		return _currentBuffer;
 	}
 
 	template<typename DataType, typename LengthType>
-	PxeGlIndexBuffer<DataType, LengthType>::PxeBufferType* PxeGlIndexBuffer<DataType, LengthType>::getPendingBuffer() const
+	PxeIndexBuffer<DataType, LengthType>::PxeBufferType* PxeIndexBuffer<DataType, LengthType>::getPendingBuffer() const
 	{
 		return _pendingBuffer;
 	}
 
 	template<typename DataType, typename LengthType>
-	bool PxeGlIndexBuffer<DataType, LengthType>::getBufferPending() const
+	bool PxeIndexBuffer<DataType, LengthType>::getBufferPending() const
 	{
 		return _pendingBuffer != nullptr;
 	}
 
 	template<typename DataType, typename LengthType>
-	uint32_t PxeGlIndexBuffer<DataType, LengthType>::getGlBufferId() const
+	uint32_t PxeIndexBuffer<DataType, LengthType>::getGlBufferId() const
 	{
 		return _glBufferId;
 	}
 
 	template<typename DataType, typename LengthType>
-	bool PxeGlIndexBuffer<DataType, LengthType>::getGlBufferValid() const
+	bool PxeIndexBuffer<DataType, LengthType>::getGlBufferValid() const
 	{
 		return _glBufferId != 0;
 	}
 
 	template<typename DataType, typename LengthType>
-	void PxeGlIndexBuffer<DataType, LengthType>::initializeGl()
+	void PxeIndexBuffer<DataType, LengthType>::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
 		if (!getGlBufferValid()) {
@@ -94,7 +94,7 @@ namespace pxengine {
 		if (getBufferPending()) {
 			// restores previously bound buffer
 			uint32_t previousBuffer;
-			glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER, &previousBuffer);
+			glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, (int32_t*)(&previousBuffer));
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _glBufferId);
 			updateGlBuffer();
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, previousBuffer);
@@ -102,7 +102,7 @@ namespace pxengine {
 	}
 
 	template<typename DataType, typename LengthType>
-	void PxeGlIndexBuffer<DataType, LengthType>::uninitializeGl()
+	void PxeIndexBuffer<DataType, LengthType>::uninitializeGl()
 	{
 		if (_pendingBuffer) {
 			_currentBuffer->drop();
@@ -117,13 +117,13 @@ namespace pxengine {
 	}
 
 	template<typename DataType, typename LengthType>
-	void PxeGlIndexBuffer<DataType, LengthType>::updateGlBuffer()
+	void PxeIndexBuffer<DataType, LengthType>::updateGlBuffer()
 	{
 		if (!getBufferPending() || !getGlBufferValid()) return;
 		if (_currentBuffer)
 			_currentBuffer->drop();
 		_currentBuffer = _pendingBuffer;
 		_pendingBuffer = nullptr;
-		// TODO Buffer Data
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _currentBuffer->getByteSize(), _currentBuffer->getBuffer(), GL_STATIC_DRAW);
 	}
 }

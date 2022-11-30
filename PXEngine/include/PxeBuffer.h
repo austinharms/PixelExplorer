@@ -9,11 +9,15 @@ namespace pxengine {
 	class PxeBuffer : public PxeRefCount
 	{
 	public:
+		PxeBuffer(const PxeBuffer& other);
 		PxeBuffer(LengthType size);
 		virtual ~PxeBuffer();
 		bool getAllocated() const;
 		LengthType getLength() const;
 		DataType* getBuffer() const;
+		inline constexpr size_t getTypeSize() const { return sizeof(DataType); }
+		size_t getByteSize() const;
+		PxeBuffer& operator=(const PxeBuffer& other);
 
 	private:
 		LengthType _length;

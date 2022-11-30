@@ -39,13 +39,13 @@
     <ClCompile Include="src\NpScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PxeGlIndexBuffer.cpp">
+    <ClCompile Include="src\PxeIndexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PxeGlVertexBuffer.cpp">
+    <ClCompile Include="src\PxeVertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,16 +92,19 @@
     <ClInclude Include="include\PxeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeGlIndexBuffer.h">
+    <ClInclude Include="include\PxeIndexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeGlVertexBuffer.h">
+    <ClInclude Include="include\PxeVertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeGlVertexBufferFormat.h">
+    <ClInclude Include="include\PxeVertexBufferFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeVertexBufferAttrib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

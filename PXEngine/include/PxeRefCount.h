@@ -20,7 +20,10 @@ namespace pxengine {
 		bool drop();
 
 		// returns the current reference count (uint32_t)
-		uint32_t getRefCount();
+		size_t getRefCount();
+
+		PxeRefCount(const PxeRefCount& other) = delete;
+		PxeRefCount operator=(const PxeRefCount& other) = delete;
 
 	protected:
 		// this is called before the object is deleted
@@ -29,7 +32,7 @@ namespace pxengine {
 		virtual void onDelete() {}
 
 	private:
-		std::atomic<uint32_t> _refCount;
+		std::atomic<size_t> _refCount;
 	};
 }
 #endif // !PXENGINE_REFCOUNT_H_

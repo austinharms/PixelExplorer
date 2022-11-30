@@ -7,13 +7,13 @@
 #define PXENGINE_GLVERTEXBUFFER_H_
 namespace pxengine {
 	template<typename DataType = uint8_t, typename LengthType = uint32_t>
-	class PxeGlVertexBuffer : public PxeGLAsset
+	class PxeVertexBuffer : public PxeGLAsset
 	{
 	public:
 		typedef PxeBuffer<DataType, LengthType> PxeBufferType;
 
-		PxeGlVertexBuffer(PxeBufferType* buffer = nullptr);
-		virtual ~PxeGlVertexBuffer();
+		PxeVertexBuffer(PxeBufferType* buffer = nullptr);
+		virtual ~PxeVertexBuffer();
 		void bind() override;
 		void unbind() override;
 		void bufferData(PxeBufferType& buffer);
@@ -34,6 +34,9 @@ namespace pxengine {
 
 		// returns true if the internal GlBuffer is allocated and valid
 		bool getGlBufferValid() const;
+
+		PxeVertexBuffer(const PxeVertexBuffer& other) = delete;
+		PxeVertexBuffer operator=(const PxeVertexBuffer& other) = delete;
 
 	protected:
 		void initializeGl() override;

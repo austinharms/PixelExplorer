@@ -68,6 +68,10 @@ namespace pxengine {
 		// note: requires an bound Gl context
 		// if no context is bound it will bind and unbind a valid context
 		virtual void initializeAsset(PxeGLAsset& asset) = 0;
+
+		PxeWindow() = default;
+		PxeWindow(const PxeWindow& other) = delete;
+		PxeWindow operator=(const PxeWindow& other) = delete;
 	};
 }
 #endif

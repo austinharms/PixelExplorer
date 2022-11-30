@@ -6,6 +6,9 @@ public:
 	PxeShader();
 	~PxeShader();
 
+	PxeShader(const PxeShader& other) = delete;
+	PxeShader operator=(const PxeShader& other) = delete;
+
 private:
 
 };

@@ -2,6 +2,12 @@
 
 namespace pxengine {
 	template<typename DataType, typename LengthType>
+	PxeBuffer<DataType, LengthType>::PxeBuffer(const PxeBuffer& other)
+	{
+		(*this) = other;
+	}
+
+	template<typename DataType, typename LengthType>
 	PxeBuffer<DataType, LengthType>::PxeBuffer(LengthType size)
 	{
 		_buffer = malloc(size * sizeof(DataType));
@@ -24,6 +30,21 @@ namespace pxengine {
 	LengthType PxeBuffer<DataType, LengthType>::getLength() const
 	{
 		return _length;
+	}
+
+	template<typename DataType, typename LengthType>
+	size_t PxeBuffer<DataType, LengthType>::getByteSize() const
+	{
+		return getTypeSize() * _length;
+	}
+
+	template<typename DataType, typename LengthType>
+	PxeBuffer<DataType, LengthType>& PxeBuffer<DataType, LengthType>::operator=(const PxeBuffer<DataType, LengthType>& other)
+	{
+		_length = other._length;
+		_buffer = malloc(other.getByteSize());
+		memcpy(_buffer, other._buffer, getByteSize());
+		return *this;
 	}
 
 	template<typename DataType, typename LengthType>
