@@ -5,11 +5,32 @@
 
 namespace pxengine {
 	template<typename DataType, typename LengthType>
+	PxeVertexBuffer<DataType, LengthType>::PxeVertexBuffer()
+	{
+		_glBufferId = 0;
+		_currentBuffer = nullptr;
+		_pendingBuffer = nullptr;
+	}
+
+	template<typename DataType, typename LengthType>
 	PxeVertexBuffer<DataType, LengthType>::PxeVertexBuffer(PxeBufferType* buffer)
 	{
 		_glBufferId = 0;
 		_currentBuffer = nullptr;
 		_pendingBuffer = nullptr;
+		if (buffer)
+			bufferData(*buffer);
+	}
+
+	template<typename DataType, typename LengthType>
+	PxeVertexBuffer<DataType, LengthType>::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBufferType* buffer)
+	{
+		_glBufferId = 0;
+		_currentBuffer = nullptr;
+		_pendingBuffer = nullptr;
+		setFormat(bufferFormat);
+		if (buffer)
+			bufferData(*buffer);
 	}
 
 	template<typename DataType, typename LengthType>
@@ -80,6 +101,24 @@ namespace pxengine {
 	bool PxeVertexBuffer<DataType, LengthType>::getGlBufferValid() const
 	{
 		return _glBufferId != 0;
+	}
+
+	template<typename DataType, typename LengthType>
+	PxeVertexBufferFormat& PxeVertexBuffer<DataType, LengthType>::getFormat()
+	{
+		return _format;
+	}
+
+	template<typename DataType, typename LengthType>
+	const PxeVertexBufferFormat& PxeVertexBuffer<DataType, LengthType>::getFormat() const
+	{
+		return _format;
+	}
+
+	template<typename DataType, typename LengthType>
+	void PxeVertexBuffer<DataType, LengthType>::setFormat(const PxeVertexBufferFormat& format)
+	{
+		_format = format;
 	}
 
 	template<typename DataType, typename LengthType>

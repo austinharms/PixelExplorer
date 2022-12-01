@@ -2,6 +2,7 @@
 
 #include "PxeGLAsset.h"
 #include "PxeBuffer.h"
+#include "PxeVertexBufferFormat.h"
 
 #ifndef PXENGINE_GLVERTEXBUFFER_H_
 #define PXENGINE_GLVERTEXBUFFER_H_
@@ -11,8 +12,9 @@ namespace pxengine {
 	{
 	public:
 		typedef PxeBuffer<DataType, LengthType> PxeBufferType;
-
+		PxeVertexBuffer();
 		PxeVertexBuffer(PxeBufferType* buffer = nullptr);
+		PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBufferType* buffer = nullptr);
 		virtual ~PxeVertexBuffer();
 		void bind() override;
 		void unbind() override;
@@ -35,8 +37,14 @@ namespace pxengine {
 		// returns true if the internal GlBuffer is allocated and valid
 		bool getGlBufferValid() const;
 
+		PxeVertexBufferFormat& getFormat();
+
+		const PxeVertexBufferFormat& getFormat() const;
+
+		void setFormat(const PxeVertexBufferFormat& format);
+
 		PxeVertexBuffer(const PxeVertexBuffer& other) = delete;
-		PxeVertexBuffer operator=(const PxeVertexBuffer& other) = delete;
+		PxeVertexBuffer& operator=(const PxeVertexBuffer& other) = delete;
 
 	protected:
 		void initializeGl() override;
@@ -46,6 +54,7 @@ namespace pxengine {
 		uint32_t _glBufferId;
 		PxeBufferType* _currentBuffer;
 		PxeBufferType* _pendingBuffer;
+		PxeVertexBufferFormat _format;
 
 		void updateGlBuffer();
 	};
