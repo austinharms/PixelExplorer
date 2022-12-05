@@ -1,54 +1,58 @@
 #include "PxeBuffer.h"
 
 namespace pxengine {
-	template<typename DataType, typename LengthType>
-	PxeBuffer<DataType, LengthType>::PxeBuffer(const PxeBuffer& other)
+	PxeBuffer::PxeBuffer(const PxeBuffer& other)
 	{
+		_buffer = nullptr;
+		_size = 0;
 		(*this) = other;
 	}
 
-	template<typename DataType, typename LengthType>
-	PxeBuffer<DataType, LengthType>::PxeBuffer(LengthType size)
+	PxeBuffer::PxeBuffer(size_t size)
 	{
-		_buffer = malloc(size * sizeof(DataType));
+		_buffer = nullptr;
+		_size = size;
+		if (_size) {
+			_buffer = malloc(_size);
+			if (!_buffer)
+				_size = 0;
+		}
 	}
 
-	template<typename DataType, typename LengthType>
-	PxeBuffer<DataType, LengthType>::~PxeBuffer()
+	PxeBuffer::~PxeBuffer()
 	{
 		if (_buffer)
 			free(_buffer);
 	}
 
-	template<typename DataType, typename LengthType>
-	bool PxeBuffer<DataType, LengthType>::getAllocated() const
+	bool PxeBuffer::getAllocated() const
 	{
-		return _buffer != nullptr;
+		return !!_buffer;
 	}
 
-	template<typename DataType, typename LengthType>
-	LengthType PxeBuffer<DataType, LengthType>::getLength() const
+	PxeBuffer& PxeBuffer::operator=(const PxeBuffer& other)
 	{
-		return _length;
-	}
+		if (_buffer)
+			free(_buffer);
+		_buffer = nullptr;
+		_size = other._size;
+		if (_size) {
+			_buffer = malloc(_size);
+			if (!_buffer)
+				_size = 0;
+		}
+		
+		if (_size)
+			memcpy(_buffer, other._buffer, _size);
 
-	template<typename DataType, typename LengthType>
-	size_t PxeBuffer<DataType, LengthType>::getByteSize() const
-	{
-		return getTypeSize() * _length;
-	}
-
-	template<typename DataType, typename LengthType>
-	PxeBuffer<DataType, LengthType>& PxeBuffer<DataType, LengthType>::operator=(const PxeBuffer<DataType, LengthType>& other)
-	{
-		_length = other._length;
-		_buffer = malloc(other.getByteSize());
-		memcpy(_buffer, other._buffer, getByteSize());
 		return *this;
 	}
 
-	template<typename DataType, typename LengthType>
-	DataType* PxeBuffer<DataType, LengthType>::getBuffer() const
+	size_t PxeBuffer::getSize() const {
+		return _size;
+	}
+
+	void* PxeBuffer::getBuffer() const
 	{
 		return _buffer;
 	}

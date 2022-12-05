@@ -4,26 +4,7 @@
 #include "NpLogger.h"
 
 namespace pxengine {
-	template<typename DataType, typename LengthType>
-	PxeVertexBuffer<DataType, LengthType>::PxeVertexBuffer()
-	{
-		_glBufferId = 0;
-		_currentBuffer = nullptr;
-		_pendingBuffer = nullptr;
-	}
-
-	template<typename DataType, typename LengthType>
-	PxeVertexBuffer<DataType, LengthType>::PxeVertexBuffer(PxeBufferType* buffer)
-	{
-		_glBufferId = 0;
-		_currentBuffer = nullptr;
-		_pendingBuffer = nullptr;
-		if (buffer)
-			bufferData(*buffer);
-	}
-
-	template<typename DataType, typename LengthType>
-	PxeVertexBuffer<DataType, LengthType>::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBufferType* buffer)
+	PxeVertexBuffer::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer)
 	{
 		_glBufferId = 0;
 		_currentBuffer = nullptr;
@@ -33,8 +14,7 @@ namespace pxengine {
 			bufferData(*buffer);
 	}
 
-	template<typename DataType, typename LengthType>
-	PxeVertexBuffer<DataType, LengthType>::~PxeVertexBuffer()
+	PxeVertexBuffer::~PxeVertexBuffer()
 	{
 		if (_currentBuffer) {
 			_currentBuffer->drop();
@@ -49,8 +29,7 @@ namespace pxengine {
 		_glBufferId = 0;
 	}
 
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::bind()
+	void PxeVertexBuffer::bind()
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, _glBufferId);
 		updateGlBuffer();
@@ -58,14 +37,12 @@ namespace pxengine {
 			PXE_WARN("Bound empty PxeGlVertexBuffer");
 	}
 
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::unbind()
+	void PxeVertexBuffer::unbind()
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::bufferData(PxeBufferType& buffer)
+	void PxeVertexBuffer::bufferData(PxeBuffer& buffer)
 	{
 		buffer.grab();
 		if (_pendingBuffer)
@@ -73,56 +50,42 @@ namespace pxengine {
 		_pendingBuffer = &buffer;
 	}
 
-	template<typename DataType, typename LengthType>
-	PxeVertexBuffer<DataType, LengthType>::PxeBufferType* PxeVertexBuffer<DataType, LengthType>::getBuffer() const
+	PxeBuffer* PxeVertexBuffer::getBuffer() const
 	{
 		return _currentBuffer;
 	}
 
-	template<typename DataType, typename LengthType>
-	PxeVertexBuffer<DataType, LengthType>::PxeBufferType* PxeVertexBuffer<DataType, LengthType>::getPendingBuffer() const
+	PxeBuffer* PxeVertexBuffer::getPendingBuffer() const
 	{
 		return _pendingBuffer;
 	}
 
-	template<typename DataType, typename LengthType>
-	bool PxeVertexBuffer<DataType, LengthType>::getBufferPending() const
+	bool PxeVertexBuffer::getBufferPending() const
 	{
 		return _pendingBuffer != nullptr;
 	}
 
-	template<typename DataType, typename LengthType>
-	uint32_t PxeVertexBuffer<DataType, LengthType>::getGlBufferId() const
+	uint32_t PxeVertexBuffer::getGlBufferId() const
 	{
 		return _glBufferId;
 	}
 
-	template<typename DataType, typename LengthType>
-	bool PxeVertexBuffer<DataType, LengthType>::getGlBufferValid() const
+	bool PxeVertexBuffer::getGlBufferValid() const
 	{
 		return _glBufferId != 0;
 	}
 
-	template<typename DataType, typename LengthType>
-	PxeVertexBufferFormat& PxeVertexBuffer<DataType, LengthType>::getFormat()
+	const PxeVertexBufferFormat& PxeVertexBuffer::getFormat() const
 	{
 		return _format;
 	}
 
-	template<typename DataType, typename LengthType>
-	const PxeVertexBufferFormat& PxeVertexBuffer<DataType, LengthType>::getFormat() const
-	{
-		return _format;
-	}
-
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::setFormat(const PxeVertexBufferFormat& format)
+	void PxeVertexBuffer::setFormat(const PxeVertexBufferFormat& format)
 	{
 		_format = format;
 	}
 
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::initializeGl()
+	void PxeVertexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
 		if (!getGlBufferValid()) {
@@ -140,8 +103,7 @@ namespace pxengine {
 		}
 	}
 
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::uninitializeGl()
+	void PxeVertexBuffer::uninitializeGl()
 	{
 		if (_pendingBuffer) {
 			_currentBuffer->drop();
@@ -155,14 +117,15 @@ namespace pxengine {
 		glDeleteBuffers(1, &_glBufferId);
 	}
 
-	template<typename DataType, typename LengthType>
-	void PxeVertexBuffer<DataType, LengthType>::updateGlBuffer()
+	void PxeVertexBuffer::updateGlBuffer()
 	{
 		if (!getBufferPending() || !getGlBufferValid()) return;
 		if (_currentBuffer)
 			_currentBuffer->drop();
 		_currentBuffer = _pendingBuffer;
 		_pendingBuffer = nullptr;
-		glBufferData(GL_ARRAY_BUFFER, _currentBuffer->getByteSize(), _currentBuffer->getBuffer(), GL_STATIC_DRAW);
+		if (_currentBuffer->getSize() % _format.getBufferStride() != 0)
+			PXE_WARN("Buffer data not divisible by buffer stride");
+		glBufferData(GL_ARRAY_BUFFER, _currentBuffer->getSize(), _currentBuffer->getBuffer(), GL_STATIC_DRAW);
 	}
 }

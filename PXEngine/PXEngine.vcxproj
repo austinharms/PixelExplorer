@@ -177,6 +177,7 @@
     <ClCompile Include="src\PxeBuffer.cpp" />
     <ClCompile Include="src\PxeEngineBase.cpp" />
     <ClCompile Include="src\PxeIndexBuffer.cpp" />
+    <ClCompile Include="src\PxeVertexArray.cpp" />
     <ClCompile Include="src\PxeVertexBuffer.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
     <ClCompile Include="src\PxeGLAsset.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="include\PxeGLAsset.h" />
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\PxeIndexBuffer.h" />
+    <ClInclude Include="include\PxeVertexArray.h" />
     <ClInclude Include="include\PxeVertexBuffer.h" />
     <ClInclude Include="include\PxeVertexBufferAttrib.h" />
     <ClInclude Include="include\PxeVertexBufferFormat.h" />

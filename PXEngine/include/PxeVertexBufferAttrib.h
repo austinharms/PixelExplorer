@@ -10,6 +10,7 @@ namespace pxengine {
 	public:
 		enum class AttribType : uint32_t
 		{
+			UNDEFINED = 0,
 			BYTE = GL_BYTE,
 			UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
 			SHORT = GL_SHORT, 
@@ -24,18 +25,18 @@ namespace pxengine {
 		static size_t componentWidth(AttribType t) {
 			switch (t)
 			{
-			case pxengine::PxeVertexBufferAttrib::AttribType::BYTE:
-			case pxengine::PxeVertexBufferAttrib::AttribType::UNSIGNED_BYTE:
+			case AttribType::BYTE:
+			case AttribType::UNSIGNED_BYTE:
 				return 1;
-			case pxengine::PxeVertexBufferAttrib::AttribType::SHORT:
-			case pxengine::PxeVertexBufferAttrib::AttribType::UNSIGNED_SHORT:
-			case pxengine::PxeVertexBufferAttrib::AttribType::HALF_FLOAT:
+			case AttribType::SHORT:
+			case AttribType::UNSIGNED_SHORT:
+			case AttribType::HALF_FLOAT:
 				return 2;
-			case pxengine::PxeVertexBufferAttrib::AttribType::INT:
-			case pxengine::PxeVertexBufferAttrib::AttribType::UNSIGNED_INT:
-			case pxengine::PxeVertexBufferAttrib::AttribType::FLOAT:
+			case AttribType::INT:
+			case AttribType::UNSIGNED_INT:
+			case AttribType::FLOAT:
 				return 4;
-			case pxengine::PxeVertexBufferAttrib::AttribType::DOUBLE:
+			case AttribType::DOUBLE:
 				return 8;
 			default:
 				return 0;
@@ -47,6 +48,14 @@ namespace pxengine {
 		bool Normalized;
 		uint32_t Offset;
 		uint32_t Stride;
+
+		PxeVertexBufferAttrib() {
+			ComponentType = AttribType::UNDEFINED;
+			ComponentCount = 0;
+			Normalized  = false;
+			Offset = 0;
+			Stride = 0;
+		}
 
 		PxeVertexBufferAttrib(AttribType type, uint8_t count, bool normalized) {
 			ComponentType = type;
