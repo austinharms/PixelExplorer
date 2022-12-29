@@ -1,6 +1,6 @@
 #include "PxeVertexArray.h"
 
-#include "NpLogger.h"
+#include "nonpublic/NpLogger.h"
 
 namespace pxengine {
 	PxeVertexArray::PxeVertexArray()
@@ -27,12 +27,19 @@ namespace pxengine {
 
 	void PxeVertexArray::unbind()
 	{
+#ifdef PXE_DEBUG
+		uint32_t previousBuffer;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (int32_t*)(&previousBuffer));
+		if (previousBuffer != _glId) {
+			PXE_WARN("unbind called on unbound PxeVertexArray");
+		}
+#endif // PXE_DEBUG
 		glBindVertexArray(0);
 	}
 
 	bool PxeVertexArray::getValid() const
 	{
-		return !_glId;
+		return _glId;
 	}
 
 	void PxeVertexArray::updateBufferBindings()
@@ -44,7 +51,7 @@ namespace pxengine {
 	{
 		removeArrayAttrib(arrayIndex);
 		vertexBuffer.grab();
-		_bufferBindings.emplace(arrayIndex, &vertexBuffer, vertexAttribIndex);
+		_bufferBindings.emplace(arrayIndex, std::pair(&vertexBuffer, vertexAttribIndex));
 		_bufferBindingsDirty = true;
 	}
 
@@ -86,7 +93,8 @@ namespace pxengine {
 
 	void PxeVertexArray::uninitializeGl()
 	{
-		glDeleteVertexArrays(1, &_glId);
+		if (_glId)
+			glDeleteVertexArrays(1, &_glId);
 	}
 
 	void PxeVertexArray::updateGlBindings()

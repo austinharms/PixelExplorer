@@ -14,43 +14,44 @@ class TestAsset : public pxengine::PxeGLAsset
 public:
 	TestAsset() { std::cout << "Create" << std::endl; }
 	virtual ~TestAsset() { std::cout << "Destroy" << std::endl; }
+	PxeGLAsset::initializeAsset;
+	PxeGLAsset::uninitializeAsset;
 	void bind() { std::cout << "Bound" << std::endl; }
 	void unbind() { std::cout << "Unbound" << std::endl; }
+protected:
 	void initializeGl() { std::cout << "Init" << std::endl; }
 	void uninitializeGl() { std::cout << "Uninit" << std::endl; }
 };
 
-class LogHandle : public pxengine::PxeLogHandler {
+class LogHandle : public pxengine::PxeLogInterface {
 public:
-	virtual ~LogHandle() {}
-	void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) override {
-		pxengine::LogLevel logLevel = (pxengine::LogLevel)level;
-		switch (logLevel)
+	void onLog(pxengine::PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line) override {
+		switch (level)
 		{
-		case pxengine::LogLevel::INFO:
+		case pxengine::PxeLogLevel::INFO:
 			std::cout << "[INFO] ";
 			break;
-		case pxengine::LogLevel::WARN:
+		case pxengine::PxeLogLevel::WARN:
 			std::cout << "[WARN] ";
 			break;
-		case pxengine::LogLevel::ERROR:
+		case pxengine::PxeLogLevel::ERROR:
 			std::cout << "[ERROR] ";
 			break;
-		case pxengine::LogLevel::FATAL:
+		case pxengine::PxeLogLevel::FATAL:
 			std::cout << "[FATAL] ";
 			break;
 		}
 
 		//std::cout << "Log: " << msg << " Level: " << level << " File: " << file << " Function: " << function << " Line: " << line << std::endl;
 		std::cout << msg << std::endl;
-		assert(logLevel != pxengine::LogLevel::FATAL);
+		assert(level != pxengine::PxeLogLevel::FATAL);
 	}
 };
 
 void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
 	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
 	TestAsset* t = new TestAsset();
-	window->initializeAsset(*t);
+	t->initializeAsset();
 	pxengine::PxeScene* scene = engineBase->createScene();
 	assert(window);
 	assert(scene);
@@ -61,13 +62,15 @@ void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t hei
 		// 1 should be delta time
 		scene->simulatePhysics(1);
 		window->acquireGlContext();
-		window->setWindowHidden(false);
+		window->setWindowShown(true);
 		//std::cout << title << " Draw" << std::endl;
 		glClearColor(r, g, b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		window->drawScene();
 		window->swapFrameBuffer();
-		window->pollEvents();
+		SDL_Event e;
+		while (window->pollEvents(&e));
+		//t->uninitializeAsset(true);
 		window->releaseGlContext();
 	}
 

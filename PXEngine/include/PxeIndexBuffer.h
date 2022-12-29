@@ -2,29 +2,35 @@
 
 #include "PxeGLAsset.h"
 #include "PxeBuffer.h"
+#include "GL/glew.h"
 
 #ifndef PXENGINE_GLINDEXBUFFER_H_
 #define PXENGINE_GLINDEXBUFFER_H_
 namespace pxengine {
-	template<typename DataType = uint8_t, typename LengthType = uint32_t>
+	enum class PxeIndexType : uint32_t
+	{
+		UNSIGNED_8BIT = GL_UNSIGNED_BYTE,
+		UNSIGNED_16BIT = GL_UNSIGNED_SHORT,
+		UNSIGNED_32BIT = GL_UNSIGNED_INT,
+	};
+
 	class PxeIndexBuffer : public PxeGLAsset
 	{
 	public:
-		typedef PxeBuffer<DataType, LengthType> PxeBufferType;
 
-		PxeIndexBuffer(PxeBufferType* buffer = nullptr);
+		PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer = nullptr);
 		virtual ~PxeIndexBuffer();
 		void bind() override;
 		void unbind() override;
-		void bufferData(PxeBufferType& buffer);
+		void bufferData(PxeBuffer& buffer);
 
 		// returns a pointer to the PxeBuffer last buffered into the internal GlBuffer
 		// returns nullptr if no data has been buffered
-		PxeBufferType* getBuffer() const;
+		PxeBuffer* getBuffer() const;
 
 		// returns a pointer to the PxeBuffer waiting to be buffered into the internal GlBuffer
 		// returns nullptr if there is no pending PxeBuffer
-		PxeBufferType* getPendingBuffer() const;
+		PxeBuffer* getPendingBuffer() const;
 
 		// returns true if a PxeBuffer is waiting to be buffered into the internal GlBuffer
 		bool getBufferPending() const;
@@ -35,6 +41,9 @@ namespace pxengine {
 		// returns true if the internal GlBuffer is allocated and valid
 		bool getGlBufferValid() const;
 
+		// returns the index type the buffer is using
+		PxeIndexType getIndexType() const;
+
 		PxeIndexBuffer(const PxeIndexBuffer& other) = delete;
 		PxeIndexBuffer operator=(const PxeIndexBuffer& other) = delete;
 
@@ -43,9 +52,10 @@ namespace pxengine {
 		void uninitializeGl() override;
 
 	private:
+		PxeBuffer* _currentBuffer;
+		PxeBuffer* _pendingBuffer;
 		uint32_t _glBufferId;
-		PxeBufferType* _currentBuffer;
-		PxeBufferType* _pendingBuffer;
+		const PxeIndexType _glBufferType;
 
 		// this function assumes the buffer is bound
 		void updateGlBuffer();

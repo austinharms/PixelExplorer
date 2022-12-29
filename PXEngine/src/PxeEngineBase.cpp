@@ -1,15 +1,16 @@
 #include "PxeEngineBase.h"
 
-#include "NpEngineBase.h"
+#include "nonpublic/NpEngineBase.h"
+#include "PxeLogger.h"
 
 namespace pxengine {
-    PxeEngineBase* createPXEEngineBase(PxeLogHandler& logHandler)
+    PxeEngineBase* createPXEEngineBase(PxeLogInterface& logInterface)
     {
-        return (PxeEngineBase*)nonpublic::NpEngineBase::createInstance(logHandler);
+        return static_cast<PxeEngineBase*>(nonpublic::NpEngineBase::createInstance(logInterface));
     }
 
     PxeEngineBase& getPXEEngineBase()
     {
-        return (PxeEngineBase&)nonpublic::NpEngineBase::getInstance();
+        return static_cast<PxeEngineBase&>(nonpublic::NpEngineBase::getInstance());
     }
 }

@@ -1,75 +1,99 @@
 #include "PxeGLAsset.h"
 
-#include "NpLogger.h"
-#include "NpEngineBase.h"
+#include "nonpublic/NpLogger.h"
+#include "nonpublic/NpEngineBase.h"
 
 namespace pxengine {
 	PxeGLAsset::PxeGLAsset()
 	{
-		_initialized = false;
-		_uninitializationQueued = false;
+		_status = PxeGLAssetStatus::UNINITIALIZED;
 	}
 
 	PxeGLAsset::~PxeGLAsset()
 	{
-		if (_initialized) {
-			PXE_WARN("PxeGLAsset not uninitialized before destructor was called, uninitializing asset");
+		if (_status >= PxeGLAssetStatus::INITIALIZED) {
+			PXE_ERROR("PxeGLAsset not uninitialized before destructor was called, you must call PxeGLAsset onDelete if it's overridden");
+			uninitializeAsset(true);
+		}
+		// this should never happen as the engine grabs things that are pending
+		else if (_status != PxeGLAssetStatus::UNINITIALIZED) {
+			PXE_ERROR("PxeGlAsset destroyed in pending status, reference counting error!");
 			uninitializeAsset(true);
 		}
 	}
 
-	bool PxeGLAsset::getInitialized() const
+	PxeGLAssetStatus PxeGLAsset::getAssetStatus() const
 	{
-		return _initialized;
+		return _status;
 	}
 
-	bool PxeGLAsset::getQueuedForUninitialization() const
+	void PxeGLAsset::uninitializeAsset(bool blocking)
 	{
-		return _uninitializationQueued;
-	}
-
-	bool PxeGLAsset::uninitializeAsset(bool block)
-	{
-		if (!_initialized) {
-			PXE_WARN("uninitializeAsset called on uninitialized PxeGlAsset");
-			return true;
+		if (_status == PxeGLAssetStatus::UNINITIALIZED) return;
+		if (_status < PxeGLAssetStatus::INITIALIZED) {
+			PXE_ERROR("uninitializeAsset called on PxeGlAsset in a pending state");
+			return;
 		}
 
-		_uninitializationQueued = true;
-		return nonpublic::NpEngineBase::getInstance().uninitializeGlAsset(*this, block);
+		nonpublic::NpEngineBase::getInstance().uninitializeGlAsset(*this, blocking);
+	}
+
+	void PxeGLAsset::initializeAsset(bool blocking)
+	{
+		if (_status >= PxeGLAssetStatus::INITIALIZED) return;
+		if (_status != PxeGLAssetStatus::UNINITIALIZED) {
+			PXE_ERROR("initializeAsset called on PxeGlAsset in a pending state");
+			return;
+		}
+
+		nonpublic::NpEngineBase::getInstance().initializeGlAsset(*this, blocking);
 	}
 
 	void PxeGLAsset::onDelete()
 	{
-		if (_initialized) {
-			// DEBUG Log
-			PXE_INFO("Asset uninitialized on drop");
-			uninitializeAsset(true);
+		if (_status >= PxeGLAssetStatus::INITIALIZED) {
+			uninitializeAsset();
 		}
+		// this should never happen as the engine grabs things that are pending
+		else if (_status != PxeGLAssetStatus::UNINITIALIZED) {
+			PXE_ERROR("Asset dropped in pending status, reference counting error!");
+		}
+	}
+
+	void PxeGLAsset::setErrorStatus()
+	{
+		if (_status < PxeGLAssetStatus::INITIALIZING) {
+			PXE_WARN("Invalid call to setErrorStatus asset must have an initializing or initialized status");
+			return;
+		}
+
+		_status = PxeGLAssetStatus::ERROR;
 	}
 
 	void PxeGLAsset::initialize()
 	{
-		if (_initialized) {
-			PXE_WARN("initialize called on initialized PxeGlAsset");
+		if (_status != PxeGLAssetStatus::PENDING_INITIALIZATION) {
+			PXE_ERROR("initialize called on when status was not PENDING_INITIALIZATION");
 			return;
 		}
 
+		_status = PxeGLAssetStatus::INITIALIZING;
 		nonpublic::NpEngineBase::getInstance().grab();
 		initializeGl();
-		_initialized = true;
+		if (_status != PxeGLAssetStatus::ERROR)
+			_status = PxeGLAssetStatus::INITIALIZED;
 	}
 
 	void PxeGLAsset::uninitialize()
 	{
-		if (!_initialized) {
-			PXE_WARN("uninitialize called on uninitialized PxeGlAsset");
+		if (_status != PxeGLAssetStatus::PENDING_UNINITIALIZATION) {
+			PXE_ERROR("uninitialize called on when status was not PENDING_UNINITIALIZATION");
 			return;
 		}
 
+		_status = PxeGLAssetStatus::UNINITIALIZING;
 		uninitializeGl();
-		_uninitializationQueued = false;
-		_initialized = false;
 		nonpublic::NpEngineBase::getInstance().drop();
+		_status = PxeGLAssetStatus::UNINITIALIZED;
 	}
 }

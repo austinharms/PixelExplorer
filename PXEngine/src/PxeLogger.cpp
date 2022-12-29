@@ -1,31 +1,38 @@
 #include "PxeLogger.h"
 
-#include <stdlib.h>
+#ifndef PXE_DISABLE_DEFAULT_ASSERT_LOG
 #include <iostream>
-
-namespace {
-	class PxeDefaultAssertHandler : public pxengine::PxeAssertHandler
-	{
-	public:
-		virtual ~PxeDefaultAssertHandler() {}
-		void onAssert(const char* msg, const char* file, uint64_t line, const char* function) override {
-			std::cout << "PXENGINE ASSERT!: " << msg << " File: " << file << " Function: " << function << " Line: " << line << std::endl;
-			abort();
-		}
-	};
-
-	PxeDefaultAssertHandler defaultAssertHandler;
-	pxengine::PxeAssertHandler* pxeAssertHandler = &defaultAssertHandler;
-}
+#endif // !PXE_DISABLE_DEFAULT_ASSERT_LOG
+#ifndef PXE_DISABLE_DEFAULT_ASSERT_ABORT
+#include <stdlib.h>
+#endif // !PXE_DISABLE_DEFAULT_ASSERT_ABORT
 
 namespace pxengine {
-	PxeAssertHandler& getPXEAssertHandler()
-	{
-		return *pxeAssertHandler;
+	namespace {
+		class PxeDefaultAssertHandler : public pxengine::PxeAssertInterface
+		{
+		public:
+			void onAssert(const char* msg, const char* file, const char* function, uint64_t line) override {
+#ifndef PXE_DISABLE_DEFAULT_ASSERT_LOG
+				std::cout << "PXENGINE ASSERT!: \"" << msg << "\" File: " << file << " Function: " << function << " Line: " << line << std::endl;
+#endif // !PXE_DISABLE_DEFAULT_ASSERT_LOG
+#ifndef PXE_DISABLE_DEFAULT_ASSERT_ABORT
+				abort();
+#endif // !PXE_DISABLE_DEFAULT_ASSERT_ABORT
+			}
+		};
+
+		PxeDefaultAssertHandler defaultAssertHandler;
+		pxengine::PxeAssertInterface* pxeAssertInterface = &defaultAssertHandler;
 	}
 
-	void setPXEAssertHandler(PxeAssertHandler& assertHandler)
+	PxeAssertInterface& pxeGetAssertInterface()
 	{
-		pxeAssertHandler = &assertHandler;
+		return *pxeAssertInterface;
+	}
+
+	void pxeSetAssertInterface(PxeAssertInterface& assertInterface)
+	{
+		pxeAssertInterface = &assertInterface;
 	}
 }

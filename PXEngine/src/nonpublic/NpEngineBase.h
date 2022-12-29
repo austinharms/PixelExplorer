@@ -4,8 +4,8 @@
 #include <list>
 
 #include "PxeEngineBase.h"
-#include "PxeLogger.h"
 #include "PxPhysicsAPI.h"
+#include "PxeLogger.h"
 #include "GL/glew.h"
 #include "SDL.h"
 #include "NpWindow.h"
@@ -16,7 +16,7 @@
 #define PXENGINE_NONPUBLIC_ENGINEBASE_H_
 namespace pxengine::nonpublic {
 	// TODO add NpEngineBase class description (copy EngineBase description)
-	class NpEngineBase : public PxeEngineBase, PxeLogHandler, physx::PxAssertHandler, physx::PxErrorCallback
+	class NpEngineBase : public PxeEngineBase, physx::PxAssertHandler, physx::PxErrorCallback
 	{
 	public:
 		//############# PUBLIC API ##################
@@ -25,26 +25,26 @@ namespace pxengine::nonpublic {
 
 		PxeScene* createScene() override;
 
+		void shutdown() override;
+
+
 		//############# PRIVATE API ##################
 
-		// creates and returns an NpEngineBase instance
-		// there should only be one instance per process
-		// returns nullptr on error or if an NpEngineBase instance already exists
-		static NpEngineBase* createInstance(PxeLogHandler& logHandler);
+		static NpEngineBase* createInstance(PxeLogInterface& logInterface);
 
-		// returns the NpEngineBase instance
 		static NpEngineBase& getInstance();
 
 		virtual ~NpEngineBase();
 
-		// this should only ever be called when a window is being destroyed
-		void removeWindowFromEventQueue(NpWindow& window);
+		void destroyWindow(NpWindow& window);
 
-		void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) override;
+		void acquireGlContextLock();
 
-		void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line) override;
+		void releaseGlContextLock();
 
-		void operator()(const char* exp, const char* file, int line, bool& ignore) override;
+		bool acquiredGlContext() const;
+
+		bool acquiredGlContext(const NpWindow& window) const;
 
 		void acquireGlContext(NpWindow& window);
 
@@ -52,34 +52,39 @@ namespace pxengine::nonpublic {
 
 		void pollEvents();
 
-		bool uninitializeGlAsset(PxeGLAsset& asset, bool blocking = false);
+		void uninitializeGlAsset(PxeGLAsset& asset, bool blocking = false);
 
-		void initializeGlAsset(PxeGLAsset& asset);
+		void initializeGlAsset(PxeGLAsset& asset, bool blocking = false);
 
-		void shutdown() override;
+		bool getShutdown() const;
 
-	protected:
-		void onDelete() override;
+
+		//############# PxErrorCallback API ##################
+
+		void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line) override;
+
+
+		//############# PxAssertHandler API ##################
+
+		void operator()(const char* exp, const char* file, int line, bool& ignore) override;
 
 	private:
 		static NpEngineBase* s_instance;
 
-		NpEngineBase(PxeLogHandler& logHandler);
+		NpEngineBase(PxeLogInterface& logHandler);
 		void initPhys();
 		void deinitPhys();
 		void initSDL();
 		void deinitSDL();
-		void uninitializeAssets();
+		void updateQueuedAssets();
 
-		// map of all the windows registered to receive events
-		// this will always be all windows that exist
-		std::unordered_map<uint32_t, NpWindow*> _eventWindows;
-		std::list<PxeGLAsset*> _assetUninitializationQueue;
-		std::recursive_mutex _glContextMutex;
-		std::mutex _glWaitMutex;
+		// map of all the windows that exist by SDL window id
+		std::unordered_map<uint32_t, NpWindow*> _windows;
+		std::list<PxeGLAsset*> _assetQueue;
+		std::recursive_mutex _glMutex;
+		std::mutex _glNextMutex;
 		NpWindow* _activeWindow;
 		std::thread::id _boundContextThread;
-		PxeLogHandler& _logHandler;
 		physx::PxAssertHandler& _defaultPhysAssertHandler;
 		physx::PxFoundation* _physFoundation;
 		physx::PxPvd* _physPVD;
@@ -92,8 +97,7 @@ namespace pxengine::nonpublic {
 		SDL_GLContext _sdlGlContext;
 		uint32_t _activeMouseWindowId;
 		uint32_t _activeKeyboardWindowId;
-		bool _physInit;
-		bool _sdlInit;
+		uint8_t _glContextDepth;
 		bool _engineInit;
 	};
 }

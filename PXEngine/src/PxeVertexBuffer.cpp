@@ -1,7 +1,7 @@
 #include "PxeVertexBuffer.h"
 
 #include "GL/glew.h"
-#include "NpLogger.h"
+#include "nonpublic/NpLogger.h"
 
 namespace pxengine {
 	PxeVertexBuffer::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer)
@@ -16,17 +16,17 @@ namespace pxengine {
 
 	PxeVertexBuffer::~PxeVertexBuffer()
 	{
-		if (_currentBuffer) {
-			_currentBuffer->drop();
-			_currentBuffer = nullptr;
-		}
 
-		if (_pendingBuffer) {
+		if (_pendingBuffer)
+		{
 			_pendingBuffer->drop();
 			_pendingBuffer = nullptr;
 		}
 
-		_glBufferId = 0;
+		// gl should be uninitialized and therefor there can not be a current buffer
+		if (_currentBuffer) {
+			PXE_ERROR("PxeIndexBuffer current buffer not deallocated before destructor call");
+		}
 	}
 
 	void PxeVertexBuffer::bind()
@@ -39,6 +39,13 @@ namespace pxengine {
 
 	void PxeVertexBuffer::unbind()
 	{
+#ifdef PXE_DEBUG
+		uint32_t previousBuffer;
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (int32_t*)(&previousBuffer));
+		if (previousBuffer != _glBufferId) {
+			PXE_WARN("unbind called on unbound PxeVertexBuffer");
+		}
+#endif // PXE_DEBUG
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
@@ -72,7 +79,7 @@ namespace pxengine {
 
 	bool PxeVertexBuffer::getGlBufferValid() const
 	{
-		return _glBufferId != 0;
+		return _glBufferId;
 	}
 
 	const PxeVertexBufferFormat& PxeVertexBuffer::getFormat() const

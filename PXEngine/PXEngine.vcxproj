@@ -88,15 +88,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);PXE_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <ShowIncludes>false</ShowIncludes>
+      <ShowIncludes>true</ShowIncludes>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -115,7 +116,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
@@ -131,15 +132,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);PXE_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <ShowIncludes>false</ShowIncludes>
+      <ShowIncludes>true</ShowIncludes>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -158,7 +160,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
@@ -171,9 +173,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\NpEngineBase.cpp" />
-    <ClCompile Include="src\NpScene.cpp" />
-    <ClCompile Include="src\NpWindow.cpp" />
+    <ClCompile Include="src\nonpublic\NpEngineBase.cpp" />
+    <ClCompile Include="src\nonpublic\NpScene.cpp" />
+    <ClCompile Include="src\nonpublic\NpWindow.cpp" />
     <ClCompile Include="src\PxeBuffer.cpp" />
     <ClCompile Include="src\PxeEngineBase.cpp" />
     <ClCompile Include="src\PxeIndexBuffer.cpp" />
@@ -181,7 +183,7 @@
     <ClCompile Include="src\PxeVertexBuffer.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
     <ClCompile Include="src\PxeGLAsset.cpp" />
-    <ClCompile Include="src\NpLogger.cpp" />
+    <ClCompile Include="src\nonpublic\NpLogger.cpp" />
     <ClCompile Include="src\PxeRefCount.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -201,10 +203,11 @@
     <ClInclude Include="include\PxeScene.h" />
     <ClInclude Include="include\PxeShader.h" />
     <ClInclude Include="include\PxeWindow.h" />
-    <ClInclude Include="src\NpEngineBase.h" />
+    <ClInclude Include="src\nonpublic\NpEngineBase.h" />
+    <ClInclude Include="src\nonpublic\NpLogger.h" />
     <ClInclude Include="src\NpLogger.h" />
-    <ClInclude Include="src\NpScene.h" />
-    <ClInclude Include="src\NpWindow.h" />
+    <ClInclude Include="src\nonpublic\NpScene.h" />
+    <ClInclude Include="src\nonpublic\NpWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

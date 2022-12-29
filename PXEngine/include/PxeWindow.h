@@ -3,6 +3,7 @@
 #include "PxeRefCount.h"
 #include "PxeScene.h"
 #include "PxeGLAsset.h"
+#include "SDL_events.h"
 
 #ifndef PXENGINE_WINDOW_H_
 #define PXENGINE_WINDOW_H_
@@ -33,24 +34,25 @@ namespace pxengine {
 		virtual int8_t getSwapInterval() = 0;
 
 		// retruns true if the user wants to close the window aka presses the X, Alt-F4...
-		// this can be reset by calling resetShouldClose
+		// this can be reset/ignored by calling resetShouldClose
 		virtual bool getShouldClose() const = 0;
 
 		// resets the internal window close flag to false
 		virtual void resetShouldClose() = 0;
 
-		// processes the windows event queue, this should be done every frame to allow for user interaction
-		// this MUST be called on the same thread that created the window
-		// note not calling this will cause windows to think the application is not responding
-		// TODO add some sort of event system
-		virtual void pollEvents() = 0;
+		// updates the window event buffer
+		// returns false if the event buffer is empty
+		// if event is not null sets and removes the first event from the buffer and returns true
+		// if event is null returns true if there is an event in the queue
+		// note this MUST be called on the same thread that created the window
+		virtual bool pollEvents(SDL_Event* event = nullptr) = 0;
 
 		// set if the window is hidden or not
-		// this is true by default
-		virtual void setWindowHidden(bool hidden) = 0;
+		// this is false by default
+		virtual void setWindowShown(bool show) = 0;
 
-		// returns true if the window is hidden
-		virtual bool getWindowHidden() const = 0;
+		// returns true if the window is "visible"
+		virtual bool getWindowShown() const = 0;
 
 		// sets scene rendered when calling drawScene
 		// to clear the current scene pass nullptr as the scene
@@ -63,11 +65,6 @@ namespace pxengine {
 
 		// returns a pointer to the current scene
 		virtual PxeScene* getScene() const = 0;
-
-		// initializes the asset useful to preload data
-		// note: requires an bound Gl context
-		// if no context is bound it will bind and unbind a valid context
-		virtual void initializeAsset(PxeGLAsset& asset) = 0;
 
 		PxeWindow() = default;
 		PxeWindow(const PxeWindow& other) = delete;

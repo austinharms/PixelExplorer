@@ -3,7 +3,7 @@
 #ifndef PXENGINE_LOGGER_H_
 #define PXENGINE_LOGGER_H_
 namespace pxengine {
-	enum class LogLevel : uint8_t
+	enum class PxeLogLevel : uint8_t
 	{
 		INFO = 0,
 		WARN,
@@ -12,24 +12,24 @@ namespace pxengine {
 		LOGLEVELCOUNT
 	};
 
-	class PxeAssertHandler
+	class PxeAssertInterface
 	{
 	public:
-		virtual ~PxeAssertHandler() {}
-		virtual void onAssert(const char* msg, const char* file, uint64_t line, const char* function) = 0;
+		virtual void onAssert(const char* msg, const char* file, const char* function, uint64_t line) = 0;
 	};
 
-	class PxeLogHandler
+	class PxeLogInterface
 	{
 	public:
-		virtual ~PxeLogHandler() {}
-		virtual void onLog(const char* msg, uint8_t level, const char* file, uint64_t line, const char* function) = 0;
+		virtual void onLog(PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line) = 0;
 	};
 
-	// get the PxeAssertHandler used when an assertion is made
-	PxeAssertHandler& getPXEAssertHandler();
+	// get the PxeAssertInterface used when an assertion is made
+	extern PxeAssertInterface& pxeGetAssertInterface();
 
-	// set the PxeAssertHandler used when an assertion is made
-	void setPXEAssertHandler(PxeAssertHandler& assertHandler);
+	// set the PxeAssertInterface used when an assertion is made
+	// note log FATAL is preferred to an assertion
+	// assertion will only happen if there was an error and the PxeLogInterface is not available 
+	extern void pxeSetAssertInterface(PxeAssertInterface& assertInterface);
 }
 #endif // !PXENGINE_LOGGER_H_

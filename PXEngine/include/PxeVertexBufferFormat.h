@@ -23,6 +23,7 @@ namespace pxengine {
 			_attribs.clear();
 			for (const PxeVertexBufferAttrib& a : other._attribs)
 				addAttrib(a);
+			return *this;
 		}
 
 		// inserts an Attrib and returns the attribs index

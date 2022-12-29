@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\NpEngineBase.cpp">
+    <ClCompile Include="src\nonpublic\NpEngineBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeLogger.cpp">
@@ -27,16 +27,16 @@
     <ClCompile Include="src\PxeGLAsset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NpLogger.cpp">
+    <ClCompile Include="src\nonpublic\NpLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeRefCount.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NpWindow.cpp">
+    <ClCompile Include="src\nonpublic\NpWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NpScene.cpp">
+    <ClCompile Include="src\nonpublic\NpScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeIndexBuffer.cpp">
@@ -68,7 +68,7 @@
     <ClInclude Include="include\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\NpEngineBase.h">
+    <ClInclude Include="src\nonpublic\NpEngineBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeLogger.h">
@@ -80,7 +80,7 @@
     <ClInclude Include="include\PxeWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\NpWindow.h">
+    <ClInclude Include="src\nonpublic\NpWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeScene.h">
@@ -89,7 +89,7 @@
     <ClInclude Include="include\PxeRingBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\NpScene.h">
+    <ClInclude Include="src\nonpublic\NpScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeShader.h">
@@ -111,6 +111,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeVertexArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nonpublic\NpLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
