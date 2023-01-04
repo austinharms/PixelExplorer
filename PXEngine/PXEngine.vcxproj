@@ -175,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="src\nonpublic\NpEngineBase.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
+    <ClCompile Include="src\nonpublic\NpShader.cpp" />
     <ClCompile Include="src\nonpublic\NpWindow.cpp" />
     <ClCompile Include="src\PxeBuffer.cpp" />
     <ClCompile Include="src\PxeEngineBase.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="include\PxeWindow.h" />
     <ClInclude Include="src\nonpublic\NpEngineBase.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
+    <ClInclude Include="src\nonpublic\NpShader.h" />
     <ClInclude Include="src\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpScene.h" />
     <ClInclude Include="src\nonpublic\NpWindow.h" />

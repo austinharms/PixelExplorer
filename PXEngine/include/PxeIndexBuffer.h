@@ -22,6 +22,8 @@ namespace pxengine {
 		virtual ~PxeIndexBuffer();
 		void bind() override;
 		void unbind() override;
+		
+		// TODO Add method description
 		void bufferData(PxeBuffer& buffer);
 
 		// returns a pointer to the PxeBuffer last buffered into the internal GlBuffer
