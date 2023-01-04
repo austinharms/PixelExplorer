@@ -236,17 +236,35 @@ namespace pxengine {
 			return scene;
 		}
 
+		// TODO make this thread safe
+		PxeShader* NpEngineBase::loadShader(const std::filesystem::path& path)
+		{
+			auto it = _shaders.find(path);
+			if (it != _shaders.end()) {
+				it->second->grab();
+				return it->second;
+			}
+			else {
+				NpShader* shader = new(std::nothrow) NpShader(path);
+				if (shader) {
+					_shaders.emplace(path, shader);
+				}
+
+				return shader;
+			}
+		}
+
 		void NpEngineBase::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
 		{
-			PxeLogLevel level = PxeLogLevel::INFO;
+			PxeLogLevel level = PxeLogLevel::PXE_INFO;
 			if (code | physx::PxErrorCode::eABORT) {
-				level = PxeLogLevel::FATAL;
+				level = PxeLogLevel::PXE_FATAL;
 			}
 			else if (code | physx::PxErrorCode::eINTERNAL_ERROR || code | physx::PxErrorCode::eOUT_OF_MEMORY || code | physx::PxErrorCode::eINVALID_OPERATION || code | physx::PxErrorCode::eINVALID_PARAMETER) {
-				level = PxeLogLevel::ERROR;
+				level = PxeLogLevel::PXE_ERROR;
 			}
 			else if (code | physx::PxErrorCode::ePERF_WARNING || code | physx::PxErrorCode::eDEBUG_WARNING) {
-				level = PxeLogLevel::WARN;
+				level = PxeLogLevel::PXE_WARN;
 			}
 
 			log(level, message, file, "PHYSX(UNKNOWN)", line);
@@ -460,6 +478,16 @@ namespace pxengine {
 		bool NpEngineBase::getShutdown() const
 		{
 			return !_engineInit;
+		}
+
+		// TODO make this thread safe
+		void NpEngineBase::removeShaderFromCache(const std::filesystem::path& path)
+		{
+#ifdef PXE_DEBUG
+			PXE_INFO("Removed PxeShader " + path.string() + " from cache");
+#endif // PXE_DEBUG
+
+			_shaders.erase(path);
 		}
 
 		void NpEngineBase::shutdown()

@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <thread>
 #include <list>
+#include <filesystem>
 
 #include "PxeEngineBase.h"
 #include "PxPhysicsAPI.h"
@@ -11,6 +12,7 @@
 #include "NpWindow.h"
 #include "PxeScene.h"
 #include "PxeGLAsset.h"
+#include "NpShader.h"
 
 #ifndef PXENGINE_NONPUBLIC_ENGINEBASE_H_
 #define PXENGINE_NONPUBLIC_ENGINEBASE_H_
@@ -24,6 +26,8 @@ namespace pxengine::nonpublic {
 		PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
 
 		PxeScene* createScene() override;
+
+		PxeShader* loadShader(const std::filesystem::path& path) override;
 
 		void shutdown() override;
 
@@ -58,6 +62,8 @@ namespace pxengine::nonpublic {
 
 		bool getShutdown() const;
 
+		void removeShaderFromCache(const std::filesystem::path& path);
+
 
 		//############# PxErrorCallback API ##################
 
@@ -80,6 +86,7 @@ namespace pxengine::nonpublic {
 
 		// map of all the windows that exist by SDL window id
 		std::unordered_map<uint32_t, NpWindow*> _windows;
+		std::unordered_map<std::filesystem::path, NpShader*> _shaders;
 		std::list<PxeGLAsset*> _assetQueue;
 		std::recursive_mutex _glMutex;
 		std::mutex _glNextMutex;

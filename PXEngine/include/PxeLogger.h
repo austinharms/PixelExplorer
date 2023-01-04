@@ -5,11 +5,11 @@
 namespace pxengine {
 	enum class PxeLogLevel : uint8_t
 	{
-		INFO = 0,
-		WARN,
-		ERROR,
-		FATAL,
-		LOGLEVELCOUNT
+		PXE_INFO = 0,
+		PXE_WARN,
+		PXE_ERROR,
+		PXE_FATAL,
+		PXE_LOGLEVELCOUNT
 	};
 
 	class PxeAssertInterface

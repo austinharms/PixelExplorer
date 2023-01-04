@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <string>
+#include <filesystem>
+#include <unordered_map>
 
 #include "PxeShader.h"
 #include "GL/glew.h"
@@ -33,12 +35,12 @@ namespace pxengine {
 
 			uint32_t getGlProgramId() const override;
 
-			const std::string& getShaderPath() const override;
+			const std::filesystem::path& getShaderPath() const override;
 
 
 			//############# PRIVATE API ##################
 
-			NpShader(const std::string& path);
+			NpShader(const std::filesystem::path& path);
 
 			virtual ~NpShader();
 
@@ -49,7 +51,7 @@ namespace pxengine {
 		protected:
 			enum class PxeShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2, SHADER_COUNT = 3 };
 			static uint32_t compileShader(PxeShaderType shaderType, const std::string& source);
-			static uint32_t loadShaderFile(const std::string& path);
+			static uint32_t loadShaderFile(const std::filesystem::path& path);
 			static constexpr const char* getShaderName(const PxeShaderType type);
 			static constexpr const GLenum getShaderGlenum(const PxeShaderType type);
 
@@ -57,10 +59,11 @@ namespace pxengine {
 			void uninitializeGl() override;
 			void bind() override;
 			void unbind() override;
+			void onDelete() override;
 
 		private:
 			uint32_t _glProgramId;
-			const std::string _path;
+			const std::filesystem::path _path;
 			std::unordered_map<std::string, int32_t> _uniformLocations;
 		};
 	}

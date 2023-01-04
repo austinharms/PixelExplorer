@@ -23,26 +23,9 @@ namespace pxengine {
 	public:
 		PxeGLAsset();
 		virtual ~PxeGLAsset();
+
+		// returns the assets current PxeGLAssetStatus
 		PxeGLAssetStatus getAssetStatus() const;
-
-	protected:
-		// called internally by the engine, all OpenGL object should be created in this function
-		// note: you can assume there is a valid OpenGl context bound on the calling thread
-		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
-		virtual void initializeGl() = 0;
-
-		// called internally by the engine, all OpenGL objects created must be cleaned up in this call
-		// note: you can assume there is a valid OpenGl context bound on the calling thread
-		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
-		virtual void uninitializeGl() = 0;
-
-		// all relevant OpenGL objects created in initializeGl should be bound
-		// note: you must bind a valid OpenGl context before calling this function 
-		virtual void bind() = 0;
-
-		// all OpenGL object bound in bindGl must be unbound
-		// note: you must bind a valid OpenGl context before calling this function 
-		virtual void unbind() = 0;
 
 		// requests the engine to uninitialize the asset and calls the uninitializeGl method
 		// if blocking is true the method will wait for the asset to be uninitialized before returning
@@ -54,6 +37,25 @@ namespace pxengine {
 		// note: there must be at least one window created to initialize assets
 		// if blocking is true and there is no window create the method will never exit!
 		void initializeAsset(bool blocking = false);
+
+		// all relevant OpenGL objects created in initializeGl should be bound
+		// note: you must bind a valid OpenGl context before calling this function 
+		virtual void bind() = 0;
+
+		// all OpenGL object bound in bindGl must be unbound
+		// note: you must bind a valid OpenGl context before calling this function 
+		virtual void unbind() = 0;
+
+	protected:
+		// called internally by the engine, all OpenGL object should be created in this function
+		// note: you can assume there is a valid OpenGl context bound on the calling thread
+		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
+		virtual void initializeGl() = 0;
+
+		// called internally by the engine, all OpenGL objects created must be cleaned up in this call
+		// note: you can assume there is a valid OpenGl context bound on the calling thread
+		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
+		virtual void uninitializeGl() = 0;
 
 		// handles engine cleanup
 		// note: if you override this method you must call this at the end of the new method

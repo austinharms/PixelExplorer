@@ -7,16 +7,17 @@
 #include "GL/glew.h"
 #include "NpLogger.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "NpEngineBase.h"
 
 namespace pxengine {
 	namespace nonpublic {
-		NpShader::NpShader(const std::string& path) : _path(path) {
+		NpShader::NpShader(const std::filesystem::path& path) : _path(path) {
 			_glProgramId = 0;
 		}
 
 		NpShader::~NpShader()
 		{
-			PXE_INFO("Destroyed PxeShader: " + _path);
+			PXE_INFO("Destroyed PxeShader: " + _path.string());
 		}
 
 		bool NpShader::validateProgram()
@@ -34,7 +35,7 @@ namespace pxengine {
 				glGetProgramiv(_glProgramId, GL_INFO_LOG_LENGTH, &errorLength);
 				char* errorString = (char*)alloca(errorLength);
 				glGetProgramInfoLog(_glProgramId, errorLength, NULL, errorString);
-				PXE_ERROR("Failed to validate shader " + _path + " " + errorString);
+				PXE_ERROR("Failed to validate shader " + _path.string() + " " + errorString);
 				setErrorStatus();
 			}
 
@@ -81,7 +82,7 @@ namespace pxengine {
 			_uniformLocations.clear();
 			_glProgramId = loadShaderFile(_path);
 			if (getValid()) {
-				PXE_INFO("Initialized PxeShader " + _path);
+				PXE_INFO("Initialized PxeShader " + _path.string());
 			}
 			else {
 				setErrorStatus();
@@ -93,7 +94,7 @@ namespace pxengine {
 			if (getValid()) {
 				glDeleteProgram(_glProgramId);
 				_glProgramId = 0;
-				PXE_INFO("Uninitialized PxeShader " + _path);
+				PXE_INFO("Uninitialized PxeShader " + _path.string());
 			}
 		}
 
@@ -118,6 +119,12 @@ namespace pxengine {
 #endif // PXE_DEBUG
 
 			glUseProgram(0);
+		}
+
+		void NpShader::onDelete()
+		{
+			NpEngineBase::getInstance().removeShaderFromCache(_path);
+			PxeGLAsset::onDelete();
 		}
 
 		uint32_t NpShader::compileShader(PxeShaderType shaderType, const std::string& source)
@@ -147,15 +154,17 @@ namespace pxengine {
 			else {
 				int32_t msgLength;
 				glGetShaderiv(id, GL_INFO_LOG_LENGTH, &msgLength);
+				if (msgLength == 0) msgLength = 1;
 				char* msgString = (char*)alloca(msgLength);
 				glGetShaderInfoLog(id, msgLength, NULL, msgString);
+				if (msgLength == 1) msgString[0] = 0;
 				PXE_INFO(std::string("Compiled ") + getShaderName(shaderType) + " shader: " + msgString);
 			}
 #endif
 			return id;
 		}
 
-		uint32_t NpShader::loadShaderFile(const std::string& path)
+		uint32_t NpShader::loadShaderFile(const std::filesystem::path& path)
 		{
 			std::ifstream stream(path);
 			std::string line;
@@ -173,8 +182,8 @@ namespace pxengine {
 						type = PxeShaderType::GEOMETRY;
 					}
 					else {
-						PXE_ERROR("Failed to load PxeShader " + path + " found unknown shader type \"" + line + "\"");
-						return;
+						PXE_ERROR("Failed to load PxeShader " + path.string() + " found unknown shader type \"" + line + "\"");
+						return 0;
 					}
 				}
 				else {
@@ -184,13 +193,13 @@ namespace pxengine {
 
 			stream.close();
 			if (type == PxeShaderType::NONE) {
-				PXE_ERROR("Failed to load PxeShader " + path + " file empty or not found");
-				return;
+				PXE_ERROR("Failed to load PxeShader " + path.string() + " file empty or not found");
+				return 0;
 			}
 
 			uint32_t programId = glCreateProgram();
 			if (programId == 0) {
-				PXE_ERROR("Failed to load PxeShader " + path + +" failed to create Gl Program");
+				PXE_ERROR("Failed to load PxeShader " + path.string() + +" failed to create Gl Program");
 				return 0;
 			}
 
@@ -211,7 +220,7 @@ namespace pxengine {
 
 			if (shaderError) {
 				glDeleteProgram(programId);
-				PXE_ERROR("Failed to load PxeShader " + path + +" failed to compile all shaders");
+				PXE_ERROR("Failed to load PxeShader " + path.string() + +" failed to compile all shaders");
 				return 0;
 			}
 
@@ -223,7 +232,7 @@ namespace pxengine {
 				glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &errorLength);
 				char* errorString = (char*)alloca(errorLength);
 				glGetProgramInfoLog(programId, errorLength, NULL, errorString);
-				PXE_ERROR("Failed to link shader " + path + " " + errorString);
+				PXE_ERROR("Failed to link shader " + path.string() + " " + errorString);
 				glDeleteProgram(programId);
 				return 0;
 			}
@@ -231,9 +240,11 @@ namespace pxengine {
 			else {
 				int32_t msgLength;
 				glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &msgLength);
+				if (msgLength == 0) msgLength = 1;
 				char* msgString = (char*)alloca(msgLength);
 				glGetProgramInfoLog(programId, msgLength, NULL, msgString);
-				PXE_INFO("Linked shader " + path + " " + msgString);
+				if (msgLength == 1) msgString[0] = 0;
+				PXE_INFO("Linked shader " + path.string() + " " + msgString);
 			}
 #endif
 
@@ -244,7 +255,7 @@ namespace pxengine {
 				glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &errorLength);
 				char* errorString = (char*)alloca(errorLength);
 				glGetProgramInfoLog(programId, errorLength, NULL, errorString);
-				PXE_ERROR("Failed to validate shader " + path + " " + errorString);
+				PXE_ERROR("Failed to validate shader " + path.string() + " " + errorString);
 				glDeleteProgram(programId);
 				return 0;
 			}
@@ -252,9 +263,11 @@ namespace pxengine {
 			else {
 				int32_t msgLength;
 				glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &msgLength);
+				if (msgLength == 0) msgLength = 1;
 				char* msgString = (char*)alloca(msgLength);
 				glGetProgramInfoLog(programId, msgLength, NULL, msgString);
-				PXE_INFO("Validated shader " + path + " " + msgString);
+				if (msgLength == 1) msgString[0] = 0;
+				PXE_INFO("Validated shader " + path.string() + " " + msgString);
 			}
 #endif
 
@@ -306,7 +319,7 @@ namespace pxengine {
 				int32_t u = glGetUniformLocation(_glProgramId, name.c_str());
 				_uniformLocations.insert({ name, u });
 				if (u == -1) {
-					PXE_WARN("Failed to find uniform \"" + name + "\" in PxeShader " + _path);
+					PXE_WARN("Failed to find uniform \"" + name + "\" in PxeShader " + _path.string());
 				}
 
 				return u;
@@ -318,7 +331,7 @@ namespace pxengine {
 			return _glProgramId;
 		}
 
-		const std::string& NpShader::getShaderPath() const
+		const std::filesystem::path& NpShader::getShaderPath() const
 		{
 			return _path;
 		}

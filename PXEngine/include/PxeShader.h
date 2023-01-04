@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <string>
-#include <unordered_map>
+#include <filesystem>
 
 #include "PxeGLAsset.h"
 #include "glm/vec2.hpp"
@@ -26,7 +26,7 @@ namespace pxengine {
 		virtual void setUniformm4fv(const std::string& name, const glm::mat4& value) = 0;
 		virtual int32_t getUniformLocation(const std::string& name) = 0;
 		virtual uint32_t getGlProgramId() const = 0;
-		virtual const std::string& getShaderPath() const = 0;
+		virtual const std::filesystem::path& getShaderPath() const = 0;
 
 		PxeShader(const PxeShader& other) = delete;
 		PxeShader operator=(const PxeShader& other) = delete;

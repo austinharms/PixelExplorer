@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <thread>
+#include <filesystem>
 
 #include "PxeEngine.h"
 #include "PxeRingBuffer.h"
@@ -14,8 +15,6 @@ class TestAsset : public pxengine::PxeGLAsset
 public:
 	TestAsset() { std::cout << "Create" << std::endl; }
 	virtual ~TestAsset() { std::cout << "Destroy" << std::endl; }
-	PxeGLAsset::initializeAsset;
-	PxeGLAsset::uninitializeAsset;
 	void bind() { std::cout << "Bound" << std::endl; }
 	void unbind() { std::cout << "Unbound" << std::endl; }
 protected:
@@ -28,28 +27,39 @@ public:
 	void onLog(pxengine::PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line) override {
 		switch (level)
 		{
-		case pxengine::PxeLogLevel::INFO:
+		case pxengine::PxeLogLevel::PXE_INFO:
 			std::cout << "[INFO] ";
 			break;
-		case pxengine::PxeLogLevel::WARN:
+		case pxengine::PxeLogLevel::PXE_WARN:
 			std::cout << "[WARN] ";
 			break;
-		case pxengine::PxeLogLevel::ERROR:
+		case pxengine::PxeLogLevel::PXE_ERROR:
 			std::cout << "[ERROR] ";
 			break;
-		case pxengine::PxeLogLevel::FATAL:
+		case pxengine::PxeLogLevel::PXE_FATAL:
 			std::cout << "[FATAL] ";
 			break;
 		}
 
 		//std::cout << "Log: " << msg << " Level: " << level << " File: " << file << " Function: " << function << " Line: " << line << std::endl;
 		std::cout << msg << std::endl;
-		assert(level != pxengine::PxeLogLevel::FATAL);
+		assert(level != pxengine::PxeLogLevel::PXE_FATAL);
 	}
 };
 
 void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
 	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
+	pxengine::PxeShader* shader = engineBase->loadShader(pxengine::getAssetPath("shaders") / "test.pxeshader");
+	assert(shader);
+	window->acquireGlContext();
+	shader->initializeAsset(true);
+	shader->unbind();
+	shader->bind();
+	shader->unbind();
+	shader->uninitializeAsset(true);
+	window->releaseGlContext();
+	shader->drop();
+	shader = nullptr;
 	TestAsset* t = new TestAsset();
 	t->initializeAsset();
 	pxengine::PxeScene* scene = engineBase->createScene();
@@ -84,9 +94,9 @@ int main(int argc, char* args[]) {
 	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
 	assert(engineBase);
 	std::thread win1(runWindow, engineBase, 500, 500, "Win 1", 1, 0, 0);
-	//std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);
+	std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);
 	win1.join();
-	//win2.join();
+	win2.join();
 	engineBase->shutdown();
 	return 0;
 }

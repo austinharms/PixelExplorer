@@ -9,3 +9,4 @@
 //#define PXE_DISABLE_DEFAULT_ASSERT_ABORT
 
 #include "PxeEngineBase.h"
+#include "PxeFSHelpers.h"
