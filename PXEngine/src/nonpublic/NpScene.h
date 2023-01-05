@@ -1,7 +1,9 @@
-#include "PxeScene.h"
+#include <list>
 
+#include "PxeScene.h"
 #include "PxPhysicsAPI.h"
 #include "NpEngineBase.h"
+#include "PxeRenderBase.h"
 
 #ifndef PXENGINE_NONPUBLIC_SCENE_H_
 #define PXENGINE_NONPUBLIC_SCENE_H_
@@ -27,6 +29,12 @@ namespace pxengine::nonpublic {
 		// note: this should only be changed before the first call to simulatePhysics for best simulation stability
 		void setSimulationStep(float step) override;
 
+		// add a PxeRenderBase aka a renderable object to the scene
+		void addRenderable(PxeRenderBase& renderable) override;
+
+		// remove a PxeRenderBase aka a renderable object from the scene
+		void removeRenderable(PxeRenderBase& renderable) override;
+
 		//############# PRIVATE API ##################
 	
 		NpScene(physx::PxScene* scene);
@@ -35,6 +43,7 @@ namespace pxengine::nonpublic {
 	private:
 		NpEngineBase* _engine;
 		physx::PxScene* _physScene;
+		std::list<PxeRenderBase*> _renderables;
 		float _simulationTimestep;
 		float _simulationAccumulator;
 	};
