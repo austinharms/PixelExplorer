@@ -18,24 +18,34 @@ namespace pxengine {
 
 			// note this only checks for initial validation not for current validation
 			bool getValid() const override;
-
-			void setUniform1i(const std::string& name, const int32_t value) override;
-
-			void setUniform1f(const std::string& name, const float value) override;
-
-			void setUniform2fv(const std::string& name, const glm::vec2& value) override;
-
-			void setUniform3fv(const std::string& name, const glm::vec3& value) override;
-
-			void setUniform4fv(const std::string& name, const glm::vec4& value) override;
-
-			void setUniformm4fv(const std::string& name, const glm::mat4& value) override;			
-
 			int32_t getUniformLocation(const std::string& name) override;
-
 			uint32_t getGlProgramId() const override;
-
 			const std::filesystem::path& getShaderPath() const override;
+
+			void setUniform1fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniform2fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniform3fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniform4fv(const std::string& name, const float* values, uint32_t count) override;
+
+			void setUniform1iv(const std::string& name, const int32_t* values, uint32_t count) override;
+			void setUniform2iv(const std::string& name, const int32_t* values, uint32_t count) override;
+			void setUniform3iv(const std::string& name, const int32_t* values, uint32_t count) override;
+			void setUniform4iv(const std::string& name, const int32_t* values, uint32_t count) override;
+
+			void setUniform1uiv(const std::string& name, const uint32_t* values, uint32_t count) override;
+			void setUniform2uiv(const std::string& name, const uint32_t* values, uint32_t count) override;
+			void setUniform3uiv(const std::string& name, const uint32_t* values, uint32_t count) override;
+			void setUniform4uiv(const std::string& name, const uint32_t* values, uint32_t count) override;
+
+			void setUniformM2fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM3fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM4fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM2x3fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM3x2fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM2x4fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM4x2fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM3x4fv(const std::string& name, const float* values, uint32_t count) override;
+			void setUniformM4x3fv(const std::string& name, const float* values, uint32_t count) override;
 
 
 			//############# PRIVATE API ##################

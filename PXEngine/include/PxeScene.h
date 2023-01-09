@@ -29,6 +29,8 @@ namespace pxengine {
 		virtual void setSimulationStep(float step) = 0;
 
 		// add a PxeRenderBase aka a renderable object to the scene
+		// note things rendered in RenderSpace::SCREEN_SPACE aka PxeRenderElement are rendered in the order inserted
+		// things rendered in RenderSpace::SCREEN_SPACE are rendered by the shader and material used
 		virtual void addRenderable(PxeRenderBase& renderable) = 0;
 
 		// remove a PxeRenderBase aka a renderable object from the scene
