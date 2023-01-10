@@ -63,7 +63,7 @@ int main(int argc, char* args[]) {
 	pxengine::PxeScene* scene = engineBase->createScene();
 
 	pxengine::PxeRenderMaterial* material = new pxengine::PxeRenderMaterial(*shader);
-	material->setProperty3f("u_color", glm::vec3(1, 0, 0));
+	material->setProperty4f("u_Color", glm::vec4(1, 0, 0, 1));
 	TestRenderObject* testObj = new TestRenderObject(*material);
 	scene->addRenderable(static_cast<pxengine::PxeRenderBase&>(*testObj));
 	window->setScene(scene);
