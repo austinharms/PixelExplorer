@@ -22,4 +22,15 @@
   <ItemGroup>
     <Text Include="assets\shaders\test.pxeshader" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\LogHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestAsset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestRenderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

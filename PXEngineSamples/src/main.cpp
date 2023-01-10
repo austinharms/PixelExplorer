@@ -4,99 +4,87 @@
 #include <filesystem>
 
 #include "PxeEngine.h"
-#include "PxeRingBuffer.h"
 #include "PxeWindow.h"
 #include "SDL.h"
 #include "GL/glew.h"
-#include "PxeGLAsset.h"
 
-class TestAsset : public pxengine::PxeGLAsset
-{
-public:
-	TestAsset() { std::cout << "Create" << std::endl; }
-	virtual ~TestAsset() { std::cout << "Destroy" << std::endl; }
-	void bind() { std::cout << "Bound" << std::endl; }
-	void unbind() { std::cout << "Unbound" << std::endl; }
-protected:
-	void initializeGl() { std::cout << "Init" << std::endl; }
-	void uninitializeGl() { std::cout << "Uninit" << std::endl; }
-};
+#include "TestAsset.h"
+#include "LogHandler.h"
+#include "TestRenderObject.h"
 
-class LogHandle : public pxengine::PxeLogInterface {
-public:
-	void onLog(pxengine::PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line) override {
-		switch (level)
-		{
-		case pxengine::PxeLogLevel::PXE_INFO:
-			std::cout << "[INFO] ";
-			break;
-		case pxengine::PxeLogLevel::PXE_WARN:
-			std::cout << "[WARN] ";
-			break;
-		case pxengine::PxeLogLevel::PXE_ERROR:
-			std::cout << "[ERROR] ";
-			break;
-		case pxengine::PxeLogLevel::PXE_FATAL:
-			std::cout << "[FATAL] ";
-			break;
-		}
+//void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
+//	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
+//	pxengine::PxeShader* shader = engineBase->loadShader(pxengine::getAssetPath("shaders") / "test.pxeshader");
+//	assert(shader);
+//	window->acquireGlContext();
+//	shader->initializeAsset(true);
+//	shader->unbind();
+//	shader->bind();
+//	shader->unbind();
+//	shader->uninitializeAsset(true);
+//	window->releaseGlContext();
+//	shader->drop();
+//	shader = nullptr;
+//	TestAsset* t = new TestAsset();
+//	t->initializeAsset();
+//	pxengine::PxeScene* scene = engineBase->createScene();
+//	assert(window);
+//	assert(scene);
+//	window->setScene(scene);
+//	window->setSwapInterval(1);
+//	while (!window->getShouldClose())
+//	{
+//		// 1 should be delta time
+//		scene->simulatePhysics(1);
+//		window->acquireGlContext();
+//		window->setWindowShown(true);
+//		//std::cout << title << " Draw" << std::endl;
+//		glClearColor(r, g, b, 1.0f);
+//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//		window->drawScene();
+//		window->swapFrameBuffer();
+//		SDL_Event e;
+//		while (window->pollEvents(&e));
+//		//t->uninitializeAsset(true);
+//		window->releaseGlContext();
+//	}
+//
+//	t->drop();
+//	scene->drop();
+//	window->drop();
+//}
 
-		//std::cout << "Log: " << msg << " Level: " << level << " File: " << file << " Function: " << function << " Line: " << line << std::endl;
-		std::cout << msg << std::endl;
-		assert(level != pxengine::PxeLogLevel::PXE_FATAL);
-	}
-};
-
-void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
-	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
+int main(int argc, char* args[]) {
+	LogHandle h;
+	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
 	pxengine::PxeShader* shader = engineBase->loadShader(pxengine::getAssetPath("shaders") / "test.pxeshader");
-	assert(shader);
-	window->acquireGlContext();
-	shader->initializeAsset(true);
-	shader->unbind();
-	shader->bind();
-	shader->unbind();
-	shader->uninitializeAsset(true);
-	window->releaseGlContext();
-	shader->drop();
-	shader = nullptr;
-	TestAsset* t = new TestAsset();
-	t->initializeAsset();
+	shader->initializeAsset();
+	pxengine::PxeWindow* window = engineBase->createWindow(600, 400, "Test Render Window");
 	pxengine::PxeScene* scene = engineBase->createScene();
-	assert(window);
-	assert(scene);
+
+	pxengine::PxeRenderMaterial* material = new pxengine::PxeRenderMaterial(*shader);
+	material->setProperty3f("u_color", glm::vec3(1, 0, 0));
+	TestRenderObject* testObj = new TestRenderObject(*material);
+	scene->addRenderable(static_cast<pxengine::PxeRenderBase&>(*testObj));
 	window->setScene(scene);
 	window->setSwapInterval(1);
 	while (!window->getShouldClose())
 	{
-		// 1 should be delta time
-		scene->simulatePhysics(1);
 		window->acquireGlContext();
 		window->setWindowShown(true);
-		//std::cout << title << " Draw" << std::endl;
-		glClearColor(r, g, b, 1.0f);
+		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		window->drawScene();
 		window->swapFrameBuffer();
 		SDL_Event e;
 		while (window->pollEvents(&e));
-		//t->uninitializeAsset(true);
 		window->releaseGlContext();
 	}
 
-	t->drop();
-	scene->drop();
-	window->drop();
-}
-
-int main(int argc, char* args[]) {
-	LogHandle h;
-	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
-	assert(engineBase);
-	std::thread win1(runWindow, engineBase, 500, 500, "Win 1", 1, 0, 0);
-	std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);
-	win1.join();
-	win2.join();
+	//std::thread win1(runWindow, engineBase, 500, 500, "Win 1", 1, 0, 0);
+	//std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);
+	//win1.join();
+	//win2.join();
 	engineBase->shutdown();
 	return 0;
 }

@@ -161,6 +161,16 @@ namespace pxengine {
 				return;
 			}
 
+			//glEnable(GL_DEBUG_OUTPUT);
+			//glDebugMessageCallback(global::glErrorCallback, 0);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glFrontFace(GL_CCW);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 			SDL_GL_MakeCurrent(nullptr, nullptr);
 			PXE_CHECKSDLERROR();
 			SDL_DestroyWindow(tempWindow);
@@ -291,8 +301,8 @@ namespace pxengine {
 			PXE_CHECKSDLERROR();
 			SDL_GL_SetSwapInterval(window.getSwapInterval());
 			PXE_CHECKSDLERROR();
-			updateQueuedAssets();
 			_glContextDepth = 1;
+			updateQueuedAssets();
 		}
 
 		void NpEngineBase::releaseGlContext(NpWindow& window)
@@ -395,8 +405,8 @@ namespace pxengine {
 		void NpEngineBase::updateQueuedAssets() {
 			while (!_assetQueue.empty())
 			{
-				PxeGLAsset* asset = _assetQueue.back();
-				_assetQueue.pop_back();
+				PxeGLAsset* asset = _assetQueue.front();
+				_assetQueue.pop_front();
 				switch (asset->getAssetStatus())
 				{
 				case pxengine::PxeGLAssetStatus::PENDING_UNINITIALIZATION:

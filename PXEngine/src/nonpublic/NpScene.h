@@ -40,6 +40,8 @@ namespace pxengine::nonpublic {
 		NpScene(physx::PxScene* scene);
 		virtual ~NpScene();
 
+		std::list<PxeRenderBase*>& getRenderList();
+
 	private:
 		NpEngineBase* _engine;
 		physx::PxScene* _physScene;

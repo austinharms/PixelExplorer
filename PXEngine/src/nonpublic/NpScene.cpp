@@ -1,6 +1,9 @@
 #include "NpScene.h"
 
 #include "NpLogger.h"
+#include "PxeRenderMaterial.h"
+#include "PxeRenderObject.h"
+#include "PxeRenderElement.h"
 
 namespace pxengine::nonpublic {
 	NpScene::NpScene(physx::PxScene* scene)
@@ -19,6 +22,11 @@ namespace pxengine::nonpublic {
 		_engine = nullptr;
 		_physScene->release();
 		_physScene = nullptr;
+	}
+
+	std::list<PxeRenderBase*>& NpScene::getRenderList()
+	{
+		return _renderables;
 	}
 
 	void NpScene::simulatePhysics(float time, bool blocking)
@@ -61,7 +69,6 @@ namespace pxengine::nonpublic {
 		}
 #endif // PXE_DEBUG
 
-
 		renderable.grab();
 		switch (renderable.getRenderSpace())
 		{
@@ -69,8 +76,22 @@ namespace pxengine::nonpublic {
 			_renderables.emplace_back(&renderable);
 			break;
 		case pxengine::PxeRenderBase::RenderSpace::WORLD_SPACE:
-			_renderables.emplace_front(&renderable);
-			break;
+		{
+			void* materialPtr = &(static_cast<PxeRenderObject&>(renderable).getRenderMaterial());
+			if (_renderables.empty()) {
+				_renderables.emplace_front(&renderable);
+			}
+			else {
+				// TODO Optimize this to also sort by shaders in materials to allow for minimal shader changes when rendering
+				for (auto it = _renderables.begin(); it != _renderables.end(); ++it) {
+					if ((*it)->getRenderSpace() == PxeRenderBase::RenderSpace::SCREEN_SPACE || materialPtr <= (void*)&(static_cast<PxeRenderObject*>(*it)->getRenderMaterial())) {
+						_renderables.emplace(it, &renderable);
+						break;
+					}
+				}
+			}
+		}
+		break;
 		default:
 			PXE_ERROR("Attempted to add PxeRenderBase with invalid RenderSpace to PxeScene");
 			renderable.drop();
@@ -83,6 +104,5 @@ namespace pxengine::nonpublic {
 		if (!_renderables.remove(&renderable)) {
 			PXE_WARN("Attempted to remove PxeRenderBase not added to PxeScene");
 		}
-
 	}
 }

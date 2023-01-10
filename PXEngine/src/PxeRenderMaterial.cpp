@@ -5,6 +5,9 @@
 namespace pxengine {
 	PxeRenderMaterial::PxeRenderMaterial(PxeShader& shader) : _shader(shader) {
 		shader.grab();
+		if (shader.getAssetStatus() == PxeGLAssetStatus::ERROR) {
+			PXE_WARN("Created PxeRenderMaterial with invalid PxeShader");
+		}
 	}
 
 	PxeRenderMaterial::~PxeRenderMaterial()
@@ -607,8 +610,20 @@ namespace pxengine {
 		}
 	}
 
+	PxeShader& PxeRenderMaterial::getShader() const
+	{
+		return _shader;
+	}
+
 	void PxeRenderMaterial::applyProperty(const std::string& name, const PxeRenderMaterialValue& value)
 	{
+#ifdef PXE_DEBUG
+		if (!_shader.getValid()) {
+			PXE_WARN("Attempted to apply PxeRenderMaterial to invalid PxeShader");
+			return;
+		}
+#endif // PXE_DEBUG
+
 		if (value.ValueCount == 1) {
 			switch (value.PropertyType)
 			{

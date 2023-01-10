@@ -30,7 +30,7 @@ namespace pxengine {
 	std::filesystem::path getExecutablePath()
 	{
 #if defined(PXE_WIN_OS)
-		uint32_t bufferSize = 512;
+		uint32_t bufferSize = 128;
 		char* pathBuf = nullptr;
 		DWORD result;
 		DWORD lastError;

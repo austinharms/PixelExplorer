@@ -26,6 +26,11 @@
       <FileType>Text</FileType>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\LogHandler.h" />
+    <ClInclude Include="src\TestAsset.h" />
+    <ClInclude Include="src\TestRenderObject.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

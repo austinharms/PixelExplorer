@@ -21,7 +21,7 @@
 #ifndef PXENGINE_RENDER_MATERIAL_H_
 #define PXENGINE_RENDER_MATERIAL_H_
 namespace pxengine {
-	class PxeRenderMaterial
+	class PxeRenderMaterial : public PxeRefCount
 	{
 	public:
 		PxeRenderMaterial(PxeShader& shader);
@@ -79,6 +79,8 @@ namespace pxengine {
 
 		// note this method assumes the PxeShader is already bound and there is a valid gl context bound
 		void applyMaterial();
+
+		PxeShader& getShader() const;
 
 		PxeRenderMaterial(const PxeRenderMaterial& other) = delete;
 		PxeRenderMaterial operator=(const PxeRenderMaterial& other) = delete;

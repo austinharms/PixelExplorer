@@ -3,7 +3,13 @@
 #include "NpEngineBase.h"
 #include "NpScene.h"
 #include "SDL.h"
+#include "PxeShader.h"
+#include "PxeRenderMaterial.h"
+#include "PxeRenderBase.h"
+#include "PxeRenderElement.h"
+#include "PxeRenderObject.h"
 #include "NpLogger.h"
+#include "imgui.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -166,7 +172,47 @@ namespace pxengine {
 			}
 
 			acquireGlContext();
-			//TODO implement scene rendering
+			int width;
+			int height;
+			SDL_GetWindowSizeInPixels(&_sdlWindow, &width, &height);
+			glViewport(0, 0, width, height);
+			std::list<PxeRenderBase*>& renderList = activeScene->getRenderList();
+			if (renderList.empty()) return;
+			glm::mat4 vp(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f)* glm::lookAt(glm::vec3(0, 0, -10), glm::vec3(0), glm::vec3(0, 1, 0)));
+			PxeShader* activeShader = nullptr;
+			PxeRenderMaterial* activeMaterial = nullptr;
+			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
+				if ((*it)->getRenderSpace() == PxeRenderBase::RenderSpace::WORLD_SPACE) {
+					PxeRenderObject& renderObject = static_cast<PxeRenderObject&>(**it);
+					if (&renderObject.getRenderMaterial() != activeMaterial) {
+						activeMaterial = &renderObject.getRenderMaterial();
+						if (&(activeMaterial->getShader()) != activeShader) {
+							activeShader = &(activeMaterial->getShader());
+							activeShader->bind();
+						}
+
+						activeMaterial->applyMaterial();
+					}
+
+					activeShader->setUniformM4f("u_MVP", vp * renderObject.getPositionMatrix());
+					renderObject.render();
+				}
+#ifdef PXE_DEBUG
+				else if ((*it)->getRenderSpace() == PxeRenderBase::RenderSpace::SCREEN_SPACE)
+#else
+				else
+#endif // PXE_DEBUG
+				{
+					//TODO implement scene screen space rendering
+				}
+#ifdef PXE_DEBUG
+			else {
+				PXE_ERROR("Failed to render PxeRenderBase in Invalid RenderSpace, How did this manage to get into the render queue?");
+			}
+#endif // PXE_DEBUG
+
+
+			}
 			releaseGlContext();
 		}
 
