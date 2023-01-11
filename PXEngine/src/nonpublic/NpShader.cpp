@@ -13,6 +13,7 @@ namespace pxengine {
 	namespace nonpublic {
 		NpShader::NpShader(const std::filesystem::path& path) : _path(path) {
 			_glProgramId = 0;
+			_initializationCount = 0;
 		}
 
 		NpShader::~NpShader()
@@ -47,114 +48,115 @@ namespace pxengine {
 			return _glProgramId;
 		}
 
-		void NpShader::setUniform1fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniform1fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniform1fv(getUniformLocation(name), count, values);
+			glUniform1fv(location, count, values);
 		}
 
-		void NpShader::setUniform2fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniform2fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniform2fv(getUniformLocation(name), count, values);
+			glUniform2fv(location, count, values);
 		}
 
-		void NpShader::setUniform3fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniform3fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniform3fv(getUniformLocation(name), count, values);
+			glUniform3fv(location, count, values);
 		}
 
-		void NpShader::setUniform4fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniform4fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniform4fv(getUniformLocation(name), count, values);
+			glUniform4fv(location, count, values);
 		}
 
-		void NpShader::setUniform1iv(const std::string& name, const int32_t* values, uint32_t count)
+		void NpShader::setUniform1iv(const int32_t location, const int32_t* values, uint32_t count)
 		{
-			glUniform1iv(getUniformLocation(name), count, values);
+			glUniform1iv(location, count, values);
 		}
 
-		void NpShader::setUniform2iv(const std::string& name, const int32_t* values, uint32_t count)
+		void NpShader::setUniform2iv(const int32_t location, const int32_t* values, uint32_t count)
 		{
-			glUniform2iv(getUniformLocation(name), count, values);
+			glUniform2iv(location, count, values);
 		}
 
-		void NpShader::setUniform3iv(const std::string& name, const int32_t* values, uint32_t count)
+		void NpShader::setUniform3iv(const int32_t location, const int32_t* values, uint32_t count)
 		{
-			glUniform3iv(getUniformLocation(name), count, values);
+			glUniform3iv(location, count, values);
 		}
 
-		void NpShader::setUniform4iv(const std::string& name, const int32_t* values, uint32_t count)
+		void NpShader::setUniform4iv(const int32_t location, const int32_t* values, uint32_t count)
 		{
-			glUniform4iv(getUniformLocation(name), count, values);
+			glUniform4iv(location, count, values);
 		}
 
-		void NpShader::setUniform1uiv(const std::string& name, const uint32_t* values, uint32_t count)
+		void NpShader::setUniform1uiv(const int32_t location, const uint32_t* values, uint32_t count)
 		{
-			glUniform1uiv(getUniformLocation(name), count, values);
+			glUniform1uiv(location, count, values);
 		}
 
-		void NpShader::setUniform2uiv(const std::string& name, const uint32_t* values, uint32_t count)
+		void NpShader::setUniform2uiv(const int32_t location, const uint32_t* values, uint32_t count)
 		{
-			glUniform2uiv(getUniformLocation(name), count, values);
+			glUniform2uiv(location, count, values);
 		}
 
-		void NpShader::setUniform3uiv(const std::string& name, const uint32_t* values, uint32_t count)
+		void NpShader::setUniform3uiv(const int32_t location, const uint32_t* values, uint32_t count)
 		{
-			glUniform3uiv(getUniformLocation(name), count, values);
+			glUniform3uiv(location, count, values);
 		}
 
-		void NpShader::setUniform4uiv(const std::string& name, const uint32_t* values, uint32_t count)
+		void NpShader::setUniform4uiv(const int32_t location, const uint32_t* values, uint32_t count)
 		{
-			glUniform4uiv(getUniformLocation(name), count, values);
+			glUniform4uiv(location, count, values);
 		}
 
-		void NpShader::setUniformM2fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM2fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix2fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix2fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM3fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM3fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix3fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix3fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM4fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM4fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix4fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM2x3fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM2x3fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix2x3fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix2x3fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM3x2fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM3x2fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix3x2fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix3x2fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM2x4fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM2x4fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix2x4fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix2x4fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM4x2fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM4x2fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix4x2fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix4x2fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM3x4fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM3x4fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix3x4fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix3x4fv(location, count, GL_FALSE, values);
 		}
 
-		void NpShader::setUniformM4x3fv(const std::string& name, const float* values, uint32_t count)
+		void NpShader::setUniformM4x3fv(const int32_t location, const float* values, uint32_t count)
 		{
-			glUniformMatrix4x3fv(getUniformLocation(name), count, GL_FALSE, values);
+			glUniformMatrix4x3fv(location, count, GL_FALSE, values);
 		}
 
 		void NpShader::initializeGl()
 		{
 			_uniformLocations.clear();
+			++_initializationCount;
 			_glProgramId = loadShaderFile(_path);
 			if (getValid()) {
 				PXE_INFO("Initialized PxeShader " + _path.string());
@@ -409,6 +411,11 @@ namespace pxengine {
 		const std::filesystem::path& NpShader::getShaderPath() const
 		{
 			return _path;
+		}
+
+		uint32_t NpShader::getAssetInitializationCount() const
+		{
+			return _initializationCount;
 		}
 	}
 }

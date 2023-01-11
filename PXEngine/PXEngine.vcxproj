@@ -119,6 +119,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -163,6 +164,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>false</ShowIncludes>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>

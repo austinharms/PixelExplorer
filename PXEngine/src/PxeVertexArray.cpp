@@ -11,6 +11,11 @@ namespace pxengine {
 
 	PxeVertexArray::~PxeVertexArray()
 	{
+		for (auto it = _bufferBindings.begin(); it != _bufferBindings.end(); ++it) {
+			(*it).second.first->drop();
+		}
+
+		_bufferBindings.clear();
 	}
 
 	void PxeVertexArray::bind()

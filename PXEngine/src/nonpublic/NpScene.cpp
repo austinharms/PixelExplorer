@@ -18,6 +18,11 @@ namespace pxengine::nonpublic {
 
 	NpScene::~NpScene()
 	{
+		for (auto it = _renderables.begin(); it != _renderables.end(); ++it) {
+			(*it)->drop();
+		}
+
+		_renderables.clear();
 		_engine->drop();
 		_engine = nullptr;
 		_physScene->release();
@@ -64,8 +69,7 @@ namespace pxengine::nonpublic {
 	{
 #ifdef PXE_DEBUG
 		if (std::find(_renderables.begin(), _renderables.end(), &renderable) != _renderables.end()) {
-			PXE_ERROR("Attempted to add PxeRenderBase already added to PxeScene");
-			return;
+			PXE_WARN("Readded PxeRenderBase to PxeScene");
 		}
 #endif // PXE_DEBUG
 

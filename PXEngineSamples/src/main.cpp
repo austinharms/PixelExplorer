@@ -58,18 +58,36 @@ int main(int argc, char* args[]) {
 	LogHandle h;
 	pxengine::PxeEngineBase* engineBase = pxengine::createPXEEngineBase(h);
 	pxengine::PxeShader* shader = engineBase->loadShader(pxengine::getAssetPath("shaders") / "test.pxeshader");
-	shader->initializeAsset();
 	pxengine::PxeWindow* window = engineBase->createWindow(600, 400, "Test Render Window");
 	pxengine::PxeScene* scene = engineBase->createScene();
 
+	shader->initializeAsset();
 	pxengine::PxeRenderMaterial* material = new pxengine::PxeRenderMaterial(*shader);
+	shader->drop();
+	shader = nullptr;
+
 	material->setProperty4f("u_Color", glm::vec4(1, 0, 0, 1));
 	TestRenderObject* testObj = new TestRenderObject(*material);
-	scene->addRenderable(static_cast<pxengine::PxeRenderBase&>(*testObj));
+	material->drop();
+	material = nullptr;
+
+	for (uint32_t i = 0; i < 5000; ++i) {
+		scene->addRenderable(static_cast<pxengine::PxeRenderBase&>(*testObj));
+	}
+
+	testObj->drop();
+	testObj = nullptr;
+
 	window->setScene(scene);
-	window->setSwapInterval(1);
+	scene->drop();
+	scene = nullptr;
+
+	uint32_t next = SDL_GetTicks() + 1000;
+	uint32_t frameCount = 0;
+	window->setSwapInterval(0);
 	while (!window->getShouldClose())
 	{
+		++frameCount;
 		window->acquireGlContext();
 		window->setWindowShown(true);
 		glClearColor(0, 0, 0, 1.0f);
@@ -79,7 +97,19 @@ int main(int argc, char* args[]) {
 		SDL_Event e;
 		while (window->pollEvents(&e));
 		window->releaseGlContext();
+		
+		if (SDL_TICKS_PASSED(SDL_GetTicks(), next)) {
+			std::cout << "FPS: " << frameCount << std::endl;
+			frameCount = 0;
+			next = SDL_GetTicks() + 1000;
+		}
 	}
+
+	window->setScene(nullptr);
+	window->acquireGlContext();
+	window->releaseGlContext();
+	window->drop();
+	window = nullptr;
 
 	//std::thread win1(runWindow, engineBase, 500, 500, "Win 1", 1, 0, 0);
 	//std::thread win2(runWindow, engineBase, 500, 500, "Win 2", 0, 1, 0);

@@ -494,10 +494,13 @@ namespace pxengine {
 		void NpEngineBase::removeShaderFromCache(const std::filesystem::path& path)
 		{
 #ifdef PXE_DEBUG
-			PXE_INFO("Removed PxeShader " + path.string() + " from cache");
+			if (_shaders.erase(path)) {
+				PXE_INFO("Removed PxeShader " + path.string() + " from cache");
+			}
+#else
+			_shaders.erase(path);
 #endif // PXE_DEBUG
 
-			_shaders.erase(path);
 		}
 
 		void NpEngineBase::shutdown()

@@ -77,7 +77,7 @@ namespace pxengine {
 		void setPropertyM3x4fv(const std::string& name, const float* values, uint32_t count);
 		void setPropertyM4x3fv(const std::string& name, const float* values, uint32_t count);
 
-		// note this method assumes the PxeShader is already bound and there is a valid gl context bound
+		// note this method assumes the PxeShader (must be the same one used to construct the PxeRenderMaterial) is already bound and there is a valid gl context bound
 		void applyMaterial();
 
 		PxeShader& getShader() const;
@@ -115,6 +115,7 @@ namespace pxengine {
 			};
 
 			uint32_t ValueCount;
+			int32_t UniformLocation;
 			PxePropertyType PropertyType;
 
 			union PxePropertyValue
@@ -152,12 +153,14 @@ namespace pxengine {
 				ValueCount = count;
 				PropertyType = type;
 				Value = value;
+				UniformLocation = -1;
 			}
 
 			PxeRenderMaterialValue(const PxeRenderMaterialValue& other) {
 				Value = other.Value;
 				ValueCount = other.ValueCount;
 				PropertyType = other.PropertyType;
+				UniformLocation = other.UniformLocation;
 				if (ValueCount > 1) {
 					Value.buffer->grab();
 				}
@@ -167,6 +170,7 @@ namespace pxengine {
 				Value = other.Value;
 				ValueCount = other.ValueCount;
 				PropertyType = other.PropertyType;
+				UniformLocation = other.UniformLocation;
 				if (ValueCount > 1) {
 					Value.buffer->grab();
 				}
@@ -183,10 +187,11 @@ namespace pxengine {
 		};
 
 	private:
-		void applyProperty(const std::string& name, const PxeRenderMaterialValue& value);
+		void updatePropertyLocations();
 
 		std::unordered_map<std::string, PxeRenderMaterialValue> _materialProperties;
 		PxeShader& _shader;
+		uint32_t _lastShaderCount;
 	};
 }
 #endif // !PXENGINE_RENDER_MATERIAL_H_

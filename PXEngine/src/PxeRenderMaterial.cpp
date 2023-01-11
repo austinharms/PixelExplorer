@@ -5,6 +5,7 @@
 namespace pxengine {
 	PxeRenderMaterial::PxeRenderMaterial(PxeShader& shader) : _shader(shader) {
 		shader.grab();
+		_lastShaderCount = 0;
 		if (shader.getAssetStatus() == PxeGLAssetStatus::ERROR) {
 			PXE_WARN("Created PxeRenderMaterial with invalid PxeShader");
 		}
@@ -605,8 +606,161 @@ namespace pxengine {
 
 	void PxeRenderMaterial::applyMaterial()
 	{
+		if (!_shader.getValid()) {
+			PXE_WARN("Attempted to apply PxeRenderMaterial to invalid PxeShader");
+			return;
+		}
+
+		if (_lastShaderCount != _shader.getAssetInitializationCount()) {
+			PXE_INFO("Updated PxeRenderMaterial uniform locations");
+			_lastShaderCount = _shader.getAssetInitializationCount();
+			updatePropertyLocations();
+		}
+
 		for (auto it = _materialProperties.begin(); it != _materialProperties.end(); ++it) {
-			applyProperty(it->first, it->second);
+			const PxeRenderMaterialValue& materialProperty = it->second;
+			if (materialProperty.ValueCount == 1) {
+				switch (materialProperty.PropertyType)
+				{
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT1:
+					_shader.setUniform1i(materialProperty.UniformLocation, materialProperty.Value.i32);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT2:
+					_shader.setUniform2i(materialProperty.UniformLocation, materialProperty.Value.i32vec2);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT3:
+					_shader.setUniform3i(materialProperty.UniformLocation, materialProperty.Value.i32vec3);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT4:
+					_shader.setUniform4i(materialProperty.UniformLocation, materialProperty.Value.i32vec4);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT1:
+					_shader.setUniform1ui(materialProperty.UniformLocation, materialProperty.Value.ui32);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT2:
+					_shader.setUniform2ui(materialProperty.UniformLocation, materialProperty.Value.ui32vec2);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT3:
+					_shader.setUniform3ui(materialProperty.UniformLocation, materialProperty.Value.ui32vec3);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT4:
+					_shader.setUniform4ui(materialProperty.UniformLocation, materialProperty.Value.ui32vec4);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT1:
+					_shader.setUniform1f(materialProperty.UniformLocation, materialProperty.Value.f);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT2:
+					_shader.setUniform2f(materialProperty.UniformLocation, materialProperty.Value.fvec2);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT3:
+					_shader.setUniform3f(materialProperty.UniformLocation, materialProperty.Value.fvec3);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT4:
+					_shader.setUniform4f(materialProperty.UniformLocation, materialProperty.Value.fvec4);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2:
+					_shader.setUniformM2f(materialProperty.UniformLocation, materialProperty.Value.fmat2);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3:
+					_shader.setUniformM3f(materialProperty.UniformLocation, materialProperty.Value.fmat3);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4:
+					_shader.setUniformM4f(materialProperty.UniformLocation, materialProperty.Value.fmat4);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X3:
+					_shader.setUniformM2x3f(materialProperty.UniformLocation, materialProperty.Value.fmat2x3);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X2:
+					_shader.setUniformM3x2f(materialProperty.UniformLocation, materialProperty.Value.fmat3x2);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X4:
+					_shader.setUniformM2x4f(materialProperty.UniformLocation, materialProperty.Value.fmat2x4);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X2:
+					_shader.setUniformM4x2f(materialProperty.UniformLocation, materialProperty.Value.fmat4x2);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X4:
+					_shader.setUniformM3x4f(materialProperty.UniformLocation, materialProperty.Value.fmat3x4);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X3:
+					_shader.setUniformM4x3f(materialProperty.UniformLocation, materialProperty.Value.fmat4x3);
+					break;
+				default:
+					PXE_WARN("Attempted to apply NONE PxePropertyType to uniform " + it->first);
+					break;
+				}
+			}
+			else {
+				switch (materialProperty.PropertyType)
+				{
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT1:
+					_shader.setUniform1iv(materialProperty.UniformLocation, (const int32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT2:
+					_shader.setUniform2iv(materialProperty.UniformLocation, (const int32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT3:
+					_shader.setUniform3iv(materialProperty.UniformLocation, (const int32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT4:
+					_shader.setUniform4iv(materialProperty.UniformLocation, (const int32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT1:
+					_shader.setUniform1uiv(materialProperty.UniformLocation, (const uint32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT2:
+					_shader.setUniform2uiv(materialProperty.UniformLocation, (const uint32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT3:
+					_shader.setUniform3uiv(materialProperty.UniformLocation, (const uint32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT4:
+					_shader.setUniform4uiv(materialProperty.UniformLocation, (const uint32_t*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT1:
+					_shader.setUniform1fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT2:
+					_shader.setUniform2fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT3:
+					_shader.setUniform3fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT4:
+					_shader.setUniform4fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2:
+					_shader.setUniformM2fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3:
+					_shader.setUniformM3fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4:
+					_shader.setUniformM4fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X3:
+					_shader.setUniformM2x3fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X2:
+					_shader.setUniformM3x2fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X4:
+					_shader.setUniformM2x4fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X2:
+					_shader.setUniformM4x2fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X4:
+					_shader.setUniformM3x4fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X3:
+					_shader.setUniformM4x3fv(materialProperty.UniformLocation, (const float*)materialProperty.Value.buffer->getBuffer(), materialProperty.ValueCount);
+					break;
+				default:
+					PXE_WARN("Attempted to apply NONE array PxePropertyType to uniform " + it->first);
+					break;
+				}
+			}
 		}
 	}
 
@@ -615,156 +769,10 @@ namespace pxengine {
 		return _shader;
 	}
 
-	void PxeRenderMaterial::applyProperty(const std::string& name, const PxeRenderMaterialValue& value)
+	void PxeRenderMaterial::updatePropertyLocations()
 	{
-#ifdef PXE_DEBUG
-		if (!_shader.getValid()) {
-			PXE_WARN("Attempted to apply PxeRenderMaterial to invalid PxeShader");
-			return;
-		}
-#endif // PXE_DEBUG
-
-		if (value.ValueCount == 1) {
-			switch (value.PropertyType)
-			{
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT1:
-				_shader.setUniform1i(name, value.Value.i32);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT2:
-				_shader.setUniform2i(name, value.Value.i32vec2);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT3:
-				_shader.setUniform3i(name, value.Value.i32vec3);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT4:
-				_shader.setUniform4i(name, value.Value.i32vec4);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT1:
-				_shader.setUniform1ui(name, value.Value.ui32);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT2:
-				_shader.setUniform2ui(name, value.Value.ui32vec2);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT3:
-				_shader.setUniform3ui(name, value.Value.ui32vec3);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT4:
-				_shader.setUniform4ui(name, value.Value.ui32vec4);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT1:
-				_shader.setUniform1f(name, value.Value.f);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT2:
-				_shader.setUniform2f(name, value.Value.fvec2);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT3:
-				_shader.setUniform3f(name, value.Value.fvec3);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT4:
-				_shader.setUniform4f(name, value.Value.fvec4);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2:
-				_shader.setUniformM2f(name, value.Value.fmat2);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3:
-				_shader.setUniformM3f(name, value.Value.fmat3);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4:
-				_shader.setUniformM4f(name, value.Value.fmat4);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X3:
-				_shader.setUniformM2x3f(name, value.Value.fmat2x3);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X2:
-				_shader.setUniformM3x2f(name, value.Value.fmat3x2);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X4:
-				_shader.setUniformM2x4f(name, value.Value.fmat2x4);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X2:
-				_shader.setUniformM4x2f(name, value.Value.fmat4x2);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X4:
-				_shader.setUniformM3x4f(name, value.Value.fmat3x4);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X3:
-				_shader.setUniformM4x3f(name, value.Value.fmat4x3);
-				break;
-			default:
-				PXE_WARN("Attempted to apply NONE PxePropertyType to uniform " + name);
-				break;
-			}
-		}
-		else {
-			switch (value.PropertyType)
-			{
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT1:
-				_shader.setUniform1iv(name, (const int32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT2:
-				_shader.setUniform2iv(name, (const int32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT3:
-				_shader.setUniform3iv(name, (const int32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::INT4:
-				_shader.setUniform4iv(name, (const int32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT1:
-				_shader.setUniform1uiv(name, (const uint32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT2:
-				_shader.setUniform2uiv(name, (const uint32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT3:
-				_shader.setUniform3uiv(name, (const uint32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::UINT4:
-				_shader.setUniform4uiv(name, (const uint32_t*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT1:
-				_shader.setUniform1fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT2:
-				_shader.setUniform2fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT3:
-				_shader.setUniform3fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::FLOAT4:
-				_shader.setUniform4fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2:
-				_shader.setUniformM2fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3:
-				_shader.setUniformM3fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4:
-				_shader.setUniformM4fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X3:
-				_shader.setUniformM2x3fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X2:
-				_shader.setUniformM3x2fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT2X4:
-				_shader.setUniformM2x4fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X2:
-				_shader.setUniformM4x2fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT3X4:
-				_shader.setUniformM3x4fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X3:
-				_shader.setUniformM4x3fv(name, (const float*)value.Value.buffer->getBuffer(), value.ValueCount);
-				break;
-			default:
-				PXE_WARN("Attempted to apply NONE array PxePropertyType to uniform " + name);
-				break;
-			}
+		for (auto it = _materialProperties.begin(); it != _materialProperties.end(); ++it) {
+			it->second.UniformLocation = _shader.getUniformLocation(it->first);
 		}
 	}
 }

@@ -181,6 +181,7 @@ namespace pxengine {
 			glm::mat4 vp(glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f)* glm::lookAt(glm::vec3(0, 0, -10), glm::vec3(0), glm::vec3(0, 1, 0)));
 			PxeShader* activeShader = nullptr;
 			PxeRenderMaterial* activeMaterial = nullptr;
+			int32_t mvpLocation = -1;
 			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
 				if ((*it)->getRenderSpace() == PxeRenderBase::RenderSpace::WORLD_SPACE) {
 					PxeRenderObject& renderObject = static_cast<PxeRenderObject&>(**it);
@@ -189,12 +190,13 @@ namespace pxengine {
 						if (&(activeMaterial->getShader()) != activeShader) {
 							activeShader = &(activeMaterial->getShader());
 							activeShader->bind();
+							mvpLocation = activeShader->getUniformLocation("u_MVP");
 						}
 
 						activeMaterial->applyMaterial();
 					}
 
-					activeShader->setUniformM4f("u_MVP", vp * renderObject.getPositionMatrix());
+					activeShader->setUniformM4f(mvpLocation, vp * renderObject.getPositionMatrix());
 					renderObject.render();
 				}
 #ifdef PXE_DEBUG
