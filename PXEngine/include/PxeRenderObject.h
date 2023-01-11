@@ -14,7 +14,7 @@ namespace pxengine {
 		inline const glm::mat4& getPositionMatrix() const { return positionMatrix; }
 
 	protected:
-		glm::mat3 positionMatrix;
+		glm::mat4 positionMatrix;
 
 	private:
 		PxeRenderMaterial& _renderMaterial;

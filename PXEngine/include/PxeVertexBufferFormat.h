@@ -29,9 +29,11 @@ namespace pxengine {
 		// inserts an Attrib and returns the attribs index
 		// the inserted attrib's Stride and Offset will also be calculated and set, the passed attrib will be unchanged
 		size_t addAttrib(const PxeVertexBufferAttrib& attrib) {
-			size_t offset = getBufferStride();
+			uint32_t offset = getBufferStride();
 			PxeVertexBufferAttrib& a = _attribs.emplace_back(attrib);
-			a.Stride = getBufferStride();
+			uint32_t totalStride = getBufferStride();
+			for (PxeVertexBufferAttrib& a : _attribs)
+				a.Stride = totalStride;
 			a.Offset = offset;
 			return _attribs.size() - 1;
 		}
@@ -46,8 +48,8 @@ namespace pxengine {
 		}
 
 		// returns the byte stride between all attribs
-		size_t getBufferStride() const {
-			size_t sum = 0;
+		uint32_t getBufferStride() const {
+			uint32_t sum = 0;
 			for (const PxeVertexBufferAttrib& a : _attribs)
 				sum += a.getByteWidth();
 			return sum;

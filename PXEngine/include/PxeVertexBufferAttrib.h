@@ -23,7 +23,7 @@ namespace pxengine {
 	{
 	public:
 
-		static size_t componentWidth(PxeVertexBufferAttribType t) {
+		static uint32_t componentWidth(PxeVertexBufferAttribType t) {
 			switch (t)
 			{
 			case PxeVertexBufferAttribType::BYTE:
@@ -83,11 +83,11 @@ namespace pxengine {
 			return *this;
 		}
 
-		size_t getComponentByteWidth() const {
+		uint32_t getComponentByteWidth() const {
 			return componentWidth(ComponentType);
 		}
 
-		size_t getByteWidth() const {
+		uint32_t getByteWidth() const {
 			return getComponentByteWidth() * ComponentCount;
 		}
 	};

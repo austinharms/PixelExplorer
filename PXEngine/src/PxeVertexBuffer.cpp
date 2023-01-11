@@ -131,8 +131,11 @@ namespace pxengine {
 			_currentBuffer->drop();
 		_currentBuffer = _pendingBuffer;
 		_pendingBuffer = nullptr;
-		if (_currentBuffer->getSize() % _format.getBufferStride() != 0)
+#ifdef PXE_DEBUG
+		if (_currentBuffer->getSize() % _format.getBufferStride() != 0) {
 			PXE_WARN("Buffer data not divisible by buffer stride");
+		}
+#endif // PXE_DEBUG
 		glBufferData(GL_ARRAY_BUFFER, _currentBuffer->getSize(), _currentBuffer->getBuffer(), GL_STATIC_DRAW);
 	}
 }

@@ -604,6 +604,12 @@ namespace pxengine {
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT4X3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
 	}
 
+	void PxeRenderMaterial::setTexture(const std::string& name, PxeRenderTexture& texture, uint8_t textureSlot)
+	{
+		texture.grab();
+		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::TEXTURE, PxeRenderMaterialValue::PxePropertyValue{ .texture = PxeRenderMaterialValue::PxePropertyValue::PxeTextureBinding { textureSlot, &texture } });
+	}
+
 	void PxeRenderMaterial::applyMaterial()
 	{
 		if (!_shader.getValid()) {
@@ -616,6 +622,11 @@ namespace pxengine {
 			_lastShaderCount = _shader.getAssetInitializationCount();
 			updatePropertyLocations();
 		}
+
+#ifdef PXE_DEBUG
+		std::unordered_map<uint8_t, PxeRenderTexture*> boundTextures;
+#endif // PXE_DEBUG
+
 
 		for (auto it = _materialProperties.begin(); it != _materialProperties.end(); ++it) {
 			const PxeRenderMaterialValue& materialProperty = it->second;
@@ -684,6 +695,19 @@ namespace pxengine {
 					break;
 				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::MAT4X3:
 					_shader.setUniformM4x3f(materialProperty.UniformLocation, materialProperty.Value.fmat4x3);
+					break;
+				case pxengine::PxeRenderMaterial::PxeRenderMaterialValue::PxePropertyType::TEXTURE:
+					_shader.setUniform1i(materialProperty.UniformLocation, materialProperty.Value.texture.Slot);
+					materialProperty.Value.texture.renderTexture->setTextureSlot(materialProperty.Value.texture.Slot);
+					materialProperty.Value.texture.renderTexture->bind();
+#ifdef PXE_DEBUG
+					{
+						auto it = boundTextures.find(materialProperty.Value.texture.Slot);
+						if (it != boundTextures.end() && it->second != materialProperty.Value.texture.renderTexture) {
+							PXE_WARN("Bound multiple different PxeRenderTextures to the same gl texture slot, this is most likely an error");
+						}
+					}
+#endif
 					break;
 				default:
 					PXE_WARN("Attempted to apply NONE PxePropertyType to uniform " + it->first);

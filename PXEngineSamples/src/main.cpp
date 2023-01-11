@@ -7,10 +7,12 @@
 #include "PxeWindow.h"
 #include "SDL.h"
 #include "GL/glew.h"
+#include "PxeRenderTexture.h"
 
 #include "TestAsset.h"
 #include "LogHandler.h"
 #include "TestRenderObject.h"
+#include "TestTextureRenderObject.h"
 
 //void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
 //	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);
@@ -66,12 +68,20 @@ int main(int argc, char* args[]) {
 	shader->drop();
 	shader = nullptr;
 
-	material->setProperty4f("u_Color", glm::vec4(1, 0, 0, 1));
-	TestRenderObject* testObj = new TestRenderObject(*material);
+	pxengine::PxeRenderTexture* texture = new pxengine::PxeRenderTexture();
+	texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
+	texture->initializeAsset();
+	material->setTexture("u_Texture", *texture, 0);
+	texture->drop();
+	texture = nullptr;
+
+	material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));
+	TestTexturedRenderObject* testObj = new TestTexturedRenderObject(*material);
+	//TestRenderObject* testObj = new TestRenderObject(*material);
 	material->drop();
 	material = nullptr;
 
-	for (uint32_t i = 0; i < 5000; ++i) {
+	for (uint32_t i = 0; i < 1; ++i) {
 		scene->addRenderable(static_cast<pxengine::PxeRenderBase&>(*testObj));
 	}
 

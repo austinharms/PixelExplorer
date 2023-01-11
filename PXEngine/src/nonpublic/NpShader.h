@@ -10,7 +10,6 @@
 #define PXENGINE_NONPUBLIC_SHADER_H_
 namespace pxengine {
 	namespace nonpublic {
-		// TODO Add all setUniform types
 		class NpShader : public PxeShader
 		{
 		public:

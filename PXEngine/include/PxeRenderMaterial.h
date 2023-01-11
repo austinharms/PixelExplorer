@@ -17,6 +17,7 @@
 #include "PxeRefCount.h"
 #include "PxeBuffer.h"
 #include "PxeShader.h"
+#include "PxeRenderTexture.h"
 
 #ifndef PXENGINE_RENDER_MATERIAL_H_
 #define PXENGINE_RENDER_MATERIAL_H_
@@ -77,6 +78,8 @@ namespace pxengine {
 		void setPropertyM3x4fv(const std::string& name, const float* values, uint32_t count);
 		void setPropertyM4x3fv(const std::string& name, const float* values, uint32_t count);
 
+		void setTexture(const std::string& name, PxeRenderTexture& texture, uint8_t textureSlot);
+
 		// note this method assumes the PxeShader (must be the same one used to construct the PxeRenderMaterial) is already bound and there is a valid gl context bound
 		void applyMaterial();
 
@@ -112,6 +115,7 @@ namespace pxengine {
 				MAT4X2,
 				MAT3X4,
 				MAT4X3,
+				TEXTURE
 			};
 
 			uint32_t ValueCount;
@@ -145,6 +149,12 @@ namespace pxengine {
 				glm::mat4x3 fmat4x3;
 
 				PxeBuffer* buffer;
+
+				struct PxeTextureBinding
+				{
+					uint8_t Slot;
+					PxeRenderTexture* renderTexture;
+				} texture;
 			} Value;
 
 			PxeRenderMaterialValue() = default;
@@ -164,6 +174,9 @@ namespace pxengine {
 				if (ValueCount > 1) {
 					Value.buffer->grab();
 				}
+				else if (PropertyType == PxePropertyType::TEXTURE) {
+					Value.texture.renderTexture->grab();
+				}
 			}
 
 			PxeRenderMaterialValue& operator =(const PxeRenderMaterialValue& other) {
@@ -174,6 +187,9 @@ namespace pxengine {
 				if (ValueCount > 1) {
 					Value.buffer->grab();
 				}
+				else if (PropertyType == PxePropertyType::TEXTURE) {
+					Value.texture.renderTexture->grab();
+				}
 
 				return *this;
 			}
@@ -181,7 +197,9 @@ namespace pxengine {
 			~PxeRenderMaterialValue() {
 				if (ValueCount > 1) {
 					Value.buffer->drop();
-					Value.i32 = 0;
+				}
+				else if (PropertyType == PxePropertyType::TEXTURE) {
+					Value.texture.renderTexture->drop();
 				}
 			}
 		};

@@ -87,7 +87,7 @@ namespace pxengine {
 		{
 			physx::PxSetAssertHandler(*this);
 			_physScale.length = 1;
-			_physScale.speed = 9.81;
+			_physScale.speed = 9.81f;
 			_physFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, _physAllocator, *this);
 			_physPVD = PxCreatePvd(*_physFoundation);
 			_physPVDTransport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
@@ -161,6 +161,7 @@ namespace pxengine {
 				return;
 			}
 
+			// TODO Add OpenGl error callback
 			//glEnable(GL_DEBUG_OUTPUT);
 			//glDebugMessageCallback(global::glErrorCallback, 0);
 			glEnable(GL_DEPTH_TEST);
@@ -170,6 +171,10 @@ namespace pxengine {
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+			//glCullFace(GL_NONE);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			SDL_GL_MakeCurrent(nullptr, nullptr);
 			PXE_CHECKSDLERROR();
@@ -501,7 +506,7 @@ namespace pxengine {
 			_shaders.erase(path);
 #endif // PXE_DEBUG
 
-		}
+			}
 
 		void NpEngineBase::shutdown()
 		{
@@ -531,5 +536,5 @@ namespace pxengine {
 			SDL_DestroyWindow(&(window.getSDLWindow()));
 			releaseGlContextLock();
 		}
+		}
 	}
-}
