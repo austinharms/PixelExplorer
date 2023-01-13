@@ -2,6 +2,8 @@
 #include <cassert>
 #include <thread>
 #include <filesystem>
+#include <stdio.h>
+#include <math.h>
 
 #include "PxeEngine.h"
 #include "PxeWindow.h"
@@ -13,6 +15,7 @@
 #include "LogHandler.h"
 #include "TestRenderObject.h"
 #include "TestTextureRenderObject.h"
+#include "imgui.h"
 
 //void runWindow(pxengine::PxeEngineBase* engineBase, uint32_t width, uint32_t height, const char* title, float r, float g, float b) {
 //	pxengine::PxeWindow* window = engineBase->createWindow(width, height, title);

@@ -7,6 +7,7 @@
 #include "NpLogger.h"
 #include "SDL.h"
 #include "NpScene.h"
+#include "imgui.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -43,8 +44,9 @@ namespace pxengine {
 			if (std::thread::hardware_concurrency() <= 0) {
 				PXE_WARN("Failed to get hardware thread count");
 			}
-
+			
 			initSDL();
+			IMGUI_CHECKVERSION();
 			initPhys();
 		}
 
@@ -135,6 +137,8 @@ namespace pxengine {
 				return;
 			}
 
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -206,6 +210,8 @@ namespace pxengine {
 				releaseGlContextLock();
 				return nullptr;
 			}
+
+			SDL_GL_MakeCurrent(sdlWindow, _sdlGlContext);
 
 			// Showing the window right away can create lockups if creating multiple widows at once
 			// TODO Fix showing windows on creation
@@ -307,6 +313,8 @@ namespace pxengine {
 			SDL_GL_SetSwapInterval(window.getSwapInterval());
 			PXE_CHECKSDLERROR();
 			_glContextDepth = 1;
+			// Required if GUI Assets create GUI object when init below
+			ImGui::SetCurrentContext(window.getGUIContext());
 			updateQueuedAssets();
 		}
 
@@ -507,6 +515,16 @@ namespace pxengine {
 #endif // PXE_DEBUG
 
 			}
+
+		ImFontAtlas& NpEngineBase::getGUIFontAtlas()
+		{
+			return _guiFontAtlas;
+		}
+
+		SDL_GLContext NpEngineBase::getOpenGlContext() const
+		{
+			return _sdlGlContext;
+		}
 
 		void NpEngineBase::shutdown()
 		{

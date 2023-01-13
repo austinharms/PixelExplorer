@@ -4,6 +4,7 @@
 #include "PxeRingBuffer.h"
 #include "SDL.h"
 #include "PxeScene.h"
+#include "imgui.h"
 
 #ifndef PXENGINE_NONPUBLIC_WINDOW_H_
 #define PXENGINE_NONPUBLIC_WINDOW_H_
@@ -68,9 +69,12 @@ namespace pxengine {
 
 			void setShouldClose();
 
+			ImGuiContext* getGUIContext();
+
 		private:
 			SDL_Window& _sdlWindow;
 			NpScene* _scene;
+			ImGuiContext* _guiContext;
 			EventBuffer _eventBuffer;
 			int8_t _swapInterval;
 			bool _shouldClose;

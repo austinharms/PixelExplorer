@@ -10,6 +10,8 @@
 #include "PxeRenderObject.h"
 #include "NpLogger.h"
 #include "imgui.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_opengl3.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -19,6 +21,16 @@ namespace pxengine {
 			_swapInterval = 1;
 			_shouldClose = false;
 			NpEngineBase::getInstance().grab();
+			_guiContext = ImGui::CreateContext(&NpEngineBase::getInstance().getGUIFontAtlas());
+			ImGui::SetCurrentContext(_guiContext);
+			ImGui::StyleColorsDark();
+			//ImGui::StyleColorsLight();
+
+			// Setup Platform/Renderer backends
+			ImGui_ImplSDL2_InitForOpenGL(&_sdlWindow, NpEngineBase::getInstance().getOpenGlContext());
+			// TODO Select correct versions dynamically
+			ImGui_ImplOpenGL3_Init("#version 130");
+
 		}
 
 		NpWindow::~NpWindow()
@@ -27,7 +39,11 @@ namespace pxengine {
 				_scene->drop();
 				_scene = nullptr;
 			}
-
+			acquiredGlContext();
+			ImGui_ImplOpenGL3_Shutdown();
+			ImGui_ImplSDL2_Shutdown();
+			ImGui::DestroyContext(_guiContext);
+			releaseGlContext();
 			NpEngineBase::getInstance().destroyWindow(*this);
 			NpEngineBase::getInstance().drop();
 		}
@@ -103,16 +119,29 @@ namespace pxengine {
 			_shouldClose = true;
 		}
 
+		ImGuiContext* NpWindow::getGUIContext()
+		{
+			return _guiContext;
+		}
+
 		bool NpWindow::pollEvents(SDL_Event* event)
 		{
+			// ensure we have GL/GUI context 
+			acquireGlContext();
 			if (_eventBuffer.size() == 0)
 				NpEngineBase::getInstance().pollEvents();
-			if (_eventBuffer.size() == 0) return false;
+			if (_eventBuffer.size() == 0) {
+				releaseGlContext();
+				return false;
+			}
+
 			if (event) {
+				ImGui_ImplSDL2_ProcessEvent(&_eventBuffer.peek<SDL_Event>());
 				*event = _eventBuffer.peek<SDL_Event>();
 				_eventBuffer.pop<SDL_Event>();
 			}
 
+			releaseGlContext();
 			return true;
 			//SDL_Event e;
 			//while (_eventBuffer.size() > 0)
@@ -182,6 +211,11 @@ namespace pxengine {
 			PxeShader* activeShader = nullptr;
 			PxeRenderMaterial* activeMaterial = nullptr;
 			int32_t mvpLocation = -1;
+
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplSDL2_NewFrame();
+			ImGui::NewFrame();
+
 			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
 				if ((*it)->getRenderSpace() == PxeRenderBase::RenderSpace::WORLD_SPACE) {
 					PxeRenderObject& renderObject = static_cast<PxeRenderObject&>(**it);
@@ -205,7 +239,7 @@ namespace pxengine {
 				else
 #endif // PXE_DEBUG
 				{
-					//TODO implement scene screen space rendering
+					(*it)->render();
 				}
 #ifdef PXE_DEBUG
 			else {
@@ -215,6 +249,11 @@ namespace pxengine {
 
 
 			}
+
+			ImGui::Render();
+			ImGuiIO& io = ImGui::GetIO();
+			glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			releaseGlContext();
 		}
 

@@ -93,7 +93,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared;$(SolutionDir)shared\stb;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>true</ShowIncludes>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -116,7 +116,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared;$(SolutionDir)shared\stb;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>false</ShowIncludes>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -138,7 +138,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared;$(SolutionDir)shared\stb;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>true</ShowIncludes>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -161,7 +161,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nonpublic;$(SolutionDir)shared;$(SolutionDir)shared\stb;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)SDL2\include;$(SolutionDir)glew\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)PhysX\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ShowIncludes>false</ShowIncludes>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -175,6 +175,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\imgui\backends\imgui_impl_sdl.cpp" />
+    <ClCompile Include="src\imgui\imgui.cpp" />
+    <ClCompile Include="src\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="src\imgui\misc\fonts\binary_to_compressed_c.cpp" />
     <ClCompile Include="src\nonpublic\NpEngineBase.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
@@ -216,6 +225,16 @@
     <ClInclude Include="include\PxeScene.h" />
     <ClInclude Include="include\PxeShader.h" />
     <ClInclude Include="include\PxeWindow.h" />
+    <ClInclude Include="src\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\imgui\backends\imgui_impl_sdl.h" />
+    <ClInclude Include="src\imgui\imconfig.h" />
+    <ClInclude Include="src\imgui\imgui.h" />
+    <ClInclude Include="src\imgui\imgui_internal.h" />
+    <ClInclude Include="src\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="src\imgui\misc\single_file\imgui_single_file.h" />
     <ClInclude Include="src\nonpublic\NpEngineBase.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpShader.h" />

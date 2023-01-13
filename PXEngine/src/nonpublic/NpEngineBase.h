@@ -13,6 +13,7 @@
 #include "PxeScene.h"
 #include "PxeGLAsset.h"
 #include "NpShader.h"
+#include "imgui.h"
 
 #ifndef PXENGINE_NONPUBLIC_ENGINEBASE_H_
 #define PXENGINE_NONPUBLIC_ENGINEBASE_H_
@@ -64,6 +65,9 @@ namespace pxengine::nonpublic {
 
 		void removeShaderFromCache(const std::filesystem::path& path);
 
+		ImFontAtlas& getGUIFontAtlas();
+
+		SDL_GLContext getOpenGlContext() const;
 
 		//############# PxErrorCallback API ##################
 
@@ -102,6 +106,7 @@ namespace pxengine::nonpublic {
 		physx::PxDefaultAllocator _physAllocator;
 		physx::PxTolerancesScale _physScale;
 		SDL_GLContext _sdlGlContext;
+		ImFontAtlas _guiFontAtlas;
 		uint32_t _activeMouseWindowId;
 		uint32_t _activeKeyboardWindowId;
 		uint8_t _glContextDepth;

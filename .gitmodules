@@ -13,3 +13,6 @@
 [submodule "shared/imgui"]
 	path = shared/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "PXEngine/src/imgui"]
+	path = PXEngine/src/imgui
+	url = https://github.com/ocornut/imgui.git
