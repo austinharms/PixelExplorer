@@ -39,7 +39,7 @@ namespace pxengine {
 				_scene->drop();
 				_scene = nullptr;
 			}
-			acquiredGlContext();
+			acquireGlContext();
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplSDL2_Shutdown();
 			ImGui::DestroyContext(_guiContext);

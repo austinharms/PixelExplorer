@@ -178,12 +178,9 @@
     <ClCompile Include="src\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\imgui\backends\imgui_impl_sdl.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
-    <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\imgui\misc\cpp\imgui_stdlib.cpp" />
-    <ClCompile Include="src\imgui\misc\fonts\binary_to_compressed_c.cpp" />
     <ClCompile Include="src\nonpublic\NpEngineBase.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
@@ -233,8 +230,6 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\imgui\misc\cpp\imgui_stdlib.h" />
-    <ClInclude Include="src\imgui\misc\single_file\imgui_single_file.h" />
     <ClInclude Include="src\nonpublic\NpEngineBase.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpShader.h" />
