@@ -1,50 +1,41 @@
-#include <stdint.h>
-
-#include "PxeGLAsset.h"
-#include "PxeBuffer.h"
-#include "GL/glew.h"
-
 #ifndef PXENGINE_GLINDEXBUFFER_H_
 #define PXENGINE_GLINDEXBUFFER_H_
-namespace pxengine {
-	enum class PxeIndexType : uint32_t
-	{
-		UNSIGNED_8BIT = GL_UNSIGNED_BYTE,
-		UNSIGNED_16BIT = GL_UNSIGNED_SHORT,
-		UNSIGNED_32BIT = GL_UNSIGNED_INT,
-	};
+#include "PxeTypes.h"
+#include "PxeGLAsset.h"
+#include "PxeBuffer.h"
 
+namespace pxengine {
+	// Wrapper class for GL_ELEMENT_ARRAY_BUFFER
 	class PxeIndexBuffer : public PxeGLAsset
 	{
 	public:
-
 		PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer = nullptr);
 		virtual ~PxeIndexBuffer();
+
+		// Binds GL_ELEMENT_ARRAY_BUFFER
 		void bind() override;
+
+		// Binds 0 to GL_ELEMENT_ARRAY_BUFFER
 		void unbind() override;
 		
-		// TODO Add method description
+		// Sets the data to be buffered into the GL_ELEMENT_ARRAY_BUFFER
+		// Note: the data will only be updated after the next call to bind()
 		void bufferData(PxeBuffer& buffer);
 
-		// returns a pointer to the PxeBuffer last buffered into the internal GlBuffer
-		// returns nullptr if no data has been buffered
-		PxeBuffer* getBuffer() const;
+		// Returns a pointer to the PxeBuffer waiting to be buffered or nullptr if nothing is pending
+		PXE_NODISCARD PxeBuffer* getPendingBuffer() const;
 
-		// returns a pointer to the PxeBuffer waiting to be buffered into the internal GlBuffer
-		// returns nullptr if there is no pending PxeBuffer
-		PxeBuffer* getPendingBuffer() const;
+		// Returns true if a PxeBuffer is waiting to be buffered
+		PXE_NODISCARD bool getBufferPending() const;
 
-		// returns true if a PxeBuffer is waiting to be buffered into the internal GlBuffer
-		bool getBufferPending() const;
+		// Returns the id of the internal GlBuffer
+		PXE_NODISCARD uint32_t getGlBufferId() const;
 
-		// returns the id of the internal GlBuffer
-		uint32_t getGlBufferId() const;
+		// Returns if the internal GlBuffer is created/valid
+		PXE_NODISCARD bool getValid() const;
 
-		// returns true if the internal GlBuffer is allocated and valid
-		bool getGlBufferValid() const;
-
-		// returns the index type the buffer is using
-		PxeIndexType getIndexType() const;
+		// Returns the index type the buffer is using
+		PXE_NODISCARD PxeIndexType getIndexType() const;
 
 		PxeIndexBuffer(const PxeIndexBuffer& other) = delete;
 		PxeIndexBuffer operator=(const PxeIndexBuffer& other) = delete;
@@ -54,12 +45,12 @@ namespace pxengine {
 		void uninitializeGl() override;
 
 	private:
-		PxeBuffer* _currentBuffer;
 		PxeBuffer* _pendingBuffer;
 		uint32_t _glBufferId;
 		const PxeIndexType _glBufferType;
 
-		// this function assumes the buffer is bound
+		// Uploads the pending buffer into the GL_ELEMENT_ARRAY_BUFFER
+		// Note: this function assumes the buffer is bound and a valid OpenGl context
 		void updateGlBuffer();
 	};
 }

@@ -1,29 +1,21 @@
-#include <stdint.h>
-
-#include "GL/glew.h"
-
 #ifndef PXENGINE_VERTEXBUFFERATTRIB_H_
 #define PXENGINE_VERTEXBUFFERATTRIB_H_
-namespace pxengine {
-	enum class PxeVertexBufferAttribType : uint32_t
-	{
-		UNDEFINED = 0,
-		BYTE = GL_BYTE,
-		UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
-		SHORT = GL_SHORT,
-		UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
-		INT = GL_INT,
-		UNSIGNED_INT = GL_UNSIGNED_INT,
-		HALF_FLOAT = GL_HALF_FLOAT,
-		FLOAT = GL_FLOAT,
-		DOUBLE = GL_DOUBLE,
-	};
+#include "PxeTypes.h"
 
+namespace pxengine {
+	// Struct used to store glAttrib information 
 	struct PxeVertexBufferAttrib
 	{
 	public:
+		PxeVertexBufferAttribType ComponentType;
+		uint8_t ComponentCount;
+		bool Normalized;
+		// Note: this is not a size_t because glVertexAttribPointer only supports a GLuint
+		uint32_t Offset;
 
-		static uint32_t componentWidth(PxeVertexBufferAttribType t) {
+		// Returns the byte size of the PxeVertexBufferAttribType {t}
+		// Note: the return is not a size_t because glVertexAttribPointer only supports a GLuint
+		static PXE_NODISCARD uint32_t componentWidth(PxeVertexBufferAttribType t) {
 			switch (t)
 			{
 			case PxeVertexBufferAttribType::BYTE:
@@ -44,52 +36,14 @@ namespace pxengine {
 			}
 		}
 
-		PxeVertexBufferAttribType ComponentType;
-		uint8_t ComponentCount;
-		bool Normalized;
-		uint32_t Offset;
-		uint32_t Stride;
+		// Returns the byte size of the PxeVertexBufferAttrib ComponentType
+		// Note: the return is not a size_t because glVertexAttribPointer only supports a GLuint
+		inline PXE_NODISCARD uint32_t getComponentWidth() const { return componentWidth(ComponentType); }
 
-		PxeVertexBufferAttrib() {
-			ComponentType = PxeVertexBufferAttribType::UNDEFINED;
-			ComponentCount = 0;
-			Normalized  = false;
-			Offset = 0;
-			Stride = 0;
-		}
-
-		PxeVertexBufferAttrib(PxeVertexBufferAttribType type, uint8_t count, bool normalized) {
-			ComponentType = type;
-			ComponentCount = count;
-			Normalized = normalized;
-			Offset = 0;
-			Stride = 0;
-		}
-
-		PxeVertexBufferAttrib(const PxeVertexBufferAttrib& other) {
-			ComponentType = other.ComponentType;
-			ComponentCount = other.ComponentCount;
-			Normalized = other.Normalized;
-			Offset = other.Offset;
-			Stride = other.Stride;
-		}
-
-		PxeVertexBufferAttrib& operator=(const PxeVertexBufferAttrib& other) {
-			ComponentType = other.ComponentType;
-			ComponentCount = other.ComponentCount;
-			Normalized = other.Normalized;
-			Offset = other.Offset;
-			Stride = other.Stride;
-			return *this;
-		}
-
-		uint32_t getComponentByteWidth() const {
-			return componentWidth(ComponentType);
-		}
-
-		uint32_t getByteWidth() const {
-			return getComponentByteWidth() * ComponentCount;
-		}
+		// Returns the byte size of the PxeVertexBufferAttrib
+		// Note: this is NOT equivalent to sizeof(PxeVertexBufferAttrib)
+		// Note: the return is not a size_t because glVertexAttribPointer only supports a GLuint
+		inline PXE_NODISCARD uint32_t getByteWidth() const { return getComponentWidth() * ComponentCount; }
 	};
 }
 #endif

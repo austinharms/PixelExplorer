@@ -788,7 +788,7 @@ namespace pxengine {
 		}
 	}
 
-	PxeShader& PxeRenderMaterial::getShader() const
+	PXE_NODISCARD PxeShader& PxeRenderMaterial::getShader() const
 	{
 		return _shader;
 	}

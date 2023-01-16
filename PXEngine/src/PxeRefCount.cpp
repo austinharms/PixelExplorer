@@ -5,7 +5,7 @@ namespace pxengine {
 
 	PxeRefCount::~PxeRefCount() {}
 
-	size_t PxeRefCount::getRefCount()
+	PXE_NODISCARD size_t PxeRefCount::getRefCount()
 	{
 		return _refCount;
 	}

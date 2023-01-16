@@ -42,7 +42,7 @@ namespace pxengine {
 		glBindVertexArray(0);
 	}
 
-	bool PxeVertexArray::getValid() const
+	PXE_NODISCARD bool PxeVertexArray::getValid() const
 	{
 		return _glId;
 	}
@@ -69,7 +69,7 @@ namespace pxengine {
 		_bufferBindingsDirty = true;
 	}
 
-	bool PxeVertexArray::getAttribBound(uint8_t index, PxeVertexBuffer** vertexBuffer, size_t* vertexAttribIndex)
+	PXE_NODISCARD bool PxeVertexArray::getAttribBound(uint8_t index, PxeVertexBuffer** vertexBuffer, size_t* vertexAttribIndex)
 	{
 		auto it = _bufferBindings.find(index);
 		if (it == _bufferBindings.end()) return false;
@@ -108,11 +108,12 @@ namespace pxengine {
 		for (auto binding : _bufferBindings)
 		{
 			PxeVertexBufferAttrib attrib;
-			if (binding.second.first && binding.second.first->getGlBufferValid() && binding.second.first->getFormat().getAttrib(binding.second.second, attrib)) {
-				binding.second.first->bind();
-				glVertexAttribPointer(binding.first, attrib.ComponentCount, (uint32_t)attrib.ComponentType, attrib.Normalized, attrib.Stride, (const void*)attrib.Offset);
+			PxeVertexBuffer* buffer = binding.second.first;
+			if (buffer && buffer->getValid() && buffer->getFormat().getAttrib(binding.second.second, attrib)) {
+				buffer->bind();
+				glVertexAttribPointer(binding.first, attrib.ComponentCount, (uint32_t)attrib.ComponentType, attrib.Normalized, buffer->getFormat().getStride(), (const void*)attrib.Offset);
 				glEnableVertexAttribArray(binding.first);
-				binding.second.first->unbind();
+				buffer->unbind();
 			}
 			else {
 				glDisableVertexAttribArray(binding.first);

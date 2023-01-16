@@ -1,60 +1,67 @@
-#include <stdint.h>
-
 #ifndef PXENGINE_RINGBUFFER_H_
 #define PXENGINE_RINGBUFFER_H_
+#include "PxeTypes.h"
+
 namespace pxengine {
-	template<typename T, uint32_t ringCapacity>
+	template<typename T, size_t ringCapacity>
 	class PxeRingBuffer
 	{
 	public:
-		PxeRingBuffer() {
+		inline PxeRingBuffer() : _capacity(ringCapacity) {
 			_size = 0;
 			_headIndex = 0;
 			_tailIndex = 0;
 		}
 
-		const uint32_t capacity() const { return ringCapacity; }
+		// Returns the number of elements able to be inserted assuming an empty buffer
+		inline PXE_NODISCARD size_t capacity() const { return _capacity; }
 
-		uint32_t size() const { return _size; }
+		// Returns the number of elements in the buffer
+		inline PXE_NODISCARD size_t size() const { return _size; }
+
+		// Returns if the buffer is empty
+		inline PXE_NODISCARD bool empty() const { return !_size; }
 
 		template<typename T>
-		bool insert(const T& value) {
-			if (_size == ringCapacity) return false;
-			new (_ring + (_tailIndex * sizeof(T))) T(value);
+		inline PXE_NODISCARD bool insert(const T& value) {
+			if (_size == _capacity) return false;
+			new (&(reinterpret_cast<T*>(&(_ring[0]))[_tailIndex])) T(value);
 			// in theory we should never overwrite our head as we checked size first
-			if (++_tailIndex == ringCapacity) _tailIndex = 0;
+			if (++_tailIndex == _capacity) _tailIndex = 0;
 			++_size;
 			return true;
 		}
 
-		// this assumes a non empty container
+		// Returns a reference to the element at the head of the container
+		// Note: this assumes a non empty container
 		template<typename T>
-		const T& peek() const {
-			return ((T*)_ring)[_headIndex];
+		inline PXE_NODISCARD const T& peek() const {
+			return (reinterpret_cast<T*>(&(_ring[0])))[_headIndex];
 		}
 
-		// this assumes a non empty container
+		// Returns a reference to the element at the head of the container
+		// Note: this assumes a non empty container
 		template<typename T>
-		T& peek() {
-			return ((T*)_ring)[_headIndex];
+		inline PXE_NODISCARD T& peek() {
+			return (reinterpret_cast<T*>(&(_ring[0])))[_headIndex];
 		}
 
-		// remove the element from the head of the container
-		// returns false if the container is empty
+		// Removes the element from the head of the container and returns true if successful 
 		template<typename T>
-		bool pop() {
+		inline PXE_NODISCARD bool pop() {
 			if (_size == 0) return false;
 			peek<T>().~T();
-			if (++_headIndex == ringCapacity) _headIndex = 0;
+			if (++_headIndex == _capacity) _headIndex = 0;
 			--_size;
 			return true;
 		}
 
 	private:
+		const size_t _capacity;
 		uint8_t _ring[ringCapacity * sizeof(T)];
-		uint32_t _size;
-		uint32_t _headIndex;
-		uint32_t _tailIndex;
+		size_t _size;
+		size_t _headIndex;
+		size_t _tailIndex;
 	};
 }
 #endif // !PXENGINE_RINGBUFFER_H_

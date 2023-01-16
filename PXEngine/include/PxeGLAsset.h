@@ -1,78 +1,73 @@
-#include "PxeRefCount.h"
-
 #ifndef PXENGINE_GLASSET_H_
 #define PXENGINE_GLASSET_H_
+#include "PxeTypes.h"
+#include "PxeRefCount.h"
+
 namespace pxengine {
 	namespace nonpublic {
-		class NpEngineBase;
+		class NpEngine;
 	}
 
-	enum class PxeGLAssetStatus : uint8_t
-	{
-		UNINITIALIZED = 0,
-		UNINITIALIZING,
-		PENDING_UNINITIALIZATION,
-		PENDING_INITIALIZATION,
-		INITIALIZING,
-		INITIALIZED,
-		ERROR,
-	};
-
+	// A class for the management of objects that are part of/use OpenGl state
+	// Ex: Textures, Element Buffers...
 	class PxeGLAsset : public PxeRefCount
 	{
 	public:
 		PxeGLAsset();
 		virtual ~PxeGLAsset();
 
-		// returns the assets current PxeGLAssetStatus
-		PxeGLAssetStatus getAssetStatus() const;
+		// Returns the assets current status
+		PXE_NODISCARD PxeGLAssetStatus getAssetStatus() const;
 
-		// requests the engine to uninitialize the asset and calls the uninitializeGl method
+		// TODO Is this function needed?
+		// Requests the engine to uninitialize the asset
 		// if blocking is true the method will wait for the asset to be uninitialized before returning
-		// note this call will not work if the asset is already in a pending state
-		void uninitializeAsset(bool blocking = false);
+		// Note: this call will not work if the asset is already in a pending state
+		//void uninitializeAsset(bool blocking = false);
 
-		// requests the engine to initialize the asset and calls the initializeGl method
+		// TODO Is this function needed?
+		// Requests the engine to initialize the asset
 		// if blocking is true the method will wait for the asset to be initialized before returning
-		// note: there must be at least one window created to initialize assets
-		// if blocking is true and there is no window create the method will never exit!
-		void initializeAsset(bool blocking = false);
+		// Note: there must be at least one window created to initialize assets
+		// Note: if blocking is true and there is no window create the method will never exit!
+		// void initializeAsset(bool blocking = false);
 
-		// all relevant OpenGL objects created in initializeGl should be bound
-		// note: you must bind a valid OpenGl context before calling this function 
+		// This method should bind the OpenGl object to the current state
+		// Note: this function MUST be called from the render thread 
 		virtual void bind() = 0;
 
-		// all OpenGL object bound in bindGl must be unbound
-		// note: you must bind a valid OpenGl context before calling this function 
+		// TODO Should this restore old state?
+		// This method should remove all bound OpenGl objects from state that were bound in bind()
+		// Note: this function MUST be called from the render thread 
 		virtual void unbind() = 0;
 
 	protected:
-		// called internally by the engine, all OpenGL object should be created in this function
-		// note: you can assume there is a valid OpenGl context bound on the calling thread
+		// This method should create all OpenGl objects for this asset
+		// Note: you can assume there is a valid OpenGl context bound on the calling thread
 		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
 		virtual void initializeGl() = 0;
 
-		// called internally by the engine, all OpenGL objects created must be cleaned up in this call
-		// note: you can assume there is a valid OpenGl context bound on the calling thread
+		// This method should delete all OpenGl objects created in initializeGl()
+		// Note: you can assume there is a valid OpenGl context bound on the calling thread
 		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
 		virtual void uninitializeGl() = 0;
 
-		// handles engine cleanup
-		// note: if you override this method you must call this at the end of the new method
+		// Handles automatic engine resource cleanup
+		// Note: if overridden you MUST call this at the end of the overriding method
 		void onDelete() override;
 
-		// changes the asset status to ERROR
-		// this may only be called if the asset is initialized or initializing
-		// note: ERROR state is cleared on uninitialize before uninitializeGl is called
+		// Changes the asset current status to ERROR
+		// Note: this can only be called if the asset status is INITIALIZING or INITIALIZED
+		// Note: ERROR status is cleared before uninitializeGl is called
 		void setErrorStatus();
 
 	private:
-		friend class pxengine::nonpublic::NpEngineBase;
+		friend class pxengine::nonpublic::NpEngine;
 		PxeGLAssetStatus _status;
 
-		// ENGINE USE ONLY
+		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
 		void initialize();
-		// ENGINE USE ONLY
+		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
 		void uninitialize();
 	};
 }

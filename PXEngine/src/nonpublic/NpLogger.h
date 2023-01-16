@@ -1,10 +1,10 @@
-#include <stdint.h>
-#include <string>
-
-#include "PxeLogger.h"
-
 #ifndef PXENGINE_NONPUBLIC_LOGGER_H_
 #define PXENGINE_NONPUBLIC_LOGGER_H_
+#include <string>
+
+#include "PxeTypes.h"
+#include "PxeLogger.h"
+#include "NpEngine.h"
 
 // TODO Add config switches to disable logging features
 #define PXE_INFO(msg) pxengine::nonpublic::log(pxengine::PxeLogLevel::PXE_INFO, msg, __FILE__, __FUNCTION__, __LINE__)
@@ -16,10 +16,13 @@
 
 namespace pxengine {
 	namespace nonpublic {
-		extern void log(PxeLogLevel level, const std::string& msg, const char* file, const char* function, uint64_t line);
-		extern void log(PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line);
-		extern void setLogInterface(PxeLogInterface& logInterface);
-		extern void clearLogInterface();
+		inline void log(PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line) {
+			NpEngine::getInstance().getLogInterface().onLog(level, msg, file, function, line);
+		}
+
+		inline void log(PxeLogLevel level, const std::string& msg, const char* file, const char* function, uint64_t line) { 
+			log(level, msg.c_str(), file, function, line); 
+		}
 	}
 }
 #endif // !PXENGINE_NONPUBLIC_LOGGER_H_

@@ -26,7 +26,7 @@ namespace pxengine {
 		pxengine::PxeAssertInterface* pxeAssertInterface = &defaultAssertHandler;
 	}
 
-	PxeAssertInterface& pxeGetAssertInterface()
+	PXE_NODISCARD PxeAssertInterface& pxeGetAssertInterface()
 	{
 		return *pxeAssertInterface;
 	}

@@ -1,35 +1,27 @@
-#include <stdint.h>
-
-#include "PxeRefCount.h"
-
 #ifndef PXENGINE_RENDER_BASE_H_
 #define PXENGINE_RENDER_BASE_H_
-namespace pxengine {
-	class PxeScene;
+#include "PxeTypes.h"
+#include "PxeRefCount.h"
 
+namespace pxengine {
+	// Base class for all renderable objects
 	class PxeRenderBase : public PxeRefCount
 	{
 	public:
-		enum class RenderSpace : uint8_t
-		{
-			NONE = 0,
-			SCREEN_SPACE,
-			WORLD_SPACE,
-		};
+		inline PxeRenderBase(PxeRenderPass renderPass) : _renderPass(renderPass) {}
+		virtual ~PxeRenderBase() = default;
 
-		inline PxeRenderBase(RenderSpace renderSpace) : _renderSpace(renderSpace) {}
-		inline virtual ~PxeRenderBase() = default;
+		// Returns the object required render pass
+		inline PXE_NODISCARD PxeRenderPass getRenderPass() const { return _renderPass; }
 
-		RenderSpace getRenderSpace() const { return _renderSpace; }
-
-		virtual void render() = 0;
+		// This method should draw the object to the current framebuffer
+		virtual void onRender() = 0;
 
 		PxeRenderBase(const PxeRenderBase& other) = delete;
 		PxeRenderBase operator=(const PxeRenderBase& other) = delete;
 
 	private:
-		friend class PxeScene;
-		const RenderSpace _renderSpace;
+		const PxeRenderPass _renderPass;
 	};
 }
 #endif // !PXENGINE_RENDER_BASE_H_

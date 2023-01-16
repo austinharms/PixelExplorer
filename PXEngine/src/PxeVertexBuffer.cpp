@@ -7,7 +7,6 @@ namespace pxengine {
 	PxeVertexBuffer::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer)
 	{
 		_glBufferId = 0;
-		_currentBuffer = nullptr;
 		_pendingBuffer = nullptr;
 		setFormat(bufferFormat);
 		if (buffer)
@@ -16,25 +15,14 @@ namespace pxengine {
 
 	PxeVertexBuffer::~PxeVertexBuffer()
 	{
-
 		if (_pendingBuffer)
-		{
 			_pendingBuffer->drop();
-			_pendingBuffer = nullptr;
-		}
-
-		// gl should be uninitialized and therefor there can not be a current buffer
-		if (_currentBuffer) {
-			PXE_ERROR("PxeIndexBuffer current buffer not deallocated before destructor call");
-		}
 	}
 
 	void PxeVertexBuffer::bind()
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, _glBufferId);
 		updateGlBuffer();
-		if (_currentBuffer == nullptr)
-			PXE_WARN("Bound empty PxeGlVertexBuffer");
 	}
 
 	void PxeVertexBuffer::unbind()
@@ -57,32 +45,27 @@ namespace pxengine {
 		_pendingBuffer = &buffer;
 	}
 
-	PxeBuffer* PxeVertexBuffer::getBuffer() const
-	{
-		return _currentBuffer;
-	}
-
-	PxeBuffer* PxeVertexBuffer::getPendingBuffer() const
+	PXE_NODISCARD PxeBuffer* PxeVertexBuffer::getPendingBuffer() const
 	{
 		return _pendingBuffer;
 	}
 
-	bool PxeVertexBuffer::getBufferPending() const
+	PXE_NODISCARD bool PxeVertexBuffer::getBufferPending() const
 	{
 		return _pendingBuffer != nullptr;
 	}
 
-	uint32_t PxeVertexBuffer::getGlBufferId() const
+	PXE_NODISCARD uint32_t PxeVertexBuffer::getGlBufferId() const
 	{
 		return _glBufferId;
 	}
 
-	bool PxeVertexBuffer::getGlBufferValid() const
+	PXE_NODISCARD bool PxeVertexBuffer::getValid() const
 	{
 		return _glBufferId;
 	}
 
-	const PxeVertexBufferFormat& PxeVertexBuffer::getFormat() const
+	PXE_NODISCARD const PxeVertexBufferFormat& PxeVertexBuffer::getFormat() const
 	{
 		return _format;
 	}
@@ -95,7 +78,7 @@ namespace pxengine {
 	void PxeVertexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
-		if (!getGlBufferValid()) {
+		if (!getValid()) {
 			PXE_ERROR("Failed to create GL_ARRAY_BUFFER buffer");
 			return;
 		}
@@ -112,30 +95,19 @@ namespace pxengine {
 
 	void PxeVertexBuffer::uninitializeGl()
 	{
-		if (_pendingBuffer) {
-			_currentBuffer->drop();
-			_currentBuffer = nullptr;
-		}
-		else {
-			_pendingBuffer = _currentBuffer;
-			_currentBuffer = nullptr;
-		}
-
 		glDeleteBuffers(1, &_glBufferId);
 	}
 
 	void PxeVertexBuffer::updateGlBuffer()
 	{
-		if (!getBufferPending() || !getGlBufferValid()) return;
-		if (_currentBuffer)
-			_currentBuffer->drop();
-		_currentBuffer = _pendingBuffer;
-		_pendingBuffer = nullptr;
+		if (!getBufferPending() || !getValid()) return;
 #ifdef PXE_DEBUG
-		if (_currentBuffer->getSize() % _format.getBufferStride() != 0) {
+		if (_pendingBuffer->getSize() % _format.getStride() != 0) {
 			PXE_WARN("Buffer data not divisible by buffer stride");
 		}
 #endif // PXE_DEBUG
-		glBufferData(GL_ARRAY_BUFFER, _currentBuffer->getSize(), _currentBuffer->getBuffer(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, _pendingBuffer->getSize(), _pendingBuffer->getBuffer(), GL_STATIC_DRAW);
+		_pendingBuffer->drop();
+		_pendingBuffer = nullptr;
 	}
 }

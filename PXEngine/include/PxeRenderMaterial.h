@@ -1,27 +1,17 @@
-#include <stdint.h>
+#ifndef PXENGINE_RENDER_MATERIAL_H_
+#define PXENGINE_RENDER_MATERIAL_H_
 #include <string>
 #include <unordered_map>
 
-#include "glm/vec2.hpp"
-#include "glm/vec3.hpp"
-#include "glm/vec4.hpp"
-#include "glm/mat2x2.hpp"
-#include "glm/mat3x3.hpp"
-#include "glm/mat4x4.hpp"
-#include "glm/mat2x3.hpp"
-#include "glm/mat3x2.hpp"
-#include "glm/mat2x4.hpp"
-#include "glm/mat4x2.hpp"
-#include "glm/mat3x4.hpp"
-#include "glm/mat4x3.hpp"
+#include "PxeTypes.h"
 #include "PxeRefCount.h"
 #include "PxeBuffer.h"
 #include "PxeShader.h"
 #include "PxeRenderTexture.h"
 
-#ifndef PXENGINE_RENDER_MATERIAL_H_
-#define PXENGINE_RENDER_MATERIAL_H_
 namespace pxengine {
+	// Class that stores/automates PxeShader Uniform bindings
+	// Note: PxeRenderMaterial can only apply to one shader but a shader can have more then one material
 	class PxeRenderMaterial : public PxeRefCount
 	{
 	public:
@@ -80,10 +70,12 @@ namespace pxengine {
 
 		void setTexture(const std::string& name, PxeRenderTexture& texture, uint8_t textureSlot);
 
-		// note this method assumes the PxeShader (must be the same one used to construct the PxeRenderMaterial) is already bound and there is a valid gl context bound
+		// Applies all stored properties to the PxeShader
+		// Note: This assumes the stored PxeShader is already bound and there is a valid OpenGl context
 		void applyMaterial();
 
-		PxeShader& getShader() const;
+		// Returns the PxeShader that was used to construct the material
+		PXE_NODISCARD PxeShader& getShader() const;
 
 		PxeRenderMaterial(const PxeRenderMaterial& other) = delete;
 		PxeRenderMaterial operator=(const PxeRenderMaterial& other) = delete;
@@ -205,6 +197,9 @@ namespace pxengine {
 		};
 
 	private:
+		// TODO Is this function still needed?
+		// Update PxeRenderMaterialValue uniform locations
+		// Note: Assumes PxeShader is bound and a valid OpenGl context
 		void updatePropertyLocations();
 
 		std::unordered_map<std::string, PxeRenderMaterialValue> _materialProperties;

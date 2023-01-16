@@ -1,34 +1,33 @@
-#include <stdint.h>
-
-#include "PxeRefCount.h"
-
 #ifndef PXENGINE_BUFFER_H_
 #define PXENGINE_BUFFER_H_
+#include "PxeTypes.h"
+#include "PxeRefCount.h"
+
 namespace pxengine {
 	class PxeBuffer : public PxeRefCount
 	{
 	public:
-		// creates and allocates a buffer with a byte length of size
+		// Allocates a buffer with a byte length of {size}
 		PxeBuffer(size_t size);
 		PxeBuffer(const PxeBuffer& other);
-		PxeBuffer& operator=(const PxeBuffer& other);
 		virtual ~PxeBuffer();
+		// Note: a new buffer allocated and all data is copied
+		PxeBuffer& operator=(const PxeBuffer& other);
 
-		// returns true if the buffer is allocated
-		// returns false if there was an allocation error
-		bool getAllocated() const;
+		// Returns true if the buffer is allocated and false on failure
+		PXE_NODISCARD bool getAllocated() const;
 
-		// returns the byte size of the buffer
-		// note: if there was an allocation error this will return 0
-		size_t getSize() const;
+		// Returns the byte size of the buffer
+		// Note: if there was an allocation error this will return 0
+		PXE_NODISCARD size_t getSize() const;
 
-		// returns a pointer to the internal buffer
-		// note: buffer may be nullptr if there was an allocation error
-		void* getBuffer() const;
+		// Returns a pointer to the internal buffer
+		// Note: return value may be nullptr if there was an allocation error
+		PXE_NODISCARD void* getBuffer() const;
 
 	private:
-		size_t _size;
 		void* _buffer;
+		size_t _size;
 	};
 }
 #endif // !PXENGINE_BUFFER_H_

@@ -7,7 +7,7 @@
 #include "GL/glew.h"
 #include "NpLogger.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "NpEngineBase.h"
+#include "NpEngine.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -200,7 +200,7 @@ namespace pxengine {
 
 		void NpShader::onDelete()
 		{
-			NpEngineBase::getInstance().removeShaderFromCache(_path);
+			NpEngine::getInstance().removeShader(_path);
 			PxeGLAsset::onDelete();
 		}
 

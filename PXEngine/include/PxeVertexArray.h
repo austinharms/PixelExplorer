@@ -1,32 +1,44 @@
+#ifndef PXENGINE_VERTEXARRAY_H_
+#define PXENGINE_VERTEXARRAY_H_
 #include <unordered_map>
 
+#include "PxeTypes.h"
 #include "PxeGLAsset.h"
 #include "PxeVertexBuffer.h"
 
-#ifndef PXENGINE_VERTEXARRAY_H_
-#define PXENGINE_VERTEXARRAY_H_
 namespace pxengine {
+	// Wrapper class for glVertexArray
 	class PxeVertexArray : public PxeGLAsset
 	{
 	public:
 		PxeVertexArray();
 		virtual ~PxeVertexArray();
+
+		// Binds the glVertexArray
 		void bind() override;
+
+		// Binds 0 as glVertexArray
 		void unbind() override;
-		bool getValid() const;
-		// flag the vertex array to re-setup/rebind vertex buffer attribs
+
+		// Returns if the glVertexArray is created
+		// Note: does NOT check if vertex buffers are valid
+		PXE_NODISCARD bool getValid() const;
+
+		// Rebinds and updates all vertex buffer attribs
+		// Note: only happens after the next call to bind()
 		void updateBufferBindings();
 
-		// adds a PxeVertexBuffer binding
+		// Adds a PxeVertexBuffer binding
+		// {arrayAttribIndex} is glVertexAttribPointer index
+		// {vertexAttribIndex} is the index of the PxeVertexBufferAttrib to use from the {vertexBuffer}
 		void addVertexBuffer(PxeVertexBuffer& vertexBuffer, size_t vertexAttribIndex, uint8_t arrayAttribIndex);
 
-		// remove and disable ArrayAttrib at index
+		// Remove and disable ArrayAttrib at {index}
 		void removeArrayAttrib(uint8_t index);
 
-		// returns true if the ArrayAttrib is bound otherwise returns false
-		// optionally sets vertexBuffer and vertexAttribIndex to the bound buffer and attrib index if they are not nullptr and ArrayAttrib is bound
-		// note will still return true if an invalid buffer is bound, but the array attrib will be disabled
-		bool getAttribBound(uint8_t index, PxeVertexBuffer** vertexBuffer = nullptr, size_t* vertexAttribIndex = nullptr);
+		// Returns true if the ArrayAttrib is bound and sets vertexBuffer and vertexAttribIndex to the current values if passed
+		// Note: will still return true if an invalid buffer is bound, but the array attrib will be disabled
+		PXE_NODISCARD bool getAttribBound(uint8_t index, PxeVertexBuffer** vertexBuffer = nullptr, size_t* vertexAttribIndex = nullptr);
 
 	protected:
 		void initializeGl() override;
@@ -37,7 +49,8 @@ namespace pxengine {
 		std::unordered_map<uint8_t, std::pair<PxeVertexBuffer*, size_t>> _bufferBindings;
 		bool _bufferBindingsDirty;
 
-		// this function assumes the vertex array is bound
+		// Rebind vertex buffer attribs
+		// Note: this function assumes the glVertexArray is bound and a valid OpenGl context
 		void updateGlBindings();
 	};
 }

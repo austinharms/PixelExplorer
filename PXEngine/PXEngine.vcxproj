@@ -181,12 +181,12 @@
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\nonpublic\NpEngineBase.cpp" />
+    <ClCompile Include="src\nonpublic\NpEngine.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
     <ClCompile Include="src\nonpublic\NpWindow.cpp" />
     <ClCompile Include="src\PxeBuffer.cpp" />
-    <ClCompile Include="src\PxeEngineBase.cpp" />
+    <ClCompile Include="src\PxeEngine.cpp" />
     <ClCompile Include="src\PxeFSHelpers.cpp" />
     <ClCompile Include="src\PxeIndexBuffer.cpp" />
     <ClCompile Include="src\PxeRenderMaterial.cpp" />
@@ -195,14 +195,14 @@
     <ClCompile Include="src\PxeVertexBuffer.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
     <ClCompile Include="src\PxeGLAsset.cpp" />
-    <ClCompile Include="src\nonpublic\NpLogger.cpp" />
     <ClCompile Include="src\PxeRefCount.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\PxeApplicationInterface.h" />
     <ClInclude Include="include\PxeBuffer.h" />
     <ClInclude Include="include\PxeEngine.h" />
-    <ClInclude Include="include\PxeEngineBase.h" />
+    <ClInclude Include="include\PxeEngineAPI.h" />
     <ClInclude Include="include\PxeFSHelpers.h" />
     <ClInclude Include="include\PxeGLAsset.h" />
     <ClInclude Include="include\Logger.h" />
@@ -212,17 +212,19 @@
     <ClInclude Include="include\PxeRenderMaterial.h" />
     <ClInclude Include="include\PxeRenderObject.h" />
     <ClInclude Include="include\PxeRenderTexture.h" />
+    <ClInclude Include="include\PxeRingBuffer.h" />
+    <ClInclude Include="include\PxeTypes.h" />
     <ClInclude Include="include\PxeVertexArray.h" />
     <ClInclude Include="include\PxeVertexBuffer.h" />
     <ClInclude Include="include\PxeVertexBufferAttrib.h" />
     <ClInclude Include="include\PxeVertexBufferFormat.h" />
     <ClInclude Include="include\PxeLogger.h" />
     <ClInclude Include="include\PxeRefCount.h" />
-    <ClInclude Include="include\PxeRingBuffer.h" />
     <ClInclude Include="include\PxeScene.h" />
     <ClInclude Include="include\PxeShader.h" />
     <ClInclude Include="include\PxeWindow.h" />
     <ClInclude Include="src\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\imgui\backends\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="src\imgui\backends\imgui_impl_sdl.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
@@ -230,7 +232,7 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\nonpublic\NpEngineBase.h" />
+    <ClInclude Include="src\nonpublic\NpEngine.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpShader.h" />
     <ClInclude Include="src\NpLogger.h" />

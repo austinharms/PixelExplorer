@@ -126,7 +126,7 @@ namespace pxengine {
 		_height = static_cast<uint16_t>(height);
 	}
 
-	bool PxeRenderTexture::getValid() const
+	PXE_NODISCARD bool PxeRenderTexture::getValid() const
 	{
 		return _glTextureId;
 	}
@@ -136,32 +136,32 @@ namespace pxengine {
 		_textureSlot = slot;
 	}
 
-	uint8_t PxeRenderTexture::getTextureSlot() const
+	PXE_NODISCARD uint8_t PxeRenderTexture::getTextureSlot() const
 	{
 		return _textureSlot;
 	}
 
-	bool PxeRenderTexture::getTexturePending() const
+	PXE_NODISCARD bool PxeRenderTexture::getTexturePending() const
 	{
 		return _imageData;
 	}
 
-	bool PxeRenderTexture::getTextureLoaded() const
+	PXE_NODISCARD bool PxeRenderTexture::getTextureLoaded() const
 	{
 		return _textureLoaded;
 	}
 
-	uint32_t PxeRenderTexture::getGlTextureId() const
+	PXE_NODISCARD uint32_t PxeRenderTexture::getGlTextureId() const
 	{
 		return _glTextureId;
 	}
 
-	uint16_t PxeRenderTexture::getTextureWidth() const
+	PXE_NODISCARD uint16_t PxeRenderTexture::getTextureWidth() const
 	{
 		return _width;
 	}
 
-	uint16_t PxeRenderTexture::getTextureHeight() const
+	PXE_NODISCARD uint16_t PxeRenderTexture::getTextureHeight() const
 	{
 		return _height;
 	}

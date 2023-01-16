@@ -1,44 +1,49 @@
-#include <stdint.h>
-
+#ifndef PXENGINE_GLVERTEXBUFFER_H_
+#define PXENGINE_GLVERTEXBUFFER_H_
+#include "PxeTypes.h"
 #include "PxeGLAsset.h"
 #include "PxeBuffer.h"
 #include "PxeVertexBufferFormat.h"
 
-#ifndef PXENGINE_GLVERTEXBUFFER_H_
-#define PXENGINE_GLVERTEXBUFFER_H_
 namespace pxengine {
+	// Wrapper class for GL_ARRAY_BUFFER
 	class PxeVertexBuffer : public PxeGLAsset
 	{
 	public:
 		PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer = nullptr);
 		virtual ~PxeVertexBuffer();
+
+		// Binds GL_ARRAY_BUFFER
 		void bind() override;
+
+		// Binds 0 to GL_ARRAY_BUFFER
 		void unbind() override;
 
-		// sets the pending buffer to buffer
+		// Sets the data to be buffered into the GL_ARRAY_BUFFER
+		// Note: the data will only be updated after the next call to bind()
 		void bufferData(PxeBuffer& buffer);
 
-		// returns a pointer to the PxeBuffer last buffered into the GlBuffer
+		// TODO Is this function needed?
+		// Returns a pointer to the PxeBuffer last buffered into the internal GlBuffer
 		// returns nullptr if no data has been buffered
-		PxeBuffer* getBuffer() const;
+		//PxeBuffer* getBuffer() const;
 
-		// returns a pointer to the PxeBuffer waiting to be buffered into the GlBuffer
-		// returns nullptr if there is no pending PxeBuffer
-		PxeBuffer* getPendingBuffer() const;
+		// Returns a pointer to the PxeBuffer waiting to be buffered or nullptr if nothing is pending
+		PXE_NODISCARD PxeBuffer* getPendingBuffer() const;
 
-		// returns true if a PxeBuffer is waiting to be buffered into the GlBuffer
-		bool getBufferPending() const;
+		// Returns true if a PxeBuffer is waiting to be buffered
+		PXE_NODISCARD bool getBufferPending() const;
 
-		// returns the id of the internal GlBuffer
-		uint32_t getGlBufferId() const;
+		// Returns the id of the internal GlBuffer
+		PXE_NODISCARD uint32_t getGlBufferId() const;
 
-		// returns true if the internal GlBuffer is allocated and valid
-		bool getGlBufferValid() const;
+		// Returns if the internal GlBuffer is created/valid
+		PXE_NODISCARD bool getValid() const;
 
-		// returns the format of the vertex buffer
-		const PxeVertexBufferFormat& getFormat() const;
+		// Returns the format of the vertex buffer
+		PXE_NODISCARD const PxeVertexBufferFormat& getFormat() const;
 
-		// sets the format of the vertex buffer
+		// Sets the format of the vertex buffer
 		void setFormat(const PxeVertexBufferFormat& format);
 
 		PxeVertexBuffer(const PxeVertexBuffer& other) = delete;
@@ -50,10 +55,11 @@ namespace pxengine {
 
 	private:
 		uint32_t _glBufferId;
-		PxeBuffer* _currentBuffer;
 		PxeBuffer* _pendingBuffer;
 		PxeVertexBufferFormat _format;
 
+		// Uploads the pending buffer into the GL_ARRAY_BUFFER
+		// Note: this function assumes the buffer is bound and a valid OpenGl context
 		void updateGlBuffer();
 	};
 }

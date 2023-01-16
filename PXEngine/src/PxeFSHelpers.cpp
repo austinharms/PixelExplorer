@@ -27,7 +27,7 @@
 #include "NpLogger.h"
 
 namespace pxengine {
-	std::filesystem::path getExecutablePath()
+	PXE_NODISCARD std::filesystem::path getExecutablePath()
 	{
 #if defined(PXE_WIN_OS)
 		uint32_t bufferSize = 128;
@@ -55,12 +55,12 @@ namespace pxengine {
 #endif
 	}
 
-	std::filesystem::path getExecutableDirectory()
+	PXE_NODISCARD std::filesystem::path getExecutableDirectory()
 	{
 		return getExecutablePath().remove_filename();
 	}
 
-	std::filesystem::path getAssetPath(const std::filesystem::path& subpath)
+	PXE_NODISCARD std::filesystem::path getAssetPath(const std::filesystem::path& subpath)
 	{
 		std::filesystem::path assetPath(getExecutableDirectory() / "assets" / subpath);
 		std::error_code errorCode;
@@ -73,7 +73,7 @@ namespace pxengine {
 		return assetPath;
 	}
 
-	std::filesystem::path getPersistentPath(const std::filesystem::path& subpath)
+	PXE_NODISCARD std::filesystem::path getPersistentPath(const std::filesystem::path& subpath)
 	{
 		std::filesystem::path userPath;
 

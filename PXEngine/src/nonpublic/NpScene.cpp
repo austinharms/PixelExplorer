@@ -4,44 +4,50 @@
 #include "PxeRenderMaterial.h"
 #include "PxeRenderObject.h"
 #include "PxeRenderElement.h"
+#include "NpEngine.h"
 
 namespace pxengine::nonpublic {
 	NpScene::NpScene(physx::PxScene* scene)
 	{
-		_engine = &NpEngineBase::getInstance();
-		_engine->grab();
 		_physScene = scene;
 		_physScene->userData = this;
 		_simulationAccumulator = 0;
 		_simulationTimestep = 0.25f;
+		NpEngine::getInstance().grab();
 	}
 
 	NpScene::~NpScene()
 	{
-		for (auto it = _renderables.begin(); it != _renderables.end(); ++it) {
-			(*it)->drop();
+		for (int8_t i = 0; i < (int8_t)PxeRenderPass::RENDER_PASS_COUNT; ++i) {
+			for (auto it = _renderables[i].begin(); it != _renderables[i].end(); ++it) {
+				(*it)->drop();
+			}
+
+			_renderables[i].clear();
 		}
 
-		_renderables.clear();
-		_engine->drop();
-		_engine = nullptr;
 		_physScene->release();
-		_physScene = nullptr;
+		NpEngine::getInstance().drop();
 	}
 
-	std::list<PxeRenderBase*>& NpScene::getRenderList()
+	const std::list<PxeRenderBase*>& NpScene::getRenderList(PxeRenderPass pass) const
 	{
-		return _renderables;
+		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
+		if ((int8_t)pass < 0 || (int8_t)pass > renderSize) {
+			PXE_FATAL("Attempted to get render objects for invalid PxeRenderPass");
+		}
+
+		return _renderables[(int8_t)pass];
 	}
 
-	void NpScene::simulatePhysics(float time, bool blocking)
+	void NpScene::simulatePhysics(float time)
 	{
 		_simulationAccumulator += time;
 		while (_simulationAccumulator >= _simulationTimestep)
 		{
 			_simulationAccumulator -= _simulationTimestep;
 			_physScene->simulate(_simulationTimestep);
-			_physScene->fetchResults(blocking);
+			_physScene->fetchResults(true);
 		}
 	}
 
@@ -67,45 +73,50 @@ namespace pxengine::nonpublic {
 
 	void NpScene::addRenderable(PxeRenderBase& renderable)
 	{
+		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
+		int8_t renderPass = (int8_t)renderable.getRenderPass();
+		if (renderPass < 0 || renderPass > renderSize) {
+			PXE_ERROR("Attempted to add PxeRenderBase with invalid PxeRenderPass");
+			return;
+		}
+
 #ifdef PXE_DEBUG
-		if (std::find(_renderables.begin(), _renderables.end(), &renderable) != _renderables.end()) {
-			PXE_WARN("Readded PxeRenderBase to PxeScene");
+		if (std::find(_renderables[renderPass].begin(), _renderables[renderPass].end(), &renderable) != _renderables[renderPass].end()) {
+			PXE_WARN("Re-added PxeRenderBase to PxeScene");
 		}
 #endif // PXE_DEBUG
 
 		renderable.grab();
-		switch (renderable.getRenderSpace())
-		{
-		case pxengine::PxeRenderBase::RenderSpace::SCREEN_SPACE:
-			_renderables.emplace_back(&renderable);
-			break;
-		case pxengine::PxeRenderBase::RenderSpace::WORLD_SPACE:
-		{
+		if (renderPass == (int8_t)PxeRenderPass::WORLD_SPACE) {
 			void* materialPtr = &(static_cast<PxeRenderObject&>(renderable).getRenderMaterial());
-			if (_renderables.empty()) {
-				_renderables.emplace_front(&renderable);
+			if (_renderables[renderPass].empty()) {
+				_renderables[renderPass].emplace_front(&renderable);
 			}
 			else {
 				// TODO Optimize this to also sort by shaders in materials to allow for minimal shader changes when rendering
-				for (auto it = _renderables.begin(); it != _renderables.end(); ++it) {
-					if ((*it)->getRenderSpace() == PxeRenderBase::RenderSpace::SCREEN_SPACE || materialPtr <= (void*)&(static_cast<PxeRenderObject*>(*it)->getRenderMaterial())) {
-						_renderables.emplace(it, &renderable);
+				for (auto it = _renderables[renderPass].begin(); it != _renderables[renderPass].end(); ++it) {
+					if (materialPtr <= (void*)&(static_cast<PxeRenderObject*>(*it)->getRenderMaterial())) {
+						_renderables[renderPass].emplace(it, &renderable);
 						break;
 					}
 				}
 			}
 		}
-		break;
-		default:
-			PXE_ERROR("Attempted to add PxeRenderBase with invalid RenderSpace to PxeScene");
-			renderable.drop();
-			break;
+		else {
+			_renderables[renderPass].emplace_back(&renderable);
 		}
 	}
 
 	void NpScene::removeRenderable(PxeRenderBase& renderable)
 	{
-		if (!_renderables.remove(&renderable)) {
+		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
+		int8_t renderPass = (int8_t)renderable.getRenderPass();
+		if (renderPass < 0 || renderPass > renderSize) {
+			PXE_ERROR("Attempted to remove PxeRenderBase with invalid PxeRenderPass");
+			return;
+		}
+
+		if (!_renderables[renderPass].remove(&renderable)) {
 			PXE_WARN("Attempted to remove PxeRenderBase not added to PxeScene");
 		}
 	}

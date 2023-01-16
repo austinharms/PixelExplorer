@@ -1,41 +1,38 @@
-#include <stdint.h>
+#ifndef PXENGINE_SHADER_H_
+#define PXENGINE_SHADER_H_
 #include <string>
 #include <filesystem>
 
+#include "PxeTypes.h"
 #include "PxeGLAsset.h"
 #include "PxeBuffer.h"
-#include "glm/vec2.hpp"
-#include "glm/vec3.hpp"
-#include "glm/vec4.hpp"
-#include "glm/mat2x2.hpp"
-#include "glm/mat3x3.hpp"
-#include "glm/mat4x4.hpp"
-#include "glm/mat2x3.hpp"
-#include "glm/mat3x2.hpp"
-#include "glm/mat2x4.hpp"
-#include "glm/mat4x2.hpp"
-#include "glm/mat3x4.hpp"
-#include "glm/mat4x3.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#ifndef PXENGINE_SHADER_H_
-#define PXENGINE_SHADER_H_
 namespace pxengine {
-	// TODO Add PxeShader description
+	// Wrapper class for a glProgram
 	class PxeShader : public PxeGLAsset
 	{
 	public:
 		PxeShader() = default;
 		virtual ~PxeShader() = default;
 
-		virtual bool getValid() const = 0;
-		virtual int32_t getUniformLocation(const std::string& name) = 0;
-		virtual uint32_t getGlProgramId() const = 0;
-		virtual const std::filesystem::path& getShaderPath() const = 0;
+		// Returns if the glProgram is created and passed validation
+		virtual PXE_NODISCARD bool getValid() const = 0;
 
-		// returns the number of times the PxeShader was initialized
-		// useful to check if uniform locations need updating
-		virtual uint32_t getAssetInitializationCount() const = 0;
+		// Returns the location of the uniform with {name}
+		// Note: returns -1 on error or if the uniform does not exist
+		virtual PXE_NODISCARD int32_t getUniformLocation(const std::string& name) = 0;
+
+		// Returns the glProgram id
+		virtual PXE_NODISCARD uint32_t getGlProgramId() const = 0;
+
+		// Returns the path used to load the shader
+		virtual PXE_NODISCARD const std::filesystem::path& getShaderPath() const = 0;
+
+		// TODO Is this function still needed?
+		// Returns the number of times the PxeShader was initialized
+		// Note: useful to check if uniform locations need updating
+		virtual PXE_NODISCARD uint32_t getAssetInitializationCount() const = 0;
 
 		inline void setUniform1f(const std::string& name, const float value) { setUniform1fv(name, &value, 1); }
 		inline void setUniform2f(const std::string& name, const glm::vec2& value) { setUniform2fv(name, glm::value_ptr(value), 1); }
@@ -141,11 +138,8 @@ namespace pxengine {
 		virtual void setUniformM4x3fv(const int32_t location, const float* values, uint32_t count) = 0;
 
 
-
 		PxeShader(const PxeShader& other) = delete;
 		PxeShader operator=(const PxeShader& other) = delete;
-	private:
-
 	};
 }
 #endif // !PXENGINE_SHADER_H_

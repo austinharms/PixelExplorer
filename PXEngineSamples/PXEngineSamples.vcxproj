@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h" />
+    <ClInclude Include="src\TestApplication.h" />
     <ClInclude Include="src\TestAsset.h" />
     <ClInclude Include="src\TestRenderObject.h" />
     <ClInclude Include="src\TestTextureRenderObject.h" />

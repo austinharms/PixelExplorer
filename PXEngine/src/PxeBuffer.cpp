@@ -25,7 +25,7 @@ namespace pxengine {
 			free(_buffer);
 	}
 
-	bool PxeBuffer::getAllocated() const
+	PXE_NODISCARD bool PxeBuffer::getAllocated() const
 	{
 		return !!_buffer;
 	}
@@ -48,11 +48,11 @@ namespace pxengine {
 		return *this;
 	}
 
-	size_t PxeBuffer::getSize() const {
+	PXE_NODISCARD size_t PxeBuffer::getSize() const {
 		return _size;
 	}
 
-	void* PxeBuffer::getBuffer() const
+	PXE_NODISCARD void* PxeBuffer::getBuffer() const
 	{
 		return _buffer;
 	}
