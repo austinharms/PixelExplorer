@@ -1,6 +1,7 @@
 #ifndef PXENGINESAMPELS_TEST_APPLICATION_H_
 #define PXENGINESAMPELS_TEST_APPLICATION_H_
 #include "PxeEngineAPI.h"
+#include "imgui.h"
 
 class TestApplication : public pxengine::PxeApplicationInterface
 {
@@ -31,6 +32,10 @@ public:
 			_mainWindow->drop();
 			_mainWindow = nullptr;
 		}
+	}
+
+	void preGUI(pxengine:: PxeWindow& window) override {
+		ImGui::ShowDemoWindow();
 	}
 
 

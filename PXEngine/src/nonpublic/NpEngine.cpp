@@ -312,7 +312,7 @@ namespace pxengine {
 		PXE_NODISCARD SDL_Window* NpEngine::createSDLWindow(NpWindow& window)
 		{
 			if (window.getPrimaryWindow()) {
-				SDL_Window* sdlWindow = SDL_CreateWindow(window.getWindowTitle(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.getWindowWidth(), window.getWindowHeight(), SDL_WINDOW_OPENGL);
+				SDL_Window* sdlWindow = SDL_CreateWindow(window.getWindowTitle(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.getWindowWidth(), window.getWindowHeight(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 				if (!sdlWindow) {
 					PXE_CHECKSDLERROR();
 					PXE_FATAL("Failed to Create SDL Window");

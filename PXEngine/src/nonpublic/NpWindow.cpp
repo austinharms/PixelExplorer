@@ -153,17 +153,17 @@ namespace pxengine {
 
 		void NpWindow::updateWindowProperties()
 		{
-			if (_propertyFlags | WINDOW_TITLE_CHANGED && _sdlWindow) {
+			if (_propertyFlags & WINDOW_TITLE_CHANGED && _sdlWindow) {
 				SDL_SetWindowTitle(_sdlWindow, _title);
 				_propertyFlags ^= WINDOW_TITLE_CHANGED;
 			}
 
-			if (_propertyFlags | WINDOW_SIZE_CHANGED && _sdlWindow) {
+			if (_propertyFlags & WINDOW_SIZE_CHANGED && _sdlWindow) {
 				SDL_SetWindowSize(_sdlWindow, _width, _height);
 				_propertyFlags ^= WINDOW_SIZE_CHANGED;
 			}
 
-			if (_propertyFlags | WINDOW_SWAP_CHANGED && _sdlWindow) {
+			if (_propertyFlags & WINDOW_SWAP_CHANGED && _sdlWindow) {
 				SDL_GL_SetSwapInterval(_swapInterval);
 				_propertyFlags ^= WINDOW_SWAP_CHANGED;
 			}
