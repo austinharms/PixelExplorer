@@ -7,7 +7,7 @@
 #include "PxeRefCount.h"
 #include "PxeBuffer.h"
 #include "PxeShader.h"
-#include "PxeRenderTexture.h"
+#include "PxeTexture.h"
 
 namespace pxengine {
 	// Class that stores/automates PxeShader Uniform bindings
@@ -68,7 +68,7 @@ namespace pxengine {
 		void setPropertyM3x4fv(const std::string& name, const float* values, uint32_t count);
 		void setPropertyM4x3fv(const std::string& name, const float* values, uint32_t count);
 
-		void setTexture(const std::string& name, PxeRenderTexture& texture, uint8_t textureSlot);
+		void setTexture(const std::string& name, PxeTexture& texture, uint8_t textureSlot);
 
 		// Applies all stored properties to the PxeShader
 		// Note: This assumes the stored PxeShader is already bound and there is a valid OpenGl context
@@ -145,7 +145,7 @@ namespace pxengine {
 				struct PxeTextureBinding
 				{
 					uint8_t Slot;
-					PxeRenderTexture* renderTexture;
+					PxeTexture* renderTexture;
 				} texture;
 			} Value;
 

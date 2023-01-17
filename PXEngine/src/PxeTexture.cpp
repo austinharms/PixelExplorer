@@ -1,11 +1,11 @@
-#include "PxeRenderTexture.h"
+#include "PxeTexture.h"
 
 #include "NpLogger.h"
 #include "GL/glew.h"
 #include "stb_image.h"
 
 namespace pxengine {
-	PxeRenderTexture::PxeRenderTexture() {
+	PxeTexture::PxeTexture() {
 		_imageData = nullptr;
 		_glTextureId = 0;
 		_width = 0;
@@ -15,7 +15,7 @@ namespace pxengine {
 		_textureLoaded = false;
 	}
 
-	void PxeRenderTexture::initializeGl()
+	void PxeTexture::initializeGl()
 	{
 		glGenTextures(1, &_glTextureId);
 		if (!getValid()) {
@@ -34,17 +34,17 @@ namespace pxengine {
 		glBindTexture(GL_TEXTURE_2D, previousTexture);
 	}
 
-	void PxeRenderTexture::uninitializeGl()
+	void PxeTexture::uninitializeGl()
 	{
 		_textureLoaded = false;
 		glDeleteTextures(1, &_glTextureId);
 		_glTextureId = 0;
 	}
 
-	void PxeRenderTexture::bind()
+	void PxeTexture::bind()
 	{
 		if (!getValid()) {
-			PXE_WARN("Attempted to bind invalid PxeRenderTexture");
+			PXE_WARN("Attempted to bind invalid PxeTexture");
 			return;
 		}
 
@@ -54,20 +54,20 @@ namespace pxengine {
 			updateTexture();
 	}
 
-	void PxeRenderTexture::unbind()
+	void PxeTexture::unbind()
 	{
 		glActiveTexture(GL_TEXTURE0 + _textureSlot);
 #ifdef PXE_DEBUG
 		uint32_t previousTexture;
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, (int32_t*)(&previousTexture));
 		if (previousTexture != _glTextureId) {
-			PXE_WARN("unbind called on unbound PxeRenderTexture");
+			PXE_WARN("unbind called on unbound PxeTexture");
 		}
 #endif // PXE_DEBUG
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void PxeRenderTexture::updateTexture()
+	void PxeTexture::updateTexture()
 	{
 		if (!getTexturePending()) return;
 		void* pixels = _imageData;
@@ -80,7 +80,7 @@ namespace pxengine {
 		freePendingTexture();
 	}
 
-	void PxeRenderTexture::freePendingTexture()
+	void PxeTexture::freePendingTexture()
 	{
 		if (!getTexturePending()) return;
 		if (_stbImage) {
@@ -93,12 +93,12 @@ namespace pxengine {
 		_imageData = nullptr;
 	}
 
-	PxeRenderTexture::~PxeRenderTexture()
+	PxeTexture::~PxeTexture()
 	{
 		freePendingTexture();
 	}
 
-	void PxeRenderTexture::loadImage(uint16_t width, uint16_t height, PxeBuffer& pixelData)
+	void PxeTexture::loadImage(uint16_t width, uint16_t height, PxeBuffer& pixelData)
 	{
 		pixelData.grab();
 		freePendingTexture();
@@ -108,7 +108,7 @@ namespace pxengine {
 		_stbImage = false;
 	}
 
-	void PxeRenderTexture::loadImage(const std::filesystem::path& path)
+	void PxeTexture::loadImage(const std::filesystem::path& path)
 	{
 		int width = 0;
 		int height = 0;
@@ -126,42 +126,42 @@ namespace pxengine {
 		_height = static_cast<uint16_t>(height);
 	}
 
-	PXE_NODISCARD bool PxeRenderTexture::getValid() const
+	PXE_NODISCARD bool PxeTexture::getValid() const
 	{
 		return _glTextureId;
 	}
 
-	void PxeRenderTexture::setTextureSlot(uint8_t slot)
+	void PxeTexture::setTextureSlot(uint8_t slot)
 	{
 		_textureSlot = slot;
 	}
 
-	PXE_NODISCARD uint8_t PxeRenderTexture::getTextureSlot() const
+	PXE_NODISCARD uint8_t PxeTexture::getTextureSlot() const
 	{
 		return _textureSlot;
 	}
 
-	PXE_NODISCARD bool PxeRenderTexture::getTexturePending() const
+	PXE_NODISCARD bool PxeTexture::getTexturePending() const
 	{
 		return _imageData;
 	}
 
-	PXE_NODISCARD bool PxeRenderTexture::getTextureLoaded() const
+	PXE_NODISCARD bool PxeTexture::getTextureLoaded() const
 	{
 		return _textureLoaded;
 	}
 
-	PXE_NODISCARD uint32_t PxeRenderTexture::getGlTextureId() const
+	PXE_NODISCARD uint32_t PxeTexture::getGlTextureId() const
 	{
 		return _glTextureId;
 	}
 
-	PXE_NODISCARD uint16_t PxeRenderTexture::getTextureWidth() const
+	PXE_NODISCARD uint16_t PxeTexture::getTextureWidth() const
 	{
 		return _width;
 	}
 
-	PXE_NODISCARD uint16_t PxeRenderTexture::getTextureHeight() const
+	PXE_NODISCARD uint16_t PxeTexture::getTextureHeight() const
 	{
 		return _height;
 	}

@@ -12,7 +12,7 @@
 #include "PxeRenderElement.h"
 #include "PxeRenderMaterial.h"
 #include "PxeRenderObject.h"
-#include "PxeRenderTexture.h"
+#include "PxeTexture.h"
 #include "PxeRingBuffer.h"
 #include "PxeScene.h"
 #include "PxeShader.h"

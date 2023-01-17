@@ -17,6 +17,8 @@ public:
 		using namespace pxengine;
 		PxeEngine& engine = pxeGetEngine();
 		_mainWindow = engine.createWindow(600, 400, "Main Window", 0);
+		PxeWindow* testWindow = engine.createWindow(600, 400, "Window 2", 1);
+		testWindow->drop();
 		PxeScene* scene = engine.createScene();
 		_mainWindow->setScene(scene);
 
@@ -25,7 +27,7 @@ public:
 		shader->drop();
 		shader = nullptr;
 
-		PxeRenderTexture* texture = new(std::nothrow) PxeRenderTexture();
+		PxeTexture* texture = new(std::nothrow) PxeTexture();
 		texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
 		material->setTexture("u_Texture", *texture, 0);
 		material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));

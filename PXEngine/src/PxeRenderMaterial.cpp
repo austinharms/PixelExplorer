@@ -604,7 +604,7 @@ namespace pxengine {
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT4X3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
 	}
 
-	void PxeRenderMaterial::setTexture(const std::string& name, PxeRenderTexture& texture, uint8_t textureSlot)
+	void PxeRenderMaterial::setTexture(const std::string& name, PxeTexture& texture, uint8_t textureSlot)
 	{
 		texture.grab();
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::TEXTURE, PxeRenderMaterialValue::PxePropertyValue{ .texture = PxeRenderMaterialValue::PxePropertyValue::PxeTextureBinding { textureSlot, &texture } });
@@ -624,7 +624,7 @@ namespace pxengine {
 		}
 
 #ifdef PXE_DEBUG
-		std::unordered_map<uint8_t, PxeRenderTexture*> boundTextures;
+		std::unordered_map<uint8_t, PxeTexture*> boundTextures;
 #endif // PXE_DEBUG
 
 
@@ -704,7 +704,7 @@ namespace pxengine {
 					{
 						auto it = boundTextures.find(materialProperty.Value.texture.Slot);
 						if (it != boundTextures.end() && it->second != materialProperty.Value.texture.renderTexture) {
-							PXE_WARN("Bound multiple different PxeRenderTextures to the same gl texture slot, this is most likely an error");
+							PXE_WARN("Bound multiple different PxeTextures to the same gl texture slot, this is most likely an error");
 						}
 					}
 #endif

@@ -1,5 +1,5 @@
-#ifndef PXENGINE_RENDERTEXTURE_H_
-#define PXENGINE_RENDERTEXTURE_H_
+#ifndef PXENGINE_TEXTURE_H_
+#define PXENGINE_TEXTURE_H_
 #include <filesystem>
 
 #include "PxeTypes.h"
@@ -8,23 +8,23 @@
 
 namespace pxengine {
 	// Wrapper class for a GL_TEXTURE_2D
-	class PxeRenderTexture : public PxeGLAsset
+	class PxeTexture : public PxeGLAsset
 	{
 	public:
-		PxeRenderTexture();
-		virtual ~PxeRenderTexture();
+		PxeTexture();
+		virtual ~PxeTexture();
 
 		void bind() override;
 
 		void unbind() override;
 
 		// TODO Add support for more texture formats
-		// Loads pixelData into the PxeRenderTexture
+		// Loads pixelData into the PxeTexture
 		// Note: pixelData is expected to be in the format RGBA with each component 8 bits
 		// Note: the GL_TEXTURE_2D will only be updated on the next call to bind()
 		void loadImage(uint16_t width, uint16_t height, PxeBuffer& pixelData);
 
-		// Loads an image from file system into the PxeRenderTexture
+		// Loads an image from file system into the PxeTexture
 		// Note: currently only configured for PNG images 
 		// Note: the GL_TEXTURE_2D will only be updated on the next call to bind()
 		void loadImage(const std::filesystem::path& path);
@@ -56,8 +56,8 @@ namespace pxengine {
 		// Note: if there is a texture pending this will return the height of the pending texture
 		PXE_NODISCARD uint16_t getTextureHeight() const;
 
-		PxeRenderTexture(const PxeRenderTexture& other) = delete;
-		PxeRenderTexture operator=(const PxeRenderTexture& other) = delete;
+		PxeTexture(const PxeTexture& other) = delete;
+		PxeTexture operator=(const PxeTexture& other) = delete;
 
 	protected:
 		void initializeGl() override;

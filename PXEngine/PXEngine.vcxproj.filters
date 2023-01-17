@@ -57,7 +57,7 @@
     <ClCompile Include="src\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PxeRenderTexture.cpp">
+    <ClCompile Include="src\PxeTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\imgui\backends\imgui_impl_opengl3.cpp">
@@ -161,7 +161,7 @@
     <ClInclude Include="include\PxeRenderMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeRenderTexture.h">
+    <ClInclude Include="include\PxeTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\imgui\backends\imgui_impl_opengl3.h">
