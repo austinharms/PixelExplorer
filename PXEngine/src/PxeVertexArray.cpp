@@ -20,10 +20,11 @@ namespace pxengine {
 
 	void PxeVertexArray::bind()
 	{
-		if (!getValid()) {
-			PXE_WARN("Attempted to bind invalid PxeVertexArray");
-			return;
+#ifdef PXE_DEBUG
+		if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+			PXE_WARN("Bound PxeVertexArray that's status was not INITIALIZED");
 		}
+#endif // PXE_DEBUG
 
 		glBindVertexArray(_glId);
 		if (_bufferBindingsDirty)
@@ -86,6 +87,7 @@ namespace pxengine {
 		glGenVertexArrays(1, &_glId);
 		if (!getValid()) {
 			PXE_ERROR("Failed to create GLVertexArray");
+			setErrorStatus();
 			return;
 		}
 

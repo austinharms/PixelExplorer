@@ -20,6 +20,12 @@ namespace pxengine {
 
 	void PxeIndexBuffer::bind()
 	{
+#ifdef PXE_DEBUG
+		if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+			PXE_WARN("Bound PxeIndexBuffer that's status was not INITIALIZED");
+		}
+#endif // PXE_DEBUG
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _glBufferId);
 		updateGlBuffer();
 	}
@@ -75,6 +81,7 @@ namespace pxengine {
 		glGenBuffers(1, &_glBufferId);
 		if (!getValid()) {
 			PXE_ERROR("Failed to create GL_ELEMENT_ARRAY_BUFFER buffer");
+			setErrorStatus();
 			return;
 		}
 

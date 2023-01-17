@@ -20,6 +20,7 @@ namespace pxengine {
 		glGenTextures(1, &_glTextureId);
 		if (!getValid()) {
 			PXE_ERROR("Failed to create GLTexture");
+			setErrorStatus();
 			return;
 		}
 
@@ -43,10 +44,11 @@ namespace pxengine {
 
 	void PxeTexture::bind()
 	{
-		if (!getValid()) {
-			PXE_WARN("Attempted to bind invalid PxeTexture");
-			return;
+#ifdef PXE_DEBUG
+		if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+			PXE_WARN("Bound PxeTexture that's status was not INITIALIZED");
 		}
+#endif // PXE_DEBUG
 
 		glActiveTexture(GL_TEXTURE0 + _textureSlot);
 		glBindTexture(GL_TEXTURE_2D, _glTextureId);
