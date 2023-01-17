@@ -5,7 +5,7 @@
 namespace pxengine {
 	PxeRenderMaterial::PxeRenderMaterial(PxeShader& shader) : _shader(shader) {
 		shader.grab();
-		_lastShaderCount = 0;
+		_loadedPropertyLocations = false;
 		if (shader.getAssetStatus() == PxeGLAssetStatus::ERROR) {
 			PXE_WARN("Created PxeRenderMaterial with invalid PxeShader");
 		}
@@ -612,16 +612,14 @@ namespace pxengine {
 
 	void PxeRenderMaterial::applyMaterial()
 	{
-		if (!_shader.getValid()) {
-			PXE_WARN("Attempted to apply PxeRenderMaterial to invalid PxeShader");
-			return;
+#ifdef PXE_DEBUG
+		if (_shader.getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+			PXE_WARN("Applying PxeRenderMaterial to PxeShader that's status was not INITIALIZED");
 		}
+#endif // PXE_DEBUG
 
-		if (_lastShaderCount != _shader.getAssetInitializationCount()) {
-			PXE_INFO("Updated PxeRenderMaterial uniform locations");
-			_lastShaderCount = _shader.getAssetInitializationCount();
-			updatePropertyLocations();
-		}
+		if (!_loadedPropertyLocations)
+			loadPropertyLocations();
 
 #ifdef PXE_DEBUG
 		std::unordered_map<uint8_t, PxeTexture*> boundTextures;
@@ -793,10 +791,12 @@ namespace pxengine {
 		return _shader;
 	}
 
-	void PxeRenderMaterial::updatePropertyLocations()
+	void PxeRenderMaterial::loadPropertyLocations()
 	{
 		for (auto it = _materialProperties.begin(); it != _materialProperties.end(); ++it) {
 			it->second.UniformLocation = _shader.getUniformLocation(it->first);
 		}
+
+		_loadedPropertyLocations = true;
 	}
 }

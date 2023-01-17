@@ -20,7 +20,6 @@ namespace pxengine {
 			int32_t getUniformLocation(const std::string& name) override;
 			uint32_t getGlProgramId() const override;
 			const std::filesystem::path& getShaderPath() const override;
-			uint32_t getAssetInitializationCount() const override;
 
 			void setUniform1fv(const int32_t location, const float* values, uint32_t count) override;
 			void setUniform2fv(const int32_t location, const float* values, uint32_t count) override;

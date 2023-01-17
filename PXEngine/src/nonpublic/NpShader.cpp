@@ -177,10 +177,11 @@ namespace pxengine {
 
 		void NpShader::bind()
 		{
-			if (!getValid()) {
-				PXE_WARN("Attempted to bind invalid PxeShader");
-				return;
+#ifdef PXE_DEBUG
+			if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+				PXE_WARN("Bound PxeShader that's status was not INITIALIZED");
 			}
+#endif // PXE_DEBUG
 
 			glUseProgram(_glProgramId);
 		}
@@ -411,11 +412,6 @@ namespace pxengine {
 		const std::filesystem::path& NpShader::getShaderPath() const
 		{
 			return _path;
-		}
-
-		uint32_t NpShader::getAssetInitializationCount() const
-		{
-			return _initializationCount;
 		}
 	}
 }

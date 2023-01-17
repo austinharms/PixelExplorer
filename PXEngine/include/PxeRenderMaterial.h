@@ -197,14 +197,13 @@ namespace pxengine {
 		};
 
 	private:
-		// TODO Is this function still needed?
 		// Update PxeRenderMaterialValue uniform locations
 		// Note: Assumes PxeShader is bound and a valid OpenGl context
-		void updatePropertyLocations();
+		void loadPropertyLocations();
 
 		std::unordered_map<std::string, PxeRenderMaterialValue> _materialProperties;
 		PxeShader& _shader;
-		uint32_t _lastShaderCount;
+		bool _loadedPropertyLocations;
 	};
 }
 #endif // !PXENGINE_RENDER_MATERIAL_H_

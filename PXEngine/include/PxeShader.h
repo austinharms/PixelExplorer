@@ -29,11 +29,6 @@ namespace pxengine {
 		// Returns the path used to load the shader
 		virtual PXE_NODISCARD const std::filesystem::path& getShaderPath() const = 0;
 
-		// TODO Is this function still needed?
-		// Returns the number of times the PxeShader was initialized
-		// Note: useful to check if uniform locations need updating
-		virtual PXE_NODISCARD uint32_t getAssetInitializationCount() const = 0;
-
 		inline void setUniform1f(const std::string& name, const float value) { setUniform1fv(name, &value, 1); }
 		inline void setUniform2f(const std::string& name, const glm::vec2& value) { setUniform2fv(name, glm::value_ptr(value), 1); }
 		inline void setUniform3f(const std::string& name, const glm::vec3& value) { setUniform3fv(name, glm::value_ptr(value), 1); }
