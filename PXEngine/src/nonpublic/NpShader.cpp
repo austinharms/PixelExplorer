@@ -159,7 +159,7 @@ namespace pxengine {
 			++_initializationCount;
 			_glProgramId = loadShaderFile(_path);
 			if (getValid()) {
-				PXE_INFO("Initialized PxeShader " + _path.string());
+				PXE_INFO("Initialized PxeShader " + _path.string() + " with GL Id: " + std::to_string(_glProgramId));
 			}
 			else {
 				setErrorStatus();

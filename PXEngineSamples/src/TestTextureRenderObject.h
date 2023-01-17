@@ -1,14 +1,9 @@
-#include <new>
-
-#include "PxeIndexBuffer.h"
-#include "PxeVertexBuffer.h"
-#include "PxeVertexArray.h"
-#include "PxeVertexBufferAttrib.h"
-#include "PxeVertexBufferFormat.h"
-#include "PxeRenderObject.h"
-
 #ifndef PXENGINESAMPLES_TEST_TEXTURED_RENDER_OBJECT_H_
 #define PXENGINESAMPLES_TEST_TEXTURED_RENDER_OBJECT_H_
+#include <new>
+
+#include "PxeEngineAPI.h"
+#include "GL/glew.h"
 
 class TestTexturedRenderObject : public pxengine::PxeRenderObject
 {
@@ -17,15 +12,12 @@ public:
 
 
 		_indexBuffer = new(std::nothrow) pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_8BIT);
-		_indexBuffer->initializeAsset();
 		pxengine::PxeVertexBufferFormat format(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 3, false));
 		format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 2, false));
 		_vertexBuffer = new(std::nothrow) pxengine::PxeVertexBuffer(format);
-		_vertexBuffer->initializeAsset();
 		_vertexArray = new(std::nothrow) pxengine::PxeVertexArray();
 		_vertexArray->addVertexBuffer(*_vertexBuffer, 0, 0);
 		_vertexArray->addVertexBuffer(*_vertexBuffer, 1, 1);
-		_vertexArray->initializeAsset();
 
 		float vertices[40] = {
 		 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  // 0
@@ -65,7 +57,7 @@ public:
 		_vertexBuffer->drop();
 	}
 
-	void render() override {
+	void onRender() override {
 		_vertexArray->bind();
 		_indexBuffer->bind();
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);

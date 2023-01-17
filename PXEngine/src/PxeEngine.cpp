@@ -72,7 +72,6 @@ namespace pxengine {
 			}
 
 			engine->processEvents();
-			engine->processAssetQueue();
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Render thread took: " + std::to_string(SDL_GetTicks64() - time));
 #endif
