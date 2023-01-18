@@ -352,5 +352,13 @@ namespace pxengine {
 		{
 			return _eventBuffer.insert(event);
 		}
+
+		PXE_NODISCARD void* NpWindow::getUserData() const {
+			return _userData;
+		}
+
+		void NpWindow::setUserData(void* data) {
+			_userData = data;
+		}
 	}
 }

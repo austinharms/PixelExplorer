@@ -21,6 +21,8 @@ namespace pxengine::nonpublic {
 		void removeRenderable(PxeRenderBase& renderable) override;
 		PXE_NODISCARD const glm::mat4& getViewMatrix() const override;
 		void setViewMatrix(const glm::mat4& view) override;
+		PXE_NODISCARD void* getUserData() const override;
+		void setUserData(void* data) override;
 
 
 		//############# PRIVATE API ##################
@@ -31,6 +33,7 @@ namespace pxengine::nonpublic {
 		void simulatePhysics(float time);
 
 	private:
+		void* _userData;
 		physx::PxScene* _physScene;
 		std::list<PxeRenderBase*> _renderables[(int8_t)PxeRenderPass::RENDER_PASS_COUNT];
 		glm::mat4 _viewMatrix;

@@ -35,6 +35,8 @@ namespace pxengine {
 			void setProjectionPerspective(float fov, float near, float far) override;
 			PXE_NODISCARD const glm::mat4& getProjectionMatrix() const override;
 			PXE_NODISCARD PxeWindowProjection getProjectionType() const override;
+			PXE_NODISCARD void* getUserData() const override;
+			void setUserData(void* data) override;
 
 
 			//############# PRIVATE API ##################
@@ -75,6 +77,7 @@ namespace pxengine {
 			void setFlag(NpWindowFlags flag, bool value);
 			void setFlag(NpWindowFlags flag);
 
+			void* _userData;
 			SDL_Window* _sdlWindow;
 			ImGuiContext* _guiContext;
 			NpScene* _scene;

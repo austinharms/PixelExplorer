@@ -39,6 +39,14 @@ namespace pxengine {
 		// Sets the view matrix used when the scene is rendered
 		virtual void setViewMatrix(const glm::mat4& view) = 0;
 
+		// Returns the user data void*
+		// Note: this is purely for application uses and is not used by the engine 
+		virtual PXE_NODISCARD void* getUserData() const = 0;
+
+		// Sets the user data void*
+		// Note: this is purely for application uses and is not used by the engine 
+		virtual void setUserData(void* data) = 0;
+
 		PxeScene(const PxeScene& other) = delete;
 		PxeScene operator=(const PxeScene& other) = delete;
 	};

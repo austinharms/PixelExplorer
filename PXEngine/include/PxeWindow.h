@@ -65,6 +65,14 @@ namespace pxengine {
 		// Returns the type of projection matrix used when the scene is rendered
 		virtual PXE_NODISCARD PxeWindowProjection getProjectionType() const = 0;
 
+		// Returns the user data void*
+		// Note: this is purely for application uses and is not used by the engine 
+		virtual PXE_NODISCARD void* getUserData() const = 0;
+
+		// Sets the user data void*
+		// Note: this is purely for application uses and is not used by the engine 
+		virtual void setUserData(void* data) = 0;
+
 		//TODO Add window event callback functions
 
 		virtual ~PxeWindow() = default;

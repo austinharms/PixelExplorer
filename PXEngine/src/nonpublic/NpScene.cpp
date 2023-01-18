@@ -130,4 +130,12 @@ namespace pxengine::nonpublic {
 	{
 		_viewMatrix = view;
 	}
+
+	PXE_NODISCARD void* NpScene::getUserData() const {
+		return _userData;
+	}
+
+	void NpScene::setUserData(void* data) {
+		_userData = data;
+	}
 }
