@@ -16,9 +16,6 @@ namespace pxengine {
 		PxeShader() = default;
 		virtual ~PxeShader() = default;
 
-		// Returns if the glProgram is created and passed validation
-		virtual PXE_NODISCARD bool getValid() const = 0;
-
 		// Returns the location of the uniform with {name}
 		// Note: returns -1 on error or if the uniform does not exist
 		virtual PXE_NODISCARD int32_t getUniformLocation(const std::string& name) = 0;

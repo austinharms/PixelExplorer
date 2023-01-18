@@ -67,11 +67,6 @@ namespace pxengine {
 		return _glBufferId;
 	}
 
-	PXE_NODISCARD bool PxeVertexBuffer::getValid() const
-	{
-		return _glBufferId;
-	}
-
 	PXE_NODISCARD const PxeVertexBufferFormat& PxeVertexBuffer::getFormat() const
 	{
 		return _format;
@@ -85,12 +80,6 @@ namespace pxengine {
 	void PxeVertexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
-		if (!getValid()) {
-			PXE_ERROR("Failed to create GL_ARRAY_BUFFER buffer");
-			setErrorStatus();
-			return;
-		}
-
 		if (getBufferPending()) {
 			// restores previously bound buffer
 			uint32_t previousBuffer;
@@ -108,7 +97,7 @@ namespace pxengine {
 
 	void PxeVertexBuffer::updateGlBuffer()
 	{
-		if (!getBufferPending() || !getValid()) return;
+		if (!getBufferPending()) return;
 #ifdef PXE_DEBUG
 		if (_pendingBuffer->getSize() % _format.getStride() != 0) {
 			PXE_WARN("Buffer data not divisible by buffer stride");

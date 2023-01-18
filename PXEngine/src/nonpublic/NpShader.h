@@ -15,8 +15,6 @@ namespace pxengine {
 		public:
 			//############# PUBLIC API ##################
 
-			// note this only checks for initial validation not for current validation
-			bool getValid() const override;
 			int32_t getUniformLocation(const std::string& name) override;
 			uint32_t getGlProgramId() const override;
 			const std::filesystem::path& getShaderPath() const override;

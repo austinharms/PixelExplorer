@@ -60,7 +60,7 @@ namespace pxengine {
 			const std::unordered_map<PxeWindowId, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				NpWindow& window = *(it->second);
-				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene()) continue;
+				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene() || !window.getWindowWidth() || !window.getWindowHeight()) continue;
 				engine->newFrame(window);
 				application->preRender(window);
 				engine->renderFrame(window);
@@ -69,6 +69,7 @@ namespace pxengine {
 				application->postGUI(window);
 				application->postRender(window);
 				engine->swapFramebuffer(window);
+				engine->bindPrimaryGlContext();
 			}
 
 			engine->processEvents();
@@ -113,7 +114,6 @@ namespace pxengine {
 			startTime = SDL_GetTicks64();
 			tempTime = SDL_GetTicks64();
 #endif
-
 			engine->processAssetQueue();
 
 #ifdef PXE_DEBUG_TIMING
@@ -147,7 +147,6 @@ namespace pxengine {
 #endif
 
 		engine->shutdownEngine();
-
 		engine = nullptr;
 	}
 }

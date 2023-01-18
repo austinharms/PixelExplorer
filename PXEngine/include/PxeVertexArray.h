@@ -20,10 +20,6 @@ namespace pxengine {
 		// Binds 0 as glVertexArray
 		void unbind() override;
 
-		// Returns if the glVertexArray is created
-		// Note: does NOT check if vertex buffers are valid
-		PXE_NODISCARD bool getValid() const;
-
 		// Rebinds and updates all vertex buffer attribs
 		// Note: only happens after the next call to bind()
 		void updateBufferBindings();

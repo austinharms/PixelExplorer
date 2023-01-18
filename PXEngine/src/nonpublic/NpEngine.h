@@ -72,17 +72,19 @@ namespace pxengine {
 			void renderFrame(NpWindow& window);
 			void renderGui(NpWindow& window);
 			void swapFramebuffer(NpWindow& window);
+			void bindPrimaryGlContext();
 
 		private:
 			static NpEngine* s_instance;
+			const char* EXTENDED_WINDOW_DATA_NAME = "PXE_NP_WINDOW_DATA";
 			static void GLAPIENTRY glErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 
 			void initPhysics();
 			void deinitPhysics();
 			void initSDL();
 			void deinitSDL();
-			void initRendering(SDL_Window* window);
-			void deinitRendering();
+			void initPrimaryGlContext();
+			void forceAssetInit(PxeGLAsset& asset);
 
 			// map of all the NpWindows that exist by PxeWindowId
 			std::unordered_map<PxeWindowId, NpWindow*> _pxeWindows;
@@ -103,11 +105,13 @@ namespace pxengine {
 			physx::PxDefaultAllocator _physAllocator;
 			physx::PxTolerancesScale _physScale;
 			PxeLogInterface& _logInterface;
-			SDL_GLContext _sdlGlContext;
+			NpWindow* _primaryWindow;
+			SDL_GLContext _primaryGlContext;
 			uint32_t _activeMouseWindowId;
 			uint32_t _activeKeyboardWindowId;
-			PxeWindowId _primaryWindowId;
 			ImFontAtlas _guiFontAtlas;
+			void* _guiBackend;
+			uint16_t _guiBackendReferenceCount;
 			// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
 			void* _shutdownFlag;
 		};

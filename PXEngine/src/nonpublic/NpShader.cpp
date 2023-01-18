@@ -43,11 +43,6 @@ namespace pxengine {
 			return res;
 		}
 
-		bool NpShader::getValid() const
-		{
-			return _glProgramId;
-		}
-
 		void NpShader::setUniform1fv(const int32_t location, const float* values, uint32_t count)
 		{
 			glUniform1fv(location, count, values);
@@ -158,7 +153,7 @@ namespace pxengine {
 			_uniformLocations.clear();
 			++_initializationCount;
 			_glProgramId = loadShaderFile(_path);
-			if (getValid()) {
+			if (_glProgramId) {
 				PXE_INFO("Initialized PxeShader " + _path.string() + " with GL Id: " + std::to_string(_glProgramId));
 			}
 			else {
@@ -168,11 +163,9 @@ namespace pxengine {
 
 		void NpShader::uninitializeGl()
 		{
-			if (getValid()) {
-				glDeleteProgram(_glProgramId);
-				_glProgramId = 0;
-				PXE_INFO("Uninitialized PxeShader " + _path.string());
-			}
+			glDeleteProgram(_glProgramId);
+			_glProgramId = 0;
+			PXE_INFO("Uninitialized PxeShader " + _path.string());
 		}
 
 		void NpShader::bind()
@@ -201,7 +194,8 @@ namespace pxengine {
 
 		void NpShader::onDelete()
 		{
-			NpEngine::getInstance().removeShader(_path);
+			if (getAssetStatus() != PxeGLAssetStatus::UNINITIALIZED)
+				NpEngine::getInstance().removeShader(_path);
 			PxeGLAsset::onDelete();
 		}
 
@@ -384,8 +378,8 @@ namespace pxengine {
 
 		int32_t NpShader::getUniformLocation(const std::string& name)
 		{
-			if (!getValid()) {
-				PXE_WARN("Attempted to get uniform location of invalid PxeShader");
+			if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+				PXE_ERROR("Attempted to get uniform location using PxeShader that's status was not INITIALIZED");
 				return -1;
 			}
 

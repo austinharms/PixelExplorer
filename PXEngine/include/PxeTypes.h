@@ -19,7 +19,6 @@
 
 namespace pxengine {
 	typedef uint16_t PxeWindowId;
-	const PxeWindowId constexpr PxeInvalidWindowId = static_cast<PxeWindowId>(-1);
 
 	enum class PxeGLAssetStatus : uint8_t
 	{

@@ -18,12 +18,6 @@ namespace pxengine {
 	void PxeTexture::initializeGl()
 	{
 		glGenTextures(1, &_glTextureId);
-		if (!getValid()) {
-			PXE_ERROR("Failed to create GLTexture");
-			setErrorStatus();
-			return;
-		}
-
 		uint32_t previousTexture;
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, (int32_t*)(&previousTexture));
 		glBindTexture(GL_TEXTURE_2D, _glTextureId);
@@ -126,11 +120,6 @@ namespace pxengine {
 		_imageData = pixels;
 		_width = static_cast<uint16_t>(width);
 		_height = static_cast<uint16_t>(height);
-	}
-
-	PXE_NODISCARD bool PxeTexture::getValid() const
-	{
-		return _glTextureId;
 	}
 
 	void PxeTexture::setTextureSlot(uint8_t slot)

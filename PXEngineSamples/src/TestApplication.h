@@ -1,6 +1,7 @@
 #ifndef PXENGINESAMPELS_TEST_APPLICATION_H_
 #define PXENGINESAMPELS_TEST_APPLICATION_H_
 #include <new>
+#include <string>
 
 #include "PxeEngineAPI.h"
 #include "imgui.h"
@@ -11,16 +12,19 @@ class TestApplication : public pxengine::PxeApplicationInterface
 public:
 	TestApplication() {
 		_mainWindow = nullptr;
+		_testWindow = nullptr;
+		_testScene = nullptr;
+		_windowIdCounter = 0;
 	}
 
 	void onStart() override {
 		using namespace pxengine;
 		PxeEngine& engine = pxeGetEngine();
-		_mainWindow = engine.createWindow(600, 400, "Main Window", 0);
-		PxeWindow* testWindow = engine.createWindow(600, 400, "Window 2", 1);
-		testWindow->drop();
-		PxeScene* scene = engine.createScene();
-		_mainWindow->setScene(scene);
+		_mainWindow = engine.createWindow(600, 400, "Main Window", _windowIdCounter++);
+		_testWindow = engine.createWindow(600, 400, ("Window " + std::to_string(_windowIdCounter)).c_str(), _windowIdCounter++);
+		_testScene = engine.createScene();
+		_mainWindow->setScene(_testScene);
+		_testWindow->setScene(_testScene);
 
 		PxeShader* shader = engine.loadShader(getAssetPath("shaders") / "test.pxeshader");
 		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader);
@@ -38,12 +42,9 @@ public:
 		material->drop();
 		material = nullptr;
 
-		scene->addRenderable(*testObj);
+		_testScene->addRenderable(*testObj);
 		testObj->drop();
 		testObj = nullptr;
-
-		scene->drop();
-		scene = nullptr;
 	}
 
 	void onUpdate() override {
@@ -51,12 +52,26 @@ public:
 			_mainWindow->drop();
 			_mainWindow = nullptr;
 		}
+
+		if (_testWindow && _testWindow->getShouldClose()) {
+			_testWindow->drop();
+			_testWindow = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowIdCounter)).c_str(), _windowIdCounter++);
+			_testWindow->setScene(_testScene);
+		}
 	}
 
 	void onStop() override {
+		_testScene->drop();
+		_testScene = nullptr;
+
 		if (_mainWindow) {
 			_mainWindow->drop();
 			_mainWindow = nullptr;
+		}
+
+		if (_testWindow) {
+			_testWindow->drop();
+			_testWindow = nullptr;
 		}
 	}
 
@@ -64,8 +79,10 @@ public:
 		ImGui::ShowDemoWindow();
 	}
 
-
 private:
 	pxengine::PxeWindow* _mainWindow;
+	pxengine::PxeWindow* _testWindow;
+	pxengine::PxeScene* _testScene;
+	uint16_t _windowIdCounter;
 };
 #endif // !PXENGINESAMPELS_TEST_APPLICATION_H_

@@ -66,11 +66,6 @@ namespace pxengine {
 		return _glBufferId;
 	}
 
-	PXE_NODISCARD bool PxeIndexBuffer::getValid() const
-	{
-		return _glBufferId;
-	}
-
 	PXE_NODISCARD PxeIndexType PxeIndexBuffer::getIndexType() const
 	{
 		return _glBufferType;
@@ -79,12 +74,6 @@ namespace pxengine {
 	void PxeIndexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
-		if (!getValid()) {
-			PXE_ERROR("Failed to create GL_ELEMENT_ARRAY_BUFFER buffer");
-			setErrorStatus();
-			return;
-		}
-
 		if (getBufferPending()) {
 			// restores previously bound buffer
 			uint32_t previousBuffer;
@@ -102,7 +91,7 @@ namespace pxengine {
 
 	void PxeIndexBuffer::updateGlBuffer()
 	{
-		if (!getBufferPending() || !getValid()) return;
+		if (!getBufferPending()) return;
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _pendingBuffer->getSize(), _pendingBuffer->getBuffer(), GL_STATIC_DRAW);
 		_pendingBuffer->drop();
 		_pendingBuffer = nullptr;

@@ -273,8 +273,8 @@ namespace pxengine {
 		uint32_t NpWindow::getSDLWindowId() const
 		{
 #ifdef PXE_DEBUG
-			if (!_guiContext) {
-				PXE_WARN("Attempted to get if of invalid SDL window");
+			if (!_sdlWindow) {
+				PXE_WARN("Attempted to get id of invalid SDL window");
 				return static_cast<uint32_t>(-1);
 			}
 #endif // PXE_DEBUG

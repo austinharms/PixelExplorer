@@ -29,9 +29,6 @@ namespace pxengine {
 		// Note: the GL_TEXTURE_2D will only be updated on the next call to bind()
 		void loadImage(const std::filesystem::path& path);
 
-		// Returns if the GL_TEXTURE_2D is created/valid
-		PXE_NODISCARD bool getValid() const;
-
 		// Sets the glActiveTexture when bind is called
 		// Note: only 0-15 (inclusive) are guaranteed to work
 		void setTextureSlot(uint8_t slot);

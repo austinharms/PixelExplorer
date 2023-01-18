@@ -37,9 +37,6 @@ namespace pxengine {
 		// Returns the id of the internal GlBuffer
 		PXE_NODISCARD uint32_t getGlBufferId() const;
 
-		// Returns if the internal GlBuffer is created/valid
-		PXE_NODISCARD bool getValid() const;
-
 		// Returns the format of the vertex buffer
 		PXE_NODISCARD const PxeVertexBufferFormat& getFormat() const;
 
