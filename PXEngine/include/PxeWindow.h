@@ -32,9 +32,6 @@ namespace pxengine {
 		// Returns if this is the primary window
 		virtual PXE_NODISCARD bool getPrimaryWindow() const = 0;
 
-		// Returns the id used to create the window
-		virtual PXE_NODISCARD PxeWindowId getWindowId() const = 0;
-
 		// Returns the width of the window in pixels
 		virtual PXE_NODISCARD int32_t getWindowWidth() const = 0;
 
@@ -50,6 +47,23 @@ namespace pxengine {
 
 		// Sets the title of the window
 		virtual void setWindowTitle(const char* title) = 0;
+
+		// Sets the projection matrix used when the scene is rendered
+		virtual void setProjectionMatrix(const glm::mat4& proj) = 0;
+
+		// Sets the projection matrix to an orthographic projection, with {near} and {far} clipping panes
+		// Note: the projection will be automatically recalculated when the screen size changes
+		virtual void setProjectionOrthographic(float near, float far) = 0;
+
+		// Sets the projection matrix to an perspective projection, with a field of view of {fov}rad with {near} and {far} clipping panes
+		// Note: the projection will be automatically recalculated when the screen size changes
+		virtual void setProjectionPerspective(float fov, float near, float far) = 0;
+
+		// Returns the projection matrix used when the scene is rendered
+		virtual PXE_NODISCARD const glm::mat4& getProjectionMatrix() const = 0;
+
+		// Returns the type of projection matrix used when the scene is rendered
+		virtual PXE_NODISCARD PxeWindowProjection getProjectionType() const = 0;
 
 		//TODO Add window event callback functions
 

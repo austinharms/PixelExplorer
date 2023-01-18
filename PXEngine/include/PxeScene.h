@@ -33,6 +33,12 @@ namespace pxengine {
 		// Remove a PxeRenderBase aka a renderable object from the scene
 		virtual void removeRenderable(PxeRenderBase& renderable) = 0;
 
+		// Returns the view matrix used when the scene is rendered
+		virtual PXE_NODISCARD const glm::mat4& getViewMatrix() const = 0;
+
+		// Sets the view matrix used when the scene is rendered
+		virtual void setViewMatrix(const glm::mat4& view) = 0;
+
 		PxeScene(const PxeScene& other) = delete;
 		PxeScene operator=(const PxeScene& other) = delete;
 	};

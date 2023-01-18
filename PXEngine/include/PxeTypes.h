@@ -18,8 +18,6 @@
 #include "glm/mat4x3.hpp"
 
 namespace pxengine {
-	typedef uint16_t PxeWindowId;
-
 	enum class PxeGLAssetStatus : uint8_t
 	{
 		UNINITIALIZED = 0,
@@ -29,6 +27,14 @@ namespace pxengine {
 		INITIALIZING,
 		INITIALIZED,
 		ERROR,
+	};
+
+	enum class PxeWindowProjection
+	{
+		NONE = 0,
+		ORTHOGRAPHIC,
+		PERSPECTIVE,
+		CUSTOM,
 	};
 
 	enum class PxeIndexType : uint32_t

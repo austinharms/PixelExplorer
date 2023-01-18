@@ -25,17 +25,21 @@ namespace pxengine {
 			void setScene(PxeScene* scene) override;
 			PXE_NODISCARD PxeScene* getScene() const override;
 			PXE_NODISCARD bool getPrimaryWindow() const override;
-			PXE_NODISCARD PxeWindowId getWindowId() const override;
 			PXE_NODISCARD int32_t getWindowWidth() const override;
 			PXE_NODISCARD int32_t getWindowHeight() const override;
 			void setWindowSize(int32_t width, int32_t height) override;
 			PXE_NODISCARD const char* getWindowTitle() const override;
 			void setWindowTitle(const char* title) override;
+			void setProjectionMatrix(const glm::mat4& proj) override;
+			void setProjectionOrthographic(float near, float far) override;
+			void setProjectionPerspective(float fov, float near, float far) override;
+			PXE_NODISCARD const glm::mat4& getProjectionMatrix() const override;
+			PXE_NODISCARD PxeWindowProjection getProjectionType() const override;
 
 
 			//############# PRIVATE API ##################
 
-			NpWindow(int32_t width, int32_t height, const char* title, PxeWindowId windowId);
+			NpWindow(int32_t width, int32_t height, const char* title);
 			virtual ~NpWindow();
 			PXE_NODISCARD SDL_Window* getSDLWindow() const;
 			PXE_NODISCARD uint32_t getSDLWindowId() const;
@@ -59,10 +63,11 @@ namespace pxengine {
 		private:
 			enum class NpWindowFlags : uint8_t
 			{
-				SIZE_CHANGED =		0b00000001,
-				TITLE_CHANGED =		0b00000010,
-				PRIMARY_WINDOW =	0b00000100,
-				WINDOW_CLOSE =		0b00001000,
+				SIZE_CHANGED		= 0b00000001,
+				TITLE_CHANGED		= 0b00000010,
+				PRIMARY_WINDOW		= 0b00000100,
+				WINDOW_CLOSE		= 0b00001000,
+				PROJECTION_CHANGED	= 0b00010000,
 			};
 
 			bool getFlag(NpWindowFlags flag) const;
@@ -77,9 +82,12 @@ namespace pxengine {
 			int32_t _width;
 			int32_t _height;
 			PxeRingBuffer<SDL_Event, WINDOW_EVENT_BUFFER_SIZE> _eventBuffer;
-			PxeWindowId _windowId;
 			uint8_t _flags;
 			int8_t _vsyncMode;
+			PxeWindowProjection _projectionMode;
+			glm::mat4 _projectionMatrix;
+			// Stores values used to recreate projection matrix when window size changes
+			float _projectionProperties[3];
 		};
 	}
 }

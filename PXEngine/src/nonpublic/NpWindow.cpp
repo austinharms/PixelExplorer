@@ -5,10 +5,11 @@
 #include "NpEngine.h"
 #include "NpLogger.h"
 #include "backends/imgui_impl_sdl.h"
+#include "glm/ext/matrix_clip_space.hpp"
 
 namespace pxengine {
 	namespace nonpublic {
-		NpWindow::NpWindow(int32_t width, int32_t height, const char* title, PxeWindowId windowId)
+		NpWindow::NpWindow(int32_t width, int32_t height, const char* title)
 		{
 			_sdlWindow = nullptr;
 			_guiContext = nullptr;
@@ -16,9 +17,9 @@ namespace pxengine {
 			_title = nullptr;
 			_width = width;
 			_height = height;
-			_windowId = windowId;
 			_flags = 0;
 			_vsyncMode = static_cast<int8_t>(0xff);
+			setProjectionPerspective(glm::radians(90.0f), 0.1f, 100.0f);
 			setWindowTitle(title);
 		}
 
@@ -154,11 +155,11 @@ namespace pxengine {
 			if (!_guiContext) {
 				PXE_WARN("Attempted to bind invalid gui context");
 				return;
-	}
+			}
 #endif // PXE_DEBUG
 
 			ImGui::SetCurrentContext(_guiContext);
-}
+		}
 
 		void NpWindow::updateSDLWindowProperties()
 		{
@@ -169,11 +170,31 @@ namespace pxengine {
 			}
 
 			if (getFlag(NpWindowFlags::SIZE_CHANGED)) {
+				setFlag(NpWindowFlags::PROJECTION_CHANGED);
 				SDL_SetWindowSize(_sdlWindow, _width, _height);
 				clearFlag(NpWindowFlags::SIZE_CHANGED);
 			}
 
+			int32_t oldWidth = _width;
+			int32_t oldHeight = _height;
 			SDL_GetWindowSizeInPixels(_sdlWindow, &_width, &_height);
+			if (oldWidth != _width || oldHeight != _height) {
+				setFlag(NpWindowFlags::PROJECTION_CHANGED);
+			}
+
+			if (getFlag(NpWindowFlags::PROJECTION_CHANGED)) {
+				switch (_projectionMode)
+				{
+				case pxengine::PxeWindowProjection::ORTHOGRAPHIC:
+					_projectionMatrix = glm::ortho(-(float)_width / 2, (float)_width / 2, -(float)_height / 2, (float)_height / 2, _projectionProperties[0], _projectionProperties[1]);
+					break;
+				case pxengine::PxeWindowProjection::PERSPECTIVE:
+					_projectionMatrix = glm::perspective(_projectionProperties[0], (float)_width / _height, _projectionProperties[1], _projectionProperties[2]);
+					break;
+				}
+
+				clearFlag(NpWindowFlags::PROJECTION_CHANGED);
+			}
 		}
 
 		void NpWindow::setVsyncMode(int8_t mode)
@@ -229,11 +250,6 @@ namespace pxengine {
 			return getFlag(NpWindowFlags::PRIMARY_WINDOW);
 		}
 
-		PXE_NODISCARD PxeWindowId NpWindow::getWindowId() const
-		{
-			return _windowId;
-		}
-
 		PXE_NODISCARD int32_t NpWindow::getWindowWidth() const
 		{
 			return _width;
@@ -282,6 +298,39 @@ namespace pxengine {
 			setFlag(NpWindowFlags::TITLE_CHANGED);
 		}
 
+		void NpWindow::setProjectionMatrix(const glm::mat4& proj)
+		{
+			_projectionMode = PxeWindowProjection::CUSTOM;
+			_projectionMatrix = proj;
+		}
+
+		void NpWindow::setProjectionOrthographic(float near, float far)
+		{
+			_projectionMode = PxeWindowProjection::ORTHOGRAPHIC;
+			_projectionProperties[0] = near;
+			_projectionProperties[1] = far;
+			_projectionMatrix = glm::ortho(-(float)_width / 2, (float)_width / 2, -(float)_height / 2, (float)_height / 2, _projectionProperties[0], _projectionProperties[1]);
+		}
+
+		void NpWindow::setProjectionPerspective(float fov, float near, float far)
+		{
+			_projectionMode = PxeWindowProjection::PERSPECTIVE;
+			_projectionProperties[0] = fov;
+			_projectionProperties[1] = near;
+			_projectionProperties[2] = far;
+			_projectionMatrix = glm::perspective(_projectionProperties[0], (float)_width / _height, _projectionProperties[1], _projectionProperties[2]);
+		}
+
+		PXE_NODISCARD const glm::mat4& NpWindow::getProjectionMatrix() const
+		{
+			return _projectionMatrix;
+		}
+
+		PXE_NODISCARD PxeWindowProjection NpWindow::getProjectionType() const
+		{
+			return _projectionMode;
+		}
+
 		uint32_t NpWindow::getSDLWindowId() const
 		{
 #ifdef PXE_DEBUG
@@ -290,7 +339,6 @@ namespace pxengine {
 				return static_cast<uint32_t>(-1);
 			}
 #endif // PXE_DEBUG
-
 
 			return SDL_GetWindowID(_sdlWindow);
 		}

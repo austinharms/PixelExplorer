@@ -264,14 +264,9 @@ namespace pxengine {
 			SDL_Quit();
 		}
 
-		PXE_NODISCARD PxeWindow* NpEngine::createWindow(uint32_t width, uint32_t height, const char* title, PxeWindowId windowId)
+		PXE_NODISCARD PxeWindow* NpEngine::createWindow(uint32_t width, uint32_t height, const char* title)
 		{
-			if (_pxeWindows.find(windowId) != _pxeWindows.end()) {
-				PXE_WARN("Attempted to create PxeWindow, PxeWindowId already in use");
-				return nullptr;
-			}
-
-			NpWindow* window = new(std::nothrow) NpWindow(width, height, title, windowId);
+			NpWindow* window = new(std::nothrow) NpWindow(width, height, title);
 			if (!window) {
 				PXE_ERROR("Failed to allocate PxeWindow");
 				return nullptr;
@@ -282,15 +277,7 @@ namespace pxengine {
 				window->setPrimaryWindow();
 			}
 
-			_pxeWindows.emplace(windowId, window);
 			return window;
-		}
-
-		PXE_NODISCARD PxeWindow* NpEngine::getWindow(PxeWindowId windowId)
-		{
-			auto it = _pxeWindows.find(windowId);
-			if (it != _pxeWindows.end()) return it->second;
-			return nullptr;
 		}
 
 		void NpEngine::removeWindow(NpWindow& window)
@@ -308,10 +295,6 @@ namespace pxengine {
 
 			if (&window == _primaryWindow)
 				_primaryWindow = nullptr;
-
-			if (!_pxeWindows.erase(window.getWindowId())) {
-				PXE_ERROR("Failed to remove PxeWindow from cache");
-			}
 		}
 
 		PXE_NODISCARD PxeLogInterface& NpEngine::getLogInterface()
@@ -753,9 +736,9 @@ namespace pxengine {
 			drop();
 		}
 
-		const std::unordered_map<PxeWindowId, NpWindow*>& NpEngine::getWindows()
+		const std::unordered_map<uint32_t, NpWindow*>& NpEngine::getWindows()
 		{
-			return _pxeWindows;
+			return _sdlWindows;
 		}
 
 		void NpEngine::newFrame(NpWindow& window)
@@ -781,14 +764,13 @@ namespace pxengine {
 
 		void NpEngine::renderFrame(NpWindow& window)
 		{
-			const std::list<PxeRenderBase*>& renderList = window.getNpScene()->getRenderList(PxeRenderPass::WORLD_SPACE);
+			NpScene* scene = window.getNpScene();
+			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(PxeRenderPass::WORLD_SPACE);
 			if (renderList.empty()) return;
-			// TODO Move this to proper locations
-			glm::mat4 vp(glm::perspective(glm::radians(90.0f), (float)window.getWindowWidth()/window.getWindowHeight(), 0.1f, 100.0f) * glm::lookAt(glm::vec3(0, 0, -10), glm::vec3(0), glm::vec3(0, 1, 0)));
 			PxeShader* activeShader = nullptr;
 			PxeRenderMaterial* activeMaterial = nullptr;
 			int32_t mvpLocation = -1;
-
+			glm::mat4 pvMatrix(window.getProjectionMatrix() * scene->getViewMatrix());
 			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
 				PxeRenderObject& renderObject = static_cast<PxeRenderObject&>(**it);
 				if (&(renderObject.getRenderMaterial()) != activeMaterial) {
@@ -802,7 +784,7 @@ namespace pxengine {
 					activeMaterial->applyMaterial();
 				}
 
-				activeShader->setUniformM4f(mvpLocation, vp * renderObject.getPositionMatrix());
+				activeShader->setUniformM4f(mvpLocation, pvMatrix * renderObject.getPositionMatrix());
 				renderObject.onRender();
 			}
 		}

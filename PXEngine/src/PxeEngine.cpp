@@ -37,7 +37,7 @@ namespace pxengine {
 #endif
 
 			application->prePhysics();
-			const std::unordered_map<PxeWindowId, NpWindow*>& windows = engine->getWindows();
+			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				if (it->second->getScene()) {
 					it->second->getNpScene()->simulatePhysics(1.0f);
@@ -57,7 +57,7 @@ namespace pxengine {
 			uint64_t time = SDL_GetTicks64();
 #endif
 
-			const std::unordered_map<PxeWindowId, NpWindow*>& windows = engine->getWindows();
+			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				NpWindow& window = *(it->second);
 				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene() || !window.getWindowWidth() || !window.getWindowHeight()) continue;

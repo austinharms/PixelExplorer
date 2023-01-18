@@ -23,10 +23,7 @@ namespace pxengine {
 	public:
 		// Creates and returns a new PxeWindow or nullptr on failure
 		// TODO Update/create notes for window creation
-		virtual PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title, PxeWindowId windowId) = 0;
-
-		// Returns the PxeWindow with id {windowId} or nullptr if no window exist
-		virtual PXE_NODISCARD PxeWindow* getWindow(PxeWindowId windowId) = 0;
+		virtual PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) = 0;
 
 		// Creates and returns a new PxeScene or nullptr on failure
 		virtual PXE_NODISCARD PxeScene* createScene() = 0;

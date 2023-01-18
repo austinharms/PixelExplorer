@@ -31,8 +31,7 @@ namespace pxengine {
 		public:
 			//############# PxeEngine API ##################
 
-			PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title, PxeWindowId windowId) override;
-			PXE_NODISCARD PxeWindow* getWindow(PxeWindowId windowId) override;
+			PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
 			PXE_NODISCARD PxeScene* createScene() override;
 			PXE_NODISCARD PxeShader* loadShader(const std::filesystem::path& path) override;
 			void setVSyncMode(int8_t mode) override;
@@ -70,7 +69,7 @@ namespace pxengine {
 			void destroyGuiContext(ImGuiContext* context, NpWindow& window);
 			void shutdownEngine();
 			
-			const std::unordered_map<PxeWindowId, NpWindow*>& getWindows();
+			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
 			void newFrame(NpWindow& window);
 			void renderFrame(NpWindow& window);
 			void renderGui(NpWindow& window);
@@ -89,8 +88,6 @@ namespace pxengine {
 			void initPrimaryGlContext();
 			void forceAssetInit(PxeGLAsset& asset);
 
-			// map of all the NpWindows that exist by PxeWindowId
-			std::unordered_map<PxeWindowId, NpWindow*> _pxeWindows;
 			// map of all the NpWindows with SDL_Windows that exist by SDL window id
 			std::unordered_map<uint32_t, NpWindow*> _sdlWindows;
 			std::unordered_map<std::filesystem::path, NpShader*> _shaderCache;

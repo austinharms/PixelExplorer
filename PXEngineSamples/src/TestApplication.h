@@ -14,14 +14,14 @@ public:
 		_mainWindow = nullptr;
 		_testWindow = nullptr;
 		_testScene = nullptr;
-		_windowIdCounter = 0;
+		_windowCounter = 0;
 	}
 
 	void onStart() override {
 		using namespace pxengine;
 		PxeEngine& engine = pxeGetEngine();
-		_mainWindow = engine.createWindow(600, 400, "Main Window", _windowIdCounter++);
-		_testWindow = engine.createWindow(600, 400, ("Window " + std::to_string(_windowIdCounter)).c_str(), _windowIdCounter++);
+		_mainWindow = engine.createWindow(600, 400, "Main Window");
+		_testWindow = engine.createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
 		_testScene = engine.createScene();
 		_mainWindow->setScene(_testScene);
 		_testWindow->setScene(_testScene);
@@ -55,7 +55,7 @@ public:
 
 		if (_testWindow && _testWindow->getShouldClose()) {
 			_testWindow->drop();
-			_testWindow = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowIdCounter)).c_str(), _windowIdCounter++);
+			_testWindow = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
 			_testWindow->setScene(_testScene);
 		}
 	}
@@ -83,6 +83,6 @@ private:
 	pxengine::PxeWindow* _mainWindow;
 	pxengine::PxeWindow* _testWindow;
 	pxengine::PxeScene* _testScene;
-	uint16_t _windowIdCounter;
+	uint32_t _windowCounter;
 };
 #endif // !PXENGINESAMPELS_TEST_APPLICATION_H_
