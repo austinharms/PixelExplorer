@@ -202,10 +202,12 @@ namespace pxengine {
 			_physPVDTransport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
 			_physPVD->connect(*_physPVDTransport, physx::PxPvdInstrumentationFlag::eALL);
 #define PXE_PHYSICS_PVD_POINTER _physPVD
+#define PXE_PHYSICS_TRACK_ALLOCATIONS true
 #else
 #define PXE_PHYSICS_PVD_POINTER nullptr
+#define PXE_PHYSICS_TRACK_ALLOCATIONS false
 #endif
-			_physPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_physFoundation, _physScale, true, PXE_PHYSICS_PVD_POINTER);
+			_physPhysics = PxCreateBasePhysics(PX_PHYSICS_VERSION, *_physFoundation, _physScale, PXE_PHYSICS_TRACK_ALLOCATIONS, PXE_PHYSICS_PVD_POINTER);
 			uint32_t threadCount = std::thread::hardware_concurrency() / 2;
 			if (threadCount < 2) {
 				PXE_WARN("Calculated physics thread count less then 2, using 2 threads");
@@ -226,6 +228,7 @@ namespace pxengine {
 		void NpEngine::deinitPhysics()
 		{
 			PxCloseExtensions();
+			_physDefaultDispatcher->release();
 			_physCooking->release();
 			_physPhysics->release();
 #ifdef PXE_DEBUG

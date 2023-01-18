@@ -7,7 +7,7 @@
 #include "NpWindow.h"
 #include "NpEngine.h"
 
-//#define PXE_DEBUG_TIMING
+#define PXE_DEBUG_TIMING
 #ifdef PXE_DEBUG_TIMING
 #include <string>
 #include "SDL_timer.h"

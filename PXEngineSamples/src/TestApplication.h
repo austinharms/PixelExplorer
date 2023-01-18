@@ -2,18 +2,22 @@
 #define PXENGINESAMPELS_TEST_APPLICATION_H_
 #include <new>
 #include <string>
+#include <list>
+#include <cstdlib>
+#include <ctime>
 
 #include "PxeEngineAPI.h"
 #include "imgui.h"
-#include "TestTextureRenderObject.h"
+#include "TestRenderObject.h"
+#include "TestGuiElement.h"
 
 class TestApplication : public pxengine::PxeApplicationInterface
 {
 public:
 	TestApplication() {
 		_mainWindow = nullptr;
-		_testWindow = nullptr;
 		_testScene = nullptr;
+		_testGui = nullptr;
 		_windowCounter = 0;
 	}
 
@@ -21,68 +25,89 @@ public:
 		using namespace pxengine;
 		PxeEngine& engine = pxeGetEngine();
 		_mainWindow = engine.createWindow(600, 400, "Main Window");
-		_testWindow = engine.createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
-		_testScene = engine.createScene();
-		_mainWindow->setScene(_testScene);
-		_testWindow->setScene(_testScene);
+
+		PxeScene* mainScene = engine.createScene();
+		_testGui = new(std::nothrow) TestGuiElement();
+		mainScene->addRenderable(*_testGui);
+		_mainWindow->setScene(mainScene);
 
 		PxeShader* shader = engine.loadShader(getAssetPath("shaders") / "test.pxeshader");
-		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader);
-		shader->drop();
-		shader = nullptr;
-
 		PxeTexture* texture = new(std::nothrow) PxeTexture();
 		texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
+		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader);
 		material->setTexture("u_Texture", *texture, 0);
 		material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));
+
+		_testScene = engine.createScene();
+
+		srand(static_cast<uint32_t>(time(nullptr)));
+		TestRenderObject* baseObj = new(std::nothrow) TestRenderObject(*material);
+		for (int32_t x = -25; x < 26; ++x) {
+			for (int32_t y = -25; y < 26; ++y) {
+				TestRenderObject* testObj = new(std::nothrow) TestRenderObject(*material, baseObj->getIndexBuffer(), baseObj->getVertexArray());
+				testObj->translate(glm::vec3(x, y, 0));
+				testObj->rotateAbout(glm::vec3(1, 0, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
+				testObj->rotateAbout(glm::vec3(0, 1, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
+				testObj->rotateAbout(glm::vec3(0, 0, 1), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
+				_testScene->addRenderable(*testObj);
+				testObj->drop();
+			}
+		}
+
+		baseObj->drop();
 		texture->drop();
-		texture = nullptr;
-
-		TestTexturedRenderObject* testObj = new(std::nothrow) TestTexturedRenderObject(*material);
+		shader->drop();
 		material->drop();
-		material = nullptr;
-
-		_testScene->addRenderable(*testObj);
-		testObj->drop();
-		testObj = nullptr;
+		mainScene->drop();
 	}
 
 	void onUpdate() override {
 		if (_mainWindow && _mainWindow->getShouldClose()) {
 			_mainWindow->drop();
 			_mainWindow = nullptr;
+			return;
 		}
 
-		if (_testWindow && _testWindow->getShouldClose()) {
-			_testWindow->drop();
-			_testWindow = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
-			_testWindow->setScene(_testScene);
+		if (_testGui->getClicked()) {
+			pxengine::PxeWindow* window = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
+			window->setScene(_testScene);
+			_windows.push_back(window);
+		}
+
+		auto it = _windows.begin();
+		while (it != _windows.end())
+		{
+			if ((*it)->getShouldClose()) {
+				(*it)->drop();
+				it = _windows.erase(it);
+			}
+			else {
+				++it;
+			}
 		}
 	}
 
 	void onStop() override {
 		_testScene->drop();
 		_testScene = nullptr;
+		_testGui->drop();
+		_testGui = nullptr;
+
+		for (pxengine::PxeWindow* window : _windows)
+			window->drop();
+		_windows.clear();
 
 		if (_mainWindow) {
 			_mainWindow->drop();
 			_mainWindow = nullptr;
 		}
-
-		if (_testWindow) {
-			_testWindow->drop();
-			_testWindow = nullptr;
-		}
-	}
-
-	void preGUI(pxengine::PxeWindow& window) override {
-		ImGui::ShowDemoWindow();
 	}
 
 private:
 	pxengine::PxeWindow* _mainWindow;
-	pxengine::PxeWindow* _testWindow;
 	pxengine::PxeScene* _testScene;
 	uint32_t _windowCounter;
+	TestGuiElement* _testGui;
+	std::list<pxengine::PxeWindow*> _windows;
 };
 #endif // !PXENGINESAMPELS_TEST_APPLICATION_H_

@@ -10,9 +10,9 @@
 #include "foundation/PxErrorCallback.h"
 #include "PxFoundation.h"
 #include "PxPhysics.h"
+#include "extensions/PxDefaultCpuDispatcher.h"
 #include "common/PxTolerancesScale.h"
 #include "extensions/PxDefaultAllocator.h"
-#include "task/PxCpuDispatcher.h"
 #include "cooking/PxCooking.h"
 #include "pvd/PxPvdTransport.h"
 #include "pvd/PxPvd.h"
@@ -101,7 +101,7 @@ namespace pxengine {
 #endif
 			physx::PxPhysics* _physPhysics;
 			physx::PxCooking* _physCooking;
-			physx::PxCpuDispatcher* _physDefaultDispatcher;
+			physx::PxDefaultCpuDispatcher* _physDefaultDispatcher;
 			physx::PxDefaultAllocator _physAllocator;
 			physx::PxTolerancesScale _physScale;
 			PxeLogInterface& _logInterface;

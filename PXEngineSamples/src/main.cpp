@@ -6,4 +6,5 @@ int main(int argc, char* args[]) {
 	LogHandle log;
 	TestApplication app;
 	pxengine::pxeRunApplication(app, log);
+	return 0;
 }

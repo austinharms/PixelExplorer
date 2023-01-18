@@ -8,62 +8,90 @@
 class TestRenderObject : public pxengine::PxeRenderObject
 {
 public:
-	TestRenderObject(pxengine::PxeRenderMaterial& material) : pxengine::PxeRenderObject(material) {
-		_indexBuffer = new(std::nothrow) pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_8BIT);
-		pxengine::PxeVertexBufferFormat format(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 3, false));
-		_vertexBuffer = new(std::nothrow) pxengine::PxeVertexBuffer(format);
-		_vertexArray = new(std::nothrow) pxengine::PxeVertexArray();
-		_vertexArray->addVertexBuffer(*_vertexBuffer, 0, 0);
+	TestRenderObject(pxengine::PxeRenderMaterial& material, pxengine::PxeIndexBuffer* indexBuffer = nullptr, pxengine::PxeVertexArray* vertextArray = nullptr) : pxengine::PxeRenderObject(material) {
 
-		float vertices[24] = {
-		 -0.5f, -0.5f, -0.5f,  // 0
-		  0.5f, -0.5f, -0.5f,  // 1
-		  0.5f,  0.5f, -0.5f,  // 2
-		 -0.5f,  0.5f, -0.5f,  // 3
-		 -0.5f, -0.5f,  0.5f,  // 4
-		  0.5f, -0.5f,  0.5f,  // 5
-		  0.5f,  0.5f,  0.5f,  // 6
-		 -0.5f,  0.5f,  0.5f   // 7
-		};
+		if (indexBuffer) {
+			_indexBuffer = indexBuffer;
+			_indexBuffer->grab();
+		}
+		else {
+			_indexBuffer = new(std::nothrow) pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_8BIT);
+			uint8_t indices[36] = {
+				0, 2, 1, 0, 3, 2,  // Front
+				4, 5, 6, 4, 6, 7,  // Back
+				0, 4, 7, 0, 7, 3,  // Left
+				1, 6, 5, 1, 2, 6,  // Right
+				3, 7, 6, 3, 6, 2,  // Top
+				0, 5, 4, 0, 1, 5,  // Bottom
+			};
 
-		uint8_t indices[36] = {
-			0, 2, 1, 0, 3, 2,  // Front
-			4, 5, 6, 4, 6, 7,  // Back
-			0, 4, 7, 0, 7, 3,  // Left
-			1, 6, 5, 1, 2, 6,  // Right
-			3, 7, 6, 3, 6, 2,  // Top
-			0, 5, 4, 0, 1, 5,  // Bottom
-		};
+			pxengine::PxeBuffer* indexData = new(std::nothrow) pxengine::PxeBuffer(sizeof(indices));
+			memcpy(indexData->getBuffer(), indices, indexData->getSize());
+			_indexBuffer->bufferData(*indexData);
+			indexData->drop();
+			indexData = nullptr;
+		}
 
-		pxengine::PxeBuffer* indexBuffer = new(std::nothrow) pxengine::PxeBuffer(36);
-		memcpy(indexBuffer->getBuffer(), indices, indexBuffer->getSize());
-		pxengine::PxeBuffer* vertexBuffer = new(std::nothrow) pxengine::PxeBuffer(24 * sizeof(float));
-		memcpy(vertexBuffer->getBuffer(), vertices, vertexBuffer->getSize());
-		_vertexBuffer->bufferData(*vertexBuffer);
-		_indexBuffer->bufferData(*indexBuffer);
-		indexBuffer->drop();
-		vertexBuffer->drop();
-		indexBuffer = nullptr;
-		vertexBuffer = nullptr;
+		if (vertextArray) {
+			_vertexArray = vertextArray;
+			_vertexArray->grab();
+		}
+		else {
+			pxengine::PxeVertexBufferFormat format(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 3, false));
+			format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 2, false));
+			pxengine::PxeVertexBuffer* vertexBuffer = new(std::nothrow) pxengine::PxeVertexBuffer(format);
+			_vertexArray = new(std::nothrow) pxengine::PxeVertexArray();
+			_vertexArray->addVertexBuffer(*vertexBuffer, 0, 0);
+			_vertexArray->addVertexBuffer(*vertexBuffer, 1, 1);
+
+			float vertices[40] = {
+			 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  // 0
+			  0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  // 1
+			  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  // 2
+			 -0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  // 3
+			 -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  // 4
+			  0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  // 5
+			  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  // 6
+			 -0.5f,  0.5f,  0.5f,  1.0f,  0.0f   // 7
+			};
+
+			pxengine::PxeBuffer* vertexData = new(std::nothrow) pxengine::PxeBuffer(sizeof(vertices));
+			memcpy(vertexData->getBuffer(), vertices, vertexData->getSize());
+			vertexBuffer->bufferData(*vertexData);
+			vertexData->drop();
+			vertexData = nullptr;
+			vertexBuffer->drop();
+			vertexBuffer = nullptr;
+		}
 	}
 
 	virtual ~TestRenderObject() {
 		_indexBuffer->drop();
 		_vertexArray->drop();
-		_vertexBuffer->drop();
 	}
 
 	void onRender() override {
 		_vertexArray->bind();
 		_indexBuffer->bind();
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
-		_indexBuffer->unbind();
-		_vertexArray->unbind();
+		//_indexBuffer->unbind();
+		//_vertexArray->unbind();
 	}
+
+	void translate(const glm::vec3& pos) {
+		positionMatrix = glm::translate(positionMatrix, pos);
+	}
+
+	void rotateAbout(const glm::vec3& axis, float rad) {
+		positionMatrix = glm::rotate(positionMatrix, rad, axis);
+	}
+
+	pxengine::PxeIndexBuffer* getIndexBuffer() const { return _indexBuffer; }
+
+	pxengine::PxeVertexArray* getVertexArray() const { return _vertexArray; }
 
 private:
 	pxengine::PxeIndexBuffer* _indexBuffer;
-	pxengine::PxeVertexBuffer* _vertexBuffer;
 	pxengine::PxeVertexArray* _vertexArray;
 };
 

@@ -32,10 +32,10 @@
     <ClInclude Include="src\TestRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestTextureRenderObject.h">
+    <ClInclude Include="src\TestApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestApplication.h">
+    <ClInclude Include="src\TestGuiElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
