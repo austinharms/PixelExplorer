@@ -9,13 +9,6 @@ namespace pxengine {
 	class PxeWindow : public PxeGLAsset
 	{
 	public:
-		// Sets the windows swap interval
-		// Note: this will take effect at the start of next frame
-		virtual void setSwapInterval(int8_t interval) = 0;
-
-		// Returns the windows swap interval
-		virtual PXE_NODISCARD int8_t getSwapInterval() = 0;
-
 		// Returns if the user wants to close the window aka presses the X, Alt-F4...
 		// Note: this can be reset/ignored by calling resetShouldClose()
 		virtual PXE_NODISCARD bool getShouldClose() const = 0;

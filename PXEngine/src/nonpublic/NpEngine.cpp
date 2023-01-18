@@ -44,6 +44,7 @@ namespace pxengine {
 			_shutdownFlag = 0;
 			_guiBackendReferenceCount = 0;
 			_guiBackend = nullptr;
+			_vsyncMode = 0;
 
 			initSDL();
 			initPhysics();
@@ -547,6 +548,16 @@ namespace pxengine {
 			}
 		}
 
+		void NpEngine::setVSyncMode(int8_t mode)
+		{
+			_vsyncMode = mode;
+		}
+
+		PXE_NODISCARD int8_t NpEngine::getVSyncMode() const
+		{
+			return _vsyncMode;
+		}
+
 		void NpEngine::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
 		{
 			PxeLogLevel level = PxeLogLevel::PXE_INFO;
@@ -749,7 +760,7 @@ namespace pxengine {
 
 		void NpEngine::newFrame(NpWindow& window)
 		{
-			window.updateWindowProperties();
+			window.updateSDLWindowProperties();
 			if (window.getPrimaryWindow()) {
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			}
@@ -820,6 +831,7 @@ namespace pxengine {
 				glBlitFramebuffer(0, 0, window.getWindowWidth(), window.getWindowHeight(), 0, 0, window.getWindowWidth(), window.getWindowHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 			}
 
+			window.setVsyncMode(_vsyncMode);
 			SDL_GL_SwapWindow(window.getSDLWindow());
 		}
 

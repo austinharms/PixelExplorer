@@ -35,6 +35,9 @@ namespace pxengine {
 			PXE_NODISCARD PxeWindow* getWindow(PxeWindowId windowId) override;
 			PXE_NODISCARD PxeScene* createScene() override;
 			PXE_NODISCARD PxeShader* loadShader(const std::filesystem::path& path) override;
+			void setVSyncMode(int8_t mode) override;
+			PXE_NODISCARD int8_t getVSyncMode() const override;
+
 			void shutdown() override;
 
 			//############# PxErrorCallback API ##################
@@ -114,6 +117,7 @@ namespace pxengine {
 			uint16_t _guiBackendReferenceCount;
 			// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
 			void* _shutdownFlag;
+			int8_t _vsyncMode;
 		};
 	}
 }

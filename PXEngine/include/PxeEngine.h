@@ -31,6 +31,17 @@ namespace pxengine {
 		// Creates and returns a new PxeScene or nullptr on failure
 		virtual PXE_NODISCARD PxeScene* createScene() = 0;
 
+		// Set VSync mode for all windows
+		// Modes:
+		//	0 for immediate updates
+		//	1 for updates synchronized with
+		//	-1 for adaptive VSync
+		// Note: the default is 0
+		virtual void setVSyncMode(int8_t mode) = 0;
+
+		// Returns VSync mode for all windows
+		virtual PXE_NODISCARD int8_t getVSyncMode() const = 0;
+
 		// Loads and returns PxeShader or nullptr on failure 
 		// Note: returned shaders still need to be validated before use
 		// Note: all PxeShader are cached by {path} and are not guaranteed to be reloaded from disk

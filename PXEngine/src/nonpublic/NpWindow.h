@@ -18,8 +18,6 @@ namespace pxengine {
 
 			//############# PxeWindow API ##################
 
-			void setSwapInterval(int8_t interval) override;
-			PXE_NODISCARD int8_t getSwapInterval() override;
 			PXE_NODISCARD bool getShouldClose() const override;
 			void resetShouldClose() override;
 			void setWindowShown(bool show) override;
@@ -47,7 +45,9 @@ namespace pxengine {
 			void setShouldClose();
 			void setPrimaryWindow();
 			void bindGuiContext();
-			void updateWindowProperties();
+			void updateSDLWindowProperties();
+			// Note: this method assumes valid OpenGl context
+			void setVsyncMode(int8_t mode);
 
 		protected:
 
@@ -57,25 +57,29 @@ namespace pxengine {
 			void uninitializeGl() override;
 
 		private:
-			enum WindowProperties : uint8_t
+			enum class NpWindowFlags : uint8_t
 			{
-				WINDOW_SIZE_CHANGED = 0b00000001,
-				WINDOW_TITLE_CHANGED = 0b00000010,
-				WINDOW_SWAP_CHANGED = 0b00000100,
+				SIZE_CHANGED =		0b00000001,
+				TITLE_CHANGED =		0b00000010,
+				PRIMARY_WINDOW =	0b00000100,
+				WINDOW_CLOSE =		0b00001000,
 			};
+
+			bool getFlag(NpWindowFlags flag) const;
+			void clearFlag(NpWindowFlags flag);
+			void setFlag(NpWindowFlags flag, bool value);
+			void setFlag(NpWindowFlags flag);
 
 			SDL_Window* _sdlWindow;
 			ImGuiContext* _guiContext;
 			NpScene* _scene;
 			char* _title;
-			PxeRingBuffer<SDL_Event, WINDOW_EVENT_BUFFER_SIZE> _eventBuffer;
 			int32_t _width;
 			int32_t _height;
+			PxeRingBuffer<SDL_Event, WINDOW_EVENT_BUFFER_SIZE> _eventBuffer;
 			PxeWindowId _windowId;
-			int8_t _swapInterval;
-			bool _shouldClose;
-			bool _primary;
-			uint8_t _propertyFlags;
+			uint8_t _flags;
+			int8_t _vsyncMode;
 		};
 	}
 }

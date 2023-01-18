@@ -17,10 +17,8 @@ namespace pxengine {
 			_width = width;
 			_height = height;
 			_windowId = windowId;
-			_swapInterval = 1;
-			_shouldClose = false;
-			_primary = false;
-			_propertyFlags = 0;
+			_flags = 0;
+			_vsyncMode = static_cast<int8_t>(0xff);
 			setWindowTitle(title);
 		}
 
@@ -37,25 +35,14 @@ namespace pxengine {
 			return _sdlWindow;
 		}
 
-		void NpWindow::setSwapInterval(int8_t interval)
-		{
-			_swapInterval = interval;
-			_propertyFlags |= WINDOW_SWAP_CHANGED;
-		}
-
-		int8_t NpWindow::getSwapInterval()
-		{
-			return _swapInterval;
-		}
-
 		bool NpWindow::getShouldClose() const
 		{
-			return _shouldClose;
+			return getFlag(NpWindowFlags::WINDOW_CLOSE);
 		}
 
 		void NpWindow::resetShouldClose()
 		{
-			_shouldClose = false;
+			clearFlag(NpWindowFlags::WINDOW_CLOSE);
 		}
 
 		// TODO does changing window visibility require the GL Context?
@@ -89,12 +76,12 @@ namespace pxengine {
 
 		void NpWindow::setShouldClose()
 		{
-			_shouldClose = true;
+			setFlag(NpWindowFlags::WINDOW_CLOSE);
 		}
 
 		void NpWindow::setPrimaryWindow()
 		{
-			_primary = true;
+			setFlag(NpWindowFlags::PRIMARY_WINDOW);
 		}
 
 		void NpWindow::initializeGl()
@@ -139,37 +126,62 @@ namespace pxengine {
 			}
 		}
 
+		bool NpWindow::getFlag(NpWindowFlags flag) const
+		{
+			return _flags & (uint8_t)flag;
+		}
+
+		void NpWindow::clearFlag(NpWindowFlags flag)
+		{
+			_flags &= ~(uint8_t)flag;
+		}
+
+		void NpWindow::setFlag(NpWindowFlags flag, bool value)
+		{
+			_flags &= ~(uint8_t)flag;
+			if (value)
+				_flags |= (uint8_t)flag;
+		}
+
+		void NpWindow::setFlag(NpWindowFlags flag)
+		{
+			_flags |= (uint8_t)flag;
+		}
+
 		void NpWindow::bindGuiContext()
 		{
 #ifdef PXE_DEBUG
 			if (!_guiContext) {
 				PXE_WARN("Attempted to bind invalid gui context");
 				return;
-			}
+	}
 #endif // PXE_DEBUG
 
 			ImGui::SetCurrentContext(_guiContext);
+}
+
+		void NpWindow::updateSDLWindowProperties()
+		{
+			if (!_sdlWindow) return;
+			if (getFlag(NpWindowFlags::TITLE_CHANGED)) {
+				SDL_SetWindowTitle(_sdlWindow, _title);
+				clearFlag(NpWindowFlags::TITLE_CHANGED);
+			}
+
+			if (getFlag(NpWindowFlags::SIZE_CHANGED)) {
+				SDL_SetWindowSize(_sdlWindow, _width, _height);
+				clearFlag(NpWindowFlags::SIZE_CHANGED);
+			}
+
+			SDL_GetWindowSizeInPixels(_sdlWindow, &_width, &_height);
 		}
 
-		void NpWindow::updateWindowProperties()
+		void NpWindow::setVsyncMode(int8_t mode)
 		{
-			if (_propertyFlags & WINDOW_TITLE_CHANGED && _sdlWindow) {
-				SDL_SetWindowTitle(_sdlWindow, _title);
-				_propertyFlags ^= WINDOW_TITLE_CHANGED;
+			if (_vsyncMode != mode) {
+				_vsyncMode = mode;
+				SDL_GL_SetSwapInterval(_vsyncMode);
 			}
-
-			if (_propertyFlags & WINDOW_SIZE_CHANGED && _sdlWindow) {
-				SDL_SetWindowSize(_sdlWindow, _width, _height);
-				_propertyFlags ^= WINDOW_SIZE_CHANGED;
-			}
-
-			if (_propertyFlags & WINDOW_SWAP_CHANGED && _sdlWindow) {
-				SDL_GL_SetSwapInterval(_swapInterval);
-				_propertyFlags ^= WINDOW_SWAP_CHANGED;
-			}
-
-			if (_sdlWindow)
-				SDL_GetWindowSizeInPixels(_sdlWindow, &_width, &_height);
 		}
 
 		void NpWindow::processEvents()
@@ -214,7 +226,7 @@ namespace pxengine {
 
 		PXE_NODISCARD bool NpWindow::getPrimaryWindow() const
 		{
-			return _primary;
+			return getFlag(NpWindowFlags::PRIMARY_WINDOW);
 		}
 
 		PXE_NODISCARD PxeWindowId NpWindow::getWindowId() const
@@ -236,7 +248,7 @@ namespace pxengine {
 		{
 			_width = width;
 			_height = height;
-			_propertyFlags |= WINDOW_SIZE_CHANGED;
+			setFlag(NpWindowFlags::SIZE_CHANGED);
 		}
 
 		PXE_NODISCARD const char* NpWindow::getWindowTitle() const
@@ -267,7 +279,7 @@ namespace pxengine {
 			if (_title)
 				free(_title);
 			_title = newTitle;
-			_propertyFlags |= WINDOW_TITLE_CHANGED;
+			setFlag(NpWindowFlags::TITLE_CHANGED);
 		}
 
 		uint32_t NpWindow::getSDLWindowId() const
