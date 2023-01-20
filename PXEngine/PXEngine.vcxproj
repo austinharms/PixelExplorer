@@ -182,6 +182,9 @@
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\nonpublic\NpAction.cpp" />
+    <ClCompile Include="src\nonpublic\NpActionSource.cpp" />
+    <ClCompile Include="src\nonpublic\NpInputManager.cpp" />
     <ClCompile Include="src\nonpublic\NpEngine.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
@@ -201,6 +204,9 @@
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\PxeAction.h" />
+    <ClInclude Include="include\PxeInputManager.h" />
+    <ClInclude Include="include\PxeActionSource.h" />
     <ClInclude Include="include\PxeApplicationInterface.h" />
     <ClInclude Include="include\PxeBuffer.h" />
     <ClInclude Include="include\PxeEngine.h" />
@@ -235,6 +241,9 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\nonpublic\NpAction.h" />
+    <ClInclude Include="src\nonpublic\NpActionSource.h" />
+    <ClInclude Include="src\nonpublic\NpInputManager.h" />
     <ClInclude Include="src\nonpublic\NpEngine.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpShader.h" />

@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "TestRenderObject.h"
 #include "TestGuiElement.h"
+#include "SDL_keycode.h"
 
 class TestApplication : public pxengine::PxeApplicationInterface
 {
@@ -18,12 +19,19 @@ public:
 		_mainWindow = nullptr;
 		_testScene = nullptr;
 		_testGui = nullptr;
+		_createAction = nullptr;
 		_windowCounter = 0;
 	}
 
 	void onStart() override {
 		using namespace pxengine;
 		PxeEngine& engine = pxeGetEngine();
+		pxengine::PxeInputManager& inputMgr = pxengine::pxeGetEngine().getInputManager();
+		PxeActionSource* createSource = inputMgr.getActionSource((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32 | SDLK_c);
+		_createAction = inputMgr.getAction("CreateWindow");
+		_createAction->grab();
+		_createAction->addSource(*createSource);
+
 		_mainWindow = engine.createWindow(600, 400, "Main Window");
 
 		PxeScene* mainScene = engine.createScene();
@@ -62,6 +70,12 @@ public:
 	}
 
 	void onUpdate() override {
+		if (_createAction && _createAction->getValue()) {
+			pxengine::PxeWindow* window = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
+			window->setScene(_testScene);
+			_windows.push_back(window);
+		}
+
 		if (_mainWindow && _mainWindow->getShouldClose()) {
 			_mainWindow->drop();
 			_mainWindow = nullptr;
@@ -88,6 +102,11 @@ public:
 	}
 
 	void onStop() override {
+		if (_createAction) {
+			_createAction->drop();
+			_createAction = nullptr;
+		}
+
 		_testScene->drop();
 		_testScene = nullptr;
 		_testGui->drop();
@@ -106,6 +125,7 @@ public:
 private:
 	pxengine::PxeWindow* _mainWindow;
 	pxengine::PxeScene* _testScene;
+	pxengine::PxeAction* _createAction;
 	uint32_t _windowCounter;
 	TestGuiElement* _testGui;
 	std::list<pxengine::PxeWindow*> _windows;

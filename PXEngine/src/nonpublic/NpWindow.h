@@ -3,10 +3,8 @@
 #include "PxeTypes.h"
 #include "PxeWindow.h"
 #include "SDL_video.h"
-#include "SDL_events.h"
 #include "PxeScene.h"
 #include "NpScene.h"
-#include "PxeRingBuffer.h"
 #include "imgui.h"
 
 namespace pxengine {
@@ -46,8 +44,6 @@ namespace pxengine {
 			PXE_NODISCARD SDL_Window* getSDLWindow() const;
 			PXE_NODISCARD uint32_t getSDLWindowId() const;
 			PXE_NODISCARD NpScene* getNpScene() const;
-			bool pushEvent(const SDL_Event& event);
-			void processEvents();
 			void setShouldClose();
 			void setPrimaryWindow();
 			void bindGuiContext();
@@ -84,7 +80,6 @@ namespace pxengine {
 			char* _title;
 			int32_t _width;
 			int32_t _height;
-			PxeRingBuffer<SDL_Event, WINDOW_EVENT_BUFFER_SIZE> _eventBuffer;
 			uint8_t _flags;
 			int8_t _vsyncMode;
 			PxeWindowProjection _projectionMode;

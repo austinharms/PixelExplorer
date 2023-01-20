@@ -23,4 +23,7 @@
 #include "PxeVertexBufferAttrib.h"
 #include "PxeVertexBufferFormat.h"
 #include "PxeWindow.h"
+#include "PxeAction.h"
+#include "PxeActionSource.h"
+#include "PxeInputManager.h"
 #endif // !PXENGINE_FULL_API_H_

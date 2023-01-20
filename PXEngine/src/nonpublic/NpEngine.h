@@ -6,6 +6,8 @@
 #include "PxeTypes.h"
 #include "PxeLogger.h"
 #include "PxeEngine.h"
+#include "PxeInputManager.h"
+#include "NpInputManager.h"
 #include "foundation/PxAssert.h"
 #include "foundation/PxErrorCallback.h"
 #include "PxFoundation.h"
@@ -36,6 +38,7 @@ namespace pxengine {
 			PXE_NODISCARD PxeShader* loadShader(const std::filesystem::path& path) override;
 			void setVSyncMode(int8_t mode) override;
 			PXE_NODISCARD int8_t getVSyncMode() const override;
+			PXE_NODISCARD PxeInputManager& getInputManager() const override;
 
 			void shutdown() override;
 
@@ -55,7 +58,6 @@ namespace pxengine {
 			virtual ~NpEngine();
 			NpEngine(const NpEngine& other) = delete;
 			NpEngine operator=(const NpEngine& other) = delete;
-			void processEvents();
 			void processAssetQueue();
 			void initializeGlAsset(PxeGLAsset& asset);
 			void uninitializeGlAsset(PxeGLAsset& asset);
@@ -67,6 +69,7 @@ namespace pxengine {
 			void destroySDLWindow(SDL_Window* sdlWindow, NpWindow& window);
 			PXE_NODISCARD ImGuiContext* createGuiContext(NpWindow& window);
 			void destroyGuiContext(ImGuiContext* context, NpWindow& window);
+			PXE_NODISCARD NpInputManager& getNpInputManager() const;
 			void shutdownEngine();
 			
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
@@ -105,12 +108,13 @@ namespace pxengine {
 			physx::PxDefaultAllocator _physAllocator;
 			physx::PxTolerancesScale _physScale;
 			PxeLogInterface& _logInterface;
+			NpInputManager* _inputManager;
 			NpWindow* _primaryWindow;
 			SDL_GLContext _primaryGlContext;
-			uint32_t _activeMouseWindowId;
-			uint32_t _activeKeyboardWindowId;
-			ImFontAtlas _guiFontAtlas;
+			NpWindow* _activeMouseWindow;
+			NpWindow* _activeKeyboardWindow;
 			void* _guiBackend;
+			ImFontAtlas _guiFontAtlas;
 			uint16_t _guiBackendReferenceCount;
 			// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
 			void* _shutdownFlag;

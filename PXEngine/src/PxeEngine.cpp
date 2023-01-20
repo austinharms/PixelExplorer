@@ -6,8 +6,9 @@
 #include "NpLogger.h"
 #include "NpWindow.h"
 #include "NpEngine.h"
+#include "NpInputManager.h"
 
-#define PXE_DEBUG_TIMING
+//#define PXE_DEBUG_TIMING
 #ifdef PXE_DEBUG_TIMING
 #include <string>
 #include "SDL_timer.h"
@@ -72,7 +73,6 @@ namespace pxengine {
 				engine->bindPrimaryGlContext();
 			}
 
-			engine->processEvents();
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Render thread took: " + std::to_string(SDL_GetTicks64() - time));
 #endif
@@ -118,6 +118,13 @@ namespace pxengine {
 
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Asset processing took: " + std::to_string(SDL_GetTicks64() - tempTime));
+			tempTime = SDL_GetTicks64();
+#endif
+
+			engine->getNpInputManager().processEvents();
+
+#ifdef PXE_DEBUG_TIMING
+			PXE_INFO("Event processing took: " + std::to_string(SDL_GetTicks64() - tempTime));
 #endif
 
 			std::thread physicsThread(runPhysicsThread, &application, engine);

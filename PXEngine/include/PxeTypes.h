@@ -74,6 +74,18 @@ namespace pxengine {
 		FLOAT = 0x1406,				// GL_FLOAT
 		DOUBLE = 0x140A,			// GL_DOUBLE
 	};
+
+	typedef uint64_t PxeActionSourceCode;
+
+	enum class PxeActionSourceType : uint8_t
+	{
+		NONE = 0,
+		KEYBOARD,
+		MOUSE,
+		JOYSTICK_HAT,
+		JOYSTICK_BUTTON,
+		CONTROLLER_BUTTON,
+	};
 }
 
 #define PXE_NODISCARD [[nodiscard]]

@@ -39,12 +39,15 @@ namespace pxengine {
 			PXE_INFO("PxeEngine Created");
 			_primaryGlContext = nullptr;
 			_primaryWindow = nullptr;
-			_activeKeyboardWindowId = 0;
-			_activeMouseWindowId = 0;
 			_shutdownFlag = 0;
 			_guiBackendReferenceCount = 0;
 			_guiBackend = nullptr;
 			_vsyncMode = 0;
+
+			_inputManager = new(std::nothrow) NpInputManager();
+			if (!_inputManager) {
+				PXE_FATAL("Failed to create PxeInputManager for PxeEngine");
+			}
 
 			initSDL();
 			initPhysics();
@@ -287,10 +290,7 @@ namespace pxengine {
 		{
 			if (window.getSDLWindow()) {
 				uint32_t sdlId = window.getSDLWindowId();
-				if (_activeKeyboardWindowId == sdlId)
-					_activeKeyboardWindowId = 0;
-				if (_activeMouseWindowId == sdlId)
-					_activeMouseWindowId = 0;
+				_inputManager->clearActiveWindow(&window);
 				if (!_sdlWindows.erase(sdlId)) {
 					PXE_ERROR("Failed to remove SDL window from cache");
 				}
@@ -460,6 +460,11 @@ namespace pxengine {
 			ImGui::DestroyContext(context);
 		}
 
+		PXE_NODISCARD NpInputManager& NpEngine::getNpInputManager() const
+		{
+			return *_inputManager;
+		}
+
 		void NpEngine::initPrimaryGlContext() {
 			if (glewInit() != GLEW_OK) {
 				PXE_FATAL("Failed to Init GLEW");
@@ -544,6 +549,11 @@ namespace pxengine {
 			return _vsyncMode;
 		}
 
+		PXE_NODISCARD PxeInputManager& NpEngine::getInputManager() const
+		{
+			return static_cast<PxeInputManager&>(*_inputManager);
+		}
+
 		void NpEngine::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
 		{
 			PxeLogLevel level = PxeLogLevel::PXE_INFO;
@@ -563,83 +573,6 @@ namespace pxengine {
 		void NpEngine::operator()(const char* exp, const char* file, int line, bool& ignore)
 		{
 			pxeGetAssertInterface().onAssert(exp, file, "PHYSX(UNKNOWN)", line);
-		}
-
-		void NpEngine::processEvents()
-		{
-			SDL_Event e;
-			while (SDL_PollEvent(&e))
-			{
-				// is it a window event
-				if (e.type == SDL_WINDOWEVENT)
-				{
-					SDL_WindowEventID winEvent = (SDL_WindowEventID)e.window.event;
-					// check if we need to switch the active mouse or keyboard window id
-					switch (winEvent)
-					{
-					case SDL_WINDOWEVENT_ENTER:
-						_activeMouseWindowId = e.window.windowID;
-						break;
-
-					case SDL_WINDOWEVENT_LEAVE:
-						if (_activeMouseWindowId == e.window.windowID)
-							_activeMouseWindowId = 0;
-						break;
-
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						_activeKeyboardWindowId = e.window.windowID;
-						break;
-
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-						if (_activeKeyboardWindowId == e.window.windowID)
-							_activeKeyboardWindowId = 0;
-						break;
-					}
-
-					auto winIt = _sdlWindows.find(e.window.windowID);
-					if (winIt != _sdlWindows.end()) {
-						if (!winIt->second->pushEvent(e)) {
-							PXE_WARN("PxeWindow event buffer overflow");
-						}
-					}
-				}
-				// is it a keyboard input event
-				else if (e.type >= SDL_KEYDOWN && e.type <= SDL_TEXTEDITING_EXT && e.type != SDL_KEYMAPCHANGED) {
-					if (_activeKeyboardWindowId) {
-						auto winIt = _sdlWindows.find(_activeKeyboardWindowId);
-						if (winIt != _sdlWindows.end()) {
-							if (!winIt->second->pushEvent(e)) {
-								PXE_WARN("PxeWindow event buffer overflow");
-							}
-						}
-					}
-				}
-				// is it a mouse/joystick/touch input event
-				else if (e.type >= SDL_MOUSEMOTION && e.type <= SDL_MULTIGESTURE) {
-					if (_activeMouseWindowId) {
-						auto winIt = _sdlWindows.find(_activeMouseWindowId);
-						if (winIt != _sdlWindows.end()) {
-							if (!winIt->second->pushEvent(e)) {
-								PXE_WARN("PxeWindow event buffer overflow");
-							}
-						}
-					}
-				}
-				// forward all other events to all windows
-				else
-				{
-					for (auto it = _sdlWindows.begin(); it != _sdlWindows.end(); ++it) {
-						if (!it->second->pushEvent(e)) {
-							PXE_WARN("PxeWindow event buffer overflow");
-						}
-					}
-				}
-			}
-
-			// We only use _sdlWindows because there the only windows that can generate SDL events 
-			for (auto it = _sdlWindows.begin(); it != _sdlWindows.end(); ++it) {
-				it->second->processEvents();
-			}
 		}
 
 		void NpEngine::processAssetQueue() {
@@ -761,6 +694,14 @@ namespace pxengine {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			window.bindGuiContext();
 			ImGui_ImplOpenGL3_NewFrame();
+			ImGuiIO& io = ImGui::GetIO();
+			if (_inputManager->getMouseFocusedWindow() == &window) {
+				io.ConfigFlags &= !ImGuiConfigFlags_NoMouseCursorChange;
+			}
+			else {
+				io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+			}
+
 			ImGui_ImplSDL2_NewFrame();
 			ImGui::NewFrame();
 		}

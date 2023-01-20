@@ -205,27 +205,6 @@ namespace pxengine {
 			}
 		}
 
-		void NpWindow::processEvents()
-		{
-			if (_eventBuffer.empty()) return;
-			bindGuiContext();
-			while (!_eventBuffer.empty())
-			{
-				SDL_Event evt = _eventBuffer.peek<SDL_Event>();
-				_eventBuffer.pop<SDL_Event>();
-				if (evt.type == SDL_QUIT || evt.type == SDL_WINDOWEVENT && static_cast<SDL_WindowEventID>(evt.window.event) == SDL_WINDOWEVENT_CLOSE) {
-					setShouldClose();
-				}
-
-				if (getAssetStatus() == PxeGLAssetStatus::ERROR) continue;
-
-				// Not great using this here as technically the underlaying implementation could be anything
-				// as it is created by the NpEngine, but it does not make senses to have the NpEngine handle window events
-				// so this is the lesser evil
-				ImGui_ImplSDL2_ProcessEvent(&evt);
-			}
-		}
-
 		void NpWindow::setScene(PxeScene* scene)
 		{
 			if (_scene)
@@ -346,11 +325,6 @@ namespace pxengine {
 		PXE_NODISCARD NpScene* NpWindow::getNpScene() const
 		{
 			return _scene;
-		}
-
-		bool NpWindow::pushEvent(const SDL_Event& event)
-		{
-			return _eventBuffer.insert(event);
 		}
 
 		PXE_NODISCARD void* NpWindow::getUserData() const {

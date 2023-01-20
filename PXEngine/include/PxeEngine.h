@@ -17,6 +17,7 @@
 #include "PxeWindow.h"
 #include "PxeScene.h"
 #include "PxeShader.h"
+#include "PxeInputManager.h"
 
 namespace pxengine {
 	class PxeEngine : public PxeRefCount {
@@ -27,6 +28,9 @@ namespace pxengine {
 
 		// Creates and returns a new PxeScene or nullptr on failure
 		virtual PXE_NODISCARD PxeScene* createScene() = 0;
+
+		// Returns the input manager for the engine
+		virtual PXE_NODISCARD PxeInputManager& getInputManager() const = 0;
 
 		// Set VSync mode for all windows
 		// Modes:
