@@ -7,7 +7,7 @@
 #include "NpEngine.h"
 
 namespace pxengine::nonpublic {
-	NpScene::NpScene(physx::PxScene* scene) : _viewMatrix(glm::lookAt(glm::vec3(0, 0, -10), glm::vec3(0), glm::vec3(0, 1, 0)))
+	NpScene::NpScene(physx::PxScene* scene)
 	{
 		_physScene = scene;
 		_physScene->userData = this;
@@ -119,16 +119,6 @@ namespace pxengine::nonpublic {
 		if (!_renderables[renderPass].remove(&renderable)) {
 			PXE_WARN("Attempted to remove PxeRenderBase not added to PxeScene");
 		}
-	}
-
-	PXE_NODISCARD const glm::mat4& NpScene::getViewMatrix() const
-	{
-		return _viewMatrix;
-	}
-
-	void NpScene::setViewMatrix(const glm::mat4& view)
-	{
-		_viewMatrix = view;
 	}
 
 	PXE_NODISCARD void* NpScene::getUserData() const {

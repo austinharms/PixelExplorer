@@ -714,7 +714,9 @@ namespace pxengine {
 			PxeShader* activeShader = nullptr;
 			PxeRenderMaterial* activeMaterial = nullptr;
 			int32_t mvpLocation = -1;
-			glm::mat4 pvMatrix(window.getProjectionMatrix() * scene->getViewMatrix());
+			PxeCamera& camera = *window.getCamera();
+			camera.setWindowSize(window.getWindowWidth(), window.getWindowHeight());
+			glm::mat4 pvMatrix(camera.getPVMatrix());
 			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
 				PxeRenderObject& renderObject = static_cast<PxeRenderObject&>(**it);
 				if (&(renderObject.getRenderMaterial()) != activeMaterial) {

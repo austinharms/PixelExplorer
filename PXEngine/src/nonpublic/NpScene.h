@@ -19,8 +19,6 @@ namespace pxengine::nonpublic {
 		void setSimulationStep(float step) override;
 		void addRenderable(PxeRenderBase& renderable) override;
 		void removeRenderable(PxeRenderBase& renderable) override;
-		PXE_NODISCARD const glm::mat4& getViewMatrix() const override;
-		void setViewMatrix(const glm::mat4& view) override;
 		PXE_NODISCARD void* getUserData() const override;
 		void setUserData(void* data) override;
 
@@ -36,7 +34,6 @@ namespace pxengine::nonpublic {
 		void* _userData;
 		physx::PxScene* _physScene;
 		std::list<PxeRenderBase*> _renderables[(int8_t)PxeRenderPass::RENDER_PASS_COUNT];
-		glm::mat4 _viewMatrix;
 		float _simulationTimestep;
 		float _simulationAccumulator;
 	};

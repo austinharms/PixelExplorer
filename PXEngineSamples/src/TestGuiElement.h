@@ -16,10 +16,13 @@ public:
 	void onRender() override 
 	{
 		ImGui::ShowDemoWindow();
-		_clicked = ImGui::Button("Button");
+		if (ImGui::Button("Button"))
+			_clicked = true;
 	}
 
 	bool getClicked() const { return _clicked; }
+
+	void resetClicked() { _clicked = false; }
 
 private:
 	bool _clicked;

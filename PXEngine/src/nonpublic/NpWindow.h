@@ -6,6 +6,7 @@
 #include "PxeScene.h"
 #include "NpScene.h"
 #include "imgui.h"
+#include "PxeCamera.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -28,11 +29,8 @@ namespace pxengine {
 			void setWindowSize(int32_t width, int32_t height) override;
 			PXE_NODISCARD const char* getWindowTitle() const override;
 			void setWindowTitle(const char* title) override;
-			void setProjectionMatrix(const glm::mat4& proj) override;
-			void setProjectionOrthographic(float near, float far) override;
-			void setProjectionPerspective(float fov, float near, float far) override;
-			PXE_NODISCARD const glm::mat4& getProjectionMatrix() const override;
-			PXE_NODISCARD PxeWindowProjection getProjectionType() const override;
+			void setCamera(PxeCamera* camera) override;
+			PXE_NODISCARD PxeCamera* getCamera() const override;
 			PXE_NODISCARD void* getUserData() const override;
 			void setUserData(void* data) override;
 
@@ -65,7 +63,6 @@ namespace pxengine {
 				TITLE_CHANGED		= 0b00000010,
 				PRIMARY_WINDOW		= 0b00000100,
 				WINDOW_CLOSE		= 0b00001000,
-				PROJECTION_CHANGED	= 0b00010000,
 			};
 
 			bool getFlag(NpWindowFlags flag) const;
@@ -77,15 +74,12 @@ namespace pxengine {
 			SDL_Window* _sdlWindow;
 			ImGuiContext* _guiContext;
 			NpScene* _scene;
+			PxeCamera* _camera;
 			char* _title;
 			int32_t _width;
 			int32_t _height;
 			uint8_t _flags;
 			int8_t _vsyncMode;
-			PxeWindowProjection _projectionMode;
-			glm::mat4 _projectionMatrix;
-			// Stores values used to recreate projection matrix when window size changes
-			float _projectionProperties[3];
 		};
 	}
 }

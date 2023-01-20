@@ -27,6 +27,7 @@ namespace pxengine {
 		virtual PXE_NODISCARD const glm::i32vec2& getCursorChange() const = 0;
 		virtual PXE_NODISCARD PxeWindow* getMouseFocusedWindow() const = 0;
 		virtual PXE_NODISCARD PxeWindow* getKeyboardFocusedWindow() const = 0;
+		virtual void clearLastActionSource() = 0;
 	};
 }
 #endif // !PXENGINE_INPUT_MANAGER_H_

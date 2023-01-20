@@ -27,6 +27,7 @@ namespace pxengine {
 			PXE_NODISCARD const glm::i32vec2& getCursorChange() const override;
 			PXE_NODISCARD PxeWindow* getMouseFocusedWindow() const override;
 			PXE_NODISCARD PxeWindow* getKeyboardFocusedWindow() const override;
+			void clearLastActionSource() override;
 
 			//############# PRIVATE API ##################
 

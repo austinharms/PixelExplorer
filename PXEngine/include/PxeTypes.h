@@ -29,14 +29,6 @@ namespace pxengine {
 		ERROR,
 	};
 
-	enum class PxeWindowProjection
-	{
-		NONE = 0,
-		ORTHOGRAPHIC,
-		PERSPECTIVE,
-		CUSTOM,
-	};
-
 	enum class PxeIndexType : uint32_t
 	{
 		UNSIGNED_8BIT = 0x1401,  // GL_UNSIGNED_BYTE

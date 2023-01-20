@@ -61,7 +61,7 @@ namespace pxengine {
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				NpWindow& window = *(it->second);
-				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene() || !window.getWindowWidth() || !window.getWindowHeight()) continue;
+				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene() || !window.getCamera() || !window.getWindowWidth() || !window.getWindowHeight()) continue;
 				engine->newFrame(window);
 				application->preRender(window);
 				engine->renderFrame(window);

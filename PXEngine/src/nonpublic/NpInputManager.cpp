@@ -86,6 +86,11 @@ namespace pxengine {
 			return static_cast<PxeWindow*>(_focusedKeyboardWindow);
 		}
 
+		void NpInputManager::clearLastActionSource()
+		{
+			_lastActionCode = 0;
+		}
+
 		NpInputManager::NpInputManager()
 		{
 			_lastActionCode = 0;

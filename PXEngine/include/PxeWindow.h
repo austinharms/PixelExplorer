@@ -3,6 +3,7 @@
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
 #include "PxeScene.h"
+#include "PxeCamera.h"
 
 namespace pxengine {
 	// Wrapper for SDL_Window
@@ -48,22 +49,11 @@ namespace pxengine {
 		// Sets the title of the window
 		virtual void setWindowTitle(const char* title) = 0;
 
-		// Sets the projection matrix used when the scene is rendered
-		virtual void setProjectionMatrix(const glm::mat4& proj) = 0;
+		// Set the PxeCamera used when the scene is rendered
+		virtual void setCamera(PxeCamera* camera) = 0;
 
-		// Sets the projection matrix to an orthographic projection, with {near} and {far} clipping panes
-		// Note: the projection will be automatically recalculated when the screen size changes
-		virtual void setProjectionOrthographic(float near, float far) = 0;
-
-		// Sets the projection matrix to an perspective projection, with a field of view of {fov}rad with {near} and {far} clipping panes
-		// Note: the projection will be automatically recalculated when the screen size changes
-		virtual void setProjectionPerspective(float fov, float near, float far) = 0;
-
-		// Returns the projection matrix used when the scene is rendered
-		virtual PXE_NODISCARD const glm::mat4& getProjectionMatrix() const = 0;
-
-		// Returns the type of projection matrix used when the scene is rendered
-		virtual PXE_NODISCARD PxeWindowProjection getProjectionType() const = 0;
+		// Returns the PxeCamera used when the scene is rendered
+		virtual PXE_NODISCARD PxeCamera* getCamera() const = 0;
 
 		// Returns the user data void*
 		// Note: this is purely for application uses and is not used by the engine 

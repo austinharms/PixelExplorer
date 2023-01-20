@@ -86,6 +86,7 @@ public:
 			pxengine::PxeWindow* window = pxengine::pxeGetEngine().createWindow(600, 400, ("Window " + std::to_string(_windowCounter++)).c_str());
 			window->setScene(_testScene);
 			_windows.push_back(window);
+			_testGui->resetClicked();
 		}
 
 		auto it = _windows.begin();

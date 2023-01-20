@@ -190,6 +190,7 @@
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
     <ClCompile Include="src\nonpublic\NpWindow.cpp" />
     <ClCompile Include="src\PxeBuffer.cpp" />
+    <ClCompile Include="src\PxeDefaultCamera.cpp" />
     <ClCompile Include="src\PxeEngine.cpp" />
     <ClCompile Include="src\PxeFSHelpers.cpp" />
     <ClCompile Include="src\PxeIndexBuffer.cpp" />
@@ -205,6 +206,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PxeAction.h" />
+    <ClInclude Include="include\PxeCamera.h" />
+    <ClInclude Include="include\PxeDefaultCamera.h" />
     <ClInclude Include="include\PxeInputManager.h" />
     <ClInclude Include="include\PxeActionSource.h" />
     <ClInclude Include="include\PxeApplicationInterface.h" />
