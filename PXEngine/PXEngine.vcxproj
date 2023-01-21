@@ -218,6 +218,7 @@
     <ClInclude Include="include\PxeGLAsset.h" />
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\PxeIndexBuffer.h" />
+    <ClInclude Include="include\PxePhysicsRenderObject.h" />
     <ClInclude Include="include\PxeRenderBase.h" />
     <ClInclude Include="include\PxeRenderElement.h" />
     <ClInclude Include="include\PxeRenderMaterial.h" />

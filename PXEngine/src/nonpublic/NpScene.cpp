@@ -12,7 +12,9 @@ namespace pxengine::nonpublic {
 		_physScene = scene;
 		_physScene->userData = this;
 		_simulationAccumulator = 0;
-		_simulationTimestep = 0.25f;
+		_simulationTimestep = 0.01f;
+		_simulationScale = 1;
+		_userData = nullptr;
 		NpEngine::getInstance().grab();
 	}
 
@@ -30,7 +32,7 @@ namespace pxengine::nonpublic {
 		NpEngine::getInstance().drop();
 	}
 
-	const std::list<PxeRenderBase*>& NpScene::getRenderList(PxeRenderPass pass) const
+	PXE_NODISCARD const std::list<PxeRenderBase*>& NpScene::getRenderList(PxeRenderPass pass) const
 	{
 		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
 		if ((int8_t)pass < 0 || (int8_t)pass > renderSize) {
@@ -42,31 +44,54 @@ namespace pxengine::nonpublic {
 
 	void NpScene::simulatePhysics(float time)
 	{
-		_simulationAccumulator += time;
+		_simulationAccumulator += time * _simulationScale;
+		if (_simulationAccumulator < _simulationTimestep) return;
+		_physScene->lockWrite(__FUNCTION__, __LINE__);
+		const std::list<PxeRenderBase*>& physicsRenderables = getRenderList(PxeRenderPass::PHYSICS_WORLD_SPACE);
+		for (auto renderable : physicsRenderables)
+			static_cast<PxePhysicsRenderObject*>(renderable)->updatePhysicsPosition();
+
 		while (_simulationAccumulator >= _simulationTimestep)
 		{
 			_simulationAccumulator -= _simulationTimestep;
 			_physScene->simulate(_simulationTimestep);
 			_physScene->fetchResults(true);
 		}
+
+		_physScene->unlockWrite();
 	}
 
-	float NpScene::getSimulationAccumulator() const
+	PXE_NODISCARD physx::PxScene* NpScene::getPhysicsScene() const
+	{
+		return _physScene;
+	}
+
+	void NpScene::setPhysicsSimulationSpeed(float speed)
+	{
+		_simulationScale = speed;
+	}
+
+	PXE_NODISCARD float NpScene::getPhysicsSimulationSpeed() const
+	{
+		return _simulationScale;
+	}
+
+	PXE_NODISCARD float NpScene::getPhysicsSimulationAccumulator() const
 	{
 		return _simulationAccumulator;
 	}
 
-	void NpScene::setSimulationAccumulator(float time)
+	void NpScene::setPhysicsSimulationAccumulator(float time)
 	{
 		_simulationAccumulator = time;
 	}
 
-	float NpScene::getSimulationStep() const
+	PXE_NODISCARD float NpScene::getPhysicsSimulationStep() const
 	{
 		return _simulationTimestep;
 	}
 
-	void NpScene::setSimulationStep(float step)
+	void NpScene::setPhysicsSimulationStep(float step)
 	{
 		_simulationTimestep = step;
 	}
@@ -82,12 +107,21 @@ namespace pxengine::nonpublic {
 
 #ifdef PXE_DEBUG
 		if (std::find(_renderables[renderPass].begin(), _renderables[renderPass].end(), &renderable) != _renderables[renderPass].end()) {
-			PXE_WARN("Re-added PxeRenderBase to PxeScene");
+			if (renderPass == (int8_t)PxeRenderPass::PHYSICS_WORLD_SPACE) {
+				PXE_ERROR("Re-added PxePhysicsRenderObject to PxeScene");
+			}
+			else {
+				PXE_WARN("Re-added PxeRenderBase to PxeScene");
+			}
 		}
 #endif // PXE_DEBUG
 
 		renderable.grab();
-		if (renderPass == (int8_t)PxeRenderPass::WORLD_SPACE) {
+		if (renderPass == (int8_t)PxeRenderPass::PHYSICS_WORLD_SPACE) {
+			_physScene->addActor(static_cast<PxePhysicsRenderObject&>(renderable).getPhysicsActor());
+		}
+
+		if (renderPass == (int8_t)PxeRenderPass::WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::PHYSICS_WORLD_SPACE) {
 			void* materialPtr = &(static_cast<PxeRenderObject&>(renderable).getRenderMaterial());
 			if (_renderables[renderPass].empty()) {
 				_renderables[renderPass].emplace_front(&renderable);

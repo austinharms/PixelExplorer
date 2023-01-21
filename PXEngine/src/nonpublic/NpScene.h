@@ -13,10 +13,13 @@ namespace pxengine::nonpublic {
 	public:
 		//############# PxeScene API ##################
 
-		PXE_NODISCARD float getSimulationAccumulator() const override;
-		void setSimulationAccumulator(float time) override;
-		PXE_NODISCARD float getSimulationStep() const override;
-		void setSimulationStep(float step) override;
+		PXE_NODISCARD physx::PxScene* getPhysicsScene() const override;
+		void setPhysicsSimulationSpeed(float speed) override;
+		PXE_NODISCARD float getPhysicsSimulationSpeed() const override;
+		PXE_NODISCARD float getPhysicsSimulationAccumulator() const override;
+		void setPhysicsSimulationAccumulator(float time) override;
+		PXE_NODISCARD float getPhysicsSimulationStep() const override;
+		void setPhysicsSimulationStep(float step) override;
 		void addRenderable(PxeRenderBase& renderable) override;
 		void removeRenderable(PxeRenderBase& renderable) override;
 		PXE_NODISCARD void* getUserData() const override;
@@ -36,6 +39,7 @@ namespace pxengine::nonpublic {
 		std::list<PxeRenderBase*> _renderables[(int8_t)PxeRenderPass::RENDER_PASS_COUNT];
 		float _simulationTimestep;
 		float _simulationAccumulator;
+		float _simulationScale;
 	};
 }
 #endif // !PXENGINE_SCENE_H_

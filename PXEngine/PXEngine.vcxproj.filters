@@ -245,5 +245,8 @@
     <ClInclude Include="include\PxeDefaultCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PxePhysicsRenderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

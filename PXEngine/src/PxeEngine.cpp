@@ -7,11 +7,11 @@
 #include "NpWindow.h"
 #include "NpEngine.h"
 #include "NpInputManager.h"
+#include "SDL_timer.h"
 
-//#define PXE_DEBUG_TIMING
+#define PXE_DEBUG_TIMING
 #ifdef PXE_DEBUG_TIMING
 #include <string>
-#include "SDL_timer.h"
 #endif // PXE_DEBUG_TIMING
 
 
@@ -36,12 +36,11 @@ namespace pxengine {
 #ifdef PXE_DEBUG_TIMING
 			uint64_t time = SDL_GetTicks64();
 #endif
-
 			application->prePhysics();
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				if (it->second->getScene()) {
-					it->second->getNpScene()->simulatePhysics(1.0f);
+					it->second->getNpScene()->simulatePhysics(engine->getDeltaTime());
 				}
 			}
 
@@ -57,14 +56,15 @@ namespace pxengine {
 #ifdef PXE_DEBUG_TIMING
 			uint64_t time = SDL_GetTicks64();
 #endif
-
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				NpWindow& window = *(it->second);
 				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene() || !window.getCamera() || !window.getWindowWidth() || !window.getWindowHeight()) continue;
 				engine->newFrame(window);
 				application->preRender(window);
-				engine->renderFrame(window);
+				NpScene* scene = window.getNpScene();
+				engine->renderFrame(window, PxeRenderPass::WORLD_SPACE);
+				engine->renderFrame(window, PxeRenderPass::PHYSICS_WORLD_SPACE);
 				application->preGUI(window);
 				engine->renderGui(window);
 				application->postGUI(window);
@@ -78,7 +78,7 @@ namespace pxengine {
 #endif
 		}
 	}
-	
+
 	void pxeRunApplication(PxeApplicationInterface& application, PxeLogInterface& logInterface) {
 		using namespace nonpublic;
 #ifdef PXE_DEBUG_TIMING
@@ -110,6 +110,7 @@ namespace pxengine {
 
 		while (!engine->getShutdownFlag())
 		{
+			uint64_t deltaTimer = SDL_GetTicks64();
 #ifdef PXE_DEBUG_TIMING
 			startTime = SDL_GetTicks64();
 			tempTime = SDL_GetTicks64();
@@ -137,7 +138,7 @@ namespace pxengine {
 
 			updateThread.join();
 			physicsThread.join();
-
+			engine->setDeltaTime((float)(SDL_GetTicks64() - deltaTimer) / 1000.0f);
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Render thread waited " + std::to_string(SDL_GetTicks64() - tempTime));
 			PXE_INFO("Complete frame took " + std::to_string(SDL_GetTicks64() - startTime));

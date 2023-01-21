@@ -11,7 +11,6 @@ namespace pxengine {
 		inline PxeRenderElement() : PxeRenderBase(PxeRenderPass::SCREEN_SPACE) {}
 		virtual ~PxeRenderElement() = default;
 
-		// TODO Test if this function call works
 		// This method should draw the object to the current framebuffer
 		// Note: you can assume a valid ImGui context and frame
 		virtual void onRender() override = 0;

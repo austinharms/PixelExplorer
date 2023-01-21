@@ -39,16 +39,22 @@ namespace pxengine {
 			void setVSyncMode(int8_t mode) override;
 			PXE_NODISCARD int8_t getVSyncMode() const override;
 			PXE_NODISCARD PxeInputManager& getInputManager() const override;
-
+			PXE_NODISCARD float getDeltaTime() const override;
+			PXE_NODISCARD physx::PxFoundation* getPhysicsFoundation() const override;
+			PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const override;
+			PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const override;
 			void shutdown() override;
+
 
 			//############# PxErrorCallback API ##################
 
 			void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line) override;
 
+
 			//############# PxAssertHandler API ##################
 
 			void operator()(const char* exp, const char* file, int line, bool& ignore) override;
+
 
 			//############# PRIVATE API ##################
 
@@ -71,13 +77,13 @@ namespace pxengine {
 			void destroyGuiContext(ImGuiContext* context, NpWindow& window);
 			PXE_NODISCARD NpInputManager& getNpInputManager() const;
 			void shutdownEngine();
-			
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
 			void newFrame(NpWindow& window);
-			void renderFrame(NpWindow& window);
+			void renderFrame(NpWindow& window, PxeRenderPass pass);
 			void renderGui(NpWindow& window);
 			void swapFramebuffer(NpWindow& window);
 			void bindPrimaryGlContext();
+			void setDeltaTime(float dt);
 
 		private:
 			static NpEngine* s_instance;
@@ -118,6 +124,7 @@ namespace pxengine {
 			uint16_t _guiBackendReferenceCount;
 			// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
 			void* _shutdownFlag;
+			float _deltaTime;
 			int8_t _vsyncMode;
 		};
 	}
