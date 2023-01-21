@@ -753,6 +753,8 @@ namespace pxengine {
 				activeShader->setUniformM4f(mvpLocation, pvMatrix * renderObject.getPositionMatrix());
 				renderObject.onRender();
 			}
+
+			if (activeShader) activeShader->unbind();
 		}
 
 		void NpEngine::renderGui(NpWindow& window)

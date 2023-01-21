@@ -13,6 +13,7 @@ namespace pxengine {
 		}
 
 		cam->setProjectionPerspective(fov, near, far);
+		return cam;
 	}
 
 	PxeDefaultCamera* PxeDefaultCamera::createCamera(float near, float far) {
