@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h" />
+    <ClInclude Include="src\PhysicsRenderable.h" />
     <ClInclude Include="src\TestApplication.h" />
     <ClInclude Include="src\TestAsset.h" />
     <ClInclude Include="src\TestGuiElement.h" />
@@ -109,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -128,7 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -147,7 +148,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -166,7 +167,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

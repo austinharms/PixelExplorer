@@ -18,6 +18,9 @@
 #include "PxeScene.h"
 #include "PxeShader.h"
 #include "PxeInputManager.h"
+#include "PxFoundation.h"
+#include "PxPhysics.h"
+#include "cooking/PxCooking.h"
 
 namespace pxengine {
 	class PxeEngine : public PxeRefCount {
@@ -50,6 +53,18 @@ namespace pxengine {
 
 		// Stops the application at the end of the current update cycle
 		virtual void shutdown() = 0;
+
+		// Returns the time the last frame took in seconds 
+		virtual PXE_NODISCARD float getDeltaTime() const = 0;
+
+		// Returns the physx PxFoundation instance created and used by the engine
+		virtual PXE_NODISCARD physx::PxFoundation* getPhysicsFoundation() const = 0;
+
+		// Returns the physx PxPhysics instance created and used by the engine
+		virtual PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const = 0;
+
+		// Returns the physx PxCooking instance created and used by the engine
+		virtual PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const = 0;
 
 		PxeEngine() = default;
 		virtual ~PxeEngine() = default;

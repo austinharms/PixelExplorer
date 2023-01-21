@@ -50,6 +50,7 @@ namespace pxengine {
 		NONE = -1,
 		SCREEN_SPACE,
 		WORLD_SPACE,
+		PHYSICS_WORLD_SPACE,
 		RENDER_PASS_COUNT
 	};
 

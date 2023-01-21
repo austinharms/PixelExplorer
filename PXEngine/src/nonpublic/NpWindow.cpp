@@ -21,6 +21,7 @@ namespace pxengine {
 			_height = height;
 			_flags = 0;
 			_vsyncMode = static_cast<int8_t>(0xff);
+			_userData = nullptr;
 			setWindowTitle(title);
 		}
 

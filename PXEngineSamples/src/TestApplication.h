@@ -9,6 +9,7 @@
 #include "PxeEngineAPI.h"
 #include "imgui.h"
 #include "TestRenderObject.h"
+#include "PhysicsRenderable.h"
 #include "TestGuiElement.h"
 #include "SDL_keycode.h"
 
@@ -47,22 +48,39 @@ public:
 		material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));
 
 		_testScene = engine.createScene();
-
-		srand(static_cast<uint32_t>(time(nullptr)));
-		TestRenderObject* baseObj = new(std::nothrow) TestRenderObject(*material);
-		for (int32_t x = -25; x < 26; ++x) {
-			for (int32_t y = -25; y < 26; ++y) {
-				TestRenderObject* testObj = new(std::nothrow) TestRenderObject(*material, baseObj->getIndexBuffer(), baseObj->getVertexArray());
-				testObj->translate(glm::vec3(x, y, 0));
-				testObj->rotateAbout(glm::vec3(1, 0, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
-				testObj->rotateAbout(glm::vec3(0, 1, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
-				testObj->rotateAbout(glm::vec3(0, 0, 1), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
-				_testScene->addRenderable(*testObj);
-				testObj->drop();
+		_testScene->setPhysicsSimulationSpeed(0.25f);
+		PhysicsRenderable* basePhysObj = PhysicsRenderable::createPhysicsRenderable(glm::vec3(0, -10, 0), false, *material);
+		_testScene->addRenderable(*basePhysObj);
+		for (int32_t y = -9; y < 1000; ++y) {
+			glm::vec3 force(0);
+			if (y == 0) {
+				//force.x = -1;
 			}
+
+			PhysicsRenderable* testObj = PhysicsRenderable::createPhysicsRenderable(glm::vec3(0, y * 1.1f, 0), true, *material, basePhysObj->getIndexBuffer(), basePhysObj->getVertexArray(), basePhysObj->getShape(), force);
+			_testScene->addRenderable(*testObj);
+			testObj->drop();
 		}
 
-		baseObj->drop();
+		basePhysObj->drop();
+
+		//srand(static_cast<uint32_t>(time(nullptr)));
+		//TestRenderObject* baseObj = new(std::nothrow) TestRenderObject(*material);
+		//for (int32_t x = -25; x < 26; ++x) {
+		//	for (int32_t y = -25; y < 26; ++y) {
+		//		TestRenderObject* testObj = new(std::nothrow) TestRenderObject(*material, baseObj->getIndexBuffer(), baseObj->getVertexArray());
+		//		testObj->translate(glm::vec3(x, y, 0));
+		//		testObj->rotateAbout(glm::vec3(1, 0, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
+		//		testObj->rotateAbout(glm::vec3(0, 1, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
+		//		testObj->rotateAbout(glm::vec3(0, 0, 1), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
+		//		_testScene->addRenderable(*testObj);
+		//		testObj->drop();
+		//	}
+		//}
+
+		//baseObj->drop();
+
+
 		texture->drop();
 		shader->drop();
 		material->drop();

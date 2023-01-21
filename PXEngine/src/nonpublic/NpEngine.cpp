@@ -554,6 +554,26 @@ namespace pxengine {
 			return static_cast<PxeInputManager&>(*_inputManager);
 		}
 
+		PXE_NODISCARD float NpEngine::getDeltaTime() const
+		{
+			return _deltaTime;
+		}
+
+		PXE_NODISCARD physx::PxFoundation* NpEngine::getPhysicsFoundation() const
+		{
+			return _physFoundation;
+		}
+
+		PXE_NODISCARD physx::PxPhysics* NpEngine::getPhysicsBase() const
+		{
+			return _physPhysics;
+		}
+
+		PXE_NODISCARD physx::PxCooking* NpEngine::getPhysicsCooking() const
+		{
+			return _physCooking;
+		}
+
 		void NpEngine::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
 		{
 			PxeLogLevel level = PxeLogLevel::PXE_INFO;
@@ -706,10 +726,10 @@ namespace pxengine {
 			ImGui::NewFrame();
 		}
 
-		void NpEngine::renderFrame(NpWindow& window)
+		void NpEngine::renderFrame(NpWindow& window, PxeRenderPass pass)
 		{
 			NpScene* scene = window.getNpScene();
-			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(PxeRenderPass::WORLD_SPACE);
+			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(pass);
 			if (renderList.empty()) return;
 			PxeShader* activeShader = nullptr;
 			PxeRenderMaterial* activeMaterial = nullptr;
@@ -768,6 +788,11 @@ namespace pxengine {
 			if (_primaryWindow && _primaryGlContext) {
 				SDL_GL_MakeCurrent(_primaryWindow->getSDLWindow(), _primaryGlContext);
 			}
+		}
+
+		void NpEngine::setDeltaTime(float dt)
+		{
+			_deltaTime = dt;
 		}
 	}
 }

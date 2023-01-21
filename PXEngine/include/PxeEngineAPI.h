@@ -1,11 +1,11 @@
 #ifndef PXENGINE_FULL_API_H_
 #define PXENGINE_FULL_API_H_
 #include "PxeApplicationInterface.h"
-#include"PxeBuffer.h"
+#include "PxeBuffer.h"
 #include "PxeEngine.h"
-#include"PxeFSHelpers.h"
+#include "PxeFSHelpers.h"
 #include "PxeGLAsset.h"
-#include"PxeIndexBuffer.h"
+#include "PxeIndexBuffer.h"
 #include "PxeLogger.h"
 #include "PxeRefCount.h"
 #include "PxeRenderBase.h"
@@ -26,4 +26,5 @@
 #include "PxeAction.h"
 #include "PxeActionSource.h"
 #include "PxeInputManager.h"
+#include "PxePhysicsRenderObject.h"
 #endif // !PXENGINE_FULL_API_H_

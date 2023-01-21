@@ -13,14 +13,14 @@ namespace pxengine {
 		inline PxeRenderObject(PxeRenderMaterial& material) : PxeRenderBase(PxeRenderPass::WORLD_SPACE), _renderMaterial(material), positionMatrix(1.0f) { _renderMaterial.grab(); }
 		virtual ~PxeRenderObject() { _renderMaterial.drop(); }
 		inline PXE_NODISCARD PxeRenderMaterial& getRenderMaterial() const { return _renderMaterial; }
-		inline PXE_NODISCARD const glm::mat4& getPositionMatrix() const { return positionMatrix; }
+		PXE_NODISCARD const glm::mat4& getPositionMatrix() const { return positionMatrix; }
 
-		// TODO Test if this function call works
 		// This method should draw the object to the current framebuffer
 		// Note: you can assume a valid OpenGl context
 		virtual void onRender() override = 0;
 
 	protected:
+		inline PxeRenderObject(PxeRenderMaterial& material, PxeRenderPass pass) : PxeRenderBase(pass), _renderMaterial(material), positionMatrix(1.0f) { _renderMaterial.grab(); }
 		glm::mat4 positionMatrix;
 
 	private:

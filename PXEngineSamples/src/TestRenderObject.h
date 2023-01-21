@@ -73,7 +73,7 @@ public:
 	void onRender() override {
 		_vertexArray->bind();
 		_indexBuffer->bind();
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
+		glDrawElements(GL_TRIANGLES, 36, (uint32_t)_indexBuffer->getIndexType(), nullptr);
 		//_indexBuffer->unbind();
 		//_vertexArray->unbind();
 	}
