@@ -18,7 +18,7 @@ namespace pxengine {
 			void addSource(PxeActionSource& source) override;
 			PXE_NODISCARD const std::string& getName() const override;
 			PXE_NODISCARD const std::list<PxeActionSource*>& getSources() const override;
-
+			PXE_NODISCARD bool hasSource() const override;
 
 			//############# PRIVATE API ##################
 

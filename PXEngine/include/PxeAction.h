@@ -27,6 +27,9 @@ namespace pxengine {
 
 		// Returns all the sources used when calculating the action value
 		virtual PXE_NODISCARD const std::list<PxeActionSource*>& getSources() const = 0;
+
+		// Returns if the action has at least one source 
+		virtual PXE_NODISCARD bool hasSource() const = 0;
 	};
 }
 #endif // !PXENGINE_ACTION_H_

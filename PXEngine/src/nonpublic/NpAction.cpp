@@ -43,6 +43,11 @@ namespace pxengine {
 			return _sources;
 		}
 
+		PXE_NODISCARD bool NpAction::hasSource() const
+		{
+			return !_sources.empty();
+		}
+
 		NpAction::NpAction(const std::string& name) : _name(name) {}
 
 		NpAction::~NpAction()
