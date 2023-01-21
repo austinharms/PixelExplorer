@@ -28,11 +28,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h" />
-    <ClInclude Include="src\PhysicsRenderable.h" />
-    <ClInclude Include="src\TestApplication.h" />
-    <ClInclude Include="src\TestAsset.h" />
-    <ClInclude Include="src\TestGuiElement.h" />
-    <ClInclude Include="src\TestRenderObject.h" />
+    <ClInclude Include="src\SampleSceneBase.h" />
+    <ClInclude Include="src\scenes\CubeStack\CubeStack.h" />
+    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.h" />
+    <ClInclude Include="src\scenes\CubeWall\CubeWall.h" />
+    <ClInclude Include="src\scenes\CubeWall\RenderCube.h" />
+    <ClInclude Include="src\SampleApplication.h" />
+    <ClInclude Include="src\MainMenu.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

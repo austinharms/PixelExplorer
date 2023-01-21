@@ -1,10 +1,10 @@
 #include "PxeEngineAPI.h"
 #include "LogHandler.h"
-#include "TestApplication.h"
+#include "SampleApplication.h"
 
 int main(int argc, char* args[]) {
 	LogHandle log;
-	TestApplication app;
+	SampleApplication app;
 	pxengine::pxeRunApplication(app, log);
 	return 0;
 }

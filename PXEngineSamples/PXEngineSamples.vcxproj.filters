@@ -26,19 +26,25 @@
     <ClInclude Include="src\LogHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestAsset.h">
+    <ClInclude Include="src\SampleApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestRenderObject.h">
+    <ClInclude Include="src\MainMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestApplication.h">
+    <ClInclude Include="src\SampleSceneBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestGuiElement.h">
+    <ClInclude Include="src\scenes\CubeWall\CubeWall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PhysicsRenderable.h">
+    <ClInclude Include="src\scenes\CubeWall\RenderCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\CubeStack\CubeStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
