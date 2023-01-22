@@ -9,6 +9,9 @@ namespace pxengine {
 	class PxeIndexBuffer : public PxeGLAsset
 	{
 	public:
+		// Returns the byte size of the PxeIndexType
+		static size_t getIndexSize(PxeIndexType type);
+
 		PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer = nullptr);
 		virtual ~PxeIndexBuffer();
 
@@ -34,6 +37,12 @@ namespace pxengine {
 		// Returns the index type the buffer is using
 		PXE_NODISCARD PxeIndexType getIndexType() const;
 
+		// Returns the number of indices currently in the  GL_ELEMENT_ARRAY_BUFFER
+		PXE_NODISCARD uint32_t getIndexCount() const;
+
+		// Returns the byte size of the PxeIndexType used
+		PXE_NODISCARD size_t getIndexSize() const;
+
 		PxeIndexBuffer(const PxeIndexBuffer& other) = delete;
 		PxeIndexBuffer operator=(const PxeIndexBuffer& other) = delete;
 
@@ -44,6 +53,7 @@ namespace pxengine {
 	private:
 		PxeBuffer* _pendingBuffer;
 		uint32_t _glBufferId;
+		uint32_t _indexCount;
 		const PxeIndexType _glBufferType;
 
 		// Uploads the pending buffer into the GL_ELEMENT_ARRAY_BUFFER

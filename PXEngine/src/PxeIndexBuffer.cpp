@@ -4,10 +4,23 @@
 #include "nonpublic/NpLogger.h"
 
 namespace pxengine {
+	size_t PxeIndexBuffer::getIndexSize(PxeIndexType type)
+	{
+		switch (type)
+		{
+		case pxengine::PxeIndexType::UNSIGNED_8BIT: return 1;
+		case pxengine::PxeIndexType::UNSIGNED_16BIT: return 2;
+		case pxengine::PxeIndexType::UNSIGNED_32BIT: return 4;
+		}
+
+		return 0;
+	}
+
 	PxeIndexBuffer::PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer) : _glBufferType(indexType)
 	{
 		_glBufferId = 0;
 		_pendingBuffer = nullptr;
+		_indexCount = 0;
 		if (buffer)
 			bufferData(*buffer);
 	}
@@ -71,6 +84,16 @@ namespace pxengine {
 		return _glBufferType;
 	}
 
+	PXE_NODISCARD uint32_t PxeIndexBuffer::getIndexCount() const
+	{
+		return _indexCount;
+	}
+
+	PXE_NODISCARD size_t PxeIndexBuffer::getIndexSize() const
+	{
+		return getIndexSize(_glBufferType);
+	}
+
 	void PxeIndexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
@@ -92,6 +115,13 @@ namespace pxengine {
 	void PxeIndexBuffer::updateGlBuffer()
 	{
 		if (!getBufferPending()) return;
+#ifdef PXE_DEBUG
+		if (_pendingBuffer->getSize() % getIndexSize(_glBufferType) != 0) {
+			PXE_WARN("pending PxeBuffer size not divisible by size of PxeIndexBuffer's PxeIndexType");
+		}
+#endif // PXE_DEBUG
+
+		_indexCount = static_cast<uint32_t>(_pendingBuffer->getSize() / getIndexSize(_glBufferType));
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _pendingBuffer->getSize(), _pendingBuffer->getBuffer(), GL_STATIC_DRAW);
 		_pendingBuffer->drop();
 		_pendingBuffer = nullptr;
