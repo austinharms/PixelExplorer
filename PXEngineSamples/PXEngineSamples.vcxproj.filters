@@ -59,5 +59,14 @@
     <ClInclude Include="src\scenes\MarchingCubes\MarchingMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\scenes\FreeCamera\FreeCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\FreeCamera\RenderCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\FreeCamera\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

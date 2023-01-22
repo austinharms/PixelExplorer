@@ -36,6 +36,9 @@
     <ClInclude Include="src\scenes\CubeWall\RenderCube.h" />
     <ClInclude Include="src\SampleApplication.h" />
     <ClInclude Include="src\MainMenu.h" />
+    <ClInclude Include="src\scenes\FreeCamera\Camera.h" />
+    <ClInclude Include="src\scenes\FreeCamera\FreeCamera.h" />
+    <ClInclude Include="src\scenes\FreeCamera\RenderCube.h" />
     <ClInclude Include="src\scenes\MarchingCubes\MarchingCubes.h" />
     <ClInclude Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.h" />
     <ClInclude Include="src\scenes\MarchingCubes\MarchingMesh.h" />

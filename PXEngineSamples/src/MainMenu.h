@@ -13,6 +13,7 @@ public:
 		CUBEWALL = 0x2,
 		CUBESTACK = 0x4,
 		MARCHINGCUBES = 0x8,
+		FREECAMERA = 0x10,
 		ALL = 0xff
 	};
 
@@ -40,6 +41,9 @@ public:
 		ImGui::Bullet();
 		if (ImGui::SmallButton("Marching Cubes"))
 			_clickedActions |= MARCHINGCUBES;
+		ImGui::Bullet();
+		if (ImGui::SmallButton("Free Camera"))
+			_clickedActions |= FREECAMERA;
 		if (ImGui::Button("Quit"))
 			_clickedActions |= QUIT;
 		ImGui::End();

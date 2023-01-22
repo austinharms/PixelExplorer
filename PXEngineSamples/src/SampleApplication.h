@@ -9,6 +9,7 @@
 #include "scenes/CubeWall/CubeWall.h"
 #include "scenes/CubeStack/CubeStack.h"
 #include "scenes/MarchingCubes/MarchingCubes.h"
+#include "scenes/FreeCamera/FreeCamera.h"
 
 class SampleApplication : public pxengine::PxeApplicationInterface
 {
@@ -74,6 +75,12 @@ public:
 		if (menuAction & MainMenu::MARCHINGCUBES)
 		{
 			MarchingCubes* scene = new(std::nothrow) MarchingCubes();
+			if (scene) _runningSamples.push_back(scene);
+		}
+
+		if (menuAction & MainMenu::FREECAMERA)
+		{
+			FreeCamera* scene = new(std::nothrow) FreeCamera();
 			if (scene) _runningSamples.push_back(scene);
 		}
 

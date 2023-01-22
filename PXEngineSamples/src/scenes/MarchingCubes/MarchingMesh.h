@@ -137,7 +137,6 @@ namespace marchingcubes {
 				}
 			}
 
-			_vertexArray->updateBufferBindings();
 			_indexBuffer->bufferData(*indexData);
 			_vertexBuffer->bufferData(*vertexData);
 			vertexData->drop();
