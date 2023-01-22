@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\shaders\test.pxeshader">
@@ -35,6 +36,9 @@
     <ClInclude Include="src\scenes\CubeWall\RenderCube.h" />
     <ClInclude Include="src\SampleApplication.h" />
     <ClInclude Include="src\MainMenu.h" />
+    <ClInclude Include="src\scenes\MarchingCubes\MarchingCubes.h" />
+    <ClInclude Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.h" />
+    <ClInclude Include="src\scenes\MarchingCubes\MarchingMesh.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

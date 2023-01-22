@@ -12,6 +12,7 @@ public:
 		QUIT = 0x1,
 		CUBEWALL = 0x2,
 		CUBESTACK = 0x4,
+		MARCHINGCUBES = 0x8,
 		ALL = 0xff
 	};
 
@@ -36,6 +37,9 @@ public:
 		ImGui::Bullet();
 		if (ImGui::SmallButton("Cube Stack"))
 			_clickedActions |= CUBESTACK;
+		ImGui::Bullet();
+		if (ImGui::SmallButton("Marching Cubes"))
+			_clickedActions |= MARCHINGCUBES;
 		if (ImGui::Button("Quit"))
 			_clickedActions |= QUIT;
 		ImGui::End();
