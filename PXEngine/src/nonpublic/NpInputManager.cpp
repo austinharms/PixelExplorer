@@ -110,6 +110,7 @@ namespace pxengine {
 
 		void NpInputManager::processEvents()
 		{
+			_cursorChange = glm::i32vec2(0);
 			SDL_Event evt;
 			while (SDL_PollEvent(&evt))
 			{
@@ -167,8 +168,8 @@ namespace pxengine {
 						_focusedMouseWindow->bindGuiContext();
 						ImGui_ImplSDL2_ProcessEvent(&evt);
 						if (!ImGui::GetIO().WantCaptureMouse) {
-							glm::i32vec2 mousePos(evt.motion.xrel, evt.motion.yrel);
-							_cursorChange = mousePos - _cursorPos;
+							glm::i32vec2 mousePos(evt.motion.x, evt.motion.y);
+							_cursorChange = glm::i32vec2(evt.motion.xrel, evt.motion.yrel);
 							_cursorPos = mousePos;
 						}
 					}
