@@ -18,63 +18,48 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui.cpp">
+    <ClCompile Include="src\gui\PlayMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp">
+    <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp">
+    <ClCompile Include="src\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp">
+    <ClCompile Include="src\UpdatableScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_glfw.cpp">
+    <ClCompile Include="src\scene\ErrorMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\backends\imgui_impl_opengl3.cpp">
+    <ClCompile Include="src\gui\ErrorScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vendor\imgui\misc\cpp\imgui_stdlib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp">
+    <ClCompile Include="src\scene\MainMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\vendor\imgui\imconfig.h">
+    <ClInclude Include="src\gui\PlayMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui.h">
+    <ClInclude Include="src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui_internal.h">
+    <ClInclude Include="src\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imstb_rectpack.h">
+    <ClInclude Include="src\UpdatableScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imstb_textedit.h">
+    <ClInclude Include="src\scene\MainMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imstb_truetype.h">
+    <ClInclude Include="src\scene\ErrorMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\misc\cpp\imgui_stdlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\misc\single_file\imgui_single_file.h">
+    <ClInclude Include="src\gui\ErrorScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
