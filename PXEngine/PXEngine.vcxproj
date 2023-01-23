@@ -104,6 +104,11 @@
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\debug\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\debug\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -128,6 +133,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\release\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\release\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -149,6 +159,11 @@
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\debug\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\debug\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -173,6 +188,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\imgui\backends\imgui_impl_opengl3.cpp" />
