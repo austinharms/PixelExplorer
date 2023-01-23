@@ -151,17 +151,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\game\block\BlockManifest.cpp" />
-    <ClCompile Include="src\game\block\BlockShape.cpp" />
-    <ClCompile Include="src\game\chunk\FlatChunkGenerator.cpp" />
-    <ClCompile Include="src\game\chunk\ChunkManager.cpp" />
-    <ClCompile Include="src\game\chunk\ChunkRenderMesh.cpp" />
-    <ClCompile Include="src\game\chunk\ChunkRenderMeshFactory.cpp" />
-    <ClCompile Include="src\game\Game.cpp" />
-    <ClCompile Include="src\game\gui\MainMenu.cpp" />
-    <ClCompile Include="src\game\player\Player.cpp" />
-    <ClCompile Include="src\game\player\PlayerCamera.cpp" />
-    <ClCompile Include="src\game\world\World.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_opengl3.cpp" />
@@ -171,35 +160,8 @@
     <ClCompile Include="src\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\vendor\imgui\misc\cpp\imgui_stdlib.cpp" />
-    <ClCompile Include="src\vendor\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\common\Color.h" />
-    <ClInclude Include="src\common\DataBuffer.h" />
-    <ClInclude Include="src\common\OSHelpers.h" />
-    <ClInclude Include="src\common\Timer.h" />
-    <ClInclude Include="src\game\block\Block.h" />
-    <ClInclude Include="src\game\block\BlockDefinition.h" />
-    <ClInclude Include="src\game\block\BlockFaceDefinition.h" />
-    <ClInclude Include="src\game\block\BlockManifest.h" />
-    <ClInclude Include="src\game\block\BlockShape.h" />
-    <ClInclude Include="src\game\block\FaceDirection.h" />
-    <ClInclude Include="src\game\chunk\Chunk.h" />
-    <ClInclude Include="src\game\chunk\ChunkGenerator.h" />
-    <ClInclude Include="src\game\chunk\FlatChunkGenerator.h" />
-    <ClInclude Include="src\game\chunk\ChunkManager.h" />
-    <ClInclude Include="src\game\chunk\ChunkRenderMesh.h" />
-    <ClInclude Include="src\game\chunk\ChunkRenderMeshFactory.h" />
-    <ClInclude Include="src\game\FPSCamera.h" />
-    <ClInclude Include="src\game\Game.h" />
-    <ClInclude Include="src\engine\Camera.h" />
-    <ClInclude Include="src\game\gui\MainMenu.h" />
-    <ClInclude Include="src\common\Logger.h" />
-    <ClInclude Include="src\common\RefCount.h" />
-    <ClInclude Include="src\game\player\Player.h" />
-    <ClInclude Include="src\game\player\PlayerCamera.h" />
-    <ClInclude Include="src\game\world\World.h" />
-    <ClInclude Include="src\game\world\WorldDetails.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_opengl3_loader.h" />
@@ -211,15 +173,6 @@
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="src\vendor\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="src\vendor\imgui\misc\single_file\imgui_single_file.h" />
-    <ClInclude Include="src\vendor\stb_image.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\common\Color.inl" />
-    <None Include="src\common\DataBuffer.inl" />
-    <None Include="src\common\Logger.inl" />
-    <None Include="src\common\OSHelpers.inl" />
-    <None Include="src\common\RefCount.inl" />
-    <None Include="src\common\Timer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
