@@ -49,6 +49,11 @@ namespace pxengine {
 				PXE_FATAL("Failed to create PxeInputManager for PxeEngine");
 			}
 
+			_fontManager = new(std::nothrow) NpFontManager();
+			if (!_fontManager) {
+				PXE_FATAL("Failed to create PxeFontManager for PxeEngine");
+			}
+
 			initSDL();
 			initPhysics();
 			PXE_INFO("PxeEngine Ready");
@@ -58,6 +63,8 @@ namespace pxengine {
 		{
 			deinitSDL();
 			deinitPhysics();
+			delete _inputManager;
+			delete _fontManager;
 			PXE_INFO("PxeEngine Destroyed");
 			s_instance = nullptr; //no logging function work from this point on
 		}
@@ -409,7 +416,7 @@ namespace pxengine {
 
 		PXE_NODISCARD ImGuiContext* NpEngine::createGuiContext(NpWindow& window)
 		{
-			ImGuiContext* ctx = ImGui::CreateContext(&_guiFontAtlas);
+			ImGuiContext* ctx = ImGui::CreateContext(_fontManager->getFontAtlas());
 			ImGui::SetCurrentContext(ctx);
 			ImGui::StyleColorsDark();
 			//ImGui::StyleColorsLight();
@@ -463,6 +470,11 @@ namespace pxengine {
 		PXE_NODISCARD NpInputManager& NpEngine::getNpInputManager() const
 		{
 			return *_inputManager;
+		}
+
+		PXE_NODISCARD NpFontManager& NpEngine::getNpFontManager() const
+		{
+			return *_fontManager;
 		}
 
 		void NpEngine::initPrimaryGlContext() {
@@ -572,6 +584,11 @@ namespace pxengine {
 		PXE_NODISCARD physx::PxCooking* NpEngine::getPhysicsCooking() const
 		{
 			return _physCooking;
+		}
+
+		PXE_NODISCARD PxeFontManager& NpEngine::getFontManager() const
+		{
+			return static_cast<PxeFontManager&>(*_fontManager);
 		}
 
 		void NpEngine::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)

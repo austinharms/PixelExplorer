@@ -68,6 +68,23 @@ namespace pxengine {
 		DOUBLE = 0x140A,			// GL_DOUBLE
 	};
 
+	enum class PxeFontScalingMode
+	{
+		UNSCALED = 0,	// Font is unscaled
+		WIDTH,			// Font is scaled based on window width
+		HEIGHT,			// Font is scaled based on window height
+		SMALLEST,		// Font is scaled based on window width or height depending on what is smaller
+		LARGEST			// Font is scaled based on window width or height depending on what is larger
+	};
+
+	enum class PxeFontStatus
+	{
+		UNDEFINED = 0,
+		PENDING,
+		LOADED,
+		ERROR
+	};
+
 	typedef uint64_t PxeActionSourceCode;
 
 	enum class PxeActionSourceType : uint8_t

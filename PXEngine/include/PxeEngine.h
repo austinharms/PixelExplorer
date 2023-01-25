@@ -17,6 +17,7 @@
 #include "PxeWindow.h"
 #include "PxeScene.h"
 #include "PxeShader.h"
+#include "PxeFontManager.h"
 #include "PxeInputManager.h"
 #include "PxFoundation.h"
 #include "PxPhysics.h"
@@ -34,6 +35,9 @@ namespace pxengine {
 
 		// Returns the input manager for the engine
 		virtual PXE_NODISCARD PxeInputManager& getInputManager() const = 0;
+
+		// Returns the font manager for the engine
+		virtual PXE_NODISCARD PxeFontManager& getFontManager() const = 0;
 
 		// Set VSync mode for all windows
 		// Modes:

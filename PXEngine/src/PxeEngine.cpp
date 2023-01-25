@@ -7,6 +7,7 @@
 #include "NpWindow.h"
 #include "NpEngine.h"
 #include "NpInputManager.h"
+#include "NpFontManager.h"
 #include "SDL_timer.h"
 
 //#define PXE_DEBUG_TIMING
@@ -115,6 +116,7 @@ namespace pxengine {
 			startTime = SDL_GetTicks64();
 			tempTime = SDL_GetTicks64();
 #endif
+			engine->bindPrimaryGlContext();
 			engine->processAssetQueue();
 
 #ifdef PXE_DEBUG_TIMING
@@ -126,6 +128,13 @@ namespace pxengine {
 
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Event processing took: " + std::to_string(SDL_GetTicks64() - tempTime));
+			tempTime = SDL_GetTicks64();
+#endif
+
+			engine->getNpFontManager().updateFontAtlas();
+
+#ifdef PXE_DEBUG_TIMING
+			PXE_INFO("Font processing took: " + std::to_string(SDL_GetTicks64() - tempTime));
 #endif
 
 			std::thread physicsThread(runPhysicsThread, &application, engine);

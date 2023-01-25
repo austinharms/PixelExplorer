@@ -24,6 +24,8 @@
 #include "NpShader.h"
 #include "PxeScene.h"
 #include "imgui.h"
+#include "PxeFontManager.h"
+#include "NpFontManager.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -43,6 +45,7 @@ namespace pxengine {
 			PXE_NODISCARD physx::PxFoundation* getPhysicsFoundation() const override;
 			PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const override;
 			PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const override;
+			PXE_NODISCARD PxeFontManager& getFontManager() const override;
 			void shutdown() override;
 
 
@@ -76,6 +79,7 @@ namespace pxengine {
 			PXE_NODISCARD ImGuiContext* createGuiContext(NpWindow& window);
 			void destroyGuiContext(ImGuiContext* context, NpWindow& window);
 			PXE_NODISCARD NpInputManager& getNpInputManager() const;
+			PXE_NODISCARD NpFontManager& getNpFontManager() const;
 			void shutdownEngine();
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
 			void newFrame(NpWindow& window);
@@ -115,12 +119,12 @@ namespace pxengine {
 			physx::PxTolerancesScale _physScale;
 			PxeLogInterface& _logInterface;
 			NpInputManager* _inputManager;
+			NpFontManager* _fontManager;
 			NpWindow* _primaryWindow;
 			SDL_GLContext _primaryGlContext;
 			NpWindow* _activeMouseWindow;
 			NpWindow* _activeKeyboardWindow;
 			void* _guiBackend;
-			ImFontAtlas _guiFontAtlas;
 			uint16_t _guiBackendReferenceCount;
 			// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
 			void* _shutdownFlag;

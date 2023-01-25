@@ -27,4 +27,6 @@
 #include "PxeActionSource.h"
 #include "PxeInputManager.h"
 #include "PxePhysicsRenderObject.h"
+#include "PxeFont.h"
+#include "PxeFontManager.h"
 #endif // !PXENGINE_FULL_API_H_

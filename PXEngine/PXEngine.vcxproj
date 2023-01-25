@@ -204,6 +204,9 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\nonpublic\NpAction.cpp" />
     <ClCompile Include="src\nonpublic\NpActionSource.cpp" />
+    <ClCompile Include="src\nonpublic\NpFont.cpp" />
+    <ClCompile Include="src\nonpublic\NpFontManager.cpp" />
+    <ClCompile Include="src\nonpublic\NpFontSource.cpp" />
     <ClCompile Include="src\nonpublic\NpInputManager.cpp" />
     <ClCompile Include="src\nonpublic\NpEngine.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
@@ -267,6 +270,9 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\nonpublic\NpAction.h" />
     <ClInclude Include="src\nonpublic\NpActionSource.h" />
+    <ClInclude Include="src\nonpublic\NpFont.h" />
+    <ClInclude Include="src\nonpublic\NpFontManager.h" />
+    <ClInclude Include="src\nonpublic\NpFontSource.h" />
     <ClInclude Include="src\nonpublic\NpInputManager.h" />
     <ClInclude Include="src\nonpublic\NpEngine.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
@@ -274,6 +280,8 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="src\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpScene.h" />
     <ClInclude Include="src\nonpublic\NpWindow.h" />
+    <ClInclude Include="include\PxeFont.h" />
+    <ClInclude Include="include\PxeFontManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
