@@ -23,9 +23,10 @@ namespace pixelexplorer {
 		void setError();
 		void setError(const char* msg);
 		void setError(const std::string& msg);
+		void quit();
 
 	private:
-		enum APPLICATION_STATE
+		enum ApplicationState
 		{
 			NONE = 0,
 			ERROR,
@@ -38,7 +39,7 @@ namespace pixelexplorer {
 		pxengine::PxeWindow* _window;
 		UpdatableScene* _activeScene;
 		scene::ErrorMenu* _errorMenu;
-		APPLICATION_STATE _state;
+		ApplicationState _state;
 	};
 }
 #endif // !PIXELEXPLORER_APPLICATION_H_

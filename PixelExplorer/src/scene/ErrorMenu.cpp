@@ -7,6 +7,7 @@
 namespace pixelexplorer {
 	namespace scene {
 		ErrorMenu::ErrorMenu() {
+			_errorScreen = nullptr;
 			if (!getScene()) {
 				PEX_FATAL("Failed to create error PxeScene");
 				return;

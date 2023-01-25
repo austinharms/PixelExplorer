@@ -7,6 +7,7 @@
 namespace pixelexplorer {
 	namespace scene {
 		MainMenu::MainMenu() {
+			_playMenu = nullptr;
 			if (!getScene()) {
 				Application::Error("Failed to create MainMenu scene");
 				return;

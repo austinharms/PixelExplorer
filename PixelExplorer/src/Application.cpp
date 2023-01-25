@@ -62,23 +62,18 @@ namespace pixelexplorer {
 
 	void Application::onStop()
 	{
-		if (_window) {
-			_window->drop();
-			_window = nullptr;
-		}
-
 		setActiveScene(nullptr);
 		_errorMenu->drop();
 		_errorMenu = nullptr;
+		_window->drop();
+		_window = nullptr;
 	}
 
 	void Application::onUpdate()
 	{
-		if (!_window) return;
 		if (_window->getShouldClose()) {
-			_window->drop();
-			_window = nullptr;
-			return;
+			_window->resetShouldClose();
+			quit();
 		}
 
 		if (_activeScene) {
@@ -104,18 +99,29 @@ namespace pixelexplorer {
 		setError();
 	}
 
+	void Application::quit()
+	{
+		bool shouldQuit = true;
+		if (_activeScene) {
+			_activeScene->quit(shouldQuit);
+		}
+
+		if (shouldQuit) {
+			setActiveScene(nullptr);
+			pxeGetEngine().shutdown();
+		}
+	}
+
 	void Application::setActiveScene(UpdatableScene* scene)
 	{
-		if (_activeScene)
+		if (_activeScene) {
+			_window->setScene(nullptr);
 			_activeScene->drop();
+		}
 		_activeScene = scene;
 		if (_activeScene) {
 			_activeScene->grab();
-			if (_window)
-				_window->setScene(_activeScene->getScene());
-		}
-		else if(_window) {
-			_window->setScene(nullptr);
+			_window->setScene(_activeScene->getScene());
 		}
 	}
 }

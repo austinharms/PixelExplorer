@@ -10,6 +10,7 @@ namespace pixelexplorer {
 		UpdatableScene();
 		virtual ~UpdatableScene();
 		virtual void update() = 0;
+		virtual void quit(bool& shouldQuit) {}
 		pxengine::PxeScene* getScene() const;
 
 	private:
