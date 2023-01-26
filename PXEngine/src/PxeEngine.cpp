@@ -65,7 +65,8 @@ namespace pxengine {
 				application->preRender(window);
 				NpScene* scene = window.getNpScene();
 				engine->renderFrame(window, PxeRenderPass::WORLD_SPACE);
-				engine->renderFrame(window, PxeRenderPass::PHYSICS_WORLD_SPACE);
+				engine->renderFrame(window, PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE);
+				engine->renderFrame(window, PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE);
 				application->preGUI(window);
 				engine->renderGui(window);
 				application->postGUI(window);

@@ -4,7 +4,6 @@
 #include "PxeRefCount.h"
 #include "PxeRenderBase.h"
 #include "PxScene.h"
-#include "PxePhysicsRenderObject.h"
 
 namespace pxengine {
 	// Collection of renderable objects and wrapper for physx::PxScene
@@ -43,7 +42,7 @@ namespace pxengine {
 		// Add a PxeRenderBase aka a renderable object to the scene
 		// Note: things rendered in PxeRenderPass::SCREEN_SPACE aka PxeRenderElement are rendered in the order added
 		// things rendered in PxeRenderPass::WORLD_SPACE are ordered by the shader and material used
-		// Note: if {renderable} is an instance of PxePhysicsRenderObject this will add the physx actor to the physics scene
+		// Note: if {renderable} is an instance of PxeStaticPhysicsRenderObject or PxeDynamicPhysicsRenderObject this will add the physx actor to the physics scene
 		virtual void addRenderable(PxeRenderBase& renderable) = 0;
 
 		// Remove a PxeRenderBase aka a renderable object from the scene

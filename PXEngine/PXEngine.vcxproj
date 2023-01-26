@@ -241,12 +241,13 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="include\PxeGLAsset.h" />
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\PxeIndexBuffer.h" />
-    <ClInclude Include="include\PxePhysicsRenderObject.h" />
+    <ClInclude Include="include\PxeStaticPhysicsRenderObject.h" />
     <ClInclude Include="include\PxeRenderBase.h" />
     <ClInclude Include="include\PxeRenderElement.h" />
     <ClInclude Include="include\PxeRenderMaterial.h" />
     <ClInclude Include="include\PxeRenderObject.h" />
     <ClInclude Include="include\PxeRenderTexture.h" />
+    <ClInclude Include="include\PxeDynamicPhysicsRenderObject.h" />
     <ClInclude Include="include\PxeTexture.h" />
     <ClInclude Include="include\PxeRingBuffer.h" />
     <ClInclude Include="include\PxeTypes.h" />

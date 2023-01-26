@@ -254,7 +254,7 @@
     <ClInclude Include="include\PxeDefaultCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxePhysicsRenderObject.h">
+    <ClInclude Include="include\PxeStaticPhysicsRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeFontManager.h">
@@ -270,6 +270,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\nonpublic\NpFontSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeDynamicPhysicsRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

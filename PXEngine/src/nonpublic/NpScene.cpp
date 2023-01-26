@@ -5,6 +5,8 @@
 #include "PxeRenderObject.h"
 #include "PxeRenderElement.h"
 #include "NpEngine.h"
+#include "PxeDynamicPhysicsRenderObject.h"
+#include "PxeStaticPhysicsRenderObject.h"
 
 namespace pxengine::nonpublic {
 	NpScene::NpScene(physx::PxScene* scene)
@@ -47,9 +49,9 @@ namespace pxengine::nonpublic {
 		_simulationAccumulator += time * _simulationScale;
 		if (_simulationAccumulator < _simulationTimestep) return;
 		_physScene->lockWrite(__FUNCTION__, __LINE__);
-		const std::list<PxeRenderBase*>& physicsRenderables = getRenderList(PxeRenderPass::PHYSICS_WORLD_SPACE);
+		const std::list<PxeRenderBase*>& physicsRenderables = getRenderList(PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE);
 		for (auto renderable : physicsRenderables)
-			static_cast<PxePhysicsRenderObject*>(renderable)->updatePhysicsPosition();
+			static_cast<PxeDynamicPhysicsRenderObject*>(renderable)->updatePhysicsPosition();
 
 		while (_simulationAccumulator >= _simulationTimestep)
 		{
@@ -107,7 +109,7 @@ namespace pxengine::nonpublic {
 
 #ifdef PXE_DEBUG
 		if (std::find(_renderables[renderPass].begin(), _renderables[renderPass].end(), &renderable) != _renderables[renderPass].end()) {
-			if (renderPass == (int8_t)PxeRenderPass::PHYSICS_WORLD_SPACE) {
+			if (renderPass == (int8_t)PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE) {
 				PXE_ERROR("Re-added PxePhysicsRenderObject to PxeScene");
 			}
 			else {
@@ -117,11 +119,27 @@ namespace pxengine::nonpublic {
 #endif // PXE_DEBUG
 
 		renderable.grab();
-		if (renderPass == (int8_t)PxeRenderPass::PHYSICS_WORLD_SPACE) {
-			_physScene->addActor(static_cast<PxePhysicsRenderObject&>(renderable).getPhysicsActor());
+		if (renderPass == (int8_t)PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE) {
+			PxeDynamicPhysicsRenderObject& physObj = static_cast<PxeDynamicPhysicsRenderObject&>(renderable);
+			if (!physObj.getPhysicsActor()) {
+				PXE_WARN("Added PxeDynamicPhysicsRenderObject without PxPhysicsActor");
+			}
+			else {
+				_physScene->addActor(*physObj.getPhysicsActor());
+			}
+		}
+		else if (renderPass == (int8_t)PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE) {
+			PxeStaticPhysicsRenderObject& physObj = static_cast<PxeStaticPhysicsRenderObject&>(renderable);
+			if (!physObj.getPhysicsActor()) {
+				PXE_WARN("Added PxeStaticPhysicsRenderObject without PxActor");
+			}
+			else {
+				_physScene->addActor(*physObj.getPhysicsActor());
+			}
 		}
 
-		if (renderPass == (int8_t)PxeRenderPass::WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::PHYSICS_WORLD_SPACE) {
+		// TODO Optimize this to put STATIC_PHYSICS_WORLD_SPACE into WORLD_SPACE queue to allow for minimal shader changes when rendering
+		if (renderPass == (int8_t)PxeRenderPass::WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE) {
 			void* materialPtr = &(static_cast<PxeRenderObject&>(renderable).getRenderMaterial());
 			if (_renderables[renderPass].empty()) {
 				_renderables[renderPass].emplace_front(&renderable);

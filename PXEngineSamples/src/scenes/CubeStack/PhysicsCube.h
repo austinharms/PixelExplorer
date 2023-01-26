@@ -7,7 +7,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 namespace cubestack {
-	class PhysicsCube : public pxengine::PxePhysicsRenderObject
+	class PhysicsCube : public pxengine::PxeDynamicPhysicsRenderObject
 	{
 	public:
 		static PhysicsCube* createPhysicsCube(const glm::vec3& pos, bool dynamic, pxengine::PxeRenderMaterial& material, pxengine::PxeIndexBuffer* indexBuffer = nullptr, pxengine::PxeVertexArray* vertextArray = nullptr, physx::PxShape* shape = nullptr, const glm::vec3& velocity = glm::vec3(0)) {
@@ -54,7 +54,7 @@ namespace cubestack {
 		physx::PxShape* getShape() const { return _pxShape; }
 
 	private:
-		PhysicsCube(physx::PxRigidActor& actor, pxengine::PxeRenderMaterial& material, pxengine::PxeIndexBuffer* indexBuffer, pxengine::PxeVertexArray* vertextArray, physx::PxShape* shape) : pxengine::PxePhysicsRenderObject(material, actor) {
+		PhysicsCube(physx::PxRigidActor& actor, pxengine::PxeRenderMaterial& material, pxengine::PxeIndexBuffer* indexBuffer, pxengine::PxeVertexArray* vertextArray, physx::PxShape* shape) : pxengine::PxeDynamicPhysicsRenderObject(material, &actor) {
 			uint16_t indices[36] = {
 				0, 2, 1, 0, 3, 2,  // Front
 				4, 5, 6, 4, 6, 7,  // Back
@@ -129,7 +129,7 @@ namespace cubestack {
 				material->release();
 			}
 
-			getPhysicsActor().attachShape(*_pxShape);
+			getPhysicsActor()->attachShape(*_pxShape);
 		}
 
 		pxengine::PxeIndexBuffer* _indexBuffer;
