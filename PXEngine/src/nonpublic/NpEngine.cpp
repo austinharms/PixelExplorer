@@ -66,7 +66,7 @@ namespace pxengine {
 			delete _inputManager;
 			delete _fontManager;
 			PXE_INFO("PxeEngine Destroyed");
-			s_instance = nullptr; //no logging function work from this point on
+			s_instance = nullptr; //no logging functions work from this point on
 		}
 
 		void GLAPIENTRY NpEngine::glErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -207,9 +207,21 @@ namespace pxengine {
 			_physScale.length = 1;
 			_physScale.speed = 9.81f;
 			_physFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, _physAllocator, *this);
+			if (!_physFoundation) {
+				PXE_FATAL("Failed to create Physics Foundation for PxeEngine");
+			}
+
 #ifdef PXE_DEBUG
 			_physPVD = PxCreatePvd(*_physFoundation);
+			if (!_physPVD) {
+				PXE_FATAL("Failed to create Physics Debugging Interface for PxeEngine");
+			}
+
 			_physPVDTransport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 1000);
+			if (!_physPVDTransport) {
+				PXE_FATAL("Failed to create Physics Debugging Transport Interface for PxeEngine");
+			}
+
 			_physPVD->connect(*_physPVDTransport, physx::PxPvdInstrumentationFlag::eALL);
 #define PXE_PHYSICS_PVD_POINTER _physPVD
 #define PXE_PHYSICS_TRACK_ALLOCATIONS true
@@ -218,6 +230,10 @@ namespace pxengine {
 #define PXE_PHYSICS_TRACK_ALLOCATIONS false
 #endif
 			_physPhysics = PxCreateBasePhysics(PX_PHYSICS_VERSION, *_physFoundation, _physScale, PXE_PHYSICS_TRACK_ALLOCATIONS, PXE_PHYSICS_PVD_POINTER);
+			if (!_physPhysics) {
+				PXE_FATAL("Failed to create Physics Base for PxeEngine");
+			}
+
 			uint32_t threadCount = std::thread::hardware_concurrency() / 2;
 			if (threadCount < 2) {
 				PXE_WARN("Calculated physics thread count less then 2, using 2 threads");
@@ -228,11 +244,21 @@ namespace pxengine {
 			}
 
 			_physDefaultDispatcher = physx::PxDefaultCpuDispatcherCreate(threadCount);
+			if (!_physDefaultDispatcher) {
+				PXE_FATAL("Failed to create Physics Dispatcher for PxeEngine");
+			}
+
 			physx::PxCookingParams params(_physScale);
 			params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
 			params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
 			_physCooking = PxCreateCooking(PX_PHYSICS_VERSION, *_physFoundation, params);
-			PxInitExtensions(*_physPhysics, PXE_PHYSICS_PVD_POINTER);
+			if (!_physCooking) {
+				PXE_FATAL("Failed to create Physics Cooking Interface for PxeEngine");
+			}
+
+			if (!PxInitExtensions(*_physPhysics, PXE_PHYSICS_PVD_POINTER)) {
+				PXE_FATAL("Failed to init Physics Extensions");
+			}
 		}
 
 		void NpEngine::deinitPhysics()
@@ -417,6 +443,11 @@ namespace pxengine {
 		PXE_NODISCARD ImGuiContext* NpEngine::createGuiContext(NpWindow& window)
 		{
 			ImGuiContext* ctx = ImGui::CreateContext(_fontManager->getFontAtlas());
+			if (!ctx) {
+				PXE_ERROR("Failed to create GUI context");
+				return nullptr;
+			}
+
 			ImGui::SetCurrentContext(ctx);
 			ImGui::StyleColorsDark();
 			//ImGui::StyleColorsLight();
@@ -543,10 +574,12 @@ namespace pxengine {
 			}
 			else {
 				NpShader* shader = new(std::nothrow) NpShader(path);
-				if (shader) {
-					_shaderCache.emplace(path, shader);
+				if (!shader) {
+					PXE_ERROR("Failed to allocate PxeShader");
+					return nullptr;
 				}
 
+				_shaderCache.emplace(path, shader);
 				return shader;
 			}
 		}
@@ -813,5 +846,5 @@ namespace pxengine {
 		{
 			_deltaTime = dt;
 		}
+		}
 	}
-}
