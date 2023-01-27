@@ -193,6 +193,10 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\scene\ErrorMenu.cpp" />
     <ClCompile Include="src\scene\MainMenu.cpp" />
+    <ClCompile Include="src\scene\TerrainGenerationTest.cpp" />
+    <ClCompile Include="src\terrain\TerrainChunk.cpp" />
+    <ClCompile Include="src\terrain\TerrainManager.cpp" />
+    <ClCompile Include="src\terrain\TerrainRenderMesh.cpp" />
     <ClCompile Include="src\UpdatableScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +207,12 @@
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\scene\ErrorMenu.h" />
     <ClInclude Include="src\scene\MainMenu.h" />
+    <ClInclude Include="src\scene\TerrainGenerationTest.h" />
+    <ClInclude Include="src\terrain\FlatTerrainGenerator.h" />
+    <ClInclude Include="src\terrain\TerrainChunk.h" />
+    <ClInclude Include="src\terrain\TerrainGenerator.h" />
+    <ClInclude Include="src\terrain\TerrainManager.h" />
+    <ClInclude Include="src\terrain\TerrainRenderMesh.h" />
     <ClInclude Include="src\UpdatableScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

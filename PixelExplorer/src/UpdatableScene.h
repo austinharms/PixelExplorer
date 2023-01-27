@@ -11,6 +11,7 @@ namespace pixelexplorer {
 		virtual ~UpdatableScene();
 		virtual void update() = 0;
 		virtual void quit(bool& shouldQuit) {}
+		virtual void stop() {}
 		pxengine::PxeScene* getScene() const;
 
 	private:

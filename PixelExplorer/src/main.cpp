@@ -1,3 +1,6 @@
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
+
 #include "Log.h"
 #include "Application.h"
 #include "PxeEngine.h"

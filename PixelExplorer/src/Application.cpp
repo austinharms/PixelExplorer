@@ -36,6 +36,11 @@ namespace pixelexplorer {
 		getInstance().setError(msg);
 	}
 
+	void Application::ChangeScene(UpdatableScene* scene)
+	{
+		getInstance().setActiveScene(scene);
+	}
+
 	void Application::onStart()
 	{
 		PxeEngine& engine = pxeGetEngine();
@@ -55,9 +60,12 @@ namespace pixelexplorer {
 			return;
 		}
 
-		setActiveScene(menu);
+		if (_state != ERROR) {
+			setActiveScene(menu);
+			_state = MAIN_MENU;
+		}
+
 		menu->drop();
-		_state = MAIN_MENU;
 	}
 
 	void Application::onStop()
@@ -83,18 +91,20 @@ namespace pixelexplorer {
 
 	void Application::setError()
 	{
-		_state = ERROR;
 		setActiveScene(_errorMenu);
+		_state = ERROR;
 	}
 
 	void Application::setError(const char* msg)
 	{
+		PEX_ERROR(msg);
 		_errorMenu->setMessage(msg);
 		setError();
 	}
 
 	void Application::setError(const std::string& msg)
 	{
+		PEX_ERROR(msg.c_str());
 		_errorMenu->setMessage(msg);
 		setError();
 	}
@@ -114,10 +124,14 @@ namespace pixelexplorer {
 
 	void Application::setActiveScene(UpdatableScene* scene)
 	{
+		if (_state == ERROR) return;
+		if (_activeScene == scene) return;
 		if (_activeScene) {
+			_activeScene->stop();
 			_window->setScene(nullptr);
 			_activeScene->drop();
 		}
+
 		_activeScene = scene;
 		if (_activeScene) {
 			_activeScene->grab();

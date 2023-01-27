@@ -5,6 +5,7 @@
 #include "PxeTypes.h"
 #include "PxeRenderElement.h"
 #include "PxeTexture.h"
+#include "PxeFont.h"
 
 namespace pixelexplorer {
 	namespace gui {
@@ -21,6 +22,7 @@ namespace pixelexplorer {
 
 		private:
 			std::string _errorMessage;
+			pxengine::PxeFont* _font;
 		};
 	}
 }

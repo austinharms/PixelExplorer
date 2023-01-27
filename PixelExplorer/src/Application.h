@@ -15,6 +15,7 @@ namespace pixelexplorer {
 		static void Error();
 		static void Error(const char* msg);
 		static void Error(const std::string& msg);
+		static void ChangeScene(UpdatableScene* scene);
 
 		~Application() = default;
 		void onStart() override;
@@ -24,6 +25,7 @@ namespace pixelexplorer {
 		void setError(const char* msg);
 		void setError(const std::string& msg);
 		void quit();
+		void setActiveScene(UpdatableScene* scene);
 
 	private:
 		enum ApplicationState
@@ -34,7 +36,6 @@ namespace pixelexplorer {
 		};
 
 		Application();
-		void setActiveScene(UpdatableScene* scene);
 
 		pxengine::PxeWindow* _window;
 		UpdatableScene* _activeScene;

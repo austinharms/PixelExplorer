@@ -44,5 +44,4 @@ namespace pixelexplorer {
 		};
 	}
 }
-
 #endif // !PIXELEXPLORER_GUI_PLAY_MENU_H_
