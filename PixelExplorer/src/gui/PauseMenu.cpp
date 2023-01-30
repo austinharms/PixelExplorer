@@ -1,4 +1,4 @@
-#include "PlayMenu.h"
+#include "PauseMenu.h"
 
 #include <new>
 #include <string>
@@ -14,19 +14,13 @@
 using namespace pxengine;
 namespace pixelexplorer {
 	namespace gui {
-		PlayMenu::PlayMenu() {
+		PauseMenu::PauseMenu() {
 			_actions = NONE;
 			memset(_textures, 0, sizeof(_textures));
 
-			_titleFont = pxeGetEngine().getFontManager().loadFont(getAssetPath("fonts") / "main_menu_title.ttf", 50);
-			if (!_titleFont) {
-				Application::Error("Out of Memory, Failed to create play menu title font");
-				return;
-			}
-
-			_buttonFont = pxeGetEngine().getFontManager().loadFont(getAssetPath("fonts") / "default.ttf", 24);
-			if (!_buttonFont) {
-				Application::Error("Out of Memory, Failed to create play menu button font");
+			_menuFont = pxeGetEngine().getFontManager().loadFont(getAssetPath("fonts") / "default.ttf", 14);
+			if (!_menuFont) {
+				Application::Error("Out of Memory, Failed to create pause menu font");
 				return;
 			}
 
@@ -43,57 +37,56 @@ namespace pixelexplorer {
 			}
 		}
 
-		PlayMenu::~PlayMenu()
+		PauseMenu::~PauseMenu()
 		{
 			for (uint8_t i = 0; i < TEXTURE_COUNT; ++i) {
 				if (_textures[i])
 					_textures[i]->drop();
 			}
 
-			if (_titleFont)
-				_titleFont->drop();
-			if (_buttonFont)
-				_buttonFont->drop();
+			if (_menuFont)
+				_menuFont->drop();
 		}
 
-		uint8_t PlayMenu::getActions()
+		uint8_t PauseMenu::getActions()
 		{
 			uint8_t actions = _actions;
 			_actions = NONE;
 			return actions;
 		}
 
-		void PlayMenu::onRender() {
+		void PauseMenu::onRender() {
 			ImGuiIO& io = ImGui::GetIO();
-			constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;
+			constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;
 			ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
 			ImGui::SetNextWindowSize(io.DisplaySize);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::Begin("Main Menu", nullptr, flags);
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.25f));
+			ImGui::Begin("Pause Menu", nullptr, flags);
+			_menuFont->guiPushFont();
+			ImVec2 menuSize(ImGui::GetFontSize() * 10, ImGui::GetFontSize() * 25);
+			ImVec2 menuPos(io.DisplaySize.x / 2 - menuSize.x / 2, io.DisplaySize.y / 2 - menuSize.y / 2);
 
 			// Background Image
 			if (_textures[BACKGROUND]->getTextureLoaded()) {
-				ImGui::SetCursorPos(ImVec2(0, 0));
-				ImGui::Image((ImTextureID)_textures[BACKGROUND]->getGlTextureId(), io.DisplaySize);
+				ImGui::SetCursorPos(menuPos);
+				ImGui::Image((ImTextureID)_textures[BACKGROUND]->getGlTextureId(), menuSize);
 			}
 			else {
-				ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(0,0), io.DisplaySize, IM_COL32(0, 195, 255, 255));
+				ImGui::GetBackgroundDrawList()->AddRectFilled(menuPos, ImVec2(menuPos.x + menuSize.x, menuPos.y + menuSize.y), IM_COL32(0, 195, 255, 255));
 			}
 
 			// Title
 			{
-				_titleFont->guiPushFont();
-				const char* title = "Pixel Explorer";
+				const char* title = "Paused";
 				ImVec2 textSize = ImGui::CalcTextSize(title);
-				ImGui::SetCursorPos(ImVec2((io.DisplaySize.x / 2) - (textSize.x / 2), textSize.y / 2));
+				ImGui::SetCursorPos(ImVec2(menuPos.x +  (menuSize.x/2 - textSize.x/2), menuPos.y + textSize.y));
 				ImGui::Text(title);
-				_titleFont->guiPopFont();
 			}
 
 			// Buttons
 			{
-				_buttonFont->guiPushFont();
 				ImVec2 buttonSize(4 * ImGui::GetFontSize(), ImGui::GetFontSize());
 				ImGui::SetCursorPos(ImVec2((io.DisplaySize.x / 2) - (buttonSize.x / 2), (io.DisplaySize.y / 2) - (buttonSize.y / 2)));
 				const char* buttonText = "Play";
@@ -115,11 +108,11 @@ namespace pixelexplorer {
 					if (ImGui::Button(buttonText, buttonSize))
 						_actions |= PLAY;
 				}
-
-				_buttonFont->guiPopFont();
 			}
 
+			_menuFont->guiPopFont();
 			ImGui::End();
+			ImGui::PopStyleColor();
 			ImGui::PopStyleVar(2);
 		}
 	}

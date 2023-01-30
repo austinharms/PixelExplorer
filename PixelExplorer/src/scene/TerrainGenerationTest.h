@@ -5,6 +5,9 @@
 #include "UpdatableScene.h"
 #include "terrain/TerrainManager.h"
 #include "terrain/TerrainRenderMesh.h"
+#include "PxeAction.h"
+#include "Camera.h"
+#include "gui/PauseMenu.h"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -14,10 +17,17 @@ namespace pixelexplorer {
 			TerrainGenerationTest();
 			virtual ~TerrainGenerationTest();
 			void update() override;
+			void start(pxengine::PxeWindow& window) override;
+			void stop() override;
 
 		private:
 			terrain::TerrainManager* _terrainManager;
-			terrain::TerrainRenderMesh* _mesh;
+			pxengine::PxeRenderMaterial* _terrainRenderMaterial;
+			terrain::TerrainRenderMesh* _testTerrainMesh;
+			Camera* _camera;
+			gui::PauseMenu* _pauseMenu;
+			pxengine::PxeAction* _pauseAction;
+			bool _paused;
 		};
 	}
 }

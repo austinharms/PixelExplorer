@@ -2,6 +2,7 @@
 #define PIXELEXPLORER_UPDATABLE_SCENE_H_
 #include "PxeScene.h"
 #include "PxeRefCount.h"
+#include "PxeWindow.h"
 
 namespace pixelexplorer {
 	class UpdatableScene : public pxengine::PxeRefCount
@@ -11,6 +12,7 @@ namespace pixelexplorer {
 		virtual ~UpdatableScene();
 		virtual void update() = 0;
 		virtual void quit(bool& shouldQuit) {}
+		virtual void start(pxengine::PxeWindow& window) {}
 		virtual void stop() {}
 		pxengine::PxeScene* getScene() const;
 

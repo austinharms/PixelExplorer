@@ -98,6 +98,7 @@ namespace pixelexplorer {
 	void Application::setError(const char* msg)
 	{
 		PEX_ERROR(msg);
+		if (_state == ERROR) return;
 		_errorMenu->setMessage(msg);
 		setError();
 	}
@@ -105,6 +106,7 @@ namespace pixelexplorer {
 	void Application::setError(const std::string& msg)
 	{
 		PEX_ERROR(msg.c_str());
+		if (_state == ERROR) return;
 		_errorMenu->setMessage(msg);
 		setError();
 	}
@@ -136,6 +138,7 @@ namespace pixelexplorer {
 		if (_activeScene) {
 			_activeScene->grab();
 			_window->setScene(_activeScene->getScene());
+			_activeScene->start(*_window);
 		}
 	}
 }

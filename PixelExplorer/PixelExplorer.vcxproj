@@ -186,7 +186,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\gui\ErrorScreen.cpp" />
+    <ClCompile Include="src\gui\PauseMenu.cpp" />
     <ClCompile Include="src\gui\PexGui.cpp" />
     <ClCompile Include="src\gui\PlayMenu.cpp" />
     <ClCompile Include="src\Log.cpp" />
@@ -201,7 +203,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\gui\ErrorScreen.h" />
+    <ClInclude Include="src\gui\PauseMenu.h" />
     <ClInclude Include="src\gui\PexGui.h" />
     <ClInclude Include="src\gui\PlayMenu.h" />
     <ClInclude Include="src\Log.h" />

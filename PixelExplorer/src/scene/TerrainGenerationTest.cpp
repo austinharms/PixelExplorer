@@ -9,78 +9,151 @@
 #include "PxeRenderMaterial.h"
 #include "PxeFSHelpers.h"
 #include "Log.h"
+#include "PxeActionSource.h"
+#include "PxeInputManager.h"
+#include "SDL_keycode.h"
 
 namespace pixelexplorer {
 	namespace scene {
 		TerrainGenerationTest::TerrainGenerationTest()
 		{
 			using namespace terrain;
+			using namespace pxengine;
 			_terrainManager = nullptr;
-			_mesh = nullptr;
+			_terrainRenderMaterial = nullptr;
+			_testTerrainMesh = nullptr;
+			_camera = nullptr;
+			_pauseAction = nullptr;
+			_pauseMenu = nullptr;
+			_paused = false;
+
+			_pauseAction = pxeGetEngine().getInputManager().getAction("Pause");
+			if (!_pauseAction) {
+				Application::Error("Out of Memory, Failed to create pause action");
+				return;
+			}
+
+			if (!_pauseAction->hasSource()) {
+				PxeActionSource* pauseScr = pxeGetEngine().getInputManager().getActionSource(((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32) | SDLK_ESCAPE);
+				if (!pauseScr) {
+					Application::Error("Out of Memory, Failed to create pause action source");
+					return;
+				}
+
+				_pauseAction->addSource(*pauseScr);
+				pauseScr->drop();
+			}
+
+			_pauseMenu = new(std::nothrow) gui::PauseMenu();
+			if (!_pauseMenu) {
+				Application::Error("Out of Memory, Failed to allocate Pause Menu");
+				return;
+			}
 
 			TerrainGenerator* gen = new(std::nothrow) FlatTerrainGenerator();
 			if (!gen) {
-				Application::Error("Failed to create Terrain Generator");
+				Application::Error("Out of Memory, Failed to create Terrain Generator");
 				return;
 			}
 
 			_terrainManager = new(std::nothrow) TerrainManager(*gen);
+			gen->drop();
+			gen = nullptr;
 			if (!_terrainManager) {
-				gen->drop();
-				Application::Error("Failed to create Terrain Manager");
+				Application::Error("Out of Memory, Failed to create Terrain Manager");
 				return;
 			}
 
-			gen->drop();
+			PxeShader* shader = pxeGetEngine().loadShader(getAssetPath("shaders") / "terrain.pxeshader");
+			if (!shader) {
+				Application::Error("Failed to load terrain shader");
+				return;
+			}
+
+			_terrainRenderMaterial = new(std::nothrow) PxeRenderMaterial(*shader);
+			shader->drop();
+			if (!_terrainRenderMaterial) {
+				Application::Error("Failed to create terrain Render Material");
+				return;
+			}
+
+			_testTerrainMesh = new(std::nothrow) terrain::TerrainRenderMesh(*_terrainRenderMaterial);
+			if (!_testTerrainMesh) {
+				Application::Error("Failed to create Terrain Render Mesh");
+				return;
+			}
+
+			getScene()->addRenderable(*_testTerrainMesh);
+			_testTerrainMesh->loadChunks(glm::i64vec3(0, 0, 0), *_terrainManager);
+			_testTerrainMesh->rebuildMesh();
 		}
 
 		TerrainGenerationTest::~TerrainGenerationTest()
 		{
-			if (_mesh) {
-				getScene()->removeRenderable(*_mesh);
-				_mesh->unloadChunks();
-				_mesh->drop();
+			if (_camera)
+				_camera->drop();
+
+			if (_pauseMenu)
+				_pauseMenu->drop();
+
+			if (_pauseAction)
+				_pauseAction->drop();
+
+			if (_testTerrainMesh) {
+				_testTerrainMesh->unloadChunks();
+				_testTerrainMesh->drop();
 			}
 
-			delete _terrainManager;
+			if (_terrainRenderMaterial)
+				_terrainRenderMaterial->drop();
+
+			if (_terrainManager)
+				delete _terrainManager;
 		}
 
 		void TerrainGenerationTest::update()
 		{
-			if (!_mesh) {
-				using namespace pxengine;
-				PxeShader* shader = pxeGetEngine().loadShader(getAssetPath("shaders") / "terrain.pxeshader");
-				if (!shader) {
-					PEX_ERROR("Failed to load terrain shader");
-					return;
+			if (_paused) {
+				if (_pauseMenu->getActions() & gui::PauseMenu::PLAY) {
+					_paused = false;
+					getScene()->removeRenderable(*_pauseMenu);
+					_camera->lockCursor();
 				}
-
-				PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader);
-				if (!material) {
-					shader->drop();
-					PEX_ERROR("Failed to create terrain material");
-					return;
-				}
-
-				_mesh = new(std::nothrow) terrain::TerrainRenderMesh(*material);
-				if (!_mesh) {
-					shader->drop();
-					material->drop();
-					PEX_ERROR("Failed to create terrain mesh");
-					return;
-				}
-
-				_mesh->loadChunks(glm::i64vec3(0, 0, 0), *_terrainManager);
-				_mesh->rebuildMesh();
-				material->drop();
-				shader->drop();
-
-				getScene()->addRenderable(*_mesh);
 			}
 			else {
-				_mesh->rebuildMesh();
+				if (_pauseAction->getValue()) {
+					_paused = true;
+					getScene()->addRenderable(*_pauseMenu);
+					_camera->unlockCursor();
+					return;
+				}
+			
+				_camera->update();
 			}
-			//_terrainManager->getTerrainChunk(glm::i64vec3(0, 0, _pos++))->grab();
+		}
+
+		void TerrainGenerationTest::start(pxengine::PxeWindow& window)
+		{
+			_camera = new(std::nothrow) Camera(window, glm::radians(90.0f), 0.1f, 1000.0f);
+			if (!_camera) {
+				Application::Error("Out of Memory, Failed to allocate Camera");
+				return;
+			}
+
+			if (_camera->getErrorFlag()) {
+				Application::Error("Failed to create Camera");
+				return;
+			}
+
+			_camera->lockCursor();
+		}
+
+		void TerrainGenerationTest::stop()
+		{
+			if (_camera) {
+				_camera->unlockCursor();
+				_camera->drop();
+			}
 		}
 	}
 }

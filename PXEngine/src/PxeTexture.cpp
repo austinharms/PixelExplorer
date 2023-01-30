@@ -73,6 +73,7 @@ namespace pxengine {
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		glGenerateMipmap(GL_TEXTURE_2D);
+		_textureLoaded = true;
 		freePendingTexture();
 	}
 

@@ -1,5 +1,5 @@
-#ifndef PIXELEXPLORER_GUI_PLAY_MENU_H_
-#define PIXELEXPLORER_GUI_PLAY_MENU_H_
+#ifndef PIXELEXPLORER_GUI_PAUSE_MENU_H_
+#define PIXELEXPLORER_GUI_PAUSE_MENU_H_
 #include "PxeTypes.h"
 #include "PxeRenderElement.h"
 #include "PxeTexture.h"
@@ -8,7 +8,7 @@
 
 namespace pixelexplorer {
 	namespace gui {
-		class PlayMenu : public pxengine::PxeRenderElement
+		class PauseMenu : public pxengine::PxeRenderElement
 		{
 		public:
 			enum MenuActions : uint8_t
@@ -17,8 +17,8 @@ namespace pixelexplorer {
 				PLAY = 0x1,
 			};
 
-			PlayMenu();
-			virtual ~PlayMenu();
+			PauseMenu();
+			virtual ~PauseMenu();
 			uint8_t getActions();
 
 		protected:
@@ -33,15 +33,14 @@ namespace pixelexplorer {
 			};
 
 			const char* TEXTURE_FILES[TEXTURE_COUNT] = {
-				"main_menu_background.png",
+				"pause_menu_background.png",
 				"primary_button_background.png",
 			};
 
 			pxengine::PxeTexture* _textures[TEXTURE_COUNT];
-			pxengine::PxeFont* _titleFont;
-			pxengine::PxeFont* _buttonFont;
+			pxengine::PxeFont* _menuFont;
 			uint8_t _actions;
 		};
 	}
 }
-#endif // !PIXELEXPLORER_GUI_PLAY_MENU_H_
+#endif // !PIXELEXPLORER_GUI_PAUSE_MENU_H_

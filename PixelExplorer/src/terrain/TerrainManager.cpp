@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Log.h"
+#include "Application.h"
 
 namespace pixelexplorer {
 	namespace terrain {
@@ -43,7 +44,7 @@ namespace pixelexplorer {
 					std::unique_lock lock(_terrainMutex);
 					chunk = new(std::nothrow) TerrainChunk(position);
 					if (!chunk) {
-						PEX_ERROR("Failed to allocate Terrain Chunk");
+						Application::Error("Out of Memory, Failed to allocate Terrain Chunk");
 						return nullptr;
 					}
 
