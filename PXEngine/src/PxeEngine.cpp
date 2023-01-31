@@ -38,6 +38,7 @@ namespace pxengine {
 			uint64_t time = SDL_GetTicks64();
 #endif
 			application->prePhysics();
+			engine->acquireWindowsReadLock();
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				if (it->second->getScene()) {
@@ -45,6 +46,7 @@ namespace pxengine {
 				}
 			}
 
+			engine->releaseWindowsReadLock();
 			application->postPhysics();
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Physics thread took: " + std::to_string(SDL_GetTicks64() - time));
@@ -57,6 +59,7 @@ namespace pxengine {
 #ifdef PXE_DEBUG_TIMING
 			uint64_t time = SDL_GetTicks64();
 #endif
+			engine->acquireWindowsReadLock();
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				NpWindow& window = *(it->second);
@@ -75,6 +78,7 @@ namespace pxengine {
 				engine->bindPrimaryGlContext();
 			}
 
+			engine->releaseWindowsReadLock();
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Render thread took: " + std::to_string(SDL_GetTicks64() - time));
 #endif

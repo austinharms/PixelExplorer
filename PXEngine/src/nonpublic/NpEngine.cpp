@@ -16,14 +16,6 @@
 
 namespace pxengine {
 	namespace nonpublic {
-		// Used to store data required for rendering for non primary windows
-		struct NpExtendedWindowData
-		{
-			SDL_GLContext GlContext;
-			PxeRenderTexture* RenderTexture;
-			uint32_t ExternalFramebuffer;
-		};
-
 		NpEngine* NpEngine::s_instance = nullptr;
 
 		PXE_NODISCARD NpEngine& NpEngine::getInstance()
@@ -38,8 +30,9 @@ namespace pxengine {
 			s_instance = this; // all logging function work from this point on
 			PXE_INFO("PxeEngine Created");
 			_primaryGlContext = nullptr;
-			_primaryWindow = nullptr;
-			_shutdownFlag = 0;
+			_primarySDLWindow = nullptr;
+			_createdWindow = false;
+			_shutdownFlag = false;
 			_guiBackendReferenceCount = 0;
 			_guiBackend = nullptr;
 			_vsyncMode = 0;
@@ -311,26 +304,12 @@ namespace pxengine {
 				return nullptr;
 			}
 
-			if (_primaryWindow == nullptr) {
-				_primaryWindow = window;
+			if (!_createdWindow) {
+				_createdWindow = true;
 				window->setPrimaryWindow();
 			}
 
 			return window;
-		}
-
-		void NpEngine::removeWindow(NpWindow& window)
-		{
-			if (window.getSDLWindow()) {
-				uint32_t sdlId = window.getSDLWindowId();
-				_inputManager->clearActiveWindow(&window);
-				if (!_sdlWindows.erase(sdlId)) {
-					PXE_ERROR("Failed to remove SDL window from cache");
-				}
-			}
-
-			if (&window == _primaryWindow)
-				_primaryWindow = nullptr;
 		}
 
 		PXE_NODISCARD PxeLogInterface& NpEngine::getLogInterface()
@@ -338,139 +317,134 @@ namespace pxengine {
 			return _logInterface;
 		}
 
-		PXE_NODISCARD SDL_Window* NpEngine::createSDLWindow(NpWindow& window)
-		{
-			SDL_Window* sdlWindow = SDL_CreateWindow(window.getWindowTitle(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.getWindowWidth(), window.getWindowHeight(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-			if (!sdlWindow) {
+		void NpEngine::initializeWindow(NpWindow& window) {
+			window.acquireWriteLock();
+			window._sdlWindow = SDL_CreateWindow(window._title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window._width, window._height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+			if (!window._sdlWindow) {
 				PXE_CHECKSDLERROR();
 				PXE_ERROR("Failed to create SDL window");
+				window.releaseWriteLock();
+				window.setErrorStatus();
+				window.setShouldClose();
 				if (window.getPrimaryWindow()) {
-					PXE_FATAL("Failed to create primary window");
+					PXE_FATAL("Failed to create primary SDL window");
 				}
-				return nullptr;
+
+				return;
 			}
 
 			if (window.getPrimaryWindow()) {
+				_primarySDLWindow = window._sdlWindow;
 				SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
 			}
 			else {
 				SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 			}
 
-			SDL_GLContext glContext = SDL_GL_CreateContext(sdlWindow);
-			if (!glContext) {
+			PXE_CHECKSDLERROR();
+			window._sdlGlContext = SDL_GL_CreateContext(window._sdlWindow);
+			if (!window._sdlGlContext) {
 				PXE_CHECKSDLERROR();
 				PXE_ERROR("Failed to create OpenGl context");
-				SDL_DestroyWindow(sdlWindow);
+				window.releaseWriteLock();
+				window.setErrorStatus();
+				window.setShouldClose();
 				if (window.getPrimaryWindow()) {
-					PXE_FATAL("Failed to create primary window");
+					PXE_FATAL("Failed to create primary OpenGl context");
 				}
-				return nullptr;
+
+				return;
 			}
 
 			if (window.getPrimaryWindow()) {
-				_primaryGlContext = glContext;
+				_primaryGlContext = window._sdlGlContext;
 				initPrimaryGlContext();
 			}
 			else {
-				NpExtendedWindowData* windowData = new(std::nothrow) NpExtendedWindowData();
-				if (!windowData) {
-					PXE_ERROR("Failed to allocate window data");
-					SDL_GL_DeleteContext(glContext);
-					SDL_DestroyWindow(sdlWindow);
-					bindPrimaryGlContext();
-					return nullptr;
-				}
-
-				windowData->GlContext = glContext;
-				windowData->RenderTexture = new(std::nothrow) PxeRenderTexture(window.getWindowWidth(), window.getWindowHeight());
-				if (!windowData->RenderTexture) {
-					PXE_ERROR("Failed to create PxeRenderTexture");
-					delete windowData;
-					SDL_GL_DeleteContext(glContext);
-					SDL_DestroyWindow(sdlWindow);
-					bindPrimaryGlContext();
-					return nullptr;
-				}
-
 				bindPrimaryGlContext();
-				forceAssetInit(*(windowData->RenderTexture));
-				SDL_GL_MakeCurrent(sdlWindow, glContext);
 
-				glGenFramebuffers(1, &(windowData->ExternalFramebuffer));
-				glBindFramebuffer(GL_FRAMEBUFFER, windowData->ExternalFramebuffer);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, windowData->RenderTexture->getGlTextureId(), 0);
+				window._renderTexture = new(std::nothrow) PxeRenderTexture(window.getWindowWidth(), window.getWindowHeight());
+				if (!window._renderTexture) {
+					PXE_ERROR("Failed to create window PxeRenderTexture");
+					window.releaseWriteLock();
+					window.setErrorStatus();
+					window.setShouldClose();
+					return;
+				}
+
+				// Need to swap to create the framebuffer on the primary Gl context
+				forceAssetInit(*window._renderTexture);
+				SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
+
+				glGenFramebuffers(1, &(window._externalFramebuffer));
+				glBindFramebuffer(GL_FRAMEBUFFER, window._externalFramebuffer);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, window._renderTexture->getGlTextureId(), 0);
 				if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 					PXE_ERROR("Failed to create window glFramebuffer: " + std::to_string(glCheckFramebufferStatus(GL_FRAMEBUFFER)));
-					windowData->RenderTexture->drop();
-					delete windowData;
-					SDL_GL_DeleteContext(glContext);
-					SDL_DestroyWindow(sdlWindow);
+					window.releaseWriteLock();
+					window.setErrorStatus();
+					window.setShouldClose();
 					bindPrimaryGlContext();
-					return nullptr;
+					return;
 				}
 
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
-				glBindFramebuffer(GL_READ_FRAMEBUFFER, windowData->ExternalFramebuffer);
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, window._externalFramebuffer);
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				bindPrimaryGlContext();
-				SDL_SetWindowData(sdlWindow, EXTENDED_WINDOW_DATA_NAME, windowData);
 			}
 
-			_sdlWindows.emplace(SDL_GetWindowID(sdlWindow), &window);
-			return sdlWindow;
-		}
+			window._guiContext = ImGui::CreateContext(_fontManager->getFontAtlas());
+			if (!window._guiContext) {
+				PXE_ERROR("Failed to create window GUI context");
+				window.releaseWriteLock();
+				window.setErrorStatus();
+				window.setShouldClose();
+				if (window.getPrimaryWindow()) {
+					PXE_FATAL("Failed to create primary GUI context");
+				}
 
-		void NpEngine::destroySDLWindow(SDL_Window* sdlWindow, NpWindow& window)
-		{
-			if (window.getPrimaryWindow()) {
-
-				// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
-				// and destroy it later in engineShutdown()
-				_shutdownFlag = sdlWindow;
-			}
-			else {
-				NpExtendedWindowData* windowData = static_cast<NpExtendedWindowData*>(SDL_GetWindowData(sdlWindow, EXTENDED_WINDOW_DATA_NAME));
-				windowData->RenderTexture->drop();
-				SDL_GL_DeleteContext(windowData->GlContext);
-				PXE_CHECKSDLERROR();
-				SDL_DestroyWindow(sdlWindow);
-				PXE_CHECKSDLERROR();
-				delete windowData;
-			}
-		}
-
-		PXE_NODISCARD ImGuiContext* NpEngine::createGuiContext(NpWindow& window)
-		{
-			ImGuiContext* ctx = ImGui::CreateContext(_fontManager->getFontAtlas());
-			if (!ctx) {
-				PXE_ERROR("Failed to create GUI context");
-				return nullptr;
+				return;
 			}
 
-			ImGui::SetCurrentContext(ctx);
+			window.bindGuiContext();
 			ImGui::StyleColorsDark();
 			//ImGui::StyleColorsLight();
 			// OpenGl context is not needed here as this is not the ImGui docking branch
-			ImGui_ImplSDL2_InitForOpenGL(window.getSDLWindow(), nullptr);
+			if (!ImGui_ImplSDL2_InitForOpenGL(window._sdlWindow, nullptr)) {
+				PXE_ERROR("Failed to create window GUI implementation");
+				window.releaseWriteLock();
+				window.setErrorStatus();
+				window.setShouldClose();
+				if (window.getPrimaryWindow()) {
+					PXE_FATAL("Failed to create primary GUI implementation");
+				}
+			}
 
 			if (window.getPrimaryWindow()) {
 				// TODO Select correct versions dynamically
-				ImGui_ImplOpenGL3_Init("#version 130");
+				if (!ImGui_ImplOpenGL3_Init("#version 130")) {
+					window.releaseWriteLock();
+					window.setErrorStatus();
+					window.setShouldClose();
+					PXE_FATAL("Failed to create primary GUI backend implementation");
+				}
+
 				_guiBackendReferenceCount = 1;
 				_guiBackend = ImGui::GetIO().BackendRendererUserData;
 			}
 			else {
 				// The primary window should always be created first and this should not happen but just in case
 				if (!_guiBackend) {
-					PXE_ERROR("Failed to get gui backend");
-					ImGui_ImplSDL2_Shutdown();
-					ImGui::DestroyContext(ctx);
-					return nullptr;
+					PXE_ERROR("Failed to get GUI backend");
+					window.releaseWriteLock();
+					window.setErrorStatus();
+					window.setShouldClose();
+					return;
 				}
 
 				ImGuiIO& io = ImGui::GetIO();
-				// Crappy hack to allow using one backend across all gui contexts
+				// Hack to allow using one backend/openGl context across all GUI contexts
 				_guiBackendReferenceCount += 1;
 				io.BackendRendererUserData = _guiBackend;
 				io.BackendRendererName = "imgui_impl_opengl3";
@@ -478,24 +452,72 @@ namespace pxengine {
 					io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 			}
 
-			return ctx;
+			acquireWindowsWriteLock();
+			_sdlWindows.emplace(window.getSDLWindowId(), &window);
+			releaseWindowsWriteLock();
+			window.releaseWriteLock();
 		}
 
-		void NpEngine::destroyGuiContext(ImGuiContext* context, NpWindow& window)
-		{
-			ImGui::SetCurrentContext(context);
-			if (--_guiBackendReferenceCount == 0) {
-				ImGui_ImplOpenGL3_Shutdown();
-				_guiBackend = nullptr;
-			}
-			else {
-				ImGuiIO& io = ImGui::GetIO();
-				io.BackendRendererName = nullptr;
-				io.BackendRendererUserData = nullptr;
+		void NpEngine::uninitializeWindow(NpWindow& window) {
+			window.acquireWriteLock();
+			if (window._sdlWindow) {
+				acquireWindowsWriteLock();
+				_sdlWindows.erase(window.getSDLWindowId());
+				releaseWindowsWriteLock();
 			}
 
-			ImGui_ImplSDL2_Shutdown();
-			ImGui::DestroyContext(context);
+			_inputManager->clearActiveWindow(&window);
+			if (window._guiContext) {
+				window.bindGuiContext();
+				ImGuiIO& io = ImGui::GetIO();
+				if (io.BackendRendererUserData && --_guiBackendReferenceCount == 0) {
+					ImGui_ImplOpenGL3_Shutdown();
+					_guiBackend = nullptr;
+				}
+				else {
+					io.BackendRendererName = nullptr;
+					io.BackendRendererUserData = nullptr;
+				}
+
+				if (io.BackendPlatformUserData)
+					ImGui_ImplSDL2_Shutdown();
+				io.BackendPlatformUserData = nullptr;
+				ImGui::DestroyContext(window._guiContext);
+			}
+
+			if (window.getPrimaryWindow()) {
+
+				// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets,
+				// so destroy it later in engineShutdown()
+#ifdef PXE_DEBUG
+				PXE_ASSERT(window._sdlWindow == _primarySDLWindow, "Primary SDL window did not match PxeEngine SDL window");
+				PXE_ASSERT(window._sdlGlContext == _primaryGlContext, "Primary PxeWindow Gl Context did not match PxeEngine Gl Context");
+#endif // PXE_DEBUG
+
+				window._sdlGlContext = nullptr;
+				window._sdlWindow = nullptr;
+				_shutdownFlag = true;
+			}
+			else {
+				if (window._sdlWindow) {
+					if (window._sdlGlContext) {
+						SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
+						glDeleteFramebuffers(1, &(window._externalFramebuffer));
+						bindPrimaryGlContext();
+						SDL_GL_DeleteContext(window._sdlGlContext);
+						window._sdlGlContext = nullptr;
+					}
+
+					if (window._renderTexture)
+						window._renderTexture->drop();
+					window._renderTexture = nullptr;
+
+					SDL_DestroyWindow(window._sdlWindow);
+					window._sdlWindow = nullptr;
+				}
+			}
+
+			window.releaseWriteLock();
 		}
 
 		PXE_NODISCARD NpInputManager& NpEngine::getNpInputManager() const
@@ -530,7 +552,6 @@ namespace pxengine {
 			glCullFace(GL_BACK);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			//glCullFace(GL_NONE);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
@@ -538,9 +559,10 @@ namespace pxengine {
 		void NpEngine::forceAssetInit(PxeGLAsset& asset)
 		{
 			asset.initialize();
-			if (_assetQueue.remove(&asset)) {
-				asset.drop();
-			}
+			_assetMutex.lock();
+			bool removed = _assetQueue.remove(&asset);
+			_assetMutex.unlock();
+			if (removed) asset.drop();
 		}
 
 		PxeScene* NpEngine::createScene()
@@ -564,9 +586,9 @@ namespace pxengine {
 			return scene;
 		}
 
-		// TODO make this thread safe
 		PxeShader* NpEngine::loadShader(const std::filesystem::path& path)
 		{
+			std::lock_guard lock(_shaderMutex);
 			auto it = _shaderCache.find(path);
 			if (it != _shaderCache.end()) {
 				it->second->grab();
@@ -646,10 +668,12 @@ namespace pxengine {
 		}
 
 		void NpEngine::processAssetQueue() {
+			_assetMutex.lock();
 			while (!_assetQueue.empty())
 			{
 				PxeGLAsset* asset = _assetQueue.front();
 				_assetQueue.pop_front();
+				_assetMutex.unlock();
 				switch (asset->getAssetStatus())
 				{
 				case pxengine::PxeGLAssetStatus::PENDING_UNINITIALIZATION:
@@ -664,7 +688,9 @@ namespace pxengine {
 				}
 
 				asset->drop();
+				_assetMutex.lock();
 			}
+			_assetMutex.unlock();
 		}
 
 		void NpEngine::uninitializeGlAsset(PxeGLAsset& asset)
@@ -676,8 +702,9 @@ namespace pxengine {
 			}
 
 			asset._status = PxeGLAssetStatus::PENDING_UNINITIALIZATION;
-			// TODO Make this thread safe
+			_assetMutex.lock();
 			_assetQueue.emplace_back(&asset);
+			_assetMutex.unlock();
 			asset.grab();
 		}
 
@@ -695,14 +722,15 @@ namespace pxengine {
 			}
 
 			asset._status = PxeGLAssetStatus::PENDING_INITIALIZATION;
-			// TODO Make this thread safe
+			_assetMutex.lock();
 			_assetQueue.emplace_back(&asset);
+			_assetMutex.unlock();
 			asset.grab();
 		}
 
-		// TODO make this thread safe
 		void NpEngine::removeShader(const std::filesystem::path& path)
 		{
+			std::lock_guard lock(_shaderMutex);
 #ifdef PXE_DEBUG
 			if (_shaderCache.erase(path)) {
 				PXE_INFO("Removed PxeShader " + path.string() + " from cache");
@@ -717,27 +745,54 @@ namespace pxengine {
 		}
 
 		void NpEngine::shutdown() {
-			if (_shutdownFlag) return;
-			_shutdownFlag = _primaryWindow->getSDLWindow();
+			_shutdownFlag = true;
 		}
 
-		// TODO This dose not work properly without creating a primary window
 		void NpEngine::shutdownEngine()
 		{
 			PXE_INFO("PxeEngine shutdown");
-			SDL_Window* primarySDLWindow = static_cast<SDL_Window*>(_shutdownFlag);
-			_shutdownFlag = 0;
-			SDL_GL_MakeCurrent(primarySDLWindow, _primaryGlContext);
-			processAssetQueue();
+			bindPrimaryGlContext();
+			
+			// Clear the asset queue
+			_assetMutex.lock();
+			while (!_assetQueue.empty())
+			{
+				PxeGLAsset* asset = _assetQueue.front();
+				_assetQueue.pop_front();
+				_assetMutex.unlock();
+				switch (asset->getAssetStatus())
+				{
+				case pxengine::PxeGLAssetStatus::PENDING_UNINITIALIZATION:
+					asset->uninitialize();
+					break;
+				case pxengine::PxeGLAssetStatus::PENDING_INITIALIZATION:
+					break;
+				default:
+					PXE_ERROR("PxeGlAsset queued not in pending state");
+					break;
+				}
+
+				asset->drop();
+				_assetMutex.lock();
+			}
+			_assetMutex.unlock();
+
 			if (getRefCount() > 1) {
 				PXE_ERROR("PxeEngine still referenced, all references to the PxeEngine should be dropped before shutdown, this indicates a memory leak, still " + std::to_string(getRefCount() - 1) + " references");
 			}
 
-			SDL_GL_DeleteContext(_primaryGlContext);
-			PXE_CHECKSDLERROR();
-			_primaryGlContext = nullptr;
-			SDL_DestroyWindow(primarySDLWindow);
-			PXE_CHECKSDLERROR();
+			if (_primaryGlContext) {
+				SDL_GL_DeleteContext(_primaryGlContext);
+				PXE_CHECKSDLERROR();
+				_primaryGlContext = nullptr;
+			}
+
+			if (_primarySDLWindow) {
+				SDL_DestroyWindow(_primarySDLWindow);
+				PXE_CHECKSDLERROR();
+				_primarySDLWindow = nullptr;
+			}
+
 			PXE_INFO("PxeEngine shutdown complete");
 			drop();
 		}
@@ -749,14 +804,14 @@ namespace pxengine {
 
 		void NpEngine::newFrame(NpWindow& window)
 		{
-			window.updateSDLWindowProperties();
+			window.updateSDLWindow();
+			window.acquireReadLock();
 			if (window.getPrimaryWindow()) {
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			}
 			else {
-				NpExtendedWindowData* windowData = static_cast<NpExtendedWindowData*>(SDL_GetWindowData(window.getSDLWindow(), EXTENDED_WINDOW_DATA_NAME));
-				windowData->RenderTexture->bind();
-				windowData->RenderTexture->resize(window.getWindowWidth(), window.getWindowHeight());
+				window._renderTexture->bind();
+				window._renderTexture->resize(window.getWindowWidth(), window.getWindowHeight());
 			}
 
 			glViewport(0, 0, window.getWindowWidth(), window.getWindowHeight());
@@ -774,11 +829,13 @@ namespace pxengine {
 
 			ImGui_ImplSDL2_NewFrame();
 			ImGui::NewFrame();
+			window.releaseReadLock();
 		}
 
 		void NpEngine::renderFrame(NpWindow& window, PxeRenderPass pass)
 		{
 			NpScene* scene = window.getNpScene();
+			if (!scene) return;
 			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(pass);
 			if (renderList.empty()) return;
 			PxeShader* activeShader = nullptr;
@@ -810,41 +867,60 @@ namespace pxengine {
 		void NpEngine::renderGui(NpWindow& window)
 		{
 			window.bindGuiContext();
-			const std::list<PxeRenderBase*>& renderList = window.getNpScene()->getRenderList(PxeRenderPass::SCREEN_SPACE);
+			NpScene* scene = window.getNpScene();
+			if (!scene) return;
+			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(PxeRenderPass::SCREEN_SPACE);
 			if (renderList.empty()) return;
-			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
-				(*it)->onRender();
-			}
+			for (PxeRenderBase* renderObj : renderList)
+				renderObj->onRender();
 		}
 
 		void NpEngine::swapFramebuffer(NpWindow& window)
 		{
+			window.acquireReadLock();
 			window.bindGuiContext();
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			if (!window.getPrimaryWindow()) {
-				NpExtendedWindowData* windowData = static_cast<NpExtendedWindowData*>(SDL_GetWindowData(window.getSDLWindow(), EXTENDED_WINDOW_DATA_NAME));
-				SDL_Window* sdlWindow = window.getSDLWindow();
-				windowData->RenderTexture->unbind();
-				SDL_GL_MakeCurrent(sdlWindow, windowData->GlContext);
+				window._renderTexture->unbind();
+				SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
 				glViewport(0, 0, window.getWindowWidth(), window.getWindowHeight());
 				glBlitFramebuffer(0, 0, window.getWindowWidth(), window.getWindowHeight(), 0, 0, window.getWindowWidth(), window.getWindowHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 			}
-
+			window.releaseReadLock();
 			window.setVsyncMode(_vsyncMode);
 			SDL_GL_SwapWindow(window.getSDLWindow());
 		}
 
 		void NpEngine::bindPrimaryGlContext()
 		{
-			if (_primaryWindow && _primaryGlContext) {
-				SDL_GL_MakeCurrent(_primaryWindow->getSDLWindow(), _primaryGlContext);
-			}
+			if (_primarySDLWindow && _primaryGlContext)
+				SDL_GL_MakeCurrent(_primarySDLWindow, _primaryGlContext);
+		}
+
+		void NpEngine::acquireWindowsReadLock()
+		{
+			_windowsMutex.lock_shared();
+		}
+
+		void NpEngine::releaseWindowsReadLock()
+		{
+			_windowsMutex.unlock_shared();
+		}
+
+		void NpEngine::acquireWindowsWriteLock()
+		{
+			_windowsMutex.lock();
+		}
+
+		void NpEngine::releaseWindowsWriteLock()
+		{
+			_windowsMutex.unlock();
 		}
 
 		void NpEngine::setDeltaTime(float dt)
 		{
 			_deltaTime = dt;
 		}
-		}
 	}
+}

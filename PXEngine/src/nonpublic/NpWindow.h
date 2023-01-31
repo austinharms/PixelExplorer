@@ -1,5 +1,8 @@
 #ifndef PXENGINE_NONPUBLIC_WINDOW_H_
 #define PXENGINE_NONPUBLIC_WINDOW_H_
+#include <mutex>
+#include <shared_mutex>
+
 #include "PxeTypes.h"
 #include "PxeWindow.h"
 #include "SDL_video.h"
@@ -7,14 +10,15 @@
 #include "NpScene.h"
 #include "imgui.h"
 #include "PxeCamera.h"
+#include "PxeRenderTexture.h"
 
 namespace pxengine {
 	namespace nonpublic {
+		class NpEngine;
+
 		class NpWindow : public PxeWindow
 		{
 		public:
-			static size_t constexpr WINDOW_EVENT_BUFFER_SIZE = 32;
-
 			//############# PxeWindow API ##################
 
 			PXE_NODISCARD bool getShouldClose() const override;
@@ -45,9 +49,13 @@ namespace pxengine {
 			void setShouldClose();
 			void setPrimaryWindow();
 			void bindGuiContext();
-			void updateSDLWindowProperties();
+			void updateSDLWindow();
 			// Note: this method assumes valid OpenGl context
 			void setVsyncMode(int8_t mode);
+			void acquireReadLock();
+			void releaseReadLock();
+			void acquireWriteLock();
+			void releaseWriteLock();
 
 		protected:
 
@@ -57,7 +65,8 @@ namespace pxengine {
 			void uninitializeGl() override;
 
 		private:
-			enum class NpWindowFlags : uint8_t
+			friend class NpEngine;
+			enum WindowFlag : uint8_t
 			{
 				SIZE_CHANGED		= 0b00000001,
 				TITLE_CHANGED		= 0b00000010,
@@ -65,17 +74,21 @@ namespace pxengine {
 				WINDOW_CLOSE		= 0b00001000,
 			};
 
-			bool getFlag(NpWindowFlags flag) const;
-			void clearFlag(NpWindowFlags flag);
-			void setFlag(NpWindowFlags flag, bool value);
-			void setFlag(NpWindowFlags flag);
+			bool getFlag(WindowFlag flag) const;
+			void clearFlag(WindowFlag flag);
+			void setFlag(WindowFlag flag, bool value);
+			void setFlag(WindowFlag flag);
 
+			mutable std::shared_mutex _windowMutex;
 			void* _userData;
-			SDL_Window* _sdlWindow;
-			ImGuiContext* _guiContext;
+			char* _title;
 			NpScene* _scene;
 			PxeCamera* _camera;
-			char* _title;
+			SDL_Window* _sdlWindow;
+			SDL_GLContext _sdlGlContext;
+			ImGuiContext* _guiContext;
+			PxeRenderTexture* _renderTexture;
+			uint32_t _externalFramebuffer;
 			int32_t _width;
 			int32_t _height;
 			uint8_t _flags;

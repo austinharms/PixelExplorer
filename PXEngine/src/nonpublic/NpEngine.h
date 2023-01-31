@@ -1,6 +1,8 @@
 #ifndef PXENGINE_NONPUBLIC_ENGINE_H_
 #define PXENGINE_NONPUBLIC_ENGINE_H_
 #include <unordered_map>
+#include <mutex>
+#include <shared_mutex>
 
 #include "GL/glew.h"
 #include "PxeTypes.h"
@@ -38,7 +40,6 @@ namespace pxengine {
 			PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
 			PXE_NODISCARD PxeScene* createScene() override;
 			PXE_NODISCARD PxeShader* loadShader(const std::filesystem::path& path) override;
-			void setVSyncMode(int8_t mode) override;
 			PXE_NODISCARD int8_t getVSyncMode() const override;
 			PXE_NODISCARD PxeInputManager& getInputManager() const override;
 			PXE_NODISCARD float getDeltaTime() const override;
@@ -46,6 +47,7 @@ namespace pxengine {
 			PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const override;
 			PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const override;
 			PXE_NODISCARD PxeFontManager& getFontManager() const override;
+			void setVSyncMode(int8_t mode) override;
 			void shutdown() override;
 
 
@@ -70,24 +72,25 @@ namespace pxengine {
 			void processAssetQueue();
 			void initializeGlAsset(PxeGLAsset& asset);
 			void uninitializeGlAsset(PxeGLAsset& asset);
+			void initializeWindow(NpWindow& window);
+			void uninitializeWindow(NpWindow& window);
 			PXE_NODISCARD bool getShutdownFlag() const;
-			void removeShader(const std::filesystem::path& path);
-			void removeWindow(NpWindow& window);
 			PXE_NODISCARD PxeLogInterface& getLogInterface();
-			PXE_NODISCARD SDL_Window* createSDLWindow(NpWindow& window);
-			void destroySDLWindow(SDL_Window* sdlWindow, NpWindow& window);
-			PXE_NODISCARD ImGuiContext* createGuiContext(NpWindow& window);
-			void destroyGuiContext(ImGuiContext* context, NpWindow& window);
 			PXE_NODISCARD NpInputManager& getNpInputManager() const;
 			PXE_NODISCARD NpFontManager& getNpFontManager() const;
-			void shutdownEngine();
+			void setDeltaTime(float dt);
+			void removeShader(const std::filesystem::path& path);
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
 			void newFrame(NpWindow& window);
 			void renderFrame(NpWindow& window, PxeRenderPass pass);
 			void renderGui(NpWindow& window);
 			void swapFramebuffer(NpWindow& window);
 			void bindPrimaryGlContext();
-			void setDeltaTime(float dt);
+			void acquireWindowsReadLock();
+			void releaseWindowsReadLock();
+			void acquireWindowsWriteLock();
+			void releaseWindowsWriteLock();
+			void shutdownEngine();
 
 		private:
 			static NpEngine* s_instance;
@@ -101,10 +104,12 @@ namespace pxengine {
 			void initPrimaryGlContext();
 			void forceAssetInit(PxeGLAsset& asset);
 
+			std::shared_mutex _windowsMutex;
+			std::mutex _shaderMutex;
+			std::mutex _assetMutex;
 			// map of all the NpWindows with SDL_Windows that exist by SDL window id
 			std::unordered_map<uint32_t, NpWindow*> _sdlWindows;
 			std::unordered_map<std::filesystem::path, NpShader*> _shaderCache;
-			// TODO Make this a thread safe queue
 			std::list<PxeGLAsset*> _assetQueue;
 			physx::PxAssertHandler& _defaultPhysAssertHandler;
 			physx::PxFoundation* _physFoundation;
@@ -120,16 +125,16 @@ namespace pxengine {
 			PxeLogInterface& _logInterface;
 			NpInputManager* _inputManager;
 			NpFontManager* _fontManager;
-			NpWindow* _primaryWindow;
+			SDL_Window* _primarySDLWindow;
 			SDL_GLContext _primaryGlContext;
 			NpWindow* _activeMouseWindow;
 			NpWindow* _activeKeyboardWindow;
 			void* _guiBackend;
 			uint16_t _guiBackendReferenceCount;
-			// Hack as we need the primary SDL window until right before shutdown to clean up PxeGlAssets, so store it here
-			void* _shutdownFlag;
 			float _deltaTime;
 			int8_t _vsyncMode;
+			bool _createdWindow;
+			bool _shutdownFlag;
 		};
 	}
 }
