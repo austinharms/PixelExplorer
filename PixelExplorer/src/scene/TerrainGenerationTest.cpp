@@ -26,6 +26,7 @@ namespace pixelexplorer {
 			_pauseAction = nullptr;
 			_pauseMenu = nullptr;
 			_paused = false;
+			_pauseHeld = false;
 
 			_pauseAction = pxeGetEngine().getInputManager().getAction("Pause");
 			if (!_pauseAction) {
@@ -90,9 +91,6 @@ namespace pixelexplorer {
 
 		TerrainGenerationTest::~TerrainGenerationTest()
 		{
-			if (_camera)
-				_camera->drop();
-
 			if (_pauseMenu)
 				_pauseMenu->drop();
 
@@ -113,16 +111,21 @@ namespace pixelexplorer {
 
 		void TerrainGenerationTest::update()
 		{
+			if (_pauseHeld && !_pauseAction->getValue())
+				_pauseHeld = false;
+
 			if (_paused) {
-				if (_pauseMenu->getActions() & gui::PauseMenu::PLAY) {
+				if (_pauseMenu->getActions() & gui::PauseMenu::PLAY || _pauseAction->getValue() && !_pauseHeld) {
+					_pauseHeld = true;
 					_paused = false;
 					getScene()->removeRenderable(*_pauseMenu);
 					_camera->lockCursor();
 				}
 			}
 			else {
-				if (_pauseAction->getValue()) {
+				if (_pauseAction->getValue() && !_pauseHeld) {
 					_paused = true;
+					_pauseHeld = true;
 					getScene()->addRenderable(*_pauseMenu);
 					_camera->unlockCursor();
 					return;
@@ -153,6 +156,7 @@ namespace pixelexplorer {
 			if (_camera) {
 				_camera->unlockCursor();
 				_camera->drop();
+				_camera = nullptr;
 			}
 		}
 	}

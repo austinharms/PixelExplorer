@@ -41,8 +41,14 @@ namespace pxengine {
 			engine->acquireWindowsReadLock();
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
-				if (it->second->getScene()) {
-					it->second->getNpScene()->simulatePhysics(engine->getDeltaTime());
+				it->second->acquireReadLock();
+				NpScene* scene = it->second->getNpScene();
+				if (scene)
+					scene->grab();
+				it->second->releaseReadLock();
+				if (scene) {
+					scene->simulatePhysics(engine->getDeltaTime());
+					scene->drop();
 				}
 			}
 

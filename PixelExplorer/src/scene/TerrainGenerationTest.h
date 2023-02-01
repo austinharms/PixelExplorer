@@ -28,6 +28,7 @@ namespace pixelexplorer {
 			gui::PauseMenu* _pauseMenu;
 			pxengine::PxeAction* _pauseAction;
 			bool _paused;
+			bool _pauseHeld;
 		};
 	}
 }

@@ -777,10 +777,6 @@ namespace pxengine {
 			}
 			_assetMutex.unlock();
 
-			if (getRefCount() > 1) {
-				PXE_ERROR("PxeEngine still referenced, all references to the PxeEngine should be dropped before shutdown, this indicates a memory leak, still " + std::to_string(getRefCount() - 1) + " references");
-			}
-
 			if (_primaryGlContext) {
 				SDL_GL_DeleteContext(_primaryGlContext);
 				PXE_CHECKSDLERROR();
@@ -793,7 +789,13 @@ namespace pxengine {
 				_primarySDLWindow = nullptr;
 			}
 
-			PXE_INFO("PxeEngine shutdown complete");
+			if (getRefCount() > 1) {
+				PXE_ERROR("PxeEngine still referenced, all references to the PxeEngine should be dropped before shutdown, this indicates a memory leak, still " + std::to_string(getRefCount() - 1) + " references");
+			}
+			else {
+				PXE_INFO("PxeEngine shutdown complete");
+			}
+
 			drop();
 		}
 
@@ -834,10 +836,19 @@ namespace pxengine {
 
 		void NpEngine::renderFrame(NpWindow& window, PxeRenderPass pass)
 		{
+			window.acquireReadLock();
 			NpScene* scene = window.getNpScene();
+			if (scene) scene->grab();
+			window.releaseReadLock();
 			if (!scene) return;
+			scene->acquireRenderableReadLock();
 			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(pass);
-			if (renderList.empty()) return;
+			if (renderList.empty()) {
+				scene->releaseRenderableReadLock();
+				scene->drop();
+				return;
+			}
+
 			PxeShader* activeShader = nullptr;
 			PxeRenderMaterial* activeMaterial = nullptr;
 			int32_t mvpLocation = -1;
@@ -862,17 +873,30 @@ namespace pxengine {
 			}
 
 			if (activeShader) activeShader->unbind();
+			scene->releaseRenderableReadLock();
+			scene->drop();
 		}
 
 		void NpEngine::renderGui(NpWindow& window)
 		{
+			window.acquireReadLock();
 			window.bindGuiContext();
 			NpScene* scene = window.getNpScene();
+			if (scene) scene->grab();
+			window.releaseReadLock();
 			if (!scene) return;
+			scene->acquireRenderableReadLock();
 			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(PxeRenderPass::SCREEN_SPACE);
-			if (renderList.empty()) return;
+			if (renderList.empty()) {
+				scene->releaseRenderableReadLock();
+				scene->drop();
+				return;
+			}
+
 			for (PxeRenderBase* renderObj : renderList)
 				renderObj->onRender();
+			scene->releaseRenderableReadLock();
+			scene->drop();
 		}
 
 		void NpEngine::swapFramebuffer(NpWindow& window)

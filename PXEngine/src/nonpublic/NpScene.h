@@ -1,6 +1,8 @@
 #ifndef PXENGINE_NONPUBLIC_SCENE_H_
 #define PXENGINE_NONPUBLIC_SCENE_H_
 #include <list>
+#include <mutex>
+#include <shared_mutex>
 
 #include "PxeTypes.h"
 #include "PxeScene.h"
@@ -32,8 +34,18 @@ namespace pxengine::nonpublic {
 		virtual ~NpScene();
 		PXE_NODISCARD const std::list<PxeRenderBase*>& getRenderList(PxeRenderPass pass) const;
 		void simulatePhysics(float time);
+		void acquireReadLock();
+		void releaseReadLock();
+		void acquireWriteLock();
+		void releaseWriteLock();
+		void acquireRenderableReadLock();
+		void releaseRenderableReadLock();
+		void acquireRenderableWriteLock();
+		void releaseRenderableWriteLock();
 
 	private:
+		mutable std::shared_mutex _sceneMutex;
+		std::shared_mutex _renderableMutex;
 		void* _userData;
 		physx::PxScene* _physScene;
 		std::list<PxeRenderBase*> _renderables[(int8_t)PxeRenderPass::RENDER_PASS_COUNT];
