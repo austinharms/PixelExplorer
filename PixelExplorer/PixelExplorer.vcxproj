@@ -214,6 +214,7 @@
     <ClInclude Include="src\scene\ErrorMenu.h" />
     <ClInclude Include="src\scene\MainMenu.h" />
     <ClInclude Include="src\scene\TerrainGenerationTest.h" />
+    <ClInclude Include="src\terrain\DebugTerrainGenerator.h" />
     <ClInclude Include="src\terrain\FlatTerrainGenerator.h" />
     <ClInclude Include="src\terrain\TerrainChunk.h" />
     <ClInclude Include="src\terrain\TerrainGenerator.h" />

@@ -4,7 +4,7 @@
 
 #include "Application.h"
 #include "terrain/TerrainGenerator.h"
-#include "terrain/FlatTerrainGenerator.h"
+#include "terrain/DebugTerrainGenerator.h"
 #include "PxeEngine.h"
 #include "PxeRenderMaterial.h"
 #include "PxeFSHelpers.h"
@@ -50,7 +50,7 @@ namespace pixelexplorer {
 				return;
 			}
 
-			TerrainGenerator* gen = new(std::nothrow) FlatTerrainGenerator();
+			TerrainGenerator* gen = new(std::nothrow) DebugTerrainGenerator();
 			if (!gen) {
 				Application::Error("Out of Memory, Failed to create Terrain Generator");
 				return;

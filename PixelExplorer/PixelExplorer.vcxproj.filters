@@ -110,5 +110,8 @@
     <ClInclude Include="src\gui\PauseMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\terrain\DebugTerrainGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
