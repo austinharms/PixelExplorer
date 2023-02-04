@@ -10,7 +10,7 @@ namespace pixelexplorer {
 		class TerrainChunk : public pxengine::PxeRefCount
 		{
 		public:
-			static constexpr uint32_t CHUNK_GRID_SIZE = 10;
+			static constexpr uint32_t CHUNK_GRID_SIZE = 15;
 			static constexpr uint32_t CHUNK_LAYER_POINT_COUNT = CHUNK_GRID_SIZE * CHUNK_GRID_SIZE;
 			static constexpr uint32_t CHUNK_POINT_COUNT = CHUNK_LAYER_POINT_COUNT * CHUNK_GRID_SIZE;
 			static constexpr float CHUNK_CELL_SIZE = 1;

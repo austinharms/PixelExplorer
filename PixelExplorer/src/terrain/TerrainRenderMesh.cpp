@@ -17,7 +17,6 @@
 
 namespace pixelexplorer {
 	namespace terrain {
-		static constexpr float HALF_CHUNK_CELL_SIZE = TerrainChunk::CHUNK_CELL_SIZE / 2;
 		const int8_t TriangleTable[0x100][0x10] = {
 			{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 			{0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -277,18 +276,18 @@ namespace pixelexplorer {
 			{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 		};
 		const glm::vec3 TriangleVertices[12] = {
-			glm::vec3(HALF_CHUNK_CELL_SIZE, 0.0f, 0.0f),
-			glm::vec3(TerrainChunk::CHUNK_CELL_SIZE, 0.0f, HALF_CHUNK_CELL_SIZE),
-			glm::vec3(HALF_CHUNK_CELL_SIZE, 0.0f, TerrainChunk::CHUNK_CELL_SIZE),
-			glm::vec3(0.0f, 0.0f, HALF_CHUNK_CELL_SIZE),
-			glm::vec3(HALF_CHUNK_CELL_SIZE, TerrainChunk::CHUNK_CELL_SIZE, 0.0f),
-			glm::vec3(TerrainChunk::CHUNK_CELL_SIZE, TerrainChunk::CHUNK_CELL_SIZE, HALF_CHUNK_CELL_SIZE),
-			glm::vec3(HALF_CHUNK_CELL_SIZE, TerrainChunk::CHUNK_CELL_SIZE, TerrainChunk::CHUNK_CELL_SIZE),
-			glm::vec3(0.0f, TerrainChunk::CHUNK_CELL_SIZE, HALF_CHUNK_CELL_SIZE),
-			glm::vec3(0.0f, HALF_CHUNK_CELL_SIZE, 0.0f),
-			glm::vec3(TerrainChunk::CHUNK_CELL_SIZE, HALF_CHUNK_CELL_SIZE, 0.0f),
-			glm::vec3(TerrainChunk::CHUNK_CELL_SIZE, HALF_CHUNK_CELL_SIZE, TerrainChunk::CHUNK_CELL_SIZE),
-			glm::vec3(0.0f, HALF_CHUNK_CELL_SIZE, TerrainChunk::CHUNK_CELL_SIZE)
+			glm::vec3(0.5f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.5f),
+			glm::vec3(0.5f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 0.5f),
+			glm::vec3(0.5f, 1.0f, 0.0f),
+			glm::vec3(1.0f, 1.0f, 0.5f),
+			glm::vec3(0.5f, 1.0f, 1.0f),
+			glm::vec3(0.0f, 1.0f, 0.5f),
+			glm::vec3(0.0f, 0.5f, 0.0f),
+			glm::vec3(1.0f, 0.5f, 0.0f),
+			glm::vec3(1.0f, 0.5f, 1.0f),
+			glm::vec3(0.0f, 0.5f, 1.0f)
 		};
 
 		TerrainRenderMesh::TerrainRenderMesh(pxengine::PxeRenderMaterial& chunkMaterial) : pxengine::PxeStaticPhysicsRenderObject(chunkMaterial)
@@ -336,7 +335,8 @@ namespace pixelexplorer {
 			for (uint8_t i = 0; i < CHUNK_COUNT; ++i)
 				_chunks[i] = mgr.getTerrainChunk(chunkPos + chunkOffsets[i]);
 			positionMatrix = glm::mat4(1);
-			glm::vec3 worldPos(glm::vec3(chunkPos) * TerrainChunk::CHUNK_WIDTH);
+			positionMatrix = glm::scale(positionMatrix, glm::vec3(TerrainChunk::CHUNK_CELL_SIZE));
+			glm::vec3 worldPos(glm::vec3(chunkPos) * (float)TerrainChunk::CHUNK_GRID_SIZE);
 			positionMatrix = glm::translate(positionMatrix, worldPos);
 			static_cast<physx::PxRigidStatic*>(getPhysicsActor())->setGlobalPose(physx::PxTransform(physx::PxVec3(worldPos.x, worldPos.y, worldPos.z)));
 		}
