@@ -444,17 +444,17 @@ namespace pixelexplorer {
 			indexData->drop();
 			vertexData->drop();
 
-			// TODO Generate physics mesh
 			physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(getPhysicsActor());
 			physx::PxScene* scene = actor->getScene();
-			if (scene) { scene->lockRead(); }
 			if (actor->getNbShapes()) {
 				physx::PxShape* oldShape;
-				if (actor->getShapes(&oldShape, 1))
+				if (actor->getShapes(&oldShape, 1)) {
+					if (scene) { scene->lockWrite(); }
 					actor->detachShape(*oldShape);
+					if (scene) { scene->unlockWrite(); }
+				}
 			}
 
-			if (scene) { scene->unlockRead(); }
 			if (vertices.size() && indices.size()) {
 				physx::PxTriangleMeshDesc meshDesc;
 				meshDesc.points.count = vertices.size();
@@ -469,9 +469,9 @@ namespace pixelexplorer {
 				physx::PxTriangleMesh* mesh = cooking->createTriangleMesh(meshDesc, physics->getPhysicsInsertionCallback());
 				physx::PxMaterial* material = physics->createMaterial(1.0f, 0.5f, 0.5f);
 				physx::PxShape* shape = physics->createShape(physx::PxTriangleMeshGeometry(mesh), *material);
-				if (scene) { scene->lockRead(); }
+				if (scene) { scene->lockWrite(); }
 				actor->attachShape(*shape);
-				if (scene) { scene->unlockRead(); }
+				if (scene) { scene->unlockWrite(); }
 				mesh->release();
 				material->release();
 				shape->release();
