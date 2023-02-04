@@ -81,7 +81,7 @@ namespace pixelexplorer {
 			float value = _actions[i]->getValue();
 			if (!value) continue;
 			if (i % 2 == 1) value = -value;
-			_position += _directionVectors[i / 2] * value * dt * 2.0f;
+			_position += _directionVectors[i / 2] * value * dt * 5.0f;
 		}
 
 		updatePVMatrix();

@@ -21,7 +21,6 @@ namespace pixelexplorer {
 			using namespace pxengine;
 			_terrainManager = nullptr;
 			_terrainRenderMaterial = nullptr;
-			_testTerrainMesh = nullptr;
 			_camera = nullptr;
 			_pauseAction = nullptr;
 			_pauseMenu = nullptr;
@@ -74,19 +73,39 @@ namespace pixelexplorer {
 			_terrainRenderMaterial = new(std::nothrow) PxeRenderMaterial(*shader);
 			shader->drop();
 			if (!_terrainRenderMaterial) {
-				Application::Error("Failed to create terrain Render Material");
+				Application::Error("Out of Memory, Failed to create terrain Render Material");
 				return;
 			}
 
-			_testTerrainMesh = new(std::nothrow) terrain::TerrainRenderMesh(*_terrainRenderMaterial);
-			if (!_testTerrainMesh) {
-				Application::Error("Failed to create Terrain Render Mesh");
-				return;
+			for (int64_t x = -10; x < 10; ++x) {
+				for (int64_t y = -10; y < 10; ++y) {
+					for (int64_t z = -10; z < 10; ++z) {
+						glm::i64vec3 pos(x, y, z);
+						terrain::TerrainRenderMesh* terrainMesh = new(std::nothrow) terrain::TerrainRenderMesh(*_terrainRenderMaterial);
+						if (!terrainMesh) {
+							Application::Error("Out of Memory, Failed to create Terrain Render Mesh");
+							return;
+						}
+
+						getScene()->addRenderable(*terrainMesh);
+						terrainMesh->loadChunks(pos, *_terrainManager);
+						terrainMesh->rebuildMesh();
+						_terrainChunks.emplace(pos, terrainMesh);
+					}
+				}
 			}
 
-			getScene()->addRenderable(*_testTerrainMesh);
-			_testTerrainMesh->loadChunks(glm::i64vec3(0, 0, 0), *_terrainManager);
-			_testTerrainMesh->rebuildMesh();
+			//glm::i64vec3 pos(0, 0, 0);
+			//terrain::TerrainRenderMesh* terrainMesh = new(std::nothrow) terrain::TerrainRenderMesh(*_terrainRenderMaterial);
+			//if (!terrainMesh) {
+			//	Application::Error("Out of Memory, Failed to create Terrain Render Mesh");
+			//	return;
+			//}
+
+			//getScene()->addRenderable(*terrainMesh);
+			//terrainMesh->loadChunks(pos, *_terrainManager);
+			//terrainMesh->rebuildMesh();
+			//_terrainChunks.emplace(pos, terrainMesh);
 		}
 
 		TerrainGenerationTest::~TerrainGenerationTest()
@@ -97,10 +116,14 @@ namespace pixelexplorer {
 			if (_pauseAction)
 				_pauseAction->drop();
 
-			if (_testTerrainMesh) {
-				_testTerrainMesh->unloadChunks();
-				_testTerrainMesh->drop();
+			for (auto meshPair : _terrainChunks) {
+				if (meshPair.second) {
+					meshPair.second->unloadChunks();
+					meshPair.second->drop();
+				}
 			}
+
+			_terrainChunks.clear();
 
 			if (_terrainRenderMaterial)
 				_terrainRenderMaterial->drop();
@@ -130,7 +153,7 @@ namespace pixelexplorer {
 					_camera->unlockCursor();
 					return;
 				}
-			
+
 				_camera->update();
 			}
 		}

@@ -10,14 +10,7 @@ namespace pixelexplorer {
 			FlatTerrainGenerator() = default;
 			virtual ~FlatTerrainGenerator() = default;
 			void generateTerrainData(TerrainChunk& chunk) override {
-				if (chunk.getPosition().y == 0) {
-					TerrainChunk::ChunkPoint* points = chunk.getPoints();
-					for (uint32_t i = TerrainChunk::CHUNK_LAYER_POINT_COUNT; i < TerrainChunk::CHUNK_POINT_COUNT; ++i) {
-						points[i] = 1;
-					}
-
-					chunk.updateLastModified();
-				} else if (chunk.getPosition().y < 0) {
+				if (chunk.getPosition().y <= 0) {
 					TerrainChunk::ChunkPoint* points = chunk.getPoints();
 					for (uint32_t i = 0; i < TerrainChunk::CHUNK_POINT_COUNT; ++i) {
 						points[i] = 1;

@@ -38,6 +38,8 @@ namespace pixelexplorer {
 				CHUNK_COUNT
 			};
 
+			TerrainChunk::ChunkPoint getRelativeChunkPoint(uint32_t x, uint32_t y, uint32_t z);
+
 			uint64_t _lastGenerated;
 			TerrainChunk* _chunks[CHUNK_COUNT];
 			pxengine::PxeIndexBuffer* _meshIndexBuffer;
@@ -47,3 +49,14 @@ namespace pixelexplorer {
 	}
 }
 #endif // !PIXELEXPLORER_TERRAIN_TERRAIN_RENDERE_MESH_H_
+
+/*
+							if (points[y * TerrainChunk::CHUNK_LAYER_POINT_COUNT + z * TerrainChunk::CHUNK_GRID_SIZE + x]) triIndex |= 0x01;
+							if (points[y * TerrainChunk::CHUNK_LAYER_POINT_COUNT + z * TerrainChunk::CHUNK_GRID_SIZE + x + 1]) triIndex |= 0x02;
+							if (points[y * TerrainChunk::CHUNK_LAYER_POINT_COUNT + (z + 1) * TerrainChunk::CHUNK_GRID_SIZE + x + 1]) triIndex |= 0x04;
+							if (points[y * TerrainChunk::CHUNK_LAYER_POINT_COUNT + (z + 1) * TerrainChunk::CHUNK_GRID_SIZE + x]) triIndex |= 0x08;
+							if (points[(y + 1) * TerrainChunk::CHUNK_LAYER_POINT_COUNT + z * TerrainChunk::CHUNK_GRID_SIZE + x]) triIndex |= 0x10;
+							if (points[(y + 1) * TerrainChunk::CHUNK_LAYER_POINT_COUNT + z * TerrainChunk::CHUNK_GRID_SIZE + x + 1]) triIndex |= 0x20;
+							if (points[(y + 1) * TerrainChunk::CHUNK_LAYER_POINT_COUNT + (z + 1) * TerrainChunk::CHUNK_GRID_SIZE + x + 1]) triIndex |= 0x40;
+							if (points[(y + 1) * TerrainChunk::CHUNK_LAYER_POINT_COUNT + (z + 1) * TerrainChunk::CHUNK_GRID_SIZE + x]) triIndex |= 0x80;
+*/

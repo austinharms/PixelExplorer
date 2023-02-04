@@ -1,6 +1,7 @@
 #ifndef PIXELEXPLORER_TERRAIN_GENERATION_TEST_H_
 #define PIXELEXPLORER_TERRAIN_GENERATION_TEST_H_
 #include <stdint.h>
+#include <unordered_map>
 
 #include "UpdatableScene.h"
 #include "terrain/TerrainManager.h"
@@ -23,7 +24,7 @@ namespace pixelexplorer {
 		private:
 			terrain::TerrainManager* _terrainManager;
 			pxengine::PxeRenderMaterial* _terrainRenderMaterial;
-			terrain::TerrainRenderMesh* _testTerrainMesh;
+			std::unordered_map<glm::i64vec3, terrain::TerrainRenderMesh*> _terrainChunks;
 			Camera* _camera;
 			gui::PauseMenu* _pauseMenu;
 			pxengine::PxeAction* _pauseAction;
