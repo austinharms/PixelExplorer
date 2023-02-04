@@ -60,8 +60,13 @@ namespace pxengine::nonpublic {
 		while (_simulationAccumulator >= _simulationTimestep)
 		{
 			_simulationAccumulator -= _simulationTimestep;
+			_physScene->lockWrite();
 			_physScene->simulate(_simulationTimestep);
+			_physScene->unlockWrite();
+			while (!_physScene->checkResults());
+			_physScene->lockWrite();
 			_physScene->fetchResults(true);
+			_physScene->unlockWrite();
 		}
 
 		_physScene->unlockWrite();

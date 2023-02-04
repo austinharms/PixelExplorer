@@ -27,7 +27,7 @@ namespace pxengine {
 
 	PXE_NODISCARD bool PxeBuffer::getAllocated() const
 	{
-		return !!_buffer;
+		return _buffer;
 	}
 
 	PxeBuffer& PxeBuffer::operator=(const PxeBuffer& other)
