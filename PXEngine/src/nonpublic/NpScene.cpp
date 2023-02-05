@@ -20,22 +20,22 @@ namespace pxengine::nonpublic {
 	{
 		_sceneMutex.lock();
 		for (PxeGUIObjectInterface* gui : _guiObjects)
-			reinterpret_cast<PxeObject*>(gui)->drop();
+			dynamic_cast<PxeObject*>(gui)->drop();
 		_guiObjects.clear();
 
 		for (PxeGeometryObjectInterface* geom : _geometryObjects)
-			reinterpret_cast<PxeObject*>(geom)->drop();
+			dynamic_cast<PxeObject*>(geom)->drop();
 		_geometryObjects.clear();
 
 		for (PxePhysicsUpdateObjectInterface* phys : _physicsUpdateObjects)
-			reinterpret_cast<PxeObject*>(phys)->drop();
-		_physicsObjects.clear();
+			dynamic_cast<PxeObject*>(phys)->drop();
+		_physicsUpdateObjects.clear();
 
 		_physScene->lockWrite();
 		for (PxePhysicsObjectInterface* phys : _physicsObjects) {
 			if (phys->getPhysicsActor())
 				_physScene->removeActor(*(phys->getPhysicsActor()));
-			reinterpret_cast<PxeObject*>(phys)->drop();
+			dynamic_cast<PxeObject*>(phys)->drop();
 		}
 
 		_physicsObjects.clear();
