@@ -39,7 +39,7 @@ namespace cubestack {
 			_pxShape->release();
 		}
 
-		void onRender() override {
+		void onGeometry() override {
 			_vertexArray->bind();
 			_indexBuffer->bind();
 			glDrawElements(GL_TRIANGLES, 36, (uint32_t)_indexBuffer->getIndexType(), nullptr);
@@ -129,7 +129,7 @@ namespace cubestack {
 				material->release();
 			}
 
-			getPhysicsActor()->attachShape(*_pxShape);
+			getPhysicsRigidActor()->attachShape(*_pxShape);
 		}
 
 		pxengine::PxeIndexBuffer* _indexBuffer;

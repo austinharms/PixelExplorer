@@ -3,7 +3,7 @@
 #include "PxeEngineAPI.h"
 #include "imgui.h"
 
-class MainMenu : public pxengine::PxeRenderElement
+class MainMenu : public pxengine::PxeGUIObject
 {
 public:
 	enum MENUACTIONS
@@ -24,7 +24,7 @@ public:
 
 	virtual ~MainMenu() {}
 
-	void onRender() override
+	void onGUI() override
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
 		ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);

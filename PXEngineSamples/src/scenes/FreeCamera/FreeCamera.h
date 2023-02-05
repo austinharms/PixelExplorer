@@ -90,7 +90,7 @@ public:
 			return;
 		}
 
-		scene->addRenderable(*cube);
+		scene->addObject(*cube);
 		_camera = new(std::nothrow) Camera(*_window, glm::radians(90.0f));
 		if (!_camera || _camera->getErrorFlag()) {
 			_error = true;

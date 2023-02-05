@@ -16,8 +16,11 @@ namespace pxengine {
 	public:
 		static const constexpr PxeObjectFlags DEFAULT_OBJECT_FLAGS = (PxeObjectFlags)((PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_OBJECT);
 		
-		PxeStaticPhysicsRenderObject(PxeRenderMaterial& material, physx::PxRigidActor* physicsActor = nullptr, PxeObjectFlags flags = DEFAULT_OBJECT_FLAGS) : 
-			PxeObject(flags), PxeGeometryObjectInterface(material) { setPhysicsActor(physicsActor); }
+		PxeStaticPhysicsRenderObject(PxeRenderMaterial& material, physx::PxRigidActor* physicsActor = nullptr, PxeObjectFlags flags = DEFAULT_OBJECT_FLAGS) :
+			PxeObject(flags), PxeGeometryObjectInterface(material) {
+			_physicsActor = nullptr;
+			setPhysicsActor(physicsActor);
+		}
 
 		virtual ~PxeStaticPhysicsRenderObject() { if (_physicsActor) _physicsActor->release(); }
 

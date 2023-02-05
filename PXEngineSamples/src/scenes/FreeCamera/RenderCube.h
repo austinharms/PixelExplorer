@@ -70,7 +70,7 @@ namespace freecamera {
 			_vertexArray->drop();
 		}
 
-		void onRender() override {
+		void onGeometry() override {
 			_vertexArray->bind();
 			_indexBuffer->bind();
 			glDrawElements(GL_TRIANGLES, _indexBuffer->getIndexCount(), (uint32_t)_indexBuffer->getIndexType(), nullptr);

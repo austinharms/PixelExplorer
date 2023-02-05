@@ -100,7 +100,7 @@ public:
 				cube->rotateAbout(glm::vec3(1, 0, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
 				cube->rotateAbout(glm::vec3(0, 1, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
 				cube->rotateAbout(glm::vec3(0, 0, 1), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
-				scene->addRenderable(*cube);
+				scene->addObject(*cube);
 				cube->drop();
 			}
 		}

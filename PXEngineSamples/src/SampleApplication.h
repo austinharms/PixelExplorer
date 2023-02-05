@@ -43,7 +43,7 @@ public:
 			return;
 		}
 
-		scene->addRenderable(*_mainMenu);
+		scene->addObject(*_mainMenu);
 		scene->drop();
 	}
 

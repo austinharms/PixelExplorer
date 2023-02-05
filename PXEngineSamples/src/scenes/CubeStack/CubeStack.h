@@ -88,11 +88,11 @@ public:
 			return;
 		}
 
-		scene->addRenderable(*baseCube);
+		scene->addObject(*baseCube);
 		for (int32_t y = -9; y < 10; ++y) {
 			PhysicsCube* cube = PhysicsCube::createPhysicsCube(glm::vec3(0, y * 1.1f, 0), true, *material, baseCube->getIndexBuffer(), baseCube->getVertexArray(), baseCube->getShape());
 			if (!cube) continue;
-			scene->addRenderable(*cube);
+			scene->addObject(*cube);
 			cube->drop();
 		}
 

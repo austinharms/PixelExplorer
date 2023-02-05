@@ -109,7 +109,7 @@ public:
 			return;
 		}
 
-		scene->addRenderable(*_mesh);
+		scene->addObject(*_mesh);
 		material->drop();
 		texture->drop();
 		shader->drop();
