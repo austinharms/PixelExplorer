@@ -28,6 +28,7 @@
 #include "imgui.h"
 #include "PxeFontManager.h"
 #include "NpFontManager.h"
+#include "SDL_log.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -96,6 +97,7 @@ namespace pxengine {
 			static NpEngine* s_instance;
 			const char* EXTENDED_WINDOW_DATA_NAME = "PXE_NP_WINDOW_DATA";
 			static void GLAPIENTRY glErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* message, const void* userParam);
+			static void sdlLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
 			void initPhysics();
 			void deinitPhysics();

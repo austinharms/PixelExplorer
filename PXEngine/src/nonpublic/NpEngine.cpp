@@ -191,6 +191,31 @@ namespace pxengine {
 #endif // PXE_DEBUG
 		}
 
+		void NpEngine::sdlLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message)
+		{
+			std::string str = "SDL: Category: " + std::to_string(category) + ", Message: " + message;
+			switch (priority)
+			{
+			case SDL_LOG_PRIORITY_VERBOSE:
+			case SDL_LOG_PRIORITY_DEBUG:
+			case SDL_LOG_PRIORITY_INFO:
+				PXE_INFO(str);
+				break;
+
+			case SDL_LOG_PRIORITY_WARN:
+				PXE_WARN(str);
+				break;
+
+			case SDL_LOG_PRIORITY_ERROR:
+				PXE_ERROR(str);
+				break;
+
+			case SDL_LOG_PRIORITY_CRITICAL:
+				PXE_FATAL(str);
+				break;
+			}
+		}
+
 		void NpEngine::initPhysics()
 		{
 			if (std::thread::hardware_concurrency() <= 0) {
@@ -272,6 +297,7 @@ namespace pxengine {
 
 		void NpEngine::initSDL()
 		{
+			SDL_LogSetOutputFunction(sdlLogOutput, this);
 			if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_EVENTS) < 0) {
 				PXE_CHECKSDLERROR();
 				PXE_FATAL("Failed to init SDL subsystems");
@@ -753,7 +779,7 @@ namespace pxengine {
 		{
 			PXE_INFO("PxeEngine shutdown");
 			bindPrimaryGlContext();
-			
+
 			// Clear the asset queue
 			_assetMutex.lock();
 			while (!_assetQueue.empty())
@@ -946,5 +972,5 @@ namespace pxengine {
 		{
 			_deltaTime = dt;
 		}
+		}
 	}
-}
