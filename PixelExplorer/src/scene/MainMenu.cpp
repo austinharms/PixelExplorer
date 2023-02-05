@@ -20,7 +20,7 @@ namespace pixelexplorer {
 				return;
 			}
 
-			getScene()->addRenderable(*_playMenu);
+			getScene()->addObject(*_playMenu);
 		}
 
 		MainMenu::~MainMenu() {

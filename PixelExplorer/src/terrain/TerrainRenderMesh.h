@@ -22,7 +22,7 @@ namespace pixelexplorer {
 			bool meshRebuildRequired() const;
 			uint64_t getLastMeshUpdate() const;
 			void rebuildMesh();
-			void onRender() override;
+			void onGeometry() override;
 
 		private:
 			enum Chunk

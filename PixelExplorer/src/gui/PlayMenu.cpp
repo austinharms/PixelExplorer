@@ -63,7 +63,7 @@ namespace pixelexplorer {
 			return actions;
 		}
 
-		void PlayMenu::onRender() {
+		void PlayMenu::onGUI() {
 			ImGuiIO& io = ImGui::GetIO();
 			constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;
 			ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));

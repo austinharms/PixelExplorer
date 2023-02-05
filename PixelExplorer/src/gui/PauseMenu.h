@@ -1,14 +1,14 @@
 #ifndef PIXELEXPLORER_GUI_PAUSE_MENU_H_
 #define PIXELEXPLORER_GUI_PAUSE_MENU_H_
 #include "PxeTypes.h"
-#include "PxeRenderElement.h"
+#include "PxeGUIObject.h"
 #include "PxeTexture.h"
 #include "imgui.h"
 #include "PxeFont.h"
 
 namespace pixelexplorer {
 	namespace gui {
-		class PauseMenu : public pxengine::PxeRenderElement
+		class PauseMenu : public pxengine::PxeGUIObject
 		{
 		public:
 			enum MenuActions : uint8_t
@@ -22,7 +22,7 @@ namespace pixelexplorer {
 			uint8_t getActions();
 
 		protected:
-			void onRender() override;
+			void onGUI() override;
 
 		private:
 			enum MenuTextures {

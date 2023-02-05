@@ -3,13 +3,13 @@
 #include <string>
 
 #include "PxeTypes.h"
-#include "PxeRenderElement.h"
+#include "PxeGUIObject.h"
 #include "PxeTexture.h"
 #include "PxeFont.h"
 
 namespace pixelexplorer {
 	namespace gui {
-		class ErrorScreen : public pxengine::PxeRenderElement
+		class ErrorScreen : public pxengine::PxeGUIObject
 		{
 		public:
 			ErrorScreen() = default;
@@ -18,7 +18,7 @@ namespace pixelexplorer {
 			void setMessage(const std::string& msg);
 
 		protected:
-			void onRender() override;
+			void onGUI() override;
 
 		private:
 			std::string _errorMessage;

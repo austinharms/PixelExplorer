@@ -20,7 +20,7 @@ namespace pixelexplorer {
 			}
 
 			_errorScreen->setMessage("An unknown error occurred");
-			getScene()->addRenderable(*_errorScreen);
+			getScene()->addObject(*_errorScreen);
 		}
 
 		ErrorMenu::~ErrorMenu()

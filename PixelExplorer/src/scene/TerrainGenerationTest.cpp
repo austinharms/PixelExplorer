@@ -87,7 +87,7 @@ namespace pixelexplorer {
 							return;
 						}
 
-						getScene()->addRenderable(*terrainMesh);
+						getScene()->addObject(*terrainMesh);
 						terrainMesh->loadChunks(pos, *_terrainManager);
 						terrainMesh->rebuildMesh();
 						_terrainChunks.emplace(pos, terrainMesh);
@@ -141,7 +141,7 @@ namespace pixelexplorer {
 				if (_pauseMenu->getActions() & gui::PauseMenu::PLAY || _pauseAction->getValue() && !_pauseHeld) {
 					_pauseHeld = true;
 					_paused = false;
-					getScene()->removeRenderable(*_pauseMenu);
+					getScene()->removeObject(*_pauseMenu);
 					_camera->lockCursor();
 				}
 			}
@@ -149,7 +149,7 @@ namespace pixelexplorer {
 				if (_pauseAction->getValue() && !_pauseHeld) {
 					_paused = true;
 					_pauseHeld = true;
-					getScene()->addRenderable(*_pauseMenu);
+					getScene()->addObject(*_pauseMenu);
 					_camera->unlockCursor();
 					return;
 				}

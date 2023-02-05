@@ -301,7 +301,7 @@ namespace pixelexplorer {
 			physx::PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
 			physx::PxTransform pxTransform(physx::PxIdentity);
 			physx::PxRigidStatic* actor = physics->createRigidStatic(pxTransform);
-			setPhysicsActor(static_cast<physx::PxActor*>(actor));
+			setPhysicsActor(actor);
 
 			_meshIndexBuffer = new PxeIndexBuffer(PxeIndexType::UNSIGNED_16BIT);
 			PxeVertexBufferFormat fmt(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
@@ -480,7 +480,7 @@ namespace pixelexplorer {
 			//PEX_INFO(("Terrain Mesh Rebuild took " + std::to_string(SDL_GetTicks64() - _lastGenerated) + "ms").c_str());
 		}
 
-		void TerrainRenderMesh::onRender()
+		void TerrainRenderMesh::onGeometry()
 		{
 			_meshVertexArray->bind();
 			_meshVertexBuffer->bind();
