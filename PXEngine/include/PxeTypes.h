@@ -45,14 +45,15 @@ namespace pxengine {
 		PXE_LOGLEVELCOUNT
 	};
 
-	enum class PxeRenderPass : int8_t
+	typedef uint8_t PxeObjectFlagsType;
+	enum class PxeObjectFlags : PxeObjectFlagsType
 	{
-		NONE = -1,
-		SCREEN_SPACE,
-		WORLD_SPACE,
-		STATIC_PHYSICS_WORLD_SPACE,
-		DYNAMIC_PHYSICS_WORLD_SPACE,
-		RENDER_PASS_COUNT
+		NONE = 0x00,
+		GUI_UPDATE = 0x01,
+		GEOMETRY_UPDATE = 0x02,
+		PHYSICS_OBJECT = 0x04,
+		PHYSICS_UPDATE = 0x08,
+		ALL = 0xff,
 	};
 
 	enum class PxeVertexBufferAttribType : uint32_t

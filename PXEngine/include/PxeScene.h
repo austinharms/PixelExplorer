@@ -2,11 +2,11 @@
 #define PXENGINE_SCENE_H_
 #include "PxeTypes.h"
 #include "PxeRefCount.h"
-#include "PxeRenderBase.h"
+#include "PxeObject.h"
 #include "PxScene.h"
 
 namespace pxengine {
-	// Collection of renderable objects and wrapper for physx::PxScene
+	// Collection of PxeObjects and wrapper for physx::PxScene
 	class PxeScene : public PxeRefCount
 	{
 	public:
@@ -39,14 +39,11 @@ namespace pxengine {
 		// Returns the physics simulation step in seconds (unscaled/real time)
 		virtual PXE_NODISCARD float getPhysicsSimulationStep() const = 0;
 
-		// Add a PxeRenderBase aka a renderable object to the scene
-		// Note: things rendered in PxeRenderPass::SCREEN_SPACE aka PxeRenderElement are rendered in the order added
-		// things rendered in PxeRenderPass::WORLD_SPACE are ordered by the shader and material used
-		// Note: if {renderable} is an instance of PxeStaticPhysicsRenderObject or PxeDynamicPhysicsRenderObject this will add the physx actor to the physics scene
-		virtual void addRenderable(PxeRenderBase& renderable) = 0;
+		// Add PxeObject object to the scene
+		virtual void addObject(PxeObject& obj) = 0;
 
-		// Remove a PxeRenderBase aka a renderable object from the scene
-		virtual void removeRenderable(PxeRenderBase& renderable) = 0;
+		// Remove PxeObject object from the scene
+		virtual void removeObject(PxeObject& obj) = 0;
 
 		// Returns the user data void*
 		// Note: this is purely for application uses and is not used by the engine 

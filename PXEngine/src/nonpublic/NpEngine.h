@@ -82,7 +82,7 @@ namespace pxengine {
 			void removeShader(const std::filesystem::path& path);
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
 			void newFrame(NpWindow& window);
-			void renderFrame(NpWindow& window, PxeRenderPass pass);
+			void renderFrame(NpWindow& window);
 			void renderGui(NpWindow& window);
 			void swapFramebuffer(NpWindow& window);
 			void bindPrimaryGlContext();

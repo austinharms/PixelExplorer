@@ -11,7 +11,8 @@
 #include "backends/imgui_impl_sdl.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "PxeRenderMaterial.h"
-#include "PxeRenderObject.h"
+#include "PxeGeometryObjectInterface.h"
+#include "PxeGUIObjectInterface.h"
 #include "PxeRenderTexture.h"
 
 namespace pxengine {
@@ -834,17 +835,17 @@ namespace pxengine {
 			window.releaseReadLock();
 		}
 
-		void NpEngine::renderFrame(NpWindow& window, PxeRenderPass pass)
+		void NpEngine::renderFrame(NpWindow& window)
 		{
 			window.acquireReadLock();
 			NpScene* scene = window.getNpScene();
 			if (scene) scene->grab();
 			window.releaseReadLock();
 			if (!scene) return;
-			scene->acquireRenderableReadLock();
-			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(pass);
+			scene->acquireObjectsReadLock();
+			const std::list<PxeGeometryObjectInterface*>& renderList = scene->getGeometryObjectList();
 			if (renderList.empty()) {
-				scene->releaseRenderableReadLock();
+				scene->releaseObjectsReadLock();
 				scene->drop();
 				return;
 			}
@@ -855,10 +856,9 @@ namespace pxengine {
 			PxeCamera& camera = *window.getCamera();
 			camera.setWindowSize(window.getWindowWidth(), window.getWindowHeight());
 			glm::mat4 pvMatrix(camera.getPVMatrix());
-			for (auto it = renderList.begin(); it != renderList.end(); ++it) {
-				PxeRenderObject& renderObject = static_cast<PxeRenderObject&>(**it);
-				if (&(renderObject.getRenderMaterial()) != activeMaterial) {
-					activeMaterial = &(renderObject.getRenderMaterial());
+			for (PxeGeometryObjectInterface* geo : renderList) {
+				if (&(geo->getRenderMaterial()) != activeMaterial) {
+					activeMaterial = &(geo->getRenderMaterial());
 					if (&(activeMaterial->getShader()) != activeShader) {
 						activeShader = &(activeMaterial->getShader());
 						activeShader->bind();
@@ -868,12 +868,12 @@ namespace pxengine {
 					activeMaterial->applyMaterial();
 				}
 
-				activeShader->setUniformM4f(mvpLocation, pvMatrix * renderObject.getPositionMatrix());
-				renderObject.onRender();
+				activeShader->setUniformM4f(mvpLocation, pvMatrix * geo->getPositionMatrix());
+				geo->onGeometry();
 			}
 
 			if (activeShader) activeShader->unbind();
-			scene->releaseRenderableReadLock();
+			scene->releaseObjectsReadLock();
 			scene->drop();
 		}
 
@@ -885,17 +885,17 @@ namespace pxengine {
 			if (scene) scene->grab();
 			window.releaseReadLock();
 			if (!scene) return;
-			scene->acquireRenderableReadLock();
-			const std::list<PxeRenderBase*>& renderList = scene->getRenderList(PxeRenderPass::SCREEN_SPACE);
+			scene->acquireObjectsReadLock();
+			const std::list<PxeGUIObjectInterface*>& renderList = scene->getGUIObjectList();
 			if (renderList.empty()) {
-				scene->releaseRenderableReadLock();
+				scene->releaseObjectsReadLock();
 				scene->drop();
 				return;
 			}
 
-			for (PxeRenderBase* renderObj : renderList)
-				renderObj->onRender();
-			scene->releaseRenderableReadLock();
+			for (PxeGUIObjectInterface* renderObj : renderList)
+				renderObj->onGUI();
+			scene->releaseObjectsReadLock();
 			scene->drop();
 		}
 

@@ -173,13 +173,13 @@
     <ClInclude Include="include\PxeFSHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeRenderBase.h">
+    <ClInclude Include="include\PxeObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeRenderElement.h">
+    <ClInclude Include="include\PxeGUIObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeRenderMaterial.h">
@@ -219,9 +219,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeRingBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\imgui\backends\imgui_impl_opengl3_loader.h">
@@ -273,6 +270,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeDynamicPhysicsRenderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeGeometryObjectInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeGUIObjectInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxePhysicsObjectInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxePhysicsUpdateObjectInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

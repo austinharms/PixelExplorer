@@ -1,39 +1,40 @@
 #ifndef PXENGINE_DYNAMIC_PHYSICS_RENDER_OBJECT_H_
 #define PXENGINE_DYNAMIC_PHYSICS_RENDER_OBJECT_H_
 #include "PxeTypes.h"
-#include "PxeRenderObject.h"
-#include "PxRigidActor.h"
-#include "foundation/PxMat44.h"
+#include "PxeStaticPhysicsRenderObject.h"
+#include "PxePhysicsUpdateObjectInterface.h"
 
 namespace pxengine {
 	// Base class for rendering object with a physx PxRigidActor that changes position in world space
 	// Note: this object may only be in one scene at once due to physx limitations
 	// Note: this assumes it has the only reference to the physx PxRigidActor and calls release on destruction
-	class PxeDynamicPhysicsRenderObject : public PxeRenderObject
+	class PxeDynamicPhysicsRenderObject : public PxeStaticPhysicsRenderObject, public PxePhysicsUpdateObjectInterface
 	{
 	public:
-		PxeDynamicPhysicsRenderObject(PxeRenderMaterial& material, physx::PxRigidActor* physicsActor = nullptr) : PxeRenderObject(material, PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE) { setPhysicsActor(physicsActor); }
-		virtual ~PxeDynamicPhysicsRenderObject() { if (_physicsActor) _physicsActor->release(); }
-		const physx::PxRigidActor* getPhysicsActor() const { return _physicsActor; }
-		physx::PxRigidActor* getPhysicsActor() { return _physicsActor; }
+		static const constexpr PxeObjectFlags DEFAULT_OBJECT_FLAGS = (PxeObjectFlags)((PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_OBJECT | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_UPDATE);
 
-		// Called by the PxeEngine every render to update the position based on the physx actor
+		PxeDynamicPhysicsRenderObject(PxeRenderMaterial& material, physx::PxRigidActor* physicsActor = nullptr, PxeObjectFlags flags = DEFAULT_OBJECT_FLAGS) : 
+			PxeStaticPhysicsRenderObject(material, physicsActor, flags) {}
+		virtual ~PxeDynamicPhysicsRenderObject() = default;
+
+
+		// ##### PxeGeometryObjectInterface API #####
+
+		// This method should draw the object to the current framebuffer
+		// Note: you can assume a valid OpenGl context
+		// Note: this requires the GEOMETRY_UPDATE flag to be set (flag is set by default)
+		virtual void onGeometry() override = 0;
+
+		
+		// ##### PxePhysicsUpdateObjectInterface API #####
+
+		// This method is called before every scene physics update
 		// Note: the physx actor is guaranteed to be read/writable during this call
-		virtual void updatePhysicsPosition() {
-			if (_physicsActor)
-				positionMatrix = glm::make_mat4(physx::PxMat44(_physicsActor->getGlobalPose()).front());
-		}
-
-	protected:
-		void setPhysicsActor(physx::PxRigidActor* physicsActor) {
-			_physicsActor = physicsActor;
-			if (_physicsActor) {
-				physicsActor->userData = this;
-			}
-		}
-
-	private:
-		physx::PxRigidActor* _physicsActor;
+		// Note: this requires the PHYSICS_UPDATE flag to be set on the base PxeObject (flag set by default)
+		virtual void onPhysics() {
+			if (getPhysicsRigidActor())
+				positionMatrix = glm::make_mat4(physx::PxMat44(getPhysicsRigidActor()->getGlobalPose()).front());
+		};
 	};
 }
 

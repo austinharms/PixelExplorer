@@ -2,11 +2,7 @@
 
 #include "NpLogger.h"
 #include "PxeRenderMaterial.h"
-#include "PxeRenderObject.h"
-#include "PxeRenderElement.h"
 #include "NpEngine.h"
-#include "PxeDynamicPhysicsRenderObject.h"
-#include "PxeStaticPhysicsRenderObject.h"
 
 namespace pxengine::nonpublic {
 	NpScene::NpScene(physx::PxScene* scene)
@@ -23,27 +19,51 @@ namespace pxengine::nonpublic {
 	NpScene::~NpScene()
 	{
 		_sceneMutex.lock();
-		for (int8_t i = 0; i < (int8_t)PxeRenderPass::RENDER_PASS_COUNT; ++i) {
-			for (auto it = _renderables[i].begin(); it != _renderables[i].end(); ++it) {
-				(*it)->drop();
-			}
+		for (PxeGUIObjectInterface* gui : _guiObjects)
+			reinterpret_cast<PxeObject*>(gui)->drop();
+		_guiObjects.clear();
 
-			_renderables[i].clear();
+		for (PxeGeometryObjectInterface* geom : _geometryObjects)
+			reinterpret_cast<PxeObject*>(geom)->drop();
+		_geometryObjects.clear();
+
+		for (PxePhysicsUpdateObjectInterface* phys : _physicsUpdateObjects)
+			reinterpret_cast<PxeObject*>(phys)->drop();
+		_physicsObjects.clear();
+
+		_physScene->lockWrite();
+		for (PxePhysicsObjectInterface* phys : _physicsObjects) {
+			if (phys->getPhysicsActor())
+				_physScene->removeActor(*(phys->getPhysicsActor()));
+			reinterpret_cast<PxeObject*>(phys)->drop();
 		}
+
+		_physicsObjects.clear();
+		_physScene->unlockWrite();
 
 		_physScene->release();
 		NpEngine::getInstance().drop();
 		_sceneMutex.unlock();
 	}
 
-	PXE_NODISCARD const std::list<PxeRenderBase*>& NpScene::getRenderList(PxeRenderPass pass) const
+	PXE_NODISCARD const std::list<PxeGUIObjectInterface*>& NpScene::getGUIObjectList() const
 	{
-		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
-		if ((int8_t)pass < 0 || (int8_t)pass > renderSize) {
-			PXE_FATAL("Attempted to get render objects for invalid PxeRenderPass");
-		}
+		return _guiObjects;
+	}
 
-		return _renderables[(int8_t)pass];
+	PXE_NODISCARD const std::list<PxeGeometryObjectInterface*>& NpScene::getGeometryObjectList() const
+	{
+		return _geometryObjects;
+	}
+
+	PXE_NODISCARD const std::list<PxePhysicsUpdateObjectInterface*>& NpScene::getPhysicsUpdateObjectList() const
+	{
+		return _physicsUpdateObjects;
+	}
+
+	PXE_NODISCARD const std::list<PxePhysicsObjectInterface*>& NpScene::getPhysicsObjectList() const
+	{
+		return _physicsObjects;
 	}
 
 	void NpScene::simulatePhysics(float time)
@@ -52,11 +72,10 @@ namespace pxengine::nonpublic {
 		_simulationAccumulator += time * _simulationScale;
 		if (_simulationAccumulator < _simulationTimestep) return;
 		_physScene->lockWrite(__FUNCTION__, __LINE__);
-		_renderableMutex.lock_shared();
-		const std::list<PxeRenderBase*>& physicsRenderables = getRenderList(PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE);
-		for (auto renderable : physicsRenderables)
-			static_cast<PxeDynamicPhysicsRenderObject*>(renderable)->updatePhysicsPosition();
-		_renderableMutex.unlock_shared();
+		_objectMutex.lock_shared();
+		for (PxePhysicsUpdateObjectInterface* phys : _physicsUpdateObjects)
+			phys->onPhysics();
+		_objectMutex.unlock_shared();
 		while (_simulationAccumulator >= _simulationTimestep)
 		{
 			_simulationAccumulator -= _simulationTimestep;
@@ -114,83 +133,151 @@ namespace pxengine::nonpublic {
 		_simulationTimestep = step;
 	}
 
-	void NpScene::addRenderable(PxeRenderBase& renderable)
+	void NpScene::addObject(PxeObject& obj)
 	{
-		std::unique_lock lock(_renderableMutex);
-		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
-		int8_t renderPass = (int8_t)renderable.getRenderPass();
-		if (renderPass < 0 || renderPass > renderSize) {
-			PXE_ERROR("Attempted to add PxeRenderBase with invalid PxeRenderPass");
-			return;
-		}
-
-#ifdef PXE_DEBUG
-		if (std::find(_renderables[renderPass].begin(), _renderables[renderPass].end(), &renderable) != _renderables[renderPass].end()) {
-			if (renderPass == (int8_t)PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE) {
-				PXE_ERROR("Re-added PxePhysicsRenderObject to PxeScene");
+		std::unique_lock lock(_objectMutex);
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_OBJECT) {
+			PxePhysicsObjectInterface* physObj = dynamic_cast<PxePhysicsObjectInterface*>(&obj);
+			if (physObj) {
+				physx::PxActor* actor;
+				if ((actor = physObj->getPhysicsActor())) {
+					if (!actor->getScene()) {
+						obj.grab();
+						_physScene->lockWrite();
+						_physScene->addActor(*actor);
+						_physScene->unlockWrite();
+						_physicsObjects.emplace_back(physObj);
+					}
+					else {
+						PXE_WARN("Added PxeObject/PxePhysicsObjectInterface with PxActor already assigned to a physics scene");
+					}
+				}
+				else {
+					PXE_WARN("Added PxeObject/PxePhysicsObjectInterface with invalid PxActor");
+				}
 			}
 			else {
-				PXE_WARN("Re-added PxeRenderBase to PxeScene");
-			}
-		}
-#endif // PXE_DEBUG
-
-		renderable.grab();
-		if (renderPass == (int8_t)PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE) {
-			PxeDynamicPhysicsRenderObject& physObj = static_cast<PxeDynamicPhysicsRenderObject&>(renderable);
-			if (!physObj.getPhysicsActor()) {
-				PXE_WARN("Added PxeDynamicPhysicsRenderObject without PxPhysicsActor");
-			}
-			else {
-				_physScene->addActor(*physObj.getPhysicsActor());
-			}
-		}
-		else if (renderPass == (int8_t)PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE) {
-			PxeStaticPhysicsRenderObject& physObj = static_cast<PxeStaticPhysicsRenderObject&>(renderable);
-			if (!physObj.getPhysicsActor()) {
-				PXE_WARN("Added PxeStaticPhysicsRenderObject without PxActor");
-			}
-			else {
-				_physScene->addActor(*physObj.getPhysicsActor());
+				PXE_WARN("Added PxeObject with PHYSICS_OBJECT flag that did not inherit from PxePhysicsObjectInterface");
 			}
 		}
 
-		// TODO Optimize this to put STATIC_PHYSICS_WORLD_SPACE into WORLD_SPACE queue to allow for minimal shader changes when rendering
-		if (renderPass == (int8_t)PxeRenderPass::WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::DYNAMIC_PHYSICS_WORLD_SPACE || renderPass == (int8_t)PxeRenderPass::STATIC_PHYSICS_WORLD_SPACE) {
-			void* materialPtr = &(static_cast<PxeRenderObject&>(renderable).getRenderMaterial());
-			if (_renderables[renderPass].empty()) {
-				_renderables[renderPass].emplace_front(&renderable);
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_UPDATE) {
+			PxePhysicsUpdateObjectInterface* physObj = dynamic_cast<PxePhysicsUpdateObjectInterface*>(&obj);
+			if (physObj) {
+				obj.grab();
+				_physicsUpdateObjects.emplace_back(physObj);
 			}
 			else {
-				// TODO Optimize this to also sort by shaders in materials to allow for minimal shader changes when rendering
-				for (auto it = _renderables[renderPass].begin(); it != _renderables[renderPass].end(); ++it) {
-					if (materialPtr <= (void*)&(static_cast<PxeRenderObject*>(*it)->getRenderMaterial())) {
-						_renderables[renderPass].emplace(it, &renderable);
-						break;
+				PXE_WARN("Added PxeObject with PHYSICS_UPDATE flag that did not inherit from PxePhysicsUpdateObjectInterface");
+			}
+		}
+
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GUI_UPDATE) {
+			PxeGUIObjectInterface* guiObj = dynamic_cast<PxeGUIObjectInterface*>(&obj);
+			if (guiObj) {
+				obj.grab();
+				_guiObjects.emplace_back(guiObj);
+			}
+			else {
+				PXE_WARN("Added PxeObject with GUI_UPDATE flag that did not inherit from PxeGUIObjectInterface");
+			}
+		}
+
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE) {
+			PxeGeometryObjectInterface* geoObj = dynamic_cast<PxeGeometryObjectInterface*>(&obj);
+			if (geoObj) {
+				obj.grab();
+				if (_geometryObjects.empty()) {
+					_geometryObjects.emplace_back(geoObj);
+				}
+				else {
+					void* materialIndex = &(geoObj->getRenderMaterial());
+					// TODO Optimize this to also sort by shaders in materials to allow for minimal shader changes when rendering
+					for (auto geoItr = _geometryObjects.begin(); geoItr != _geometryObjects.end(); ++geoItr) {
+						if (materialIndex <= &(geoObj->getRenderMaterial())) {
+							_geometryObjects.emplace(geoItr, geoObj);
+							break;
+						}
 					}
 				}
 			}
-		}
-		else {
-			_renderables[renderPass].emplace_back(&renderable);
+			else {
+				PXE_WARN("Added PxeObject with GEOMETRY_UPDATE flag that did not inherit from PxeGeometryObjectInterface");
+			}
 		}
 	}
 
-	void NpScene::removeRenderable(PxeRenderBase& renderable)
+	void NpScene::removeObject(PxeObject& obj)
 	{
-		std::unique_lock lock(_renderableMutex);
-		constexpr size_t renderSize = sizeof(_renderables) / sizeof(*_renderables);
-		int8_t renderPass = (int8_t)renderable.getRenderPass();
-		if (renderPass < 0 || renderPass > renderSize) {
-			PXE_ERROR("Attempted to remove PxeRenderBase with invalid PxeRenderPass");
-			return;
+		std::unique_lock lock(_objectMutex);
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_OBJECT) {
+			PxePhysicsObjectInterface* physObj = dynamic_cast<PxePhysicsObjectInterface*>(&obj);
+			if (physObj) {
+				physx::PxActor* actor;
+				if ((actor = physObj->getPhysicsActor())) {
+					if (actor->getScene() == _physScene) {
+						_physScene->lockWrite();
+						_physScene->removeActor(*actor);
+						_physScene->unlockWrite();
+						if (_physicsObjects.remove(physObj))
+							obj.drop();
+					}
+					else {
+						PXE_WARN("Removed PxeObject/PxePhysicsObjectInterface with PxActor not assigned to correct physics scene");
+					}
+				}
+				else {
+					PXE_WARN("Removed PxeObject/PxePhysicsObjectInterface with invalid PxActor");
+				}
+			}
+			else {
+				PXE_WARN("Removed PxeObject with PHYSICS_OBJECT flag that did not inherit from PxePhysicsObjectInterface");
+			}
 		}
 
-		if (_renderables[renderPass].remove(&renderable)) {
-			renderable.drop();
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_UPDATE) {
+			PxePhysicsUpdateObjectInterface* physObj = dynamic_cast<PxePhysicsUpdateObjectInterface*>(&obj);
+			if (physObj) {
+				if (_physicsUpdateObjects.remove(physObj)) {
+					obj.drop();
+				}
+				else {
+					PXE_WARN("Removed PxeObject/PxePhysicsUpdateObjectInterface that was not added to the PxeScene");
+				}
+			}
+			else {
+				PXE_WARN("Removed PxeObject with PHYSICS_UPDATE flag that did not inherit from PxePhysicsUpdateObjectInterface");
+			}
 		}
-		else {
-			PXE_WARN("Attempted to remove PxeRenderBase not added to PxeScene");
+
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GUI_UPDATE) {
+			PxeGUIObjectInterface* guiObj = dynamic_cast<PxeGUIObjectInterface*>(&obj);
+			if (guiObj) {
+				if (_guiObjects.remove(guiObj)) {
+					obj.drop();
+				}
+				else {
+					PXE_WARN("Removed PxeObject/PxeGUIObjectInterface that was not added to the PxeScene");
+				}
+			}
+			else {
+				PXE_WARN("Removed PxeObject with GUI_UPDATE flag that did not inherit from PxeGUIObjectInterface");
+			}
+		}
+
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE) {
+			PxeGeometryObjectInterface* geoObj = dynamic_cast<PxeGeometryObjectInterface*>(&obj);
+			if (geoObj) {
+				if (_geometryObjects.remove(geoObj)) {
+					obj.drop();
+				}
+				else {
+					PXE_WARN("Removed PxeObject/PxeGeometryObjectInterface that was not added to the PxeScene");
+				}
+			}
+			else {
+				PXE_WARN("Removed PxeObject with GEOMETRY_UPDATE flag that did not inherit from PxeGeometryObjectInterface");
+			}
 		}
 	}
 
@@ -224,23 +311,23 @@ namespace pxengine::nonpublic {
 		_sceneMutex.unlock();
 	}
 
-	void NpScene::acquireRenderableReadLock()
+	void NpScene::acquireObjectsReadLock()
 	{
-		_renderableMutex.lock_shared();
+		_objectMutex.lock_shared();
 	}
 
-	void NpScene::releaseRenderableReadLock()
+	void NpScene::releaseObjectsReadLock()
 	{
-		_renderableMutex.unlock_shared();
+		_objectMutex.unlock_shared();
 	}
 
-	void NpScene::acquireRenderableWriteLock()
+	void NpScene::acquireObjectsWriteLock()
 	{
-		_renderableMutex.lock();
+		_objectMutex.lock();
 	}
 
-	void NpScene::releaseRenderableWriteLock()
+	void NpScene::releaseObjectsWriteLock()
 	{
-		_renderableMutex.unlock();
+		_objectMutex.unlock();
 	}
 }
