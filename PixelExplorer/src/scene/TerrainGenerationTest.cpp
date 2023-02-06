@@ -1,6 +1,7 @@
 #include "TerrainGenerationTest.h"
 
 #include <new>
+#include <math.h>
 
 #include "Application.h"
 #include "terrain/TerrainGenerator.h"
@@ -12,6 +13,8 @@
 #include "PxeActionSource.h"
 #include "PxeInputManager.h"
 #include "SDL_keycode.h"
+#include "terrain/TerrainChunk.h"
+#include "SDL_timer.h"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -24,6 +27,8 @@ namespace pixelexplorer {
 			_camera = nullptr;
 			_pauseAction = nullptr;
 			_pauseMenu = nullptr;
+			// Dummy value that is well outside the position of the camera to force terrain reloading
+			_lastLoadedChunkPosition = glm::i64vec3(-10000, -10000, -10000);
 			_paused = false;
 			_pauseHeld = false;
 
@@ -76,36 +81,6 @@ namespace pixelexplorer {
 				Application::Error("Out of Memory, Failed to create terrain Render Material");
 				return;
 			}
-
-			for (int64_t x = -10; x < 10; ++x) {
-				for (int64_t y = -10; y < 10; ++y) {
-					for (int64_t z = -10; z < 10; ++z) {
-						glm::i64vec3 pos(x, y, z);
-						terrain::TerrainRenderMesh* terrainMesh = new(std::nothrow) terrain::TerrainRenderMesh(*_terrainRenderMaterial);
-						if (!terrainMesh) {
-							Application::Error("Out of Memory, Failed to create Terrain Render Mesh");
-							return;
-						}
-
-						getScene()->addObject(*terrainMesh);
-						terrainMesh->loadChunks(pos, *_terrainManager);
-						terrainMesh->rebuildMesh();
-						_terrainChunks.emplace(pos, terrainMesh);
-					}
-				}
-			}
-
-			//glm::i64vec3 pos(0, 0, 0);
-			//terrain::TerrainRenderMesh* terrainMesh = new(std::nothrow) terrain::TerrainRenderMesh(*_terrainRenderMaterial);
-			//if (!terrainMesh) {
-			//	Application::Error("Out of Memory, Failed to create Terrain Render Mesh");
-			//	return;
-			//}
-
-			//getScene()->addRenderable(*terrainMesh);
-			//terrainMesh->loadChunks(pos, *_terrainManager);
-			//terrainMesh->rebuildMesh();
-			//_terrainChunks.emplace(pos, terrainMesh);
 		}
 
 		TerrainGenerationTest::~TerrainGenerationTest()
@@ -155,6 +130,99 @@ namespace pixelexplorer {
 				}
 
 				_camera->update();
+				using namespace terrain;
+				uint64_t primaryTime = SDL_GetTicks64();
+				glm::i64vec3 cameraChunkPos = TerrainChunk::ChunkSpaceToChunkPosition(TerrainChunk::WorldToChunkSpace(_camera->getPosition()));
+				for (int64_t x = -1; x < 2; ++x) {
+					for (int64_t y = -1; y < 2; ++y) {
+						for (int64_t z = -1; z < 2; ++z) {
+							glm::i64vec3 pos = glm::i64vec3(x, y, z) + cameraChunkPos;
+							auto terrainItr = _terrainChunks.find(pos);
+							if (terrainItr == _terrainChunks.end()) {
+								TerrainRenderMesh* terrainMesh = new(std::nothrow) TerrainRenderMesh(*_terrainRenderMaterial);
+								if (!terrainMesh) {
+									Application::Error("Out of Memory, Failed to create Terrain Render Mesh");
+									return;
+								}
+
+								getScene()->addObject(*terrainMesh);
+								terrainMesh->loadChunks(pos, *_terrainManager);
+								terrainMesh->rebuildMesh();
+								_terrainChunks.emplace(pos, terrainMesh);
+							}
+							else {
+								TerrainRenderMesh* terrainMesh = terrainItr->second;
+								if (terrainMesh->meshRebuildRequired())
+									terrainMesh->rebuildMesh();
+							}
+						}
+					}
+				}
+
+				PEX_INFO(("Required chunk loading, took: " + std::to_string(SDL_GetTicks64() - primaryTime) + "ms").c_str());
+
+				if (llabs(cameraChunkPos.x - _lastLoadedChunkPosition.x) >= 2 || 
+					llabs(cameraChunkPos.y - _lastLoadedChunkPosition.y) >= 2 || 
+					llabs(cameraChunkPos.z - _lastLoadedChunkPosition.z) >= 2) 
+				{
+					uint64_t startTime = SDL_GetTicks64();
+					static constexpr int64_t loadDistance = 5;
+					for (int64_t x = -loadDistance; x < loadDistance + 1; ++x) {
+						for (int64_t y = -loadDistance; y < loadDistance + 1; ++y) {
+							for (int64_t z = -loadDistance; z < loadDistance + 1; ++z) {
+								glm::i64vec3 loopPos(x, y, z);
+								glm::i64vec3 unloadPos = loopPos + _lastLoadedChunkPosition;
+								glm::i64vec3 loadPos = loopPos + cameraChunkPos;
+
+								// Check if unload position is out of loaded area
+								if (llabs(unloadPos.x - cameraChunkPos.x) > loadDistance ||
+									llabs(unloadPos.y - cameraChunkPos.y) > loadDistance ||
+									llabs(unloadPos.z - cameraChunkPos.z) > loadDistance)
+								{
+									auto terrainItr = _terrainChunks.find(unloadPos);
+									if (terrainItr != _terrainChunks.end()) {
+										TerrainRenderMesh* mesh = terrainItr->second;
+										_terrainChunks.erase(terrainItr);
+										getScene()->removeObject(*mesh);
+										mesh->unloadChunks();
+										mesh->drop();
+									}
+								}
+
+								// Check if load position was already loaded
+								if (llabs(loadPos.x - _lastLoadedChunkPosition.x) > loadDistance ||
+									llabs(loadPos.y - _lastLoadedChunkPosition.y) > loadDistance ||
+									llabs(loadPos.z - _lastLoadedChunkPosition.z) > loadDistance) 
+								{
+									TerrainRenderMesh* terrainMesh = new(std::nothrow) TerrainRenderMesh(*_terrainRenderMaterial);
+									if (!terrainMesh) {
+										Application::Error("Out of Memory, Failed to create Terrain Render Mesh");
+										return;
+									}
+
+									bool inserted = _terrainChunks.emplace(loadPos, terrainMesh).second;
+									if (inserted) {
+										getScene()->addObject(*terrainMesh);
+										terrainMesh->loadChunks(loadPos, *_terrainManager);
+										terrainMesh->rebuildMesh();
+									}
+									else {
+										PEX_WARN(("Attempted to load terrain that was already loaded, x: " + std::to_string(loadPos.x) + " y: " + std::to_string(loadPos.y) + " z: " + std::to_string(loadPos.z)).c_str());
+										terrainMesh->drop();
+									}
+								}
+							}
+						}
+					}
+
+					_lastLoadedChunkPosition = cameraChunkPos;
+					PEX_INFO(("Updated chunk loading, took: " + std::to_string(SDL_GetTicks64() - startTime) + "ms").c_str());
+				}
+
+				for (auto pair : _terrainChunks) {
+					if (pair.second->meshRebuildRequired())
+						pair.second->rebuildMesh();
+				}
 			}
 		}
 

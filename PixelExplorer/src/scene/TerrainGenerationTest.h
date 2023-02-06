@@ -24,10 +24,11 @@ namespace pixelexplorer {
 		private:
 			terrain::TerrainManager* _terrainManager;
 			pxengine::PxeRenderMaterial* _terrainRenderMaterial;
-			std::unordered_map<glm::i64vec3, terrain::TerrainRenderMesh*> _terrainChunks;
 			Camera* _camera;
 			gui::PauseMenu* _pauseMenu;
 			pxengine::PxeAction* _pauseAction;
+			std::unordered_map<glm::i64vec3, terrain::TerrainRenderMesh*> _terrainChunks;
+			glm::i64vec3 _lastLoadedChunkPosition;
 			bool _paused;
 			bool _pauseHeld;
 		};
