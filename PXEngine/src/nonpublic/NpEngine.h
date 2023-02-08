@@ -135,6 +135,7 @@ namespace pxengine {
 			uint16_t _guiBackendReferenceCount;
 			float _deltaTime;
 			int8_t _vsyncMode;
+			bool _boundPrimaryGlContext;
 			bool _createdWindow;
 			bool _shutdownFlag;
 		};

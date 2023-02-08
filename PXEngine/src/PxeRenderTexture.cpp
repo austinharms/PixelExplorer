@@ -4,7 +4,7 @@
 #include "NpLogger.h"
 
 namespace pxengine {
-	PxeRenderTexture::PxeRenderTexture(uint32_t width, uint32_t height) {
+	PxeRenderTexture::PxeRenderTexture(uint32_t width, uint32_t height, bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization) {
 		_glFramebufferId = 0;
 		_glRenderTextureId = 0;
 		_glDepthBuffer = 0;

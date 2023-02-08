@@ -4,7 +4,7 @@
 #include "nonpublic/NpLogger.h"
 
 namespace pxengine {
-	PxeVertexBuffer::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer)
+	PxeVertexBuffer::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer, bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization)
 	{
 		_glBufferId = 0;
 		_pendingBuffer = nullptr;
@@ -80,6 +80,12 @@ namespace pxengine {
 	void PxeVertexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
+		if (_glBufferId == 0) {
+			PXE_ERROR("Failed to create Gl Array Buffer");
+			setErrorStatus();
+			return;
+		}
+
 		if (getBufferPending()) {
 			// restores previously bound buffer
 			uint32_t previousBuffer;

@@ -13,24 +13,21 @@ namespace pxengine {
 	class PxeGLAsset : public PxeRefCount
 	{
 	public:
-		PxeGLAsset();
+		// A class for the management of objects that are part of/use OpenGl state
+		// Ex: Textures, Element Buffers...
+		// delayInitialization prevents the default initialization of the asset
+		// if this is true you must call initializeAsset to load the asset
+		// Note: if the asset is created on a non engine thread (not on the render, update, physics thread), delayInitialization must be true
+		PxeGLAsset(bool delayInitialization = false);
 		virtual ~PxeGLAsset();
 
 		// Returns the assets current status
 		PXE_NODISCARD PxeGLAssetStatus getAssetStatus() const;
 
-		// TODO Is this function needed?
-		// Requests the engine to uninitialize the asset
-		// if blocking is true the method will wait for the asset to be uninitialized before returning
-		// Note: this call will not work if the asset is already in a pending state
-		//void uninitializeAsset(bool blocking = false);
-
-		// TODO Is this function needed?
 		// Requests the engine to initialize the asset
-		// if blocking is true the method will wait for the asset to be initialized before returning
-		// Note: there must be at least one window created to initialize assets
-		// Note: if blocking is true and there is no window create the method will never exit!
-		// void initializeAsset(bool blocking = false);
+		// Note: this is only needed if the constructor was called with delayInitialization = true
+		// Note: this is not immediate and you must check the asset status if it is loaded 
+		void initializeAsset();
 
 		// This method should bind the OpenGl object to the current state
 		// Note: this function MUST be called from the render thread 
@@ -64,6 +61,7 @@ namespace pxengine {
 	private:
 		friend class pxengine::nonpublic::NpEngine;
 		PxeGLAssetStatus _status;
+		const bool _delayedInitialization;
 
 		// ENGINE USE ONLY DO NOT CALL THIS FUNCTION
 		void initialize();

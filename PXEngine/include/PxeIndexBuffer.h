@@ -12,7 +12,7 @@ namespace pxengine {
 		// Returns the byte size of the PxeIndexType
 		static size_t getIndexSize(PxeIndexType type);
 
-		PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer = nullptr);
+		PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer = nullptr, bool delayAssetInitialization = false);
 		virtual ~PxeIndexBuffer();
 
 		// Binds GL_ELEMENT_ARRAY_BUFFER

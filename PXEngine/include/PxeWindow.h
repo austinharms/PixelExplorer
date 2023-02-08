@@ -70,7 +70,7 @@ namespace pxengine {
 		PxeWindow operator=(const PxeWindow& other) = delete;
 
 	protected:
-		PxeWindow() = default;
+		PxeWindow() : PxeGLAsset(true) {}
 
 	private:
 		void PxeGLAsset::bind() {}

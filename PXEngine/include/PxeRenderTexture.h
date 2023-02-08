@@ -8,7 +8,7 @@ namespace pxengine {
 	class PxeRenderTexture : public PxeGLAsset
 	{
 	public:
-		PxeRenderTexture(uint32_t width, uint32_t height);
+		PxeRenderTexture(uint32_t width, uint32_t height, bool delayAssetInitialization = false);
 		virtual ~PxeRenderTexture();
 
 		// Binds the GL_FRAMEBUFFER

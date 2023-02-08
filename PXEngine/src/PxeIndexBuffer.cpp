@@ -16,7 +16,7 @@ namespace pxengine {
 		return 0;
 	}
 
-	PxeIndexBuffer::PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer) : _glBufferType(indexType)
+	PxeIndexBuffer::PxeIndexBuffer(PxeIndexType indexType, PxeBuffer* buffer, bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization), _glBufferType(indexType)
 	{
 		_glBufferId = 0;
 		_pendingBuffer = nullptr;
@@ -97,6 +97,12 @@ namespace pxengine {
 	void PxeIndexBuffer::initializeGl()
 	{
 		glGenBuffers(1, &_glBufferId);
+		if (_glBufferId == 0) {
+			PXE_ERROR("Failed to create Gl Element Array Buffer");
+			setErrorStatus();
+			return;
+		}
+
 		if (getBufferPending()) {
 			// restores previously bound buffer
 			uint32_t previousBuffer;

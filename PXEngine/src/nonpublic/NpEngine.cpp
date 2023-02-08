@@ -32,6 +32,7 @@ namespace pxengine {
 			PXE_INFO("PxeEngine Created");
 			_primaryGlContext = nullptr;
 			_primarySDLWindow = nullptr;
+			_boundPrimaryGlContext = false;
 			_createdWindow = false;
 			_shutdownFlag = false;
 			_guiBackendReferenceCount = 0;
@@ -331,6 +332,7 @@ namespace pxengine {
 				return nullptr;
 			}
 
+			window->initializeAsset();
 			if (!_createdWindow) {
 				_createdWindow = true;
 				window->setPrimaryWindow();
@@ -370,6 +372,7 @@ namespace pxengine {
 
 			PXE_CHECKSDLERROR();
 			window._sdlGlContext = SDL_GL_CreateContext(window._sdlWindow);
+			_boundPrimaryGlContext = false;
 			if (!window._sdlGlContext) {
 				PXE_CHECKSDLERROR();
 				PXE_ERROR("Failed to create OpenGl context");
@@ -385,6 +388,7 @@ namespace pxengine {
 
 			if (window.getPrimaryWindow()) {
 				_primaryGlContext = window._sdlGlContext;
+				bindPrimaryGlContext();
 				initPrimaryGlContext();
 			}
 			else {
@@ -402,6 +406,7 @@ namespace pxengine {
 				// Need to swap to create the framebuffer on the primary Gl context
 				forceAssetInit(*window._renderTexture);
 				SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
+				_boundPrimaryGlContext = false;
 
 				glGenFramebuffers(1, &(window._externalFramebuffer));
 				glBindFramebuffer(GL_FRAMEBUFFER, window._externalFramebuffer);
@@ -498,6 +503,7 @@ namespace pxengine {
 				window.bindGuiContext();
 				ImGuiIO& io = ImGui::GetIO();
 				if (io.BackendRendererUserData && --_guiBackendReferenceCount == 0) {
+					bindPrimaryGlContext();
 					ImGui_ImplOpenGL3_Shutdown();
 					_guiBackend = nullptr;
 				}
@@ -529,6 +535,7 @@ namespace pxengine {
 				if (window._sdlWindow) {
 					if (window._sdlGlContext) {
 						SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
+						_boundPrimaryGlContext = false;
 						glDeleteFramebuffers(1, &(window._externalFramebuffer));
 						bindPrimaryGlContext();
 						SDL_GL_DeleteContext(window._sdlGlContext);
@@ -585,6 +592,7 @@ namespace pxengine {
 
 		void NpEngine::forceAssetInit(PxeGLAsset& asset)
 		{
+			bindPrimaryGlContext();
 			asset.initialize();
 			_assetMutex.lock();
 			bool removed = _assetQueue.remove(&asset);
@@ -629,6 +637,7 @@ namespace pxengine {
 					return nullptr;
 				}
 
+				shader->initializeAsset();
 				_shaderCache.emplace(path, shader);
 				return shader;
 			}
@@ -696,6 +705,7 @@ namespace pxengine {
 		}
 
 		void NpEngine::processAssetQueue() {
+			bindPrimaryGlContext();
 			_assetMutex.lock();
 			while (!_assetQueue.empty())
 			{
@@ -834,6 +844,7 @@ namespace pxengine {
 
 		void NpEngine::newFrame(NpWindow& window)
 		{
+			bindPrimaryGlContext();
 			window.updateSDLWindow();
 			window.acquireReadLock();
 			if (window.getPrimaryWindow()) {
@@ -864,6 +875,7 @@ namespace pxengine {
 
 		void NpEngine::renderFrame(NpWindow& window)
 		{
+			bindPrimaryGlContext();
 			window.acquireReadLock();
 			NpScene* scene = window.getNpScene();
 			if (scene) scene->grab();
@@ -928,6 +940,7 @@ namespace pxengine {
 
 		void NpEngine::swapFramebuffer(NpWindow& window)
 		{
+			bindPrimaryGlContext();
 			window.acquireReadLock();
 			window.bindGuiContext();
 			ImGui::Render();
@@ -935,6 +948,7 @@ namespace pxengine {
 			if (!window.getPrimaryWindow()) {
 				window._renderTexture->unbind();
 				SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
+				_boundPrimaryGlContext = false;
 				glViewport(0, 0, window.getWindowWidth(), window.getWindowHeight());
 				glBlitFramebuffer(0, 0, window.getWindowWidth(), window.getWindowHeight(), 0, 0, window.getWindowWidth(), window.getWindowHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 			}
@@ -945,8 +959,10 @@ namespace pxengine {
 
 		void NpEngine::bindPrimaryGlContext()
 		{
-			if (_primarySDLWindow && _primaryGlContext)
+			if (!_boundPrimaryGlContext && _primarySDLWindow && _primaryGlContext) {
 				SDL_GL_MakeCurrent(_primarySDLWindow, _primaryGlContext);
+				_boundPrimaryGlContext = true;
+			}
 		}
 
 		void NpEngine::acquireWindowsReadLock()

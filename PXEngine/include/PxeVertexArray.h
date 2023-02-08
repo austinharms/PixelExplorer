@@ -11,7 +11,7 @@ namespace pxengine {
 	class PxeVertexArray : public PxeGLAsset
 	{
 	public:
-		PxeVertexArray();
+		PxeVertexArray(bool delayAssetInitialization = false);
 		virtual ~PxeVertexArray();
 
 		// Binds the glVertexArray

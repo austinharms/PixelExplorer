@@ -11,7 +11,7 @@ namespace pxengine {
 	class PxeTexture : public PxeGLAsset
 	{
 	public:
-		PxeTexture();
+		PxeTexture(bool delayAssetInitialization = false);
 		virtual ~PxeTexture();
 
 		void bind() override;

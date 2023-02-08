@@ -10,7 +10,7 @@ namespace pxengine {
 	class PxeVertexBuffer : public PxeGLAsset
 	{
 	public:
-		PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer = nullptr);
+		PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer = nullptr, bool delayAssetInitialization = false);
 		virtual ~PxeVertexBuffer();
 
 		// Binds GL_ARRAY_BUFFER

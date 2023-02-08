@@ -5,7 +5,7 @@
 #include "stb_image.h"
 
 namespace pxengine {
-	PxeTexture::PxeTexture() {
+	PxeTexture::PxeTexture(bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization) {
 		_imageData = nullptr;
 		_glTextureId = 0;
 		_width = 0;

@@ -13,7 +13,6 @@ namespace pxengine {
 	class PxeShader : public PxeGLAsset
 	{
 	public:
-		PxeShader() = default;
 		virtual ~PxeShader() = default;
 
 		// Returns the location of the uniform with {name}
@@ -132,6 +131,9 @@ namespace pxengine {
 
 		PxeShader(const PxeShader& other) = delete;
 		PxeShader operator=(const PxeShader& other) = delete;
+
+	protected:
+		PxeShader() : PxeGLAsset(true) {}
 	};
 }
 #endif // !PXENGINE_SHADER_H_

@@ -3,7 +3,7 @@
 #include "nonpublic/NpLogger.h"
 
 namespace pxengine {
-	PxeVertexArray::PxeVertexArray()
+	PxeVertexArray::PxeVertexArray(bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization)
 	{
 		_glId = 0;
 		_bufferBindingsDirty = false;
@@ -80,6 +80,12 @@ namespace pxengine {
 	void PxeVertexArray::initializeGl()
 	{
 		glGenVertexArrays(1, &_glId);
+		if (_glId == 0) {
+			PXE_ERROR("Failed to create GlVertexArray");
+			setErrorStatus();
+			return;
+		}
+
 		uint32_t previousBuffer;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (int32_t*)(&previousBuffer));
 		glBindVertexArray(_glId);
@@ -100,7 +106,7 @@ namespace pxengine {
 		{
 			PxeVertexBufferAttrib attrib;
 			PxeVertexBuffer* buffer = binding.second.first;
-			if (buffer && buffer->getFormat().getAttrib(binding.second.second, attrib)) {
+			if (buffer && buffer->getAssetStatus() == PxeGLAssetStatus::INITIALIZED && buffer->getFormat().getAttrib(binding.second.second, attrib)) {
 				buffer->bind();
 				glVertexAttribPointer(binding.first, attrib.ComponentCount, (uint32_t)attrib.ComponentType, attrib.Normalized, buffer->getFormat().getStride(), (const void*)attrib.Offset);
 				glEnableVertexAttribArray(binding.first);

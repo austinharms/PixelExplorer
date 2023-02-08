@@ -82,7 +82,6 @@ namespace pxengine {
 				application->postGUI(window);
 				application->postRender(window);
 				engine->swapFramebuffer(window);
-				engine->bindPrimaryGlContext();
 			}
 
 			engine->releaseWindowsReadLock();
@@ -129,7 +128,6 @@ namespace pxengine {
 			startTime = SDL_GetTicks64();
 			tempTime = SDL_GetTicks64();
 #endif
-			engine->bindPrimaryGlContext();
 			engine->processAssetQueue();
 
 #ifdef PXE_DEBUG_TIMING

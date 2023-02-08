@@ -4,10 +4,11 @@
 #include "nonpublic/NpEngine.h"
 
 namespace pxengine {
-	PxeGLAsset::PxeGLAsset()
+	PxeGLAsset::PxeGLAsset(bool delayInitialization) : _delayedInitialization(delayInitialization)
 	{
 		_status = PxeGLAssetStatus::UNINITIALIZED;
-		nonpublic::NpEngine::getInstance().initializeGlAsset(*this);
+		if (!_delayedInitialization)
+			nonpublic::NpEngine::getInstance().initializeGlAsset(*this);
 	}
 
 	PxeGLAsset::~PxeGLAsset()
@@ -24,6 +25,20 @@ namespace pxengine {
 	PXE_NODISCARD PxeGLAssetStatus PxeGLAsset::getAssetStatus() const
 	{
 		return _status;
+	}
+
+	void PxeGLAsset::initializeAsset() {
+		if (_delayedInitialization) {
+			if (_status == PxeGLAssetStatus::UNINITIALIZED) {
+				nonpublic::NpEngine::getInstance().initializeGlAsset(*this);
+			}
+			else {
+				PXE_WARN("Attempted to initialize asset multiple times");
+			}
+		}
+		else {
+			PXE_WARN("Attempted to initialize asset when delayInitialization was not set");
+		}
 	}
 
 	void PxeGLAsset::onDelete()
