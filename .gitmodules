@@ -16,3 +16,6 @@
 [submodule "PXEngine/src/imgui"]
 	path = PXEngine/src/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "shared/thread-pool"]
+	path = shared/thread-pool
+	url = https://github.com/austinharms/thread-pool.git

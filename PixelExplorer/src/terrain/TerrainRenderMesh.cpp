@@ -303,11 +303,15 @@ namespace pixelexplorer {
 			physx::PxRigidStatic* actor = physics->createRigidStatic(pxTransform);
 			setPhysicsActor(actor);
 
-			_meshIndexBuffer = new PxeIndexBuffer(PxeIndexType::UNSIGNED_16BIT);
+			_meshIndexBuffer = new PxeIndexBuffer(PxeIndexType::UNSIGNED_16BIT, nullptr, true);
 			PxeVertexBufferFormat fmt(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
-			_meshVertexBuffer = new PxeVertexBuffer(fmt);
-			_meshVertexArray = new PxeVertexArray();
+			_meshVertexBuffer = new PxeVertexBuffer(fmt, nullptr, true);
+			_meshVertexArray = new PxeVertexArray(true);
 			_meshVertexArray->addVertexBuffer(*_meshVertexBuffer, 0, 0);
+
+			_meshIndexBuffer->initializeAsset();
+			_meshVertexBuffer->initializeAsset();
+			_meshVertexArray->initializeAsset();
 		}
 
 		TerrainRenderMesh::~TerrainRenderMesh()
@@ -349,11 +353,19 @@ namespace pixelexplorer {
 			if (scene) { scene->lockRead(); }
 			if (actor->getNbShapes()) {
 				physx::PxShape* oldShape;
+				if (scene) {
+					scene->unlockRead();
+					scene->lockWrite();
+				}
+
 				if (actor->getShapes(&oldShape, 1))
 					actor->detachShape(*oldShape);
+				if (scene) { scene->unlockWrite(); }
+			}
+			else if (scene) {
+				scene->unlockRead();
 			}
 
-			if (scene) { scene->unlockRead(); }
 			for (uint8_t i = 0; i < CHUNK_COUNT; ++i)
 			{
 				if (_chunks[i]) {
@@ -446,13 +458,18 @@ namespace pixelexplorer {
 
 			physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(getPhysicsActor());
 			physx::PxScene* scene = actor->getScene();
+			if (scene) scene->lockRead(__FILE__, __LINE__);
 			if (actor->getNbShapes()) {
+				if (scene) scene->unlockRead();
 				physx::PxShape* oldShape;
+				if (scene) { scene->lockWrite(__FILE__, __LINE__); }
 				if (actor->getShapes(&oldShape, 1)) {
-					if (scene) { scene->lockWrite(); }
 					actor->detachShape(*oldShape);
-					if (scene) { scene->unlockWrite(); }
 				}
+				if (scene) { scene->unlockWrite(); }
+			}
+			else {
+				if (scene) scene->unlockRead();
 			}
 
 			if (vertices.size() && indices.size()) {
@@ -469,7 +486,7 @@ namespace pixelexplorer {
 				physx::PxTriangleMesh* mesh = cooking->createTriangleMesh(meshDesc, physics->getPhysicsInsertionCallback());
 				physx::PxMaterial* material = physics->createMaterial(1.0f, 0.5f, 0.5f);
 				physx::PxShape* shape = physics->createShape(physx::PxTriangleMeshGeometry(mesh), *material);
-				if (scene) { scene->lockWrite(); }
+				if (scene) { scene->lockWrite(__FILE__, __LINE__); }
 				actor->attachShape(*shape);
 				if (scene) { scene->unlockWrite(); }
 				mesh->release();
@@ -482,6 +499,11 @@ namespace pixelexplorer {
 
 		void TerrainRenderMesh::onGeometry()
 		{
+			if (_meshVertexArray->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED ||
+				_meshVertexBuffer->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED ||
+				_meshIndexBuffer->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED
+				) return;
+
 			_meshVertexArray->bind();
 			_meshVertexBuffer->bind();
 			_meshIndexBuffer->bind();

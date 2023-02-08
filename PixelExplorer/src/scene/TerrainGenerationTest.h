@@ -2,6 +2,8 @@
 #define PIXELEXPLORER_TERRAIN_GENERATION_TEST_H_
 #include <stdint.h>
 #include <unordered_map>
+#include <mutex>
+#include <shared_mutex>
 
 #include "UpdatableScene.h"
 #include "terrain/TerrainManager.h"
@@ -9,6 +11,7 @@
 #include "PxeAction.h"
 #include "Camera.h"
 #include "gui/PauseMenu.h"
+#include "BS_thread_pool_light.hpp"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -22,13 +25,24 @@ namespace pixelexplorer {
 			void stop() override;
 
 		private:
+			void updateTerrain();
+			void jobUpdateTerrainLoading(const glm::i64vec3& currentLoadPos, const glm::i64vec3& lastLoadedPos);
+			// Loads and or updates terrainChunk
+			void jobLoadTerrain(const glm::i64vec3& terrainPos);
+			// Note: calls drop on chunk due to using a ref caller must grab the terrain before passing it
+			void jobUpdateTerrain (terrain::TerrainRenderMesh* terrainMesh);
+			void jobUnloadTerrain(const glm::i64vec3& terrainPos);
+
 			terrain::TerrainManager* _terrainManager;
 			pxengine::PxeRenderMaterial* _terrainRenderMaterial;
 			Camera* _camera;
 			gui::PauseMenu* _pauseMenu;
 			pxengine::PxeAction* _pauseAction;
+			std::shared_mutex _terrainMutex;
 			std::unordered_map<glm::i64vec3, terrain::TerrainRenderMesh*> _terrainChunks;
+			BS::thread_pool_light _threadPool;
 			glm::i64vec3 _lastLoadedChunkPosition;
+			int64_t _loadDistance;
 			bool _paused;
 			bool _pauseHeld;
 		};
