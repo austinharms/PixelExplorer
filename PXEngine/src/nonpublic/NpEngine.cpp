@@ -393,8 +393,7 @@ namespace pxengine {
 			}
 			else {
 				bindPrimaryGlContext();
-
-				window._renderTexture = new(std::nothrow) PxeRenderTexture(window.getWindowWidth(), window.getWindowHeight());
+				window._renderTexture = new(std::nothrow) PxeRenderTexture(window.getWindowWidth(), window.getWindowHeight(), true);
 				if (!window._renderTexture) {
 					PXE_ERROR("Failed to create window PxeRenderTexture");
 					window.releaseWriteLock();
@@ -403,7 +402,6 @@ namespace pxengine {
 					return;
 				}
 
-				// Need to swap to create the framebuffer on the primary Gl context
 				forceAssetInit(*window._renderTexture);
 				SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
 				_boundPrimaryGlContext = false;
@@ -589,15 +587,30 @@ namespace pxengine {
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
-
+		
 		void NpEngine::forceAssetInit(PxeGLAsset& asset)
 		{
 			bindPrimaryGlContext();
-			asset.initialize();
-			_assetMutex.lock();
-			bool removed = _assetQueue.remove(&asset);
-			_assetMutex.unlock();
-			if (removed) asset.drop();
+			if (asset._delayedInitialization && asset.getAssetStatus() == PxeGLAssetStatus::UNINITIALIZED) {
+				asset._status = PxeGLAssetStatus::PENDING_INITIALIZATION;
+				asset.initialize();
+			}
+			else {
+				std::lock_guard lock(_assetMutex);
+				if (asset.getAssetStatus() != PxeGLAssetStatus::PENDING_INITIALIZATION) {
+					PXE_WARN("Attempted to force asset initialization with asset thats status was not PENDING_INITIALIZATION");
+					return;
+				}
+
+				asset.initialize();
+				bool removed = _assetQueue.remove(&asset);
+				if (removed) {
+					asset.drop();
+				}
+				else {
+					PXE_ERROR("Asset was not queued for initialization but status was PENDING_INITIALIZATION");
+				}
+			}
 		}
 
 		PxeScene* NpEngine::createScene()
