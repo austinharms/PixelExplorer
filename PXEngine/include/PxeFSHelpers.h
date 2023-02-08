@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "PxeTypes.h"
+#include "PxeOSHelpers.h"
 
 namespace pxengine {
 	// Returns a path to the executable

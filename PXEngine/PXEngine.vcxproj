@@ -217,6 +217,7 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClCompile Include="src\PxeEngine.cpp" />
     <ClCompile Include="src\PxeFSHelpers.cpp" />
     <ClCompile Include="src\PxeIndexBuffer.cpp" />
+    <ClCompile Include="src\PxeOSHelpers.cpp" />
     <ClCompile Include="src\PxeRenderMaterial.cpp" />
     <ClCompile Include="src\PxeRenderTexture.cpp" />
     <ClCompile Include="src\PxeTexture.cpp" />
@@ -243,6 +244,7 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="include\PxeGLAsset.h" />
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\PxeIndexBuffer.h" />
+    <ClInclude Include="include\PxeOSHelpers.h" />
     <ClInclude Include="include\PxePhysicsObjectInterface.h" />
     <ClInclude Include="include\PxePhysicsUpdateObjectInterface.h" />
     <ClInclude Include="include\PxeStaticPhysicsRenderObject.h" />

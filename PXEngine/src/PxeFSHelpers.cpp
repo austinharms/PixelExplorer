@@ -1,15 +1,5 @@
 #include "PxeFSHelpers.h"
 
-// ################ WARNING all of the PXE_LINUX_OS code in this file is untested ################
-
-#if (_WIN32 || _WIN64 || __CYGWIN__)
-#define PXE_WIN_OS
-#elif (__linux__ || linux || __linux)
-#define PXE_LINUX_OS
-#else
-#error PxeFSHelpers Unsupported OS, expected _WIN32 || _WIN64 || __CYGWIN__ || __linux__ || linux || __linux to be defined
-#endif
-
 #include <stdint.h>
 #include <filesystem>
 
@@ -26,6 +16,7 @@
 
 #include "NpLogger.h"
 
+// ################ WARNING all of the PXE_LINUX_OS code in this file is untested ################
 namespace pxengine {
 	PXE_NODISCARD std::filesystem::path getExecutablePath()
 	{
@@ -116,12 +107,3 @@ namespace pxengine {
 		return userPath;
 	}
 }
-
-#ifdef PXE_WIN_OS
-#undef PXE_WIN_OS
-#endif // PXE_WIN_OS
-
-#ifdef PXE_LINUX_OS
-#undef PXE_LINUX_OS
-#endif // PXE_LINUX_OS
-

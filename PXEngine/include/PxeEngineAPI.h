@@ -20,6 +20,7 @@
 #include "PxeInputManager.h"
 #include "PxeLogger.h"
 #include "PxeObject.h"
+#include "PxeOSHelpers.h"
 #include "PxePhysicsObjectInterface.h"
 #include "PxePhysicsUpdateObjectInterface.h"
 #include "PxeRefCount.h"

@@ -108,6 +108,9 @@
     <ClCompile Include="src\nonpublic\NpFontSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PxeOSHelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PxeEngine.h">
@@ -282,6 +285,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxePhysicsUpdateObjectInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeOSHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

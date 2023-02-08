@@ -3,6 +3,7 @@
 #include <thread>
 #include <unordered_map>
 
+#include "PxeOSHelpers.h"
 #include "NpLogger.h"
 #include "NpWindow.h"
 #include "NpEngine.h"
@@ -23,6 +24,7 @@ namespace pxengine {
 
 	namespace {
 		void runUpdateThread(PxeApplicationInterface* application) {
+			setThreadName(L"PXE_UpdateThread");
 #ifdef PXE_DEBUG_TIMING
 			uint64_t time = SDL_GetTicks64();
 #endif
@@ -33,6 +35,7 @@ namespace pxengine {
 		}
 
 		void runPhysicsThread(PxeApplicationInterface* application, nonpublic::NpEngine* engine) {
+			setThreadName(L"PXE_PhysicsThread");
 			using namespace nonpublic;
 #ifdef PXE_DEBUG_TIMING
 			uint64_t time = SDL_GetTicks64();
@@ -90,6 +93,7 @@ namespace pxengine {
 	}
 
 	void pxeRunApplication(PxeApplicationInterface& application, PxeLogInterface& logInterface) {
+		setThreadName(L"PXE_MainThread");
 		using namespace nonpublic;
 #ifdef PXE_DEBUG_TIMING
 		uint64_t startTime = SDL_GetTicks64();
