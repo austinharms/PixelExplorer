@@ -598,6 +598,7 @@ namespace pxengine {
 			desc.gravity = physx::PxVec3(0, -9.81f, 0);
 			desc.cpuDispatcher = _physDefaultDispatcher;
 			desc.filterShader = physx::PxDefaultSimulationFilterShader;
+			desc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
 			physx::PxScene* physScene = _physPhysics->createScene(desc);
 			if (!physScene) {
 				PXE_ERROR("Failed to create PxeScene, failed to create physics scene");

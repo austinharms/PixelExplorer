@@ -71,8 +71,8 @@ namespace pxengine::nonpublic {
 		std::unique_lock lock(_sceneMutex);
 		_simulationAccumulator += time * _simulationScale;
 		if (_simulationAccumulator < _simulationTimestep) return;
-		_physScene->lockWrite(__FUNCTION__, __LINE__);
 		_objectMutex.lock_shared();
+		_physScene->lockWrite(__FUNCTION__, __LINE__);
 		for (PxePhysicsUpdateObjectInterface* phys : _physicsUpdateObjects)
 			phys->onPhysics();
 		_objectMutex.unlock_shared();
