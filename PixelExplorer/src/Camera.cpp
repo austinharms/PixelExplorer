@@ -97,6 +97,8 @@ namespace pixelexplorer {
 
 	PXE_NODISCARD const glm::vec3& Camera::getPosition() const { return _position; }
 
+	PXE_NODISCARD const glm::vec3& Camera::getForward() const { return _directionVectors[2]; }
+
 	PXE_NODISCARD const glm::vec3& Camera::getRotation() const { return _rotation; }
 
 	void Camera::setFOV(float value) {

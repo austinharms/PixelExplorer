@@ -19,6 +19,7 @@ namespace pixelexplorer {
 		PXE_NODISCARD float getFOV() const;
 		PXE_NODISCARD float getNearClip() const;
 		PXE_NODISCARD float getFarClip() const;
+		PXE_NODISCARD const glm::vec3& getForward() const;
 		PXE_NODISCARD const glm::vec3& getPosition() const;
 		PXE_NODISCARD const glm::vec3& getRotation() const;
 		void setFOV(float value);

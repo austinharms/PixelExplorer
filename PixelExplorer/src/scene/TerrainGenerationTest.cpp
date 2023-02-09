@@ -15,6 +15,7 @@
 #include "SDL_keycode.h"
 #include "terrain/TerrainChunk.h"
 #include "SDL_timer.h"
+#include "PxScene.h"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -27,6 +28,8 @@ namespace pixelexplorer {
 			_camera = nullptr;
 			_pauseAction = nullptr;
 			_pauseMenu = nullptr;
+			_placeAction = nullptr;
+			_breakAction = nullptr;
 			// Dummy value that is well outside the position of the camera to force terrain reloading
 			_lastLoadedChunkPosition = glm::i64vec3(-10000, -10000, -10000);
 			_loadDistance = 7;
@@ -48,6 +51,40 @@ namespace pixelexplorer {
 
 				_pauseAction->addSource(*pauseScr);
 				pauseScr->drop();
+			}
+
+			_placeAction = pxeGetEngine().getInputManager().getAction("Place");
+			if (!_placeAction) {
+				Application::Error("Out of Memory, Failed to create place action");
+				return;
+			}
+
+			if (!_placeAction->hasSource()) {
+				PxeActionSource* actionSrc = pxeGetEngine().getInputManager().getActionSource(((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32) | SDLK_e);
+				if (!actionSrc) {
+					Application::Error("Out of Memory, Failed to create place action source");
+					return;
+				}
+
+				_placeAction->addSource(*actionSrc);
+				actionSrc->drop();
+			}
+
+			_breakAction = pxeGetEngine().getInputManager().getAction("Break");
+			if (!_breakAction) {
+				Application::Error("Out of Memory, Failed to create break action");
+				return;
+			}
+
+			if (!_breakAction->hasSource()) {
+				PxeActionSource* actionSrc = pxeGetEngine().getInputManager().getActionSource(((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32) | SDLK_q);
+				if (!actionSrc) {
+					Application::Error("Out of Memory, Failed to create break action source");
+					return;
+				}
+
+				_breakAction->addSource(*actionSrc);
+				actionSrc->drop();
 			}
 
 			_pauseMenu = new(std::nothrow) gui::PauseMenu();
@@ -134,6 +171,7 @@ namespace pixelexplorer {
 				}
 
 				_camera->update();
+				updateInteractions();
 				updateTerrain();
 			}
 		}
@@ -161,6 +199,41 @@ namespace pixelexplorer {
 				_camera->drop();
 				_camera = nullptr;
 			}
+		}
+
+		void TerrainGenerationTest::updateInteractions()
+		{
+			using namespace physx;
+			using namespace terrain;
+			PxScene* scene = getScene()->getPhysicsScene();
+			const glm::vec3& camPos = _camera->getPosition();
+			const glm::vec3& camDir = _camera->getForward();
+			PxVec3 rayStart(camPos.x, camPos.y, camPos.z);
+			PxVec3 rayDir(camDir.x, camDir.y, camDir.z);
+			PxRaycastBuffer rayRes;
+			scene->lockRead();
+			bool hit = scene->raycast(rayStart, rayDir, 1000, rayRes);
+			scene->unlockRead();
+			if (hit && rayRes.hasBlock) {
+				const glm::vec3 hitPos(rayRes.block.position.x, rayRes.block.position.y, rayRes.block.position.z);
+				if (_placeAction->getValue()) {
+					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos));
+					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
+					terrainChunk->getPoints()[TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace))] = 1;
+					terrainChunk->updateLastModified();
+					terrainChunk->drop();
+				}
+				else if (_breakAction->getValue()) {
+					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos));
+					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
+					terrainChunk->getPoints()[TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace))] = 0;
+					terrainChunk->updateLastModified();
+					terrainChunk->drop();
+				}
+
+				//PEX_INFO(("Ray Hit: x:" + std::to_string(rayRes.block.position.x) + ", y: " + std::to_string(rayRes.block.position.y) + ", z: " + std::to_string(rayRes.block.position.z)).c_str());
+			}
+
 		}
 
 		void TerrainGenerationTest::updateTerrain()

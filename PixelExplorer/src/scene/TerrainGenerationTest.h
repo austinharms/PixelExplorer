@@ -25,6 +25,7 @@ namespace pixelexplorer {
 			void stop() override;
 
 		private:
+			void updateInteractions();
 			void updateTerrain();
 			void jobUpdateTerrainLoading(const glm::i64vec3& currentLoadPos, const glm::i64vec3& lastLoadedPos);
 			// Loads and or updates terrainChunk
@@ -38,6 +39,8 @@ namespace pixelexplorer {
 			Camera* _camera;
 			gui::PauseMenu* _pauseMenu;
 			pxengine::PxeAction* _pauseAction;
+			pxengine::PxeAction* _placeAction;
+			pxengine::PxeAction* _breakAction;
 			std::shared_mutex _terrainMutex;
 			std::unordered_map<glm::i64vec3, terrain::TerrainRenderMesh*> _terrainChunks;
 			BS::thread_pool_light _threadPool;
