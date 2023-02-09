@@ -18,7 +18,7 @@
 
 namespace pixelexplorer {
 	namespace scene {
-		TerrainGenerationTest::TerrainGenerationTest() : _threadPool(((std::thread::hardware_concurrency() - 2) / 2) > 0 ? (std::thread::hardware_concurrency() - 2) / 2 : 1)
+		TerrainGenerationTest::TerrainGenerationTest() : _threadPool((std::thread::hardware_concurrency() - 4) > 0 ? (std::thread::hardware_concurrency() - 4) : 2)
 		{
 			using namespace terrain;
 			using namespace pxengine;
@@ -29,7 +29,7 @@ namespace pixelexplorer {
 			_pauseMenu = nullptr;
 			// Dummy value that is well outside the position of the camera to force terrain reloading
 			_lastLoadedChunkPosition = glm::i64vec3(-10000, -10000, -10000);
-			_loadDistance = 5;
+			_loadDistance = 7;
 			_paused = false;
 			_pauseHeld = false;
 
@@ -255,6 +255,7 @@ namespace pixelexplorer {
 			}
 
 			terrainMesh->loadChunks(terrainPos, *_terrainManager);
+			terrainMesh->grab();
 			_terrainMutex.lock();
 			bool inserted = _terrainChunks.emplace(terrainPos, terrainMesh).second;
 			_terrainMutex.unlock();
@@ -268,6 +269,8 @@ namespace pixelexplorer {
 				terrainMesh->unloadChunks();
 				terrainMesh->drop();
 			}
+
+			terrainMesh->drop();
 		}
 
 		void TerrainGenerationTest::jobUnloadTerrain(const glm::i64vec3& terrainPos)

@@ -10,13 +10,13 @@
 using namespace pxengine;
 namespace pixelexplorer {
 	Application::Application() {
+		_state = INITIALIZING;
 		_window = nullptr;
 		_errorMenu = nullptr;
 		_activeScene = nullptr;
 		_frameCount = 0;
 		_frameCountTimer = 1000;
 		_lastFrameCount = 0;
-		_state = NONE;
 	}
 
 	Application& Application::getInstance()
@@ -47,6 +47,7 @@ namespace pixelexplorer {
 
 	void Application::onStart()
 	{
+		_state = RUNNING;
 		PxeEngine& engine = pxeGetEngine();
 		engine.setVSyncMode(0);
 		_window = engine.createWindow(600, 400, "Pixel Explorer");
@@ -65,11 +66,7 @@ namespace pixelexplorer {
 			return;
 		}
 
-		if (_state != ERROR) {
-			setActiveScene(menu);
-			_state = MAIN_MENU;
-		}
-
+		setActiveScene(menu);
 		menu->drop();
 	}
 
@@ -80,13 +77,14 @@ namespace pixelexplorer {
 		_errorMenu = nullptr;
 		_window->drop();
 		_window = nullptr;
+		_state = STOPPED;
 	}
 
 	void Application::onUpdate()
 	{
 		if (SDL_GetTicks64() > +_frameCountTimer) {
-			_frameCountTimer = SDL_GetTicks64() + 1000;
-			_lastFrameCount = _frameCount;
+			_frameCountTimer = SDL_GetTicks64() + 250;
+			_lastFrameCount = _frameCount * 4;
 			_frameCount = 0;
 		}
 

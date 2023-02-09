@@ -308,6 +308,7 @@ namespace pixelexplorer {
 			_meshVertexBuffer = new PxeVertexBuffer(fmt, nullptr, true);
 			_meshVertexArray = new PxeVertexArray(true);
 			_meshVertexArray->addVertexBuffer(*_meshVertexBuffer, 0, 0);
+			_meshVertexArray->setIndexBuffer(_meshIndexBuffer);
 
 			_meshIndexBuffer->initializeAsset();
 			_meshVertexBuffer->initializeAsset();
@@ -379,7 +380,7 @@ namespace pixelexplorer {
 		{
 			for (uint8_t i = 0; i < CHUNK_COUNT; ++i)
 			{
-				if (_chunks[i]->getLastModified() > _lastGenerated)
+				if (_chunks[i] && _chunks[i]->getLastModified() > _lastGenerated)
 					return true;
 			}
 
@@ -499,14 +500,13 @@ namespace pixelexplorer {
 
 		void TerrainRenderMesh::onGeometry()
 		{
-			if (_meshVertexArray->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED ||
-				_meshVertexBuffer->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED ||
-				_meshIndexBuffer->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED
-				) return;
-
+			if (_meshVertexArray->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED) return;
 			_meshVertexArray->bind();
-			_meshVertexBuffer->bind();
-			_meshIndexBuffer->bind();
+			if (_meshVertexArray->getBindingError()) {
+				_meshVertexArray->unbind();
+				return;
+			}
+
 			glDrawElements(GL_TRIANGLES, _meshIndexBuffer->getIndexCount(), (uint32_t)_meshIndexBuffer->getIndexType(), nullptr);
 		}
 	}

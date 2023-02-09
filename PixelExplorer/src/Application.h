@@ -31,9 +31,10 @@ namespace pixelexplorer {
 	private:
 		enum ApplicationState
 		{
-			NONE = 0,
+			INITIALIZING = 0,
+			RUNNING,
+			STOPPED,
 			ERROR,
-			MAIN_MENU
 		};
 
 		Application();
