@@ -6,7 +6,9 @@ namespace pxengine {
 	PxeVertexArray::PxeVertexArray(bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization)
 	{
 		_glId = 0;
+		_indexBuffer = nullptr;
 		_bufferBindingsDirty = false;
+		_bufferBindingError = false;
 	}
 
 	PxeVertexArray::~PxeVertexArray()
@@ -16,6 +18,8 @@ namespace pxengine {
 		}
 
 		_bufferBindings.clear();
+		if (_indexBuffer)
+			_indexBuffer->drop();
 	}
 
 	void PxeVertexArray::bind()
@@ -27,8 +31,17 @@ namespace pxengine {
 #endif // PXE_DEBUG
 
 		glBindVertexArray(_glId);
-		if (_bufferBindingsDirty)
-			updateBufferBindings();
+		if (_bufferBindingsDirty) {
+			updateGlBindings();
+		}
+		else {
+			if (_indexBuffer && _indexBuffer->getBufferPending())
+				_indexBuffer->bind();
+			for (auto pair : _bufferBindings) {
+				if (pair.second.first->getBufferPending())
+					pair.second.first->bind();
+			}
+		}
 	}
 
 	void PxeVertexArray::unbind()
@@ -56,6 +69,13 @@ namespace pxengine {
 		_bufferBindingsDirty = true;
 	}
 
+	void PxeVertexArray::setIndexBuffer(PxeIndexBuffer* indexBuffer)
+	{
+		if (_indexBuffer) _indexBuffer->drop();
+		if ((_indexBuffer = indexBuffer)) _indexBuffer->grab();
+		_bufferBindingsDirty = true;
+	}
+
 	void PxeVertexArray::removeArrayAttrib(uint8_t index)
 	{
 		auto it = _bufferBindings.find(index);
@@ -77,6 +97,11 @@ namespace pxengine {
 		return true;
 	}
 
+	PXE_NODISCARD bool PxeVertexArray::getBindingError() const
+	{
+		return _bufferBindingError;
+	}
+
 	void PxeVertexArray::initializeGl()
 	{
 		glGenVertexArrays(1, &_glId);
@@ -85,12 +110,6 @@ namespace pxengine {
 			setErrorStatus();
 			return;
 		}
-
-		uint32_t previousBuffer;
-		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (int32_t*)(&previousBuffer));
-		glBindVertexArray(_glId);
-		updateGlBindings();
-		glBindVertexArray(previousBuffer);
 	}
 
 	void PxeVertexArray::uninitializeGl()
@@ -102,6 +121,7 @@ namespace pxengine {
 	void PxeVertexArray::updateGlBindings()
 	{
 		_bufferBindingsDirty = false;
+		_bufferBindingError = false;
 		for (auto binding : _bufferBindings)
 		{
 			PxeVertexBufferAttrib attrib;
@@ -110,11 +130,14 @@ namespace pxengine {
 				buffer->bind();
 				glVertexAttribPointer(binding.first, attrib.ComponentCount, (uint32_t)attrib.ComponentType, attrib.Normalized, buffer->getFormat().getStride(), (const void*)attrib.Offset);
 				glEnableVertexAttribArray(binding.first);
-				buffer->unbind();
 			}
 			else {
 				glDisableVertexAttribArray(binding.first);
+				_bufferBindingError = true;
 			}
 		}
+
+		if (_indexBuffer)
+			_indexBuffer->bind();
 	}
 }

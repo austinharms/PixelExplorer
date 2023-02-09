@@ -5,6 +5,7 @@
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
 #include "PxeVertexBuffer.h"
+#include "PxeIndexBuffer.h"
 
 namespace pxengine {
 	// Wrapper class for glVertexArray
@@ -29,12 +30,18 @@ namespace pxengine {
 		// {vertexAttribIndex} is the index of the PxeVertexBufferAttrib to use from the {vertexBuffer}
 		void addVertexBuffer(PxeVertexBuffer& vertexBuffer, size_t vertexAttribIndex, uint8_t arrayAttribIndex);
 
+		// Adds a PxeVertexBuffer binding
+		void setIndexBuffer(PxeIndexBuffer* indexBuffer);
+
 		// Remove and disable ArrayAttrib at {index}
 		void removeArrayAttrib(uint8_t index);
 
 		// Returns true if the ArrayAttrib is bound and sets vertexBuffer and vertexAttribIndex to the current values if passed
 		// Note: will still return true if an invalid buffer is bound, but the array attrib will be disabled
 		PXE_NODISCARD bool getAttribBound(uint8_t index, PxeVertexBuffer** vertexBuffer = nullptr, size_t* vertexAttribIndex = nullptr);
+
+		// Returns if there was an error updating the buffer bindings
+		PXE_NODISCARD bool getBindingError() const;
 
 	protected:
 		void initializeGl() override;
@@ -43,7 +50,9 @@ namespace pxengine {
 	private:
 		uint32_t _glId;
 		std::unordered_map<uint8_t, std::pair<PxeVertexBuffer*, size_t>> _bufferBindings;
+		PxeIndexBuffer* _indexBuffer;
 		bool _bufferBindingsDirty;
+		bool _bufferBindingError;
 
 		// Rebind vertex buffer attribs
 		// Note: this function assumes the glVertexArray is bound and a valid OpenGl context
