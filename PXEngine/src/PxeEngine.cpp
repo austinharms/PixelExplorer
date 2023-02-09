@@ -1,6 +1,8 @@
 #include "PxeEngine.h"
 
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <unordered_map>
 
 #include "PxeOSHelpers.h"
@@ -23,43 +25,71 @@ namespace pxengine {
 	}
 
 	namespace {
-		void runUpdateThread(PxeApplicationInterface* application) {
+		void runUpdateThread(std::mutex* startMutex, std::mutex* completeMutex, std::condition_variable* startCondition, std::condition_variable* completeCondition, bool* runFlag, bool* stopFlag, PxeApplicationInterface* application) {
 			setThreadName(L"PXE_UpdateThread");
+			while (true)
+			{
+				std::unique_lock lock(*startMutex);
+				startCondition->wait(lock, [runFlag, stopFlag]() { return *runFlag || *stopFlag; });
+				lock.unlock();
+				if (*stopFlag) return;
+
 #ifdef PXE_DEBUG_TIMING
-			uint64_t time = SDL_GetTicks64();
+				uint64_t time = SDL_GetTicks64();
 #endif
-			application->onUpdate();
+				application->onUpdate();
 #ifdef PXE_DEBUG_TIMING
-			PXE_INFO("Update thread took: " + std::to_string(SDL_GetTicks64() - time));
+				PXE_INFO("Update thread took: " + std::to_string(SDL_GetTicks64() - time));
 #endif
+
+				completeMutex->lock();
+				*runFlag = false;
+				completeMutex->unlock();
+				completeCondition->notify_all();
+			}
 		}
 
-		void runPhysicsThread(PxeApplicationInterface* application, nonpublic::NpEngine* engine) {
+		void runPhysicsThread(std::mutex* startMutex, std::mutex* completeMutex, std::condition_variable* startCondition, std::condition_variable* completeCondition, bool* runFlag, bool* stopFlag, PxeApplicationInterface* application, nonpublic::NpEngine* engine) {
 			setThreadName(L"PXE_PhysicsThread");
 			using namespace nonpublic;
-#ifdef PXE_DEBUG_TIMING
-			uint64_t time = SDL_GetTicks64();
-#endif
-			application->prePhysics();
-			engine->acquireWindowsReadLock();
-			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
-			for (auto it = windows.begin(); it != windows.end(); ++it) {
-				it->second->acquireReadLock();
-				NpScene* scene = it->second->getNpScene();
-				if (scene)
-					scene->grab();
-				it->second->releaseReadLock();
-				if (scene) {
-					scene->simulatePhysics(engine->getDeltaTime());
-					scene->drop();
-				}
-			}
+			while (true)
+			{
+				std::unique_lock lock(*startMutex);
+				startCondition->wait(lock, [runFlag, stopFlag]() { return *runFlag || *stopFlag; });
+				lock.unlock();
+				if (*stopFlag) return;
 
-			engine->releaseWindowsReadLock();
-			application->postPhysics();
 #ifdef PXE_DEBUG_TIMING
-			PXE_INFO("Physics thread took: " + std::to_string(SDL_GetTicks64() - time));
+				uint64_t time = SDL_GetTicks64();
 #endif
+
+				application->prePhysics();
+				engine->acquireWindowsReadLock();
+				const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
+				for (auto it = windows.begin(); it != windows.end(); ++it) {
+					it->second->acquireReadLock();
+					NpScene* scene = it->second->getNpScene();
+					if (scene)
+						scene->grab();
+					it->second->releaseReadLock();
+					if (scene) {
+						scene->simulatePhysics(engine->getDeltaTime());
+						scene->drop();
+					}
+				}
+
+				engine->releaseWindowsReadLock();
+				application->postPhysics();
+
+#ifdef PXE_DEBUG_TIMING
+				PXE_INFO("Physics thread took: " + std::to_string(SDL_GetTicks64() - time));
+#endif
+
+				completeMutex->lock();
+				*runFlag = false;
+				completeMutex->unlock();
+				completeCondition->notify_all();
+			}
 		}
 
 		void runRenderThread(PxeApplicationInterface* application, nonpublic::NpEngine* engine)
@@ -101,6 +131,18 @@ namespace pxengine {
 
 		NpEngine* engine = new(std::nothrow) NpEngine(logInterface);
 		PXE_ASSERT(engine, "Failed to allocate PxeEngine");
+
+		std::mutex threadStartMutex;
+		std::mutex threadCompleteMutex;
+		std::condition_variable threadStartCondition;
+		std::condition_variable threadCompleteCondition;
+		bool physicsThreadFlag = false;
+		bool updateThreadFlag = false;
+		bool* updateThreadFlagPtr = &updateThreadFlag;
+		bool* physicsThreadFlagPtr = &physicsThreadFlag;
+		bool threadStopFlag = false;
+		std::thread physicsThread(runPhysicsThread, &threadStartMutex, &threadCompleteMutex, &threadStartCondition, &threadCompleteCondition, &physicsThreadFlag, &threadStopFlag, &application, engine);
+		std::thread updateThread(runUpdateThread, &threadStartMutex, &threadCompleteMutex, &threadStartCondition, &threadCompleteCondition, &updateThreadFlag, &threadStopFlag, &application);
 
 #ifdef PXE_DEBUG_TIMING
 		PXE_INFO("Engine instantiation took " + std::to_string(SDL_GetTicks64() - tempTime));
@@ -148,22 +190,34 @@ namespace pxengine {
 			PXE_INFO("Font processing took: " + std::to_string(SDL_GetTicks64() - tempTime));
 #endif
 
-			std::thread physicsThread(runPhysicsThread, &application, engine);
-			std::thread updateThread(runUpdateThread, &application);
+			threadStartMutex.lock();
+			physicsThreadFlag = true;
+			updateThreadFlag = true;
+			threadStartMutex.unlock();
+			threadStartCondition.notify_all();
 			runRenderThread(&application, engine);
 
 #ifdef PXE_DEBUG_TIMING
 			tempTime = SDL_GetTicks64();
 #endif
 
-			updateThread.join();
-			physicsThread.join();
+			std::unique_lock lock(threadCompleteMutex);
+			threadCompleteCondition.wait(lock, [physicsThreadFlagPtr, updateThreadFlagPtr]() { return !(*physicsThreadFlagPtr || *updateThreadFlagPtr); });
+			lock.unlock();
+
 			engine->setDeltaTime((float)(SDL_GetTicks64() - deltaTimer) / 1000.0f);
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Render thread waited " + std::to_string(SDL_GetTicks64() - tempTime));
 			PXE_INFO("Complete frame took " + std::to_string(SDL_GetTicks64() - startTime));
 #endif
 		}
+
+		threadStartMutex.lock();
+		threadStopFlag = true;
+		threadStartMutex.unlock();
+		threadStartCondition.notify_all();
+		updateThread.join();
+		physicsThread.join();
 
 #ifdef PXE_DEBUG_TIMING
 		tempTime = SDL_GetTicks64();
