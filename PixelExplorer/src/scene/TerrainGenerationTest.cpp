@@ -217,16 +217,25 @@ namespace pixelexplorer {
 			if (hit && rayRes.hasBlock) {
 				const glm::vec3 hitPos(rayRes.block.position.x, rayRes.block.position.y, rayRes.block.position.z);
 				if (_placeAction->getValue()) {
-					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos));
+					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos - camDir * TerrainChunk::CHUNK_CELL_SIZE));
 					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
-					terrainChunk->getPoints()[TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace))] = 1;
-					terrainChunk->updateLastModified();
+					uint32_t pointIndex = TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace));
+					if (terrainChunk->getPoints()[pointIndex] != 1) {
+						terrainChunk->getPoints()[pointIndex] = 1;
+						terrainChunk->updateLastModified();
+					}
+
 					terrainChunk->drop();
 				}
 				else if (_breakAction->getValue()) {
-					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos));
+					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos + camDir * TerrainChunk::CHUNK_CELL_SIZE));
 					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
-					terrainChunk->getPoints()[TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace))] = 0;
+					uint32_t pointIndex = TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace));
+					if (terrainChunk->getPoints()[pointIndex] != 0) {
+						terrainChunk->getPoints()[pointIndex] = 0;
+						terrainChunk->updateLastModified();
+					}
+
 					terrainChunk->updateLastModified();
 					terrainChunk->drop();
 				}
@@ -240,22 +249,6 @@ namespace pixelexplorer {
 		{
 			using namespace terrain;
 			glm::i64vec3 cameraChunkPos = TerrainChunk::ChunkSpaceToChunkPosition(TerrainChunk::WorldToChunkSpace(_camera->getPosition()));
-			std::future<void> requiredUpdates[27];
-			{
-				glm::i64vec3 loadPos(-2, -1, -1);
-				for (int8_t i = 0; i < 27; ++i) {
-					if (++loadPos.x == 2) {
-						loadPos.x = -1;
-						if (++loadPos.z == 2) {
-							loadPos.z = -1;
-							++loadPos.y;
-						}
-					}
-
-					requiredUpdates[i] = _threadPool.submit_priority(&TerrainGenerationTest::jobLoadTerrain, this, cameraChunkPos + loadPos);
-				}
-			}
-
 			if (llabs(cameraChunkPos.x - _lastLoadedChunkPosition.x) >= 2 ||
 				llabs(cameraChunkPos.y - _lastLoadedChunkPosition.y) >= 2 ||
 				llabs(cameraChunkPos.z - _lastLoadedChunkPosition.z) >= 2)
@@ -264,18 +257,41 @@ namespace pixelexplorer {
 				_lastLoadedChunkPosition = cameraChunkPos;
 			}
 
+			constexpr uint8_t MAX_REFINE_MESH_COUNT = 5;
+			uint8_t refineCount = 0;
+			TerrainRenderMesh* refineMeshQueue[MAX_REFINE_MESH_COUNT];
+
 			{
 				std::shared_lock lock(_terrainMutex);
 				for (auto pair : _terrainChunks) {
-					if (pair.second->meshRebuildRequired()) {
-						pair.second->grab();
-						_threadPool.push_task(&TerrainGenerationTest::jobUpdateTerrain, this, pair.second);
+					TerrainRenderMesh* mesh = pair.second;
+					if (!mesh->getWorkPending()) {
+						if (mesh->getMeshOutdated()) {
+							mesh->setWorkPending();
+							mesh->grab();
+							_threadPool.push_task_priority(&TerrainGenerationTest::jobUpdateTerrain, this, pair.second);
+						}
+						else if (mesh->getWorkingMeshType() == TerrainRenderMesh::FAST && refineCount < MAX_REFINE_MESH_COUNT) {
+							mesh->grab();
+							refineMeshQueue[refineCount++] = mesh;
+						}
 					}
 				}
 			}
 
-			for (int8_t i = 0; i < 27; ++i)
-				requiredUpdates[i].wait();
+			if (refineCount) {
+				if (_threadPool.get_tasks_queued() < _threadPool.get_thread_count()) {
+					for (uint8_t i = 0; i < refineCount; ++i) {
+						refineMeshQueue[i]->setWorkPending();
+						_threadPool.push_task(&TerrainGenerationTest::jobUpdateTerrain, this, refineMeshQueue[i]);
+					}
+				}
+				else {
+					for (uint8_t i = 0; i < refineCount; ++i) {
+						refineMeshQueue[i]->drop();
+					}
+				}
+			}
 		}
 
 		void TerrainGenerationTest::jobUpdateTerrainLoading(const glm::i64vec3& currentLoadPos, const glm::i64vec3& lastLoadedPos) {
@@ -307,8 +323,17 @@ namespace pixelexplorer {
 		}
 
 		void TerrainGenerationTest::jobUpdateTerrain(terrain::TerrainRenderMesh* terrainMesh) {
-			if (terrainMesh->meshRebuildRequired())
-				terrainMesh->rebuildMesh();
+			if (terrainMesh->getMeshOutdated()) {
+				terrainMesh->rebuildMesh(terrain::TerrainRenderMesh::FAST);
+			}
+			else if (terrainMesh->getWorkingMeshType() == terrain::TerrainRenderMesh::FAST) {
+				terrainMesh->rebuildMesh(terrain::TerrainRenderMesh::REFINED);
+			}
+			else {
+				PEX_WARN("Updated terrain chunk with no updates");
+				terrainMesh->resetWorkPending();
+			}
+
 			terrainMesh->drop();
 		}
 
@@ -329,13 +354,14 @@ namespace pixelexplorer {
 
 			terrainMesh->loadChunks(terrainPos, *_terrainManager);
 			terrainMesh->grab();
+			terrainMesh->setWorkPending();
 			_terrainMutex.lock();
 			bool inserted = _terrainChunks.emplace(terrainPos, terrainMesh).second;
 			_terrainMutex.unlock();
 
 			if (inserted) {
 				getScene()->addObject(*terrainMesh);
-				terrainMesh->rebuildMesh();
+				terrainMesh->rebuildMesh(terrain::TerrainRenderMesh::REFINED);
 			}
 			else {
 				PEX_WARN(("Attempted to load terrain that was already loaded, x: " + std::to_string(terrainPos.x) + " y: " + std::to_string(terrainPos.y) + " z: " + std::to_string(terrainPos.z)).c_str());

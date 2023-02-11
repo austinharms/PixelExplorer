@@ -28,10 +28,9 @@ namespace pixelexplorer {
 			void updateInteractions();
 			void updateTerrain();
 			void jobUpdateTerrainLoading(const glm::i64vec3& currentLoadPos, const glm::i64vec3& lastLoadedPos);
-			// Loads and or updates terrainChunk
 			void jobLoadTerrain(const glm::i64vec3& terrainPos);
 			// Note: calls drop on chunk due to using a ref caller must grab the terrain before passing it
-			void jobUpdateTerrain (terrain::TerrainRenderMesh* terrainMesh);
+			void jobUpdateTerrain(terrain::TerrainRenderMesh* terrainMesh);
 			void jobUnloadTerrain(const glm::i64vec3& terrainPos);
 
 			terrain::TerrainManager* _terrainManager;

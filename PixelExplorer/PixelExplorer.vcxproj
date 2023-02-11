@@ -94,7 +94,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)shared\stb;$(SolutionDir)shared\thread-pool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ShowIncludes>false</ShowIncludes>
+      <ShowIncludes>true</ShowIncludes>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -122,6 +122,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)shared\stb;$(SolutionDir)shared\thread-pool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,7 +145,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)shared\stb;$(SolutionDir)shared\thread-pool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ShowIncludes>false</ShowIncludes>
+      <ShowIncludes>true</ShowIncludes>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -172,6 +173,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui;$(SolutionDir)shared\stb;$(SolutionDir)shared\thread-pool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

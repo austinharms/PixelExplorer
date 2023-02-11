@@ -2,7 +2,6 @@
 
 #include <new>
 #include <string>
-#include <vector>
 #include <unordered_map>
 
 #include "PxeEngine.h"
@@ -293,7 +292,11 @@ namespace pixelexplorer {
 		TerrainRenderMesh::TerrainRenderMesh(pxengine::PxeRenderMaterial& chunkMaterial) : pxengine::PxeStaticPhysicsRenderObject(chunkMaterial)
 		{
 			using namespace pxengine;
-			_lastGenerated = 0;
+			_currentMeshDate = 0;
+			_latestWorkingMeshDate = 0;
+			_currentMeshType = NONE;
+			_workPending = false;
+			_hasMesh = false;
 			_meshIndexBuffer = nullptr;
 			_meshVertexArray = nullptr;
 			memset(_chunks, 0, sizeof(_chunks));
@@ -348,20 +351,29 @@ namespace pixelexplorer {
 
 		void TerrainRenderMesh::unloadChunks()
 		{
-			_lastGenerated = 0;
+			std::lock_guard lock(_meshWorkMutex);
+			_currentMeshDate = 0;
+			_latestWorkingMeshDate = 0;
+			_latestWorkingMeshType = NONE;
+			_currentMeshType = NONE;
+			_workPending = false;
+			_hasMesh = false;
+
 			physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(getPhysicsActor());
 			physx::PxScene* scene = actor->getScene();
-			if (scene) { scene->lockRead(); }
-			if (actor->getNbShapes()) {
-				physx::PxShape* oldShape;
+			uint32_t shapeCount;
+			if (scene)scene->lockRead(__FILE__, __LINE__);
+			if ((shapeCount = actor->getNbShapes())) {
 				if (scene) {
 					scene->unlockRead();
-					scene->lockWrite();
+					scene->lockWrite(__FILE__, __LINE__);
 				}
 
-				if (actor->getShapes(&oldShape, 1))
-					actor->detachShape(*oldShape);
-				if (scene) { scene->unlockWrite(); }
+				physx::PxShape** oldShapes = static_cast<physx::PxShape**>(alloca(sizeof(physx::PxShape*) * shapeCount));
+				shapeCount = actor->getShapes(oldShapes, shapeCount);
+				for (uint32_t i = 0; i < shapeCount; ++i)
+					actor->detachShape(*(oldShapes[i]));
+				if (scene) scene->unlockWrite();
 			}
 			else if (scene) {
 				scene->unlockRead();
@@ -376,23 +388,57 @@ namespace pixelexplorer {
 			}
 		}
 
-		bool TerrainRenderMesh::meshRebuildRequired() const
+		bool TerrainRenderMesh::getMeshOutdated() const
 		{
+			//return _chunks[CENTER] && _chunks[CENTER]->getLastModified() > _latestWorkingMeshDate;
 			for (uint8_t i = 0; i < CHUNK_COUNT; ++i)
 			{
-				if (_chunks[i] && _chunks[i]->getLastModified() > _lastGenerated)
+				if (_chunks[i] && _chunks[i]->getLastModified() >= _latestWorkingMeshDate)
 					return true;
 			}
 
 			return false;
 		}
 
-		uint64_t TerrainRenderMesh::getLastMeshUpdate() const
+		uint64_t TerrainRenderMesh::getCurrentMeshTimestamp() const
 		{
-			return _lastGenerated;
+			return _currentMeshDate;
 		}
 
-		TerrainChunk::ChunkPoint TerrainRenderMesh::getRelativeChunkPoint(uint32_t x, uint32_t y, uint32_t z) {
+		uint64_t TerrainRenderMesh::getWorkingMeshTimestamp() const
+		{
+			return _latestWorkingMeshDate;
+		}
+
+		TerrainRenderMesh::MeshType TerrainRenderMesh::getCurrentMeshType() const
+		{
+			return _currentMeshType;
+		}
+
+		TerrainRenderMesh::MeshType TerrainRenderMesh::getWorkingMeshType() const
+		{
+			return _latestWorkingMeshType;
+		}
+
+		bool TerrainRenderMesh::getWorkPending() const
+		{
+			std::lock_guard lock(_meshWorkMutex);
+			return _workPending;
+		}
+
+		void TerrainRenderMesh::setWorkPending()
+		{
+			std::lock_guard lock(_meshWorkMutex);
+			_workPending = true;
+		}
+
+		void TerrainRenderMesh::resetWorkPending()
+		{
+			std::lock_guard lock(_meshWorkMutex);
+			_workPending = false;
+		}
+
+		TerrainChunk::ChunkPoint TerrainRenderMesh::getRelativeChunkPoint(uint32_t x, uint32_t y, uint32_t z) const {
 			glm::u32vec3 localSpace(x, y, z);
 			uint8_t chunkIndex = 0;
 			if (x >= TerrainChunk::CHUNK_GRID_SIZE) {
@@ -415,13 +461,35 @@ namespace pixelexplorer {
 			return chunk->getPoints()[localSpace.x + localSpace.z * TerrainChunk::CHUNK_GRID_SIZE + localSpace.y * TerrainChunk::CHUNK_LAYER_POINT_COUNT];
 		}
 
-		void TerrainRenderMesh::rebuildMesh()
+		physx::PxShape* TerrainRenderMesh::buildPhysicsShape(const std::vector<uint16_t>& indices, const std::vector<glm::vec3>& vertices) const
 		{
-			_lastGenerated = SDL_GetTicks64();
-			std::vector<uint16_t> indices;
-			std::vector<glm::vec3> vertices;
-			std::unordered_map<glm::vec3, uint16_t> verticiesMap;
+			using namespace physx;
+			if (vertices.size() == 0 || indices.size() == 0) return nullptr;
+			PxTriangleMeshDesc meshDesc;
+			meshDesc.points.count = vertices.size();
+			meshDesc.points.data = &(vertices[0]);
+			meshDesc.points.stride = sizeof(float) * 3;
+			meshDesc.triangles.data = &(indices[0]);
+			meshDesc.triangles.stride = sizeof(uint16_t) * 3;
+			meshDesc.triangles.count = indices.size() / 3;
+			meshDesc.flags = PxMeshFlag::e16_BIT_INDICES;
+			PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
+			PxCooking* cooking = pxengine::pxeGetEngine().getPhysicsCooking();
+			//if (!cooking->validateTriangleMesh(meshDesc)) {
+			//	PEX_WARN("Invalid terrain mesh");
+			//}
 
+			physx::PxTriangleMesh* mesh = cooking->createTriangleMesh(meshDesc, physics->getPhysicsInsertionCallback());
+			physx::PxMaterial* material = physics->createMaterial(1.0f, 0.5f, 0.5f);
+			physx::PxShape* shape = physics->createShape(physx::PxTriangleMeshGeometry(mesh), *material);
+			mesh->release();
+			material->release();
+			return shape;
+		}
+
+		void TerrainRenderMesh::buildTerrainMesh(std::vector<uint16_t>& indices, std::vector<glm::vec3>& vertices) const
+		{
+			std::unordered_map<glm::vec3, uint16_t> verticiesMap;
 			for (uint32_t y = 0; y < TerrainChunk::CHUNK_GRID_SIZE; ++y) {
 				for (uint32_t z = 0; z < TerrainChunk::CHUNK_GRID_SIZE; ++z) {
 					for (uint32_t x = 0; x < TerrainChunk::CHUNK_GRID_SIZE; ++x) {
@@ -445,62 +513,99 @@ namespace pixelexplorer {
 					}
 				}
 			}
+		}
 
+		void TerrainRenderMesh::buildTerrainMeshFast(std::vector<uint16_t>& indices, std::vector<glm::vec3>& vertices) const
+		{
+			for (uint32_t y = 0; y < TerrainChunk::CHUNK_GRID_SIZE; ++y) {
+				for (uint32_t z = 0; z < TerrainChunk::CHUNK_GRID_SIZE; ++z) {
+					for (uint32_t x = 0; x < TerrainChunk::CHUNK_GRID_SIZE; ++x) {
+						uint8_t triIndex = 0;
+						if (getRelativeChunkPoint(x, y, z)) triIndex |= 0x01;
+						if (getRelativeChunkPoint(x + 1, y, z)) triIndex |= 0x02;
+						if (getRelativeChunkPoint(x + 1, y, z + 1)) triIndex |= 0x04;
+						if (getRelativeChunkPoint(x, y, z + 1)) triIndex |= 0x08;
+						if (getRelativeChunkPoint(x, y + 1, z)) triIndex |= 0x10;
+						if (getRelativeChunkPoint(x + 1, y + 1, z)) triIndex |= 0x20;
+						if (getRelativeChunkPoint(x + 1, y + 1, z + 1)) triIndex |= 0x40;
+						if (getRelativeChunkPoint(x, y + 1, z + 1)) triIndex |= 0x80;
+						const int8_t* triPoints = TriangleTable[triIndex];
+						for (uint8_t i = 0; i < 16; ++i) {
+							if (triPoints[i] == -1) break;
+							indices.emplace_back(vertices.size());
+							vertices.emplace_back(glm::vec3(x, y, z) + TriangleVertices[triPoints[i]]);
+						}
+					}
+				}
+			}
+		}
+
+		void TerrainRenderMesh::updateRenderMesh(const std::vector<uint16_t>& indices, const std::vector<glm::vec3>& vertices)
+		{
 			pxengine::PxeBuffer* indexData = new pxengine::PxeBuffer(indices.size() * sizeof(uint16_t));
 			pxengine::PxeBuffer* vertexData = new pxengine::PxeBuffer(vertices.size() * sizeof(glm::vec3));
-			if (indices.size() > 0)
+			if (indices.size() && vertices.size()) {
 				memcpy(indexData->getBuffer(), &(indices[0]), indexData->getSize());
-			if (vertices.size() > 0)
 				memcpy(vertexData->getBuffer(), &(vertices[0]), vertexData->getSize());
+				_hasMesh = true;
+			}
+			else {
+				_hasMesh = false;
+			}
+
 			_meshIndexBuffer->bufferData(*indexData);
 			_meshVertexBuffer->bufferData(*vertexData);
 			indexData->drop();
 			vertexData->drop();
+		}
+
+		void TerrainRenderMesh::rebuildMesh(MeshType type)
+		{
+			_meshWorkMutex.lock();
+			_workPending = false;
+			uint64_t buildDate = SDL_GetTicks64();
+			_latestWorkingMeshDate = buildDate;
+			_latestWorkingMeshType = type;
+			_meshWorkMutex.unlock();
+			std::vector<uint16_t> indices;
+			std::vector<glm::vec3> vertices;
+			if (type == FAST) {
+				buildTerrainMeshFast(indices, vertices);
+			}
+			else {
+				buildTerrainMesh(indices, vertices);
+			}
+
+			physx::PxShape* shape = buildPhysicsShape(indices, vertices);
+			std::lock_guard lock(_meshWorkMutex);
+			if (_currentMeshDate > buildDate) {
+				if (shape) shape->release();
+				return;
+			}
 
 			physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(getPhysicsActor());
 			physx::PxScene* scene = actor->getScene();
-			if (scene) scene->lockRead(__FILE__, __LINE__);
-			if (actor->getNbShapes()) {
-				if (scene) scene->unlockRead();
-				physx::PxShape* oldShape;
-				if (scene) { scene->lockWrite(__FILE__, __LINE__); }
-				if (actor->getShapes(&oldShape, 1)) {
-					actor->detachShape(*oldShape);
-				}
-				if (scene) { scene->unlockWrite(); }
-			}
-			else {
-				if (scene) scene->unlockRead();
+			if (scene) scene->lockWrite(__FILE__, __LINE__);
+			uint32_t shapeCount;
+			if ((shapeCount = actor->getNbShapes())) {
+				physx::PxShape** oldShapes = static_cast<physx::PxShape**>(alloca(sizeof(physx::PxShape*) * shapeCount));
+				shapeCount = actor->getShapes(oldShapes, shapeCount);
+				for (uint32_t i = 0; i < shapeCount; ++i)
+					actor->detachShape(*(oldShapes[i]));
 			}
 
-			if (vertices.size() && indices.size()) {
-				physx::PxTriangleMeshDesc meshDesc;
-				meshDesc.points.count = vertices.size();
-				meshDesc.points.data = &(vertices[0]);
-				meshDesc.points.stride = sizeof(float) * 3;
-				meshDesc.triangles.data = &(indices[0]);
-				meshDesc.triangles.stride = sizeof(uint16_t) * 3;
-				meshDesc.triangles.count = indices.size() / 3;
-				meshDesc.flags = physx::PxMeshFlag::e16_BIT_INDICES;
-				physx::PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
-				physx::PxCooking* cooking = pxengine::pxeGetEngine().getPhysicsCooking();
-				physx::PxTriangleMesh* mesh = cooking->createTriangleMesh(meshDesc, physics->getPhysicsInsertionCallback());
-				physx::PxMaterial* material = physics->createMaterial(1.0f, 0.5f, 0.5f);
-				physx::PxShape* shape = physics->createShape(physx::PxTriangleMeshGeometry(mesh), *material);
-				if (scene) { scene->lockWrite(__FILE__, __LINE__); }
-				actor->attachShape(*shape);
-				if (scene) { scene->unlockWrite(); }
-				mesh->release();
-				material->release();
-				shape->release();
-			}
-
-			//PEX_INFO(("Terrain Mesh Rebuild took " + std::to_string(SDL_GetTicks64() - _lastGenerated) + "ms").c_str());
+			if (shape) actor->attachShape(*shape);
+			if (scene) scene->unlockWrite();
+			if (shape) shape->release();
+			updateRenderMesh(indices, vertices);
+			_currentMeshDate = buildDate;
+			_currentMeshType = type;
+			//PEX_INFO(("Terrain Mesh Rebuild took " + std::to_string(SDL_GetTicks64() - buildDate) + "ms").c_str());
 		}
 
 		void TerrainRenderMesh::onGeometry()
 		{
-			if (_meshVertexArray->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED) return;
+			if (!_hasMesh || _meshVertexArray->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED) return;
 			_meshVertexArray->bind();
 			if (_meshVertexArray->getBindingError()) {
 				_meshVertexArray->unbind();
@@ -508,6 +613,12 @@ namespace pixelexplorer {
 			}
 
 			glDrawElements(GL_TRIANGLES, _meshIndexBuffer->getIndexCount(), (uint32_t)_meshIndexBuffer->getIndexType(), nullptr);
+		}
+
+		glm::i64vec3 TerrainRenderMesh::getChunkPosition() const
+		{
+			if (_chunks[CENTER]) return _chunks[CENTER]->getPosition();
+			return glm::i64vec3(0);
 		}
 	}
 }
