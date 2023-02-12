@@ -16,31 +16,43 @@ namespace pixelexplorer {
 			static constexpr uint32_t CHUNK_LAYER_POINT_COUNT = CHUNK_GRID_SIZE * CHUNK_GRID_SIZE;
 			static constexpr uint32_t CHUNK_POINT_COUNT = CHUNK_LAYER_POINT_COUNT * CHUNK_GRID_SIZE;
 			static constexpr float CHUNK_CELL_SIZE = 1;
-			static constexpr float CHUNK_POSITION_SCALE_FACTOR = 1.0f / CHUNK_CELL_SIZE;
+			static constexpr float HALF_CHUNK_CELL_SIZE = CHUNK_CELL_SIZE / 2.0f;
 			static constexpr float CHUNK_WIDTH = CHUNK_GRID_SIZE * CHUNK_CELL_SIZE;
 
-			static inline constexpr glm::i64vec3 WorldToChunkSpace(const glm::vec3& worldSpace) { 
+			static inline constexpr glm::i64vec3 WorldToChunkSpace(const glm::vec3& worldSpace) {
 				return glm::i64vec3(
-					(int64_t)roundf(worldSpace.x * CHUNK_POSITION_SCALE_FACTOR), 
-					(int64_t)roundf(worldSpace.y * CHUNK_POSITION_SCALE_FACTOR), 
-					(int64_t)roundf(worldSpace.z * CHUNK_POSITION_SCALE_FACTOR)
+					(int64_t)roundf(worldSpace.x / CHUNK_CELL_SIZE),
+					(int64_t)roundf(worldSpace.y / CHUNK_CELL_SIZE),
+					(int64_t)roundf(worldSpace.z / CHUNK_CELL_SIZE)
 				);
 			}
 
+			static inline constexpr int64_t ChunkSpaceToChunkPosition(const int64_t& chunkSpace) {
+				if (chunkSpace >= 0) {
+					return chunkSpace / CHUNK_GRID_SIZE;
+				}
+				else {
+					return ((chunkSpace + 1) / CHUNK_GRID_SIZE) - 1;
+				}
+			}
+
 			static inline constexpr glm::i64vec3 ChunkSpaceToChunkPosition(const glm::i64vec3& chunkSpace) {
-				glm::i64vec3 chunkPos(chunkSpace.x / CHUNK_GRID_SIZE, chunkSpace.y / CHUNK_GRID_SIZE, chunkSpace.z / CHUNK_GRID_SIZE);
-				if (chunkSpace.x < 0) chunkPos.x -= 1;
-				if (chunkSpace.y < 0) chunkPos.y -= 1;
-				if (chunkSpace.z < 0) chunkPos.z -= 1;
-				return chunkPos;
+				return glm::i64vec3(ChunkSpaceToChunkPosition(chunkSpace.x), ChunkSpaceToChunkPosition(chunkSpace.y), ChunkSpaceToChunkPosition(chunkSpace.z));
+			}
+
+			static inline constexpr int64_t ChunkSpaceToRelativeChunkSpace(const int64_t& chunkSpace) {
+				int64_t res = chunkSpace % CHUNK_GRID_SIZE;
+
+				if (chunkSpace >= 0 || res == 0) {
+					return res;
+				}
+				else {
+					return CHUNK_GRID_SIZE + res;
+				}
 			}
 
 			static inline constexpr glm::i64vec3 ChunkSpaceToRelativeChunkSpace(const glm::i64vec3& chunkSpace) {
-				glm::i64vec3 chunkPos(chunkSpace.x % CHUNK_GRID_SIZE, chunkSpace.y % CHUNK_GRID_SIZE, chunkSpace.z % CHUNK_GRID_SIZE);
-				if (chunkSpace.x < 0) chunkPos.x += CHUNK_GRID_SIZE - 1;
-				if (chunkSpace.y < 0) chunkPos.y += CHUNK_GRID_SIZE - 1;
-				if (chunkSpace.z < 0) chunkPos.z += CHUNK_GRID_SIZE - 1;
-				return chunkPos;
+				return glm::i64vec3(ChunkSpaceToRelativeChunkSpace(chunkSpace.x), ChunkSpaceToRelativeChunkSpace(chunkSpace.y), ChunkSpaceToRelativeChunkSpace(chunkSpace.z));
 			}
 
 			static inline constexpr uint32_t RelativeChunkSpaceToPointIndex(const glm::i64vec3& relChunkSpace) {

@@ -26,6 +26,8 @@ namespace pixelexplorer {
 			_terrainManager = nullptr;
 			_terrainRenderMaterial = nullptr;
 			_camera = nullptr;
+			_debugLine = nullptr;
+			_debugPoint = nullptr;
 			_pauseAction = nullptr;
 			_pauseMenu = nullptr;
 			_placeAction = nullptr;
@@ -35,6 +37,30 @@ namespace pixelexplorer {
 			_loadDistance = 7;
 			_paused = false;
 			_pauseHeld = false;
+
+			if (!getScene()) {
+				Application::Error("Out of Memory, Failed to create terrain generation scene");
+				return;
+			}
+
+			_debugLine = tools::RenderLine::createLine();
+			if (!_debugLine) {
+				Application::Error("Out of Memory, Failed to create render line");
+				return;
+			}
+
+			_debugLine->Color = glm::vec4(0, 0, 1, 1);
+			getScene()->addObject(*_debugLine);
+
+			_debugPoint = tools::RenderPoint::createPoint();
+			if (!_debugPoint) {
+				Application::Error("Out of Memory, Failed to create render point");
+				return;
+			}
+
+			_debugPoint->Width = 1.1f;
+			_debugPoint->Color = glm::vec4(1, 1, 1, 1);
+			getScene()->addObject(*_debugPoint);
 
 			_pauseAction = pxeGetEngine().getInputManager().getAction("Pause");
 			if (!_pauseAction) {
@@ -124,6 +150,12 @@ namespace pixelexplorer {
 		TerrainGenerationTest::~TerrainGenerationTest()
 		{
 			_threadPool.wait_for_tasks();
+			if (_debugLine)
+				_debugLine->drop();
+
+			if (_debugPoint)
+				_debugPoint->drop();
+
 			if (_pauseMenu)
 				_pauseMenu->drop();
 
@@ -216,8 +248,12 @@ namespace pixelexplorer {
 			scene->unlockRead();
 			if (hit && rayRes.hasBlock) {
 				const glm::vec3 hitPos(rayRes.block.position.x, rayRes.block.position.y, rayRes.block.position.z);
+				_debugLine->Disabled = false;
+				_debugLine->PointA = camPos - glm::vec3(0, 0.5f, 0);
+				_debugLine->PointB = hitPos;
+
 				if (_placeAction->getValue()) {
-					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos - camDir * TerrainChunk::CHUNK_CELL_SIZE));
+					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos - camDir * TerrainChunk::HALF_CHUNK_CELL_SIZE));
 					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
 					uint32_t pointIndex = TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace));
 					if (terrainChunk->getPoints()[pointIndex] != 1) {
@@ -228,7 +264,7 @@ namespace pixelexplorer {
 					terrainChunk->drop();
 				}
 				else if (_breakAction->getValue()) {
-					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos + camDir * TerrainChunk::CHUNK_CELL_SIZE));
+					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos + camDir * TerrainChunk::HALF_CHUNK_CELL_SIZE));
 					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
 					uint32_t pointIndex = TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace));
 					if (terrainChunk->getPoints()[pointIndex] != 0) {
@@ -236,11 +272,23 @@ namespace pixelexplorer {
 						terrainChunk->updateLastModified();
 					}
 
-					terrainChunk->updateLastModified();
 					terrainChunk->drop();
 				}
 
-				//PEX_INFO(("Ray Hit: x:" + std::to_string(rayRes.block.position.x) + ", y: " + std::to_string(rayRes.block.position.y) + ", z: " + std::to_string(rayRes.block.position.z)).c_str());
+				//glm::vec3 pos(hitPos);
+				//PEX_INFO(("Ray Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
+				//glm::i64vec3 chunkSpacePos = TerrainChunk::WorldToChunkSpace(pos);
+				//pos = chunkSpacePos;
+				_debugPoint->Point = TerrainChunk::WorldToChunkSpace(hitPos);
+				_debugPoint->Disabled = false;
+				//PEX_INFO(("Chunk Space Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
+				//pos = TerrainChunk::ChunkSpaceToChunkPosition(chunkSpacePos);
+				//PEX_INFO(("Chunk Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
+				//pos = TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpacePos);
+				//PEX_INFO(("Rel Chunk Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
+			} else {
+				_debugLine->Disabled = true;
+				_debugPoint->Disabled = true;
 			}
 
 		}

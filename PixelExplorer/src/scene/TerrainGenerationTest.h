@@ -12,6 +12,8 @@
 #include "Camera.h"
 #include "gui/PauseMenu.h"
 #include "BS_thread_pool_light.hpp"
+#include "tools/RenderLine.h"
+#include "tools/RenderPoint.h"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -36,6 +38,8 @@ namespace pixelexplorer {
 			terrain::TerrainManager* _terrainManager;
 			pxengine::PxeRenderMaterial* _terrainRenderMaterial;
 			Camera* _camera;
+			tools::RenderLine* _debugLine;
+			tools::RenderPoint* _debugPoint;
 			gui::PauseMenu* _pauseMenu;
 			pxengine::PxeAction* _pauseAction;
 			pxengine::PxeAction* _placeAction;
