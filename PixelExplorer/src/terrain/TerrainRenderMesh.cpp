@@ -288,6 +288,8 @@ namespace pixelexplorer {
 			glm::vec3(1.0f, 0.5f, 1.0f),
 			glm::vec3(0.0f, 0.5f, 1.0f)
 		};
+		const uint8_t TriangleColorMixingTable[12][2] = { {0,1}, {1,2}, {2,3}, {3,0}, {4,5}, {5,6}, {6,7}, {7,4}, {4,0}, {5,1}, {6,2}, {7,3} };
+		const glm::vec3 TerrainColorTable[4] = { glm::vec3(1, 0, 1), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1) };
 
 		TerrainRenderMesh::TerrainRenderMesh(pxengine::PxeRenderMaterial& chunkMaterial) : pxengine::PxeStaticPhysicsRenderObject(chunkMaterial)
 		{
@@ -307,10 +309,13 @@ namespace pixelexplorer {
 			setPhysicsActor(actor);
 
 			_meshIndexBuffer = new PxeIndexBuffer(PxeIndexType::UNSIGNED_16BIT, nullptr, true);
-			PxeVertexBufferFormat fmt(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
+			PxeVertexBufferFormat fmt;
+			fmt.addAttrib(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
+			fmt.addAttrib(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
 			_meshVertexBuffer = new PxeVertexBuffer(fmt, nullptr, true);
 			_meshVertexArray = new PxeVertexArray(true);
 			_meshVertexArray->addVertexBuffer(*_meshVertexBuffer, 0, 0);
+			_meshVertexArray->addVertexBuffer(*_meshVertexBuffer, 1, 1);
 			_meshVertexArray->setIndexBuffer(_meshIndexBuffer);
 
 			_meshIndexBuffer->initializeAsset();
@@ -466,9 +471,9 @@ namespace pixelexplorer {
 			using namespace physx;
 			if (vertices.size() == 0 || indices.size() == 0) return nullptr;
 			PxTriangleMeshDesc meshDesc;
-			meshDesc.points.count = vertices.size();
+			meshDesc.points.count = vertices.size()/2;
 			meshDesc.points.data = &(vertices[0]);
-			meshDesc.points.stride = sizeof(float) * 3;
+			meshDesc.points.stride = sizeof(float) * 6;
 			meshDesc.triangles.data = &(indices[0]);
 			meshDesc.triangles.stride = sizeof(uint16_t) * 3;
 			meshDesc.triangles.count = indices.size() / 3;
@@ -494,20 +499,48 @@ namespace pixelexplorer {
 				for (uint32_t z = 0; z < TerrainChunk::CHUNK_GRID_SIZE; ++z) {
 					for (uint32_t x = 0; x < TerrainChunk::CHUNK_GRID_SIZE; ++x) {
 						uint8_t triIndex = 0;
-						if (getRelativeChunkPoint(x, y, z)) triIndex |= 0x01;
-						if (getRelativeChunkPoint(x + 1, y, z)) triIndex |= 0x02;
-						if (getRelativeChunkPoint(x + 1, y, z + 1)) triIndex |= 0x04;
-						if (getRelativeChunkPoint(x, y, z + 1)) triIndex |= 0x08;
-						if (getRelativeChunkPoint(x, y + 1, z)) triIndex |= 0x10;
-						if (getRelativeChunkPoint(x + 1, y + 1, z)) triIndex |= 0x20;
-						if (getRelativeChunkPoint(x + 1, y + 1, z + 1)) triIndex |= 0x40;
-						if (getRelativeChunkPoint(x, y + 1, z + 1)) triIndex |= 0x80;
+						TerrainChunk::ChunkPoint points[8] = {
+							getRelativeChunkPoint(x, y, z),
+							getRelativeChunkPoint(x + 1, y, z),
+							getRelativeChunkPoint(x + 1, y, z + 1),
+							getRelativeChunkPoint(x, y, z + 1),
+							getRelativeChunkPoint(x, y + 1, z),
+							getRelativeChunkPoint(x + 1, y + 1, z),
+							getRelativeChunkPoint(x + 1, y + 1, z + 1),
+							getRelativeChunkPoint(x, y + 1, z + 1)
+						};
+
+						if (points[0]) triIndex |= 0x01;
+						if (points[1]) triIndex |= 0x02;
+						if (points[2]) triIndex |= 0x04;
+						if (points[3]) triIndex |= 0x08;
+						if (points[4]) triIndex |= 0x10;
+						if (points[5]) triIndex |= 0x20;
+						if (points[6]) triIndex |= 0x40;
+						if (points[7]) triIndex |= 0x80;
+
 						const int8_t* triPoints = TriangleTable[triIndex];
 						for (uint8_t i = 0; i < 16; ++i) {
 							if (triPoints[i] == -1) break;
 							glm::vec3 vertex(glm::vec3(x, y, z) + TriangleVertices[triPoints[i]]);
-							auto pair = verticiesMap.emplace(vertex, static_cast<uint16_t>(vertices.size()));
-							if (pair.second) vertices.emplace_back(vertex);
+							auto pair = verticiesMap.emplace(vertex, static_cast<uint16_t>(vertices.size() / 2));
+							if (pair.second) {
+								vertices.emplace_back(vertex);
+								const uint8_t* colorMix = TriangleColorMixingTable[triPoints[i]];
+								glm::vec3 color;
+								if (points[colorMix[0]] && points[colorMix[1]]) {
+									color = TerrainColorTable[points[colorMix[0]]] / 2.0f + TerrainColorTable[points[colorMix[1]]] / 2.0f;
+								}
+								else if (points[colorMix[0]]) {
+									color = TerrainColorTable[points[colorMix[0]]];
+								}
+								else {
+									color = TerrainColorTable[points[colorMix[1]]];
+								}
+
+								vertices.emplace_back(color);
+							}
+
 							indices.emplace_back(pair.first->second);
 						}
 					}
@@ -521,19 +554,45 @@ namespace pixelexplorer {
 				for (uint32_t z = 0; z < TerrainChunk::CHUNK_GRID_SIZE; ++z) {
 					for (uint32_t x = 0; x < TerrainChunk::CHUNK_GRID_SIZE; ++x) {
 						uint8_t triIndex = 0;
-						if (getRelativeChunkPoint(x, y, z)) triIndex |= 0x01;
-						if (getRelativeChunkPoint(x + 1, y, z)) triIndex |= 0x02;
-						if (getRelativeChunkPoint(x + 1, y, z + 1)) triIndex |= 0x04;
-						if (getRelativeChunkPoint(x, y, z + 1)) triIndex |= 0x08;
-						if (getRelativeChunkPoint(x, y + 1, z)) triIndex |= 0x10;
-						if (getRelativeChunkPoint(x + 1, y + 1, z)) triIndex |= 0x20;
-						if (getRelativeChunkPoint(x + 1, y + 1, z + 1)) triIndex |= 0x40;
-						if (getRelativeChunkPoint(x, y + 1, z + 1)) triIndex |= 0x80;
+						TerrainChunk::ChunkPoint points[8] = {
+							getRelativeChunkPoint(x, y, z),
+							getRelativeChunkPoint(x + 1, y, z),
+							getRelativeChunkPoint(x + 1, y, z + 1),
+							getRelativeChunkPoint(x, y, z + 1),
+							getRelativeChunkPoint(x, y + 1, z),
+							getRelativeChunkPoint(x + 1, y + 1, z),
+							getRelativeChunkPoint(x + 1, y + 1, z + 1),
+							getRelativeChunkPoint(x, y + 1, z + 1)
+						};
+
+						if (points[0]) triIndex |= 0x01;
+						if (points[1]) triIndex |= 0x02;
+						if (points[2]) triIndex |= 0x04;
+						if (points[3]) triIndex |= 0x08;
+						if (points[4]) triIndex |= 0x10;
+						if (points[5]) triIndex |= 0x20;
+						if (points[6]) triIndex |= 0x40;
+						if (points[7]) triIndex |= 0x80;
+
 						const int8_t* triPoints = TriangleTable[triIndex];
 						for (uint8_t i = 0; i < 16; ++i) {
 							if (triPoints[i] == -1) break;
-							indices.emplace_back(vertices.size());
-							vertices.emplace_back(glm::vec3(x, y, z) + TriangleVertices[triPoints[i]]);
+							glm::vec3 vertex(glm::vec3(x, y, z) + TriangleVertices[triPoints[i]]);
+							indices.emplace_back(vertices.size() / 2);
+							vertices.emplace_back(vertex);
+							const uint8_t* colorMix = TriangleColorMixingTable[triPoints[i]];
+							glm::vec3 color(0);
+							if (points[colorMix[0]] && points[colorMix[1]]) {
+								color = TerrainColorTable[points[colorMix[0]]] / 2.0f + TerrainColorTable[points[colorMix[1]]] / 2.0f;
+							}
+							else if (points[colorMix[0]]) {
+								color = TerrainColorTable[points[colorMix[0]]];
+							}
+							else {
+								color = TerrainColorTable[points[colorMix[1]]];
+							}
+
+							vertices.emplace_back(color);
 						}
 					}
 				}

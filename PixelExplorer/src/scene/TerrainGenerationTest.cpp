@@ -256,8 +256,8 @@ namespace pixelexplorer {
 					const glm::i64vec3 chunkSpace(TerrainChunk::WorldToChunkSpace(hitPos - camDir * TerrainChunk::HALF_CHUNK_CELL_SIZE));
 					TerrainChunk* terrainChunk = _terrainManager->getTerrainChunk(TerrainChunk::ChunkSpaceToChunkPosition(chunkSpace));
 					uint32_t pointIndex = TerrainChunk::RelativeChunkSpaceToPointIndex(TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpace));
-					if (terrainChunk->getPoints()[pointIndex] != 1) {
-						terrainChunk->getPoints()[pointIndex] = 1;
+					if (terrainChunk->getPoints()[pointIndex] != 2) {
+						terrainChunk->getPoints()[pointIndex] = 2;
 						terrainChunk->updateLastModified();
 					}
 
@@ -286,7 +286,8 @@ namespace pixelexplorer {
 				//PEX_INFO(("Chunk Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
 				//pos = TerrainChunk::ChunkSpaceToRelativeChunkSpace(chunkSpacePos);
 				//PEX_INFO(("Rel Chunk Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
-			} else {
+			}
+			else {
 				_debugLine->Disabled = true;
 				_debugPoint->Disabled = true;
 			}
