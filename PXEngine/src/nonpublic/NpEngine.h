@@ -29,6 +29,7 @@
 #include "PxeFontManager.h"
 #include "NpFontManager.h"
 #include "SDL_log.h"
+#include "NpGuiGlBackend.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -48,6 +49,7 @@ namespace pxengine {
 			PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const override;
 			PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const override;
 			PXE_NODISCARD PxeFontManager& getFontManager() const override;
+			PXE_NODISCARD PxeRenderMaterialInterface* getGuiRenderMaterial() const override;
 			void setVSyncMode(int8_t mode) override;
 			void shutdown() override;
 
@@ -79,6 +81,7 @@ namespace pxengine {
 			PXE_NODISCARD PxeLogInterface& getLogInterface();
 			PXE_NODISCARD NpInputManager& getNpInputManager() const;
 			PXE_NODISCARD NpFontManager& getNpFontManager() const;
+			PXE_NODISCARD NpGuiGlBackend& getNpGuiBackend() const;
 			void setDeltaTime(float dt);
 			void removeShader(const std::filesystem::path& path);
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
@@ -127,12 +130,11 @@ namespace pxengine {
 			PxeLogInterface& _logInterface;
 			NpInputManager* _inputManager;
 			NpFontManager* _fontManager;
+			NpGuiGlBackend* _guiBackend;
 			SDL_Window* _primarySDLWindow;
 			SDL_GLContext _primaryGlContext;
 			NpWindow* _activeMouseWindow;
 			NpWindow* _activeKeyboardWindow;
-			void* _guiBackend;
-			uint16_t _guiBackendReferenceCount;
 			float _deltaTime;
 			int8_t _vsyncMode;
 			bool _boundPrimaryGlContext;

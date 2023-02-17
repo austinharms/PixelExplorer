@@ -49,11 +49,10 @@ namespace pxengine {
 	enum class PxeObjectFlags : PxeObjectFlagsType
 	{
 		NONE = 0x00,
-		GUI_UPDATE = 0x01,
-		GEOMETRY_UPDATE = 0x02,
-		PHYSICS_OBJECT = 0x04,
-		PHYSICS_UPDATE = 0x08,
-		ALL = 0xff,
+		RENDER_OBJECT = 0x01,
+		PHYSICS_OBJECT = 0x02,
+		PHYSICS_UPDATE = 0x04,
+		ALL = 0x07,
 	};
 
 	enum class PxeVertexBufferAttribType : uint32_t
@@ -70,7 +69,7 @@ namespace pxengine {
 		DOUBLE = 0x140A,			// GL_DOUBLE
 	};
 
-	enum class PxeFontScalingMode
+	enum class PxeFontScalingMode : uint8_t
 	{
 		UNSCALED = 0,	// Font is unscaled
 		WIDTH,			// Font is scaled based on window width
@@ -79,7 +78,7 @@ namespace pxengine {
 		LARGEST			// Font is scaled based on window width or height depending on what is larger
 	};
 
-	enum class PxeFontStatus
+	enum class PxeFontStatus : uint8_t
 	{
 		UNDEFINED = 0,
 		PENDING,
@@ -97,6 +96,24 @@ namespace pxengine {
 		JOYSTICK_HAT,
 		JOYSTICK_BUTTON,
 		CONTROLLER_BUTTON,
+	};
+
+	enum class PxeRenderPass : uint8_t
+	{
+		DEFERED = 0,	// All lighting calculations are done on this pass
+		FORWARD,
+		TRANSPARENCY,
+		SCREEN_SPACE,
+		GUI,
+		RENDER_PASS_COUNT
+	};
+
+	constexpr int32_t PxeRenderPassCount = (int32_t)PxeRenderPass::RENDER_PASS_COUNT;
+
+	enum class PxeRenderMaterialType : uint8_t
+	{
+		UNDEFINED = 0,
+		UNLIT,
 	};
 }
 

@@ -3,7 +3,8 @@
 #include <new>
 
 #include "NpLogger.h"
-#include "backends/imgui_impl_opengl3.h"
+#include "NpEngine.h"
+#include "NpGuiGlBackend.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -76,9 +77,7 @@ namespace pxengine {
 					pair.second->updateFontAtlas();
 				}
 
-				// Hack to update the font atlas texture
-				ImGui_ImplOpenGL3_DestroyFontsTexture();
-				ImGui_ImplOpenGL3_CreateFontsTexture();
+				NpEngine::getInstance().getNpGuiBackend().rebuildFontTexture();
 				PXE_INFO("Font atlas rebuilt");
 			}
 		}

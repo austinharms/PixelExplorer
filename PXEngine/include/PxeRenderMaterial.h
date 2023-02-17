@@ -4,18 +4,21 @@
 #include <unordered_map>
 
 #include "PxeTypes.h"
-#include "PxeRefCount.h"
+#include "PxeRenderMaterialInterface.h"
 #include "PxeBuffer.h"
 #include "PxeShader.h"
 #include "PxeTexture.h"
 
 namespace pxengine {
 	// Class that stores/automates PxeShader Uniform bindings
-	// Note: PxeRenderMaterial can only apply to one shader but a shader can have more then one material
-	class PxeRenderMaterial : public PxeRefCount
+	class PxeRenderMaterial : public PxeRenderMaterialInterface
 	{
 	public:
-		PxeRenderMaterial(PxeShader& shader);
+		// Helper to create different types of PxeRenderMaterials, returns nullptr on failure
+		// Note: to create a custom material you can not use this function
+		static PxeRenderMaterial* createMaterial(PxeRenderMaterialType materialType);
+
+		PxeRenderMaterial(PxeShader& shader, PxeRenderPass pass);
 		virtual ~PxeRenderMaterial();
 
 		void setProperty1f(const std::string& name, const float value);
@@ -70,12 +73,11 @@ namespace pxengine {
 
 		void setTexture(const std::string& name, PxeTexture& texture, uint8_t textureSlot);
 
-		// Applies all stored properties to the PxeShader
-		// Note: This assumes the stored PxeShader is already bound and there is a valid OpenGl context
-		void applyMaterial();
+		// Applies all stored uniforms to the PxeShader
+		void applyMaterial() override;
 
 		// Returns the PxeShader that was used to construct the material
-		PXE_NODISCARD PxeShader& getShader() const;
+		PXE_NODISCARD PxeShader& getShader() const override;
 
 		PxeRenderMaterial(const PxeRenderMaterial& other) = delete;
 		PxeRenderMaterial operator=(const PxeRenderMaterial& other) = delete;

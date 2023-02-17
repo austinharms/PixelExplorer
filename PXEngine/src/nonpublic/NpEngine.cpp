@@ -9,10 +9,6 @@
 #include "extensions/PxExtensionsAPI.h"
 #include "SDL.h"
 #include "backends/imgui_impl_sdl.h"
-#include "backends/imgui_impl_opengl3.h"
-#include "PxeRenderMaterial.h"
-#include "PxeGeometryObjectInterface.h"
-#include "PxeGUIObjectInterface.h"
 #include "PxeRenderTexture.h"
 
 namespace pxengine {
@@ -35,8 +31,6 @@ namespace pxengine {
 			_boundPrimaryGlContext = false;
 			_createdWindow = false;
 			_shutdownFlag = false;
-			_guiBackendReferenceCount = 0;
-			_guiBackend = nullptr;
 			_vsyncMode = 0;
 
 			_inputManager = new(std::nothrow) NpInputManager();
@@ -47,6 +41,11 @@ namespace pxengine {
 			_fontManager = new(std::nothrow) NpFontManager();
 			if (!_fontManager) {
 				PXE_FATAL("Failed to create PxeFontManager for PxeEngine");
+			}
+
+			_guiBackend = new(std::nothrow) NpGuiGlBackend();
+			if (!_guiBackend) {
+				PXE_FATAL("Failed to create GuiBackend for PxeEngine");
 			}
 
 			initSDL();
@@ -309,7 +308,7 @@ namespace pxengine {
 			PXE_CHECKSDLERROR();
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 			PXE_CHECKSDLERROR();
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 			PXE_CHECKSDLERROR();
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 			PXE_CHECKSDLERROR();
@@ -332,10 +331,18 @@ namespace pxengine {
 				return nullptr;
 			}
 
-			window->initializeAsset();
+			window->_status = PxeGLAssetStatus::PENDING_INITIALIZATION;
+			window->grab();
 			if (!_createdWindow) {
 				_createdWindow = true;
 				window->setPrimaryWindow();
+				std::lock_guard lock(_assetMutex);
+				// Add primary window to the front of the asset queue
+				_assetQueue.emplace_front(window);
+			}
+			else {
+				std::lock_guard lock(_assetMutex);
+				_assetQueue.emplace_back(window);
 			}
 
 			return window;
@@ -451,37 +458,10 @@ namespace pxengine {
 				}
 			}
 
-			if (window.getPrimaryWindow()) {
-				// TODO Select correct versions dynamically
-				if (!ImGui_ImplOpenGL3_Init("#version 130")) {
-					window.releaseWriteLock();
-					window.setErrorStatus();
-					window.setShouldClose();
-					PXE_FATAL("Failed to create primary GUI backend implementation");
-				}
-
-				_guiBackendReferenceCount = 1;
-				_guiBackend = ImGui::GetIO().BackendRendererUserData;
-			}
-			else {
-				// The primary window should always be created first and this should not happen but just in case
-				if (!_guiBackend) {
-					PXE_ERROR("Failed to get GUI backend");
-					window.releaseWriteLock();
-					window.setErrorStatus();
-					window.setShouldClose();
-					return;
-				}
-
-				ImGuiIO& io = ImGui::GetIO();
-				// Hack to allow using one backend/openGl context across all GUI contexts
-				_guiBackendReferenceCount += 1;
-				io.BackendRendererUserData = _guiBackend;
-				io.BackendRendererName = "imgui_impl_opengl3";
-				if (*((uint32_t*)_guiBackend) >= 320)
-					io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
-			}
-
+			if (_guiBackend->getAssetStatus() != PxeGLAssetStatus::INITIALIZED)
+				forceAssetInit(*_guiBackend);
+			_guiBackend->grab();
+			_guiBackend->bind();
 			acquireWindowsWriteLock();
 			_sdlWindows.emplace(window.getSDLWindowId(), &window);
 			releaseWindowsWriteLock();
@@ -500,16 +480,8 @@ namespace pxengine {
 			if (window._guiContext) {
 				window.bindGuiContext();
 				ImGuiIO& io = ImGui::GetIO();
-				if (io.BackendRendererUserData && --_guiBackendReferenceCount == 0) {
-					bindPrimaryGlContext();
-					ImGui_ImplOpenGL3_Shutdown();
-					_guiBackend = nullptr;
-				}
-				else {
-					io.BackendRendererName = nullptr;
-					io.BackendRendererUserData = nullptr;
-				}
-
+				_guiBackend->unbind();
+				_guiBackend->drop();
 				if (io.BackendPlatformUserData)
 					ImGui_ImplSDL2_Shutdown();
 				io.BackendPlatformUserData = nullptr;
@@ -562,6 +534,11 @@ namespace pxengine {
 			return *_fontManager;
 		}
 
+		PXE_NODISCARD NpGuiGlBackend& NpEngine::getNpGuiBackend() const
+		{
+			return *_guiBackend;
+		}
+
 		void NpEngine::initPrimaryGlContext() {
 			if (glewInit() != GLEW_OK) {
 				PXE_FATAL("Failed to Init GLEW");
@@ -587,7 +564,7 @@ namespace pxengine {
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
-		
+
 		void NpEngine::forceAssetInit(PxeGLAsset& asset)
 		{
 			bindPrimaryGlContext();
@@ -694,6 +671,11 @@ namespace pxengine {
 		PXE_NODISCARD PxeFontManager& NpEngine::getFontManager() const
 		{
 			return static_cast<PxeFontManager&>(*_fontManager);
+		}
+
+		PXE_NODISCARD PxeRenderMaterialInterface* NpEngine::getGuiRenderMaterial() const
+		{
+			return _guiBackend->getMaterial();
 		}
 
 		void NpEngine::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
@@ -804,6 +786,9 @@ namespace pxengine {
 			PXE_INFO("PxeEngine shutdown");
 			bindPrimaryGlContext();
 
+			_guiBackend->drop();
+			_guiBackend = nullptr;
+
 			// Clear the asset queue
 			_assetMutex.lock();
 			while (!_assetQueue.empty())
@@ -872,7 +857,6 @@ namespace pxengine {
 			glClearColor(0, 0, 0, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			window.bindGuiContext();
-			ImGui_ImplOpenGL3_NewFrame();
 			ImGuiIO& io = ImGui::GetIO();
 			if (_inputManager->getMouseFocusedWindow() == &window) {
 				io.ConfigFlags &= !ImGuiConfigFlags_NoMouseCursorChange;
@@ -895,7 +879,7 @@ namespace pxengine {
 			window.releaseReadLock();
 			if (!scene) return;
 			scene->acquireObjectsReadLock();
-			const std::list<PxeGeometryObjectInterface*>& renderList = scene->getGeometryObjectList();
+			const std::list<PxeGeometryObjectInterface*>& renderList = scene->getGeometryObjectList(PxeRenderPass::FORWARD);
 			if (renderList.empty()) {
 				scene->releaseObjectsReadLock();
 				scene->drop();
@@ -957,7 +941,7 @@ namespace pxengine {
 			window.acquireReadLock();
 			window.bindGuiContext();
 			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			_guiBackend->renderDrawData();
 			if (!window.getPrimaryWindow()) {
 				window._renderTexture->unbind();
 				SDL_GL_MakeCurrent(window._sdlWindow, window._sdlGlContext);
@@ -1002,5 +986,5 @@ namespace pxengine {
 		{
 			_deltaTime = dt;
 		}
-		}
 	}
+}

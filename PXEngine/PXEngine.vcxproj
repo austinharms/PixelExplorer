@@ -107,7 +107,8 @@
     <PostBuildEvent>
       <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
 xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\debug\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
-xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\debug\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\debug\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Configuration)\assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -136,7 +137,8 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\debug\*.
     <PostBuildEvent>
       <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
 xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\release\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
-xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\release\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\release\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Configuration)\assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -162,7 +164,8 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_32.vc142.mt\release\
     <PostBuildEvent>
       <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
 xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\debug\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
-xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\debug\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\debug\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Configuration)\assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -191,7 +194,8 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\debug\*.
     <PostBuildEvent>
       <Command>xcopy /i /e /s /y /f "$(SolutionDir)glew\bin\$(Configuration)\$(PlatformName)\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
 xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\*.dll" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
-xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"</Command>
+xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\*.lib" "$(SolutionDir)$(PlatformName)\$(Configuration)\"
+xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Configuration)\assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -207,8 +211,11 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClCompile Include="src\nonpublic\NpFont.cpp" />
     <ClCompile Include="src\nonpublic\NpFontManager.cpp" />
     <ClCompile Include="src\nonpublic\NpFontSource.cpp" />
+    <ClCompile Include="src\nonpublic\NpGuiGlBackend.cpp" />
+    <ClCompile Include="src\nonpublic\NpGuiRenderMaterial.cpp" />
     <ClCompile Include="src\nonpublic\NpInputManager.cpp" />
     <ClCompile Include="src\nonpublic\NpEngine.cpp" />
+    <ClCompile Include="src\nonpublic\NpRenderCollection.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
     <ClCompile Include="src\nonpublic\NpWindow.cpp" />
@@ -221,6 +228,7 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClCompile Include="src\PxeRenderMaterial.cpp" />
     <ClCompile Include="src\PxeRenderTexture.cpp" />
     <ClCompile Include="src\PxeTexture.cpp" />
+    <ClCompile Include="src\PxeUnlitRenderMaterial.cpp" />
     <ClCompile Include="src\PxeVertexArray.cpp" />
     <ClCompile Include="src\PxeVertexBuffer.cpp" />
     <ClCompile Include="src\PxeLogger.cpp" />
@@ -232,8 +240,7 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="include\PxeAction.h" />
     <ClInclude Include="include\PxeCamera.h" />
     <ClInclude Include="include\PxeDefaultCamera.h" />
-    <ClInclude Include="include\PxeGeometryObjectInterface.h" />
-    <ClInclude Include="include\PxeGUIObjectInterface.h" />
+    <ClInclude Include="include\PxeRenderObjectInterface.h" />
     <ClInclude Include="include\PxeInputManager.h" />
     <ClInclude Include="include\PxeActionSource.h" />
     <ClInclude Include="include\PxeApplicationInterface.h" />
@@ -247,6 +254,7 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="include\PxeOSHelpers.h" />
     <ClInclude Include="include\PxePhysicsObjectInterface.h" />
     <ClInclude Include="include\PxePhysicsUpdateObjectInterface.h" />
+    <ClInclude Include="include\PxeRenderMaterialInterface.h" />
     <ClInclude Include="include\PxeStaticPhysicsRenderObject.h" />
     <ClInclude Include="include\PxeObject.h" />
     <ClInclude Include="include\PxeGUIObject.h" />
@@ -256,6 +264,7 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="include\PxeDynamicPhysicsRenderObject.h" />
     <ClInclude Include="include\PxeTexture.h" />
     <ClInclude Include="include\PxeTypes.h" />
+    <ClInclude Include="include\PxeUnlitRenderMaterial.h" />
     <ClInclude Include="include\PxeVertexArray.h" />
     <ClInclude Include="include\PxeVertexBuffer.h" />
     <ClInclude Include="include\PxeVertexBufferAttrib.h" />
@@ -279,15 +288,23 @@ xcopy /i /e /s /y /f "$(SolutionDir)PhysX\physx\bin\win.x86_64.vc142.mt\release\
     <ClInclude Include="src\nonpublic\NpFont.h" />
     <ClInclude Include="src\nonpublic\NpFontManager.h" />
     <ClInclude Include="src\nonpublic\NpFontSource.h" />
+    <ClInclude Include="src\nonpublic\NpGuiGlBackend.h" />
+    <ClInclude Include="src\nonpublic\NpGuiRenderMaterial.h" />
     <ClInclude Include="src\nonpublic\NpInputManager.h" />
     <ClInclude Include="src\nonpublic\NpEngine.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
+    <ClInclude Include="src\nonpublic\NpRenderCollection.h" />
     <ClInclude Include="src\nonpublic\NpShader.h" />
+    <ClInclude Include="src\nonpublic\NpRenderPipeline.h" />
     <ClInclude Include="src\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpScene.h" />
     <ClInclude Include="src\nonpublic\NpWindow.h" />
     <ClInclude Include="include\PxeFont.h" />
     <ClInclude Include="include\PxeFontManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\pxengine_gui_shader.pxeshader" />
+    <None Include="assets\shaders\pxengine_unlit_shader.pxeshader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

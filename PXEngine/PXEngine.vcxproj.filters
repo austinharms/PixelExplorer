@@ -111,6 +111,18 @@
     <ClCompile Include="src\PxeOSHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PxeUnlitRenderMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nonpublic\NpGuiGlBackend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nonpublic\NpGuiRenderMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nonpublic\NpRenderCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PxeEngine.h">
@@ -275,10 +287,7 @@
     <ClInclude Include="include\PxeDynamicPhysicsRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeGeometryObjectInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeGUIObjectInterface.h">
+    <ClInclude Include="include\PxeRenderObjectInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxePhysicsObjectInterface.h">
@@ -290,5 +299,27 @@
     <ClInclude Include="include\PxeOSHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PxeUnlitRenderMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nonpublic\NpRenderCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nonpublic\NpRenderPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nonpublic\NpGuiGlBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeRenderMaterialInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nonpublic\NpGuiRenderMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\pxengine_unlit_shader.pxeshader" />
+    <None Include="assets\shaders\pxengine_gui_shader.pxeshader" />
   </ItemGroup>
 </Project>

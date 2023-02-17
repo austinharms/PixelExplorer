@@ -22,22 +22,23 @@
 #include "PxFoundation.h"
 #include "PxPhysics.h"
 #include "cooking/PxCooking.h"
+#include "PxeRenderMaterialInterface.h"
 
 namespace pxengine {
 	class PxeEngine : public PxeRefCount {
 	public:
 		// Creates and returns a new PxeWindow or nullptr on failure
 		// TODO Update/create notes for window creation
-		virtual PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) = 0;
+		PXE_NODISCARD virtual PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) = 0;
 
 		// Creates and returns a new PxeScene or nullptr on failure
-		virtual PXE_NODISCARD PxeScene* createScene() = 0;
+		PXE_NODISCARD virtual PxeScene* createScene() = 0;
 
 		// Returns the input manager for the engine
-		virtual PXE_NODISCARD PxeInputManager& getInputManager() const = 0;
+		PXE_NODISCARD virtual PxeInputManager& getInputManager() const = 0;
 
 		// Returns the font manager for the engine
-		virtual PXE_NODISCARD PxeFontManager& getFontManager() const = 0;
+		PXE_NODISCARD virtual PxeFontManager& getFontManager() const = 0;
 
 		// Set VSync mode for all windows
 		// Modes:
@@ -48,27 +49,31 @@ namespace pxengine {
 		virtual void setVSyncMode(int8_t mode) = 0;
 
 		// Returns VSync mode for all windows
-		virtual PXE_NODISCARD int8_t getVSyncMode() const = 0;
+		PXE_NODISCARD virtual int8_t getVSyncMode() const = 0;
 
 		// Loads and returns PxeShader or nullptr on failure 
 		// Note: returned shaders still need to be validated before use
 		// Note: all PxeShader are cached by {path} and are not guaranteed to be reloaded from disk
-		virtual PXE_NODISCARD PxeShader* loadShader(const std::filesystem::path& path) = 0;
+		PXE_NODISCARD virtual PxeShader* loadShader(const std::filesystem::path& path) = 0;
 
 		// Stops the application at the end of the current update cycle
 		virtual void shutdown() = 0;
 
 		// Returns the time the last frame took in seconds 
-		virtual PXE_NODISCARD float getDeltaTime() const = 0;
+		PXE_NODISCARD virtual float getDeltaTime() const = 0;
 
 		// Returns the physx PxFoundation instance created and used by the engine
-		virtual PXE_NODISCARD physx::PxFoundation* getPhysicsFoundation() const = 0;
+		PXE_NODISCARD virtual physx::PxFoundation* getPhysicsFoundation() const = 0;
 
 		// Returns the physx PxPhysics instance created and used by the engine
-		virtual PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const = 0;
+		PXE_NODISCARD virtual physx::PxPhysics* getPhysicsBase() const = 0;
 
 		// Returns the physx PxCooking instance created and used by the engine
-		virtual PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const = 0;
+		PXE_NODISCARD virtual physx::PxCooking* getPhysicsCooking() const = 0;
+
+		// Returns the PxeRenderMaterialInterface required to be used to render gui elements
+		// Note: this will not be created until the primary window has been created
+		PXE_NODISCARD virtual PxeRenderMaterialInterface* getGuiRenderMaterial() const = 0;
 
 		PxeEngine() = default;
 		virtual ~PxeEngine() = default;

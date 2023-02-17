@@ -13,15 +13,6 @@ namespace pxengine {
 		virtual void onStart() = 0;
 		virtual void onStop() = 0;
 		virtual void onUpdate() = 0;
-
-		virtual void preRender(PxeWindow& window) {}
-		virtual void postRender(PxeWindow& window) {}
-
-		virtual void preGUI(PxeWindow& window) {}
-		virtual void postGUI(PxeWindow& window) {}
-
-		virtual void prePhysics() {}
-		virtual void postPhysics() {}
 	};
 }
 #endif // !PXENGINE_APPLICATION_INTERFACE_H_

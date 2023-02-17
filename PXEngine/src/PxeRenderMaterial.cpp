@@ -1,9 +1,25 @@
 #include "PxeRenderMaterial.h"
 
+#include <new>
+
 #include "NpLogger.h"
+#include "PxeUnlitRenderMaterial.h"
 
 namespace pxengine {
-	PxeRenderMaterial::PxeRenderMaterial(PxeShader& shader) : _shader(shader) {
+	PxeRenderMaterial* PxeRenderMaterial::createMaterial(PxeRenderMaterialType materialType)
+	{
+		switch (materialType)
+		{
+		case PxeRenderMaterialType::UNLIT:
+			return PxeUnlitRenderMaterial::createMaterial();
+
+		default:
+			PXE_WARN("Attempted to create PxeRenderMaterial with invalid PxeRenderMaterialType");
+			return nullptr;
+		}
+	}
+
+	PxeRenderMaterial::PxeRenderMaterial(PxeShader& shader, PxeRenderPass pass) : PxeRenderMaterialInterface(pass), _shader(shader) {
 		shader.grab();
 		_loadedPropertyLocations = false;
 		if (shader.getAssetStatus() == PxeGLAssetStatus::ERROR) {
@@ -19,106 +35,127 @@ namespace pxengine {
 	void PxeRenderMaterial::setProperty1f(const std::string& name, const float value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::FLOAT1, PxeRenderMaterialValue::PxePropertyValue{ .f = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty2f(const std::string& name, const glm::vec2& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::FLOAT2, PxeRenderMaterialValue::PxePropertyValue{ .fvec2 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty3f(const std::string& name, const glm::vec3& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::FLOAT3, PxeRenderMaterialValue::PxePropertyValue{ .fvec3 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty4f(const std::string& name, const glm::vec4& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::FLOAT4, PxeRenderMaterialValue::PxePropertyValue{ .fvec4 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty1i(const std::string& name, const int32_t value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::INT1, PxeRenderMaterialValue::PxePropertyValue{ .i32 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty2i(const std::string& name, const glm::i32vec2& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::INT2, PxeRenderMaterialValue::PxePropertyValue{ .i32vec2 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty3i(const std::string& name, const glm::i32vec3& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::INT3, PxeRenderMaterialValue::PxePropertyValue{ .i32vec3 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty4i(const std::string& name, const glm::i32vec4& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::INT4, PxeRenderMaterialValue::PxePropertyValue{ .i32vec4 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty1ui(const std::string& name, const uint32_t value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::UINT1, PxeRenderMaterialValue::PxePropertyValue{ .ui32 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty2ui(const std::string& name, const glm::u32vec2& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::UINT2, PxeRenderMaterialValue::PxePropertyValue{ .ui32vec2 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty3ui(const std::string& name, const glm::u32vec3& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::UINT3, PxeRenderMaterialValue::PxePropertyValue{ .ui32vec3 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty4ui(const std::string& name, const glm::u32vec4& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::UINT4, PxeRenderMaterialValue::PxePropertyValue{ .ui32vec4 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM2f(const std::string& name, const glm::mat2& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT2, PxeRenderMaterialValue::PxePropertyValue{ .fmat2 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM3f(const std::string& name, const glm::mat3& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT3, PxeRenderMaterialValue::PxePropertyValue{ .fmat3 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM4f(const std::string& name, const glm::mat4& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT4, PxeRenderMaterialValue::PxePropertyValue{ .fmat4 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM2x3f(const std::string& name, const glm::mat2x3& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT2X3, PxeRenderMaterialValue::PxePropertyValue{ .fmat2x3 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM3x2f(const std::string& name, const glm::mat3x2& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT3X2, PxeRenderMaterialValue::PxePropertyValue{ .fmat3x2 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM2x4f(const std::string& name, const glm::mat2x4& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT2X4, PxeRenderMaterialValue::PxePropertyValue{ .fmat2x4 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM4x2f(const std::string& name, const glm::mat4x2& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT4X2, PxeRenderMaterialValue::PxePropertyValue{ .fmat4x2 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM3x4f(const std::string& name, const glm::mat3x4& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT3X4, PxeRenderMaterialValue::PxePropertyValue{ .fmat3x4 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM4x3f(const std::string& name, const glm::mat4x3& value)
 	{
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::MAT4X3, PxeRenderMaterialValue::PxePropertyValue{ .fmat4x3 = value });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty1fv(const std::string& name, const float* values, uint32_t count)
@@ -142,6 +179,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::FLOAT1, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty2fv(const std::string& name, const float* values, uint32_t count)
@@ -165,6 +203,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::FLOAT2, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty3fv(const std::string& name, const float* values, uint32_t count)
@@ -188,6 +227,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::FLOAT3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty4fv(const std::string& name, const float* values, uint32_t count)
@@ -211,6 +251,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::FLOAT4, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty1iv(const std::string& name, const int32_t* values, uint32_t count)
@@ -234,6 +275,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::INT1, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty2iv(const std::string& name, const int32_t* values, uint32_t count)
@@ -257,6 +299,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::INT2, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty3iv(const std::string& name, const int32_t* values, uint32_t count)
@@ -280,6 +323,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::INT3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty4iv(const std::string& name, const int32_t* values, uint32_t count)
@@ -303,6 +347,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::INT4, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty1uiv(const std::string& name, const uint32_t* values, uint32_t count)
@@ -326,6 +371,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::UINT1, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty2uiv(const std::string& name, const uint32_t* values, uint32_t count)
@@ -349,6 +395,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::UINT2, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty3uiv(const std::string& name, const uint32_t* values, uint32_t count)
@@ -372,6 +419,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::UINT3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setProperty4uiv(const std::string& name, const uint32_t* values, uint32_t count)
@@ -395,6 +443,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::UINT4, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM2fv(const std::string& name, const float* values, uint32_t count)
@@ -418,6 +467,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT2, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM3fv(const std::string& name, const float* values, uint32_t count)
@@ -441,6 +491,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM4fv(const std::string& name, const float* values, uint32_t count)
@@ -464,6 +515,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT4, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM2x3fv(const std::string& name, const float* values, uint32_t count)
@@ -487,6 +539,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT2X3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM3x2fv(const std::string& name, const float* values, uint32_t count)
@@ -510,6 +563,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT3X2, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM2x4fv(const std::string& name, const float* values, uint32_t count)
@@ -533,6 +587,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT2X4, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM4x2fv(const std::string& name, const float* values, uint32_t count)
@@ -556,6 +611,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT4X2, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM3x4fv(const std::string& name, const float* values, uint32_t count)
@@ -579,6 +635,7 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT3X4, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setPropertyM4x3fv(const std::string& name, const float* values, uint32_t count)
@@ -602,12 +659,14 @@ namespace pxengine {
 
 		memcpy(buf->getBuffer(), values, buf->getSize());
 		_materialProperties[name] = PxeRenderMaterialValue(count, PxeRenderMaterialValue::PxePropertyType::MAT4X3, PxeRenderMaterialValue::PxePropertyValue{ .buffer = buf });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::setTexture(const std::string& name, PxeTexture& texture, uint8_t textureSlot)
 	{
 		texture.grab();
 		_materialProperties[name] = PxeRenderMaterialValue(1, PxeRenderMaterialValue::PxePropertyType::TEXTURE, PxeRenderMaterialValue::PxePropertyValue{ .texture = PxeRenderMaterialValue::PxePropertyValue::PxeTextureBinding { textureSlot, &texture } });
+		_loadedPropertyLocations = false;
 	}
 
 	void PxeRenderMaterial::applyMaterial()

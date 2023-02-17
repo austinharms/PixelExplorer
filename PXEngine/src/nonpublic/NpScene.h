@@ -9,8 +9,7 @@
 #include "PxeObject.h"
 #include "PxePhysicsObjectInterface.h"
 #include "PxePhysicsUpdateObjectInterface.h"
-#include "PxeGeometryObjectInterface.h"
-#include "PxeGUIObjectInterface.h"
+#include "NpRenderCollection.h"
 #include "PxScene.h"
 
 namespace pxengine::nonpublic {
@@ -37,9 +36,7 @@ namespace pxengine::nonpublic {
 		NpScene(physx::PxScene* scene);
 		virtual ~NpScene();
 		// Note: this does not lock the NpScene
-		PXE_NODISCARD const std::list<PxeGUIObjectInterface*>& getGUIObjectList() const;
-		// Note: this does not lock the NpScene
-		PXE_NODISCARD const std::list<PxeGeometryObjectInterface*>& getGeometryObjectList() const;
+		PXE_NODISCARD const NpRenderCollection& getRenderCollection() const;
 		// Note: this does not lock the NpScene
 		PXE_NODISCARD const std::list<PxePhysicsUpdateObjectInterface*>& getPhysicsUpdateObjectList() const;
 		// Note: this does not lock the NpScene
@@ -59,8 +56,7 @@ namespace pxengine::nonpublic {
 		std::shared_mutex _objectMutex;
 		void* _userData;
 		physx::PxScene* _physScene;
-		std::list<PxeGUIObjectInterface*> _guiObjects;
-		std::list<PxeGeometryObjectInterface*> _geometryObjects;
+		NpRenderCollection _renderCollection;
 		std::list<PxePhysicsUpdateObjectInterface*> _physicsUpdateObjects;
 		std::list<PxePhysicsObjectInterface*> _physicsObjects;
 		float _simulationTimestep;

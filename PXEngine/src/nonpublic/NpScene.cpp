@@ -2,10 +2,11 @@
 
 #include "NpLogger.h"
 #include "PxeRenderMaterial.h"
+#include "PxeRenderObjectInterface.h"
 #include "NpEngine.h"
 
 namespace pxengine::nonpublic {
-	NpScene::NpScene(physx::PxScene* scene)
+	NpScene::NpScene(physx::PxScene* scene) : _renderCollection(this)
 	{
 		_physScene = scene;
 		_physScene->userData = this;
@@ -19,13 +20,7 @@ namespace pxengine::nonpublic {
 	NpScene::~NpScene()
 	{
 		_sceneMutex.lock();
-		for (PxeGUIObjectInterface* gui : _guiObjects)
-			dynamic_cast<PxeObject*>(gui)->drop();
-		_guiObjects.clear();
-
-		for (PxeGeometryObjectInterface* geom : _geometryObjects)
-			dynamic_cast<PxeObject*>(geom)->drop();
-		_geometryObjects.clear();
+		_renderCollection.clear();
 
 		for (PxePhysicsUpdateObjectInterface* phys : _physicsUpdateObjects)
 			dynamic_cast<PxeObject*>(phys)->drop();
@@ -46,14 +41,9 @@ namespace pxengine::nonpublic {
 		_sceneMutex.unlock();
 	}
 
-	PXE_NODISCARD const std::list<PxeGUIObjectInterface*>& NpScene::getGUIObjectList() const
+	PXE_NODISCARD const NpRenderCollection& NpScene::getRenderCollection() const
 	{
-		return _guiObjects;
-	}
-
-	PXE_NODISCARD const std::list<PxeGeometryObjectInterface*>& NpScene::getGeometryObjectList() const
-	{
-		return _geometryObjects;
+		return _renderCollection;
 	}
 
 	PXE_NODISCARD const std::list<PxePhysicsUpdateObjectInterface*>& NpScene::getPhysicsUpdateObjectList() const
@@ -172,38 +162,8 @@ namespace pxengine::nonpublic {
 			}
 		}
 
-		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GUI_UPDATE) {
-			PxeGUIObjectInterface* guiObj = dynamic_cast<PxeGUIObjectInterface*>(&obj);
-			if (guiObj) {
-				obj.grab();
-				_guiObjects.emplace_back(guiObj);
-			}
-			else {
-				PXE_WARN("Added PxeObject with GUI_UPDATE flag that did not inherit from PxeGUIObjectInterface");
-			}
-		}
-
-		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE) {
-			PxeGeometryObjectInterface* geoObj = dynamic_cast<PxeGeometryObjectInterface*>(&obj);
-			if (geoObj) {
-				obj.grab();
-				if (_geometryObjects.empty()) {
-					_geometryObjects.emplace_back(geoObj);
-				}
-				else {
-					void* materialIndex = &(geoObj->getRenderMaterial());
-					// TODO Optimize this to also sort by shaders in materials to allow for minimal shader changes when rendering
-					for (auto geoItr = _geometryObjects.begin(); geoItr != _geometryObjects.end(); ++geoItr) {
-						if (materialIndex <= &(geoObj->getRenderMaterial())) {
-							_geometryObjects.emplace(geoItr, geoObj);
-							break;
-						}
-					}
-				}
-			}
-			else {
-				PXE_WARN("Added PxeObject with GEOMETRY_UPDATE flag that did not inherit from PxeGeometryObjectInterface");
-			}
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::RENDER_OBJECT) {
+			_renderCollection.addObject(obj);
 		}
 	}
 
@@ -250,34 +210,8 @@ namespace pxengine::nonpublic {
 			}
 		}
 
-		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GUI_UPDATE) {
-			PxeGUIObjectInterface* guiObj = dynamic_cast<PxeGUIObjectInterface*>(&obj);
-			if (guiObj) {
-				if (_guiObjects.remove(guiObj)) {
-					obj.drop();
-				}
-				else {
-					PXE_WARN("Removed PxeObject/PxeGUIObjectInterface that was not added to the PxeScene");
-				}
-			}
-			else {
-				PXE_WARN("Removed PxeObject with GUI_UPDATE flag that did not inherit from PxeGUIObjectInterface");
-			}
-		}
-
-		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE) {
-			PxeGeometryObjectInterface* geoObj = dynamic_cast<PxeGeometryObjectInterface*>(&obj);
-			if (geoObj) {
-				if (_geometryObjects.remove(geoObj)) {
-					obj.drop();
-				}
-				else {
-					PXE_WARN("Removed PxeObject/PxeGeometryObjectInterface that was not added to the PxeScene");
-				}
-			}
-			else {
-				PXE_WARN("Removed PxeObject with GEOMETRY_UPDATE flag that did not inherit from PxeGeometryObjectInterface");
-			}
+		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::RENDER_OBJECT) {
+			_renderCollection.removeObject(obj);
 		}
 	}
 
