@@ -29,15 +29,6 @@ namespace pxengine {
 		// Note: this is not immediate and you must check the asset status if it is loaded 
 		void initializeAsset();
 
-		// This method should bind the OpenGl object to the current state
-		// Note: this function MUST be called from the render thread 
-		virtual void bind() = 0;
-
-		// TODO Should this restore old state?
-		// This method should remove all bound OpenGl objects from state that were bound in bind()
-		// Note: this function MUST be called from the render thread 
-		virtual void unbind() = 0;
-
 	protected:
 		// This method should create all OpenGl objects for this asset
 		// Note: you can assume there is a valid OpenGl context bound on the calling thread

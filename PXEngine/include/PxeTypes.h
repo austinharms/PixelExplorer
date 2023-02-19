@@ -31,6 +31,7 @@ namespace pxengine {
 
 	enum class PxeIndexType : uint32_t
 	{
+		UNDEFINED = 0,
 		UNSIGNED_8BIT = 0x1401,  // GL_UNSIGNED_BYTE
 		UNSIGNED_16BIT = 0x1403, // GL_UNSIGNED_SHORT
 		UNSIGNED_32BIT = 0x1405, // GL_UNSIGNED_INT
@@ -42,7 +43,6 @@ namespace pxengine {
 		PXE_WARN,
 		PXE_ERROR,
 		PXE_FATAL,
-		PXE_LOGLEVELCOUNT
 	};
 
 	typedef uint8_t PxeObjectFlagsType;
@@ -53,6 +53,14 @@ namespace pxengine {
 		PHYSICS_OBJECT = 0x02,
 		PHYSICS_UPDATE = 0x04,
 		ALL = 0x07,
+	};
+
+	typedef uint8_t PxeSceneUpdateFlagsType;
+	enum class PxeSceneUpdateFlags : PxeSceneUpdateFlagsType
+	{
+		NONE = 0x00,
+		PHYSICS_UPDATE = 0x01,
+		ALL = 0x01
 	};
 
 	enum class PxeVertexBufferAttribType : uint32_t

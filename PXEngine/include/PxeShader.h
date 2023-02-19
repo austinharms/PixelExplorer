@@ -5,12 +5,13 @@
 
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
+#include "PxeGlBindable.h"
 #include "PxeBuffer.h"
 #include "glm/gtc/type_ptr.hpp"
 
 namespace pxengine {
 	// Wrapper class for a glProgram
-	class PxeShader : public PxeGLAsset
+	class PxeShader : public PxeGLAsset, public PxeGlBindable
 	{
 	public:
 		virtual ~PxeShader() = default;

@@ -8,6 +8,7 @@
 #include "NpLogger.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "NpEngine.h"
+#include "NpRenderPipeline.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -195,7 +196,7 @@ namespace pxengine {
 		void NpShader::onDelete()
 		{
 			if (getAssetStatus() != PxeGLAssetStatus::UNINITIALIZED)
-				NpEngine::getInstance().removeShader(_path);
+				NpEngine::getInstance().getNpRenderPipeline().removeShaderFromCache(*this);
 			PxeGLAsset::onDelete();
 		}
 

@@ -10,6 +10,7 @@ namespace pxengine {
 		NpGuiRenderMaterial::NpGuiRenderMaterial(PxeShader& shader) : PxeRenderMaterialInterface(PxeRenderPass::GUI), _guiShader(shader) {
 			_projLocation = -1;
 			_textureLocation = -1;
+			_guiShader.grab();
 		}
 
 		NpGuiRenderMaterial::~NpGuiRenderMaterial() {
@@ -30,8 +31,8 @@ namespace pxengine {
 			glBindSampler(0, 0);
 			glActiveTexture(GL_TEXTURE0);
 			if (_textureLocation == -1)
-				_textureLocation = glGetUniformLocation(_guiShader.getGlProgramId(), "u_Texture");
-			glUniform1i(_textureLocation, 0);
+				_textureLocation = _guiShader.getUniformLocation("u_Texture");
+			_guiShader.setUniform1i(_textureLocation, 0);
 		}
 
 		PXE_NODISCARD PxeShader& NpGuiRenderMaterial::getShader() const
@@ -42,8 +43,8 @@ namespace pxengine {
 		void NpGuiRenderMaterial::setProjectionMatrix(const glm::mat4& mat)
 		{
 			if (_projLocation == -1)
-				_projLocation = glGetUniformLocation(_guiShader.getGlProgramId(), "u_Projection");
-			glUniformMatrix4fv(_projLocation, 1, GL_FALSE, glm::value_ptr(mat));
+				_projLocation = _guiShader.getUniformLocation("u_Projection");
+			_guiShader.setUniformM4f(_projLocation, mat);
 		}
 
 		void NpGuiRenderMaterial::setTexture(uint32_t texture)

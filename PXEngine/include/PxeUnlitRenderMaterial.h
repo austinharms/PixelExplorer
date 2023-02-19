@@ -16,8 +16,24 @@ namespace pxengine {
 		// Note: default value is <1,1,1> (white)
 		void setColor(const glm::vec3& color);
 
+		void applyMaterial() override;
+
+		PxeShader& getShader() const override;
+
 	private:
+		enum UNIFORMS
+		{
+			COLOR = 0,
+			UNIFORM_COUNT
+		};
+
 		PxeUnlitRenderMaterial(PxeShader& shader);
+		void loadLocations();
+
+		PxeShader& _shader;
+		int32_t _locations[UNIFORM_COUNT];
+		glm::vec3 _color;
+		bool _loadedLocations;
 	};
 }
 #endif // !PXENGINE_UNLIT_RENDER_MATERIAL_H_

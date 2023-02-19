@@ -12,7 +12,7 @@ namespace pxengine {
 	public:
 		// Returns if the user wants to close the window aka presses the X, Alt-F4...
 		// Note: this can be reset/ignored by calling resetShouldClose()
-		virtual PXE_NODISCARD bool getShouldClose() const = 0;
+		PXE_NODISCARD virtual bool getShouldClose() const = 0;
 
 		// Resets the internal window close flag to false
 		virtual void resetShouldClose() = 0;
@@ -30,9 +30,6 @@ namespace pxengine {
 		// Returns the current scene
 		virtual PxeScene* getScene() const = 0;
 
-		// Returns if this is the primary window
-		virtual PXE_NODISCARD bool getPrimaryWindow() const = 0;
-
 		// Returns the width of the window in pixels
 		virtual PXE_NODISCARD int32_t getWindowWidth() const = 0;
 
@@ -40,7 +37,6 @@ namespace pxengine {
 		virtual PXE_NODISCARD int32_t getWindowHeight() const = 0;
 
 		// Sets {width} and {height} to the windows width and height
-		// Note: width or height my be nullptr
 		virtual void setWindowSize(int32_t width, int32_t height) = 0;
 
 		// Returns the title of the window
@@ -71,10 +67,6 @@ namespace pxengine {
 
 	protected:
 		PxeWindow() : PxeGLAsset(true) {}
-
-	private:
-		void PxeGLAsset::bind() {}
-		void PxeGLAsset::unbind() {}
 	};
 }
 #endif

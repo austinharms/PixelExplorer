@@ -16,7 +16,7 @@ namespace pxengine {
 	public:
 		// Helper to create different types of PxeRenderMaterials, returns nullptr on failure
 		// Note: to create a custom material you can not use this function
-		static PxeRenderMaterial* createMaterial(PxeRenderMaterialType materialType);
+		static PxeRenderMaterialInterface* createMaterial(PxeRenderMaterialType materialType);
 
 		PxeRenderMaterial(PxeShader& shader, PxeRenderPass pass);
 		virtual ~PxeRenderMaterial();

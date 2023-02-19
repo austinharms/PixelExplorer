@@ -4,12 +4,13 @@
 
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
+#include "PxeGlBindable.h"
 #include "PxeVertexBuffer.h"
 #include "PxeIndexBuffer.h"
 
 namespace pxengine {
 	// Wrapper class for glVertexArray
-	class PxeVertexArray : public PxeGLAsset
+	class PxeVertexArray : public PxeGLAsset, public PxeGlBindable
 	{
 	public:
 		PxeVertexArray(bool delayAssetInitialization = false);

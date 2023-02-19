@@ -4,11 +4,12 @@
 
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
+#include "PxeGlBindable.h"
 #include "PxeBuffer.h"
 
 namespace pxengine {
 	// Wrapper class for a GL_TEXTURE_2D
-	class PxeTexture : public PxeGLAsset
+	class PxeTexture : public PxeGLAsset, public PxeGlBindable
 	{
 	public:
 		PxeTexture(bool delayAssetInitialization = false);

@@ -3,8 +3,7 @@
 #include <fstream>
 
 #include "NpEngine.h"
-#include "NpFontManager.h"
-#include "imgui.h"
+#include "NpRenderPipeline.h"
 #include "NpLogger.h"
 
 namespace pxengine {
@@ -76,27 +75,21 @@ namespace pxengine {
 
 		void NpFontSource::onDelete()
 		{
-			NpEngine::getInstance().getNpFontManager().removeSource(*this);
+			NpEngine::getInstance().getNpRenderPipeline().removeFontSourceFromCache(*this);
 		}
 
-		void NpFontSource::clearGuiFont()
+		void NpFontSource::addFontToAtlas(ImFontAtlas& atlas)
 		{
-			_font = nullptr;
-		}
-
-		void NpFontSource::updateFontAtlas()
-		{
-			if (!updateRequired()) return;
 			ImFontConfig fontConfig;
 			fontConfig.FontDataOwnedByAtlas = false;
 			fontConfig.FontData = _fontFileData;
 			fontConfig.FontDataSize = _fontFileSize;
 			fontConfig.SizePixels = _requiredSize;
 			_size = _requiredSize;
-			_font = ImGui::GetIO().Fonts->AddFont(&fontConfig);
+			_font = atlas.AddFont(&fontConfig);
 		}
 
-		bool NpFontSource::updateRequired()
+		bool NpFontSource::fontAtlasUpdateRequired()
 		{
 			return _status == PxeFontStatus::LOADED && (!_font || _size != _requiredSize);
 		}

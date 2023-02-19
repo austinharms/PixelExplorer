@@ -1,6 +1,7 @@
 #ifndef PXENGINE_NONPUBLIC_ENGINE_H_
 #define PXENGINE_NONPUBLIC_ENGINE_H_
 #include <unordered_map>
+#include <list>
 #include <mutex>
 #include <shared_mutex>
 
@@ -26,10 +27,8 @@
 #include "NpShader.h"
 #include "PxeScene.h"
 #include "imgui.h"
-#include "PxeFontManager.h"
-#include "NpFontManager.h"
 #include "SDL_log.h"
-#include "NpGuiGlBackend.h"
+#include "NpRenderPipeline.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -41,16 +40,13 @@ namespace pxengine {
 
 			PXE_NODISCARD PxeWindow* createWindow(uint32_t width, uint32_t height, const char* title) override;
 			PXE_NODISCARD PxeScene* createScene() override;
-			PXE_NODISCARD PxeShader* loadShader(const std::filesystem::path& path) override;
-			PXE_NODISCARD int8_t getVSyncMode() const override;
 			PXE_NODISCARD PxeInputManager& getInputManager() const override;
 			PXE_NODISCARD float getDeltaTime() const override;
-			PXE_NODISCARD physx::PxFoundation* getPhysicsFoundation() const override;
-			PXE_NODISCARD physx::PxPhysics* getPhysicsBase() const override;
-			PXE_NODISCARD physx::PxCooking* getPhysicsCooking() const override;
-			PXE_NODISCARD PxeFontManager& getFontManager() const override;
-			PXE_NODISCARD PxeRenderMaterialInterface* getGuiRenderMaterial() const override;
-			void setVSyncMode(int8_t mode) override;
+			PXE_NODISCARD physx::PxFoundation& getPhysicsFoundation() const override;
+			PXE_NODISCARD physx::PxPhysics& getPhysicsBase() const override;
+			PXE_NODISCARD physx::PxCooking& getPhysicsCooking() const override;
+			PXE_NODISCARD PxeRenderPipeline& getRenderPipeline() const override;
+			PXE_NODISCARD bool getShutdownFlag() const override;
 			void shutdown() override;
 
 
@@ -74,31 +70,29 @@ namespace pxengine {
 			NpEngine operator=(const NpEngine& other) = delete;
 			void processAssetQueue();
 			void initializeGlAsset(PxeGLAsset& asset);
+			// Note: must be called from the render thread with primary OpenGl context bound
+			void forceInitializeGlAsset(PxeGLAsset& asset);
 			void uninitializeGlAsset(PxeGLAsset& asset);
-			void initializeWindow(NpWindow& window);
-			void uninitializeWindow(NpWindow& window);
-			PXE_NODISCARD bool getShutdownFlag() const;
+			void registerWindow(NpWindow& window);
+			void unregisterWindow(NpWindow& window);
+			void removeScene(NpScene& scene);
 			PXE_NODISCARD PxeLogInterface& getLogInterface();
 			PXE_NODISCARD NpInputManager& getNpInputManager() const;
-			PXE_NODISCARD NpFontManager& getNpFontManager() const;
-			PXE_NODISCARD NpGuiGlBackend& getNpGuiBackend() const;
+			PXE_NODISCARD NpRenderPipeline& getNpRenderPipeline() const;
+			PXE_NODISCARD bool hasPrimaryGlContext() const;
 			void setDeltaTime(float dt);
-			void removeShader(const std::filesystem::path& path);
 			const std::unordered_map<uint32_t, NpWindow*>& getWindows();
-			void newFrame(NpWindow& window);
-			void renderFrame(NpWindow& window);
-			void renderGui(NpWindow& window);
-			void swapFramebuffer(NpWindow& window);
+			const std::list<NpScene*>& getScenes();
 			void bindPrimaryGlContext();
 			void acquireWindowsReadLock();
 			void releaseWindowsReadLock();
-			void acquireWindowsWriteLock();
-			void releaseWindowsWriteLock();
+			void acquireScenesReadLock();
+			void releaseScenesReadLock();
 			void shutdownEngine();
+			void initGlContext();
 
 		private:
 			static NpEngine* s_instance;
-			const char* EXTENDED_WINDOW_DATA_NAME = "PXE_NP_WINDOW_DATA";
 			static void GLAPIENTRY glErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 			static void sdlLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
@@ -106,16 +100,17 @@ namespace pxengine {
 			void deinitPhysics();
 			void initSDL();
 			void deinitSDL();
-			void initPrimaryGlContext();
-			void forceAssetInit(PxeGLAsset& asset);
 
 			std::shared_mutex _windowsMutex;
-			std::mutex _shaderMutex;
-			std::mutex _assetMutex;
 			// map of all the NpWindows with SDL_Windows that exist by SDL window id
 			std::unordered_map<uint32_t, NpWindow*> _sdlWindows;
-			std::unordered_map<std::filesystem::path, NpShader*> _shaderCache;
+
+			std::mutex _assetMutex;
 			std::list<PxeGLAsset*> _assetQueue;
+
+			std::shared_mutex _sceneMutex;
+			std::list<NpScene*> _scenes;
+
 			physx::PxAssertHandler& _defaultPhysAssertHandler;
 			physx::PxFoundation* _physFoundation;
 #ifdef PXE_DEBUG
@@ -129,17 +124,13 @@ namespace pxengine {
 			physx::PxTolerancesScale _physScale;
 			PxeLogInterface& _logInterface;
 			NpInputManager* _inputManager;
-			NpFontManager* _fontManager;
-			NpGuiGlBackend* _guiBackend;
+			NpRenderPipeline* _renderPipeline;
 			SDL_Window* _primarySDLWindow;
 			SDL_GLContext _primaryGlContext;
-			NpWindow* _activeMouseWindow;
-			NpWindow* _activeKeyboardWindow;
 			float _deltaTime;
-			int8_t _vsyncMode;
-			bool _boundPrimaryGlContext;
-			bool _createdWindow;
 			bool _shutdownFlag;
+			bool _windowQueueForCreation;
+			bool _renderInit;
 		};
 	}
 }

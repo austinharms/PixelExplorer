@@ -2,11 +2,12 @@
 #define PXENGINE_GLINDEXBUFFER_H_
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
+#include "PxeGlBindable.h"
 #include "PxeBuffer.h"
 
 namespace pxengine {
 	// Wrapper class for GL_ELEMENT_ARRAY_BUFFER
-	class PxeIndexBuffer : public PxeGLAsset
+	class PxeIndexBuffer : public PxeGLAsset, public PxeGlBindable
 	{
 	public:
 		// Returns the byte size of the PxeIndexType

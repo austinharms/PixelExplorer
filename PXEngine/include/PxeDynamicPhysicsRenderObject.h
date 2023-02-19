@@ -3,6 +3,7 @@
 #include "PxeTypes.h"
 #include "PxeStaticPhysicsRenderObject.h"
 #include "PxePhysicsUpdateObjectInterface.h"
+#include "PxeRenderMaterialInterface.h"
 
 namespace pxengine {
 	// Base class for rendering object with a physx PxRigidActor that changes position in world space
@@ -11,19 +12,19 @@ namespace pxengine {
 	class PxeDynamicPhysicsRenderObject : public PxeStaticPhysicsRenderObject, public PxePhysicsUpdateObjectInterface
 	{
 	public:
-		static const constexpr PxeObjectFlags DEFAULT_OBJECT_FLAGS = (PxeObjectFlags)((PxeObjectFlagsType)PxeObjectFlags::GEOMETRY_UPDATE | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_OBJECT | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_UPDATE);
+		static const constexpr PxeObjectFlags DEFAULT_OBJECT_FLAGS = (PxeObjectFlags)((PxeObjectFlagsType)PxeObjectFlags::RENDER_OBJECT | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_OBJECT | (PxeObjectFlagsType)PxeObjectFlags::PHYSICS_UPDATE);
 
-		PxeDynamicPhysicsRenderObject(PxeRenderMaterial& material, physx::PxRigidActor* physicsActor = nullptr, PxeObjectFlags flags = DEFAULT_OBJECT_FLAGS) : 
+		PxeDynamicPhysicsRenderObject(PxeRenderMaterialInterface& material, physx::PxRigidActor* physicsActor = nullptr, PxeObjectFlags flags = DEFAULT_OBJECT_FLAGS) : 
 			PxeStaticPhysicsRenderObject(material, physicsActor, flags) {}
 		virtual ~PxeDynamicPhysicsRenderObject() = default;
 
 
-		// ##### PxeGeometryObjectInterface API #####
+		// ##### PxeRenderObjectInterface API #####
 
 		// This method should draw the object to the current framebuffer
 		// Note: you can assume a valid OpenGl context
-		// Note: this requires the GEOMETRY_UPDATE flag to be set (flag is set by default)
-		virtual void onGeometry() override = 0;
+		// Note: this requires the RENDER_OBJECT flag to be set (flag is set by default)
+		virtual void onRender() override = 0;
 
 		
 		// ##### PxePhysicsUpdateObjectInterface API #####

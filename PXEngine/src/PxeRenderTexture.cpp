@@ -5,9 +5,7 @@
 
 namespace pxengine {
 	PxeRenderTexture::PxeRenderTexture(uint32_t width, uint32_t height, bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization) {
-		_glFramebufferId = 0;
 		_glRenderTextureId = 0;
-		_glDepthBuffer = 0;
 		_width = width;
 		_height = height;
 	}
@@ -25,14 +23,22 @@ namespace pxengine {
 		_width = width;
 		_height = height;
 		glBindTexture(GL_TEXTURE_2D, _glRenderTextureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-		glBindRenderbuffer(GL_RENDERBUFFER, _glDepthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	}
 
 	uint32_t PxeRenderTexture::getGlTextureId() const
 	{
 		return _glRenderTextureId;
+	}
+
+	uint32_t PxeRenderTexture::getWidth() const
+	{
+		return _width;
+	}
+
+	uint32_t PxeRenderTexture::getHeight() const
+	{
+		return _height;
 	}
 
 	void PxeRenderTexture::initializeGl()
@@ -45,41 +51,11 @@ namespace pxengine {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glBindTexture(GL_TEXTURE_2D, previousTexture);
-
-		uint32_t previousBuffer;
-		glGetIntegerv(GL_RENDERBUFFER_BINDING, (int32_t*)(&previousBuffer));
-		glGenRenderbuffers(1, &_glDepthBuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, _glDepthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height);
-		glBindRenderbuffer(GL_RENDERBUFFER, previousBuffer);
-
-		glGenFramebuffers(1, &_glFramebufferId);
-		glBindFramebuffer(GL_FRAMEBUFFER, _glFramebufferId);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _glDepthBuffer);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _glRenderTextureId, 0);
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			setErrorStatus();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void PxeRenderTexture::uninitializeGl()
 	{
-		glDeleteFramebuffers(1, &_glFramebufferId);
-		_glFramebufferId = 0;
 		glDeleteTextures(1, &_glRenderTextureId);
 		_glRenderTextureId = 0;
-		glDeleteRenderbuffers(1, &_glDepthBuffer);
-		_glDepthBuffer = 0;
-	}
-
-	void PxeRenderTexture::bind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, _glFramebufferId);
-	}
-
-	void PxeRenderTexture::unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }

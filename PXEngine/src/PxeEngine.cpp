@@ -3,14 +3,15 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <unordered_map>
+#include <list>
 
 #include "PxeOSHelpers.h"
 #include "NpLogger.h"
 #include "NpWindow.h"
 #include "NpEngine.h"
+#include "NpScene.h"
 #include "NpInputManager.h"
-#include "NpFontManager.h"
+#include "NpRenderPipeline.h"
 #include "SDL_timer.h"
 
 //#define PXE_DEBUG_TIMING
@@ -64,21 +65,15 @@ namespace pxengine {
 #endif
 
 				application->prePhysics();
-				engine->acquireWindowsReadLock();
-				const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
-				for (auto it = windows.begin(); it != windows.end(); ++it) {
-					it->second->acquireReadLock();
-					NpScene* scene = it->second->getNpScene();
-					if (scene)
-						scene->grab();
-					it->second->releaseReadLock();
-					if (scene) {
+				engine->acquireScenesReadLock();
+				const std::list<NpScene*>& scenes = engine->getScenes();
+				for (NpScene* scene : scenes) {
+					if (scene->getUpdateFlag(PxeSceneUpdateFlags::PHYSICS_UPDATE)) {
 						scene->simulatePhysics(engine->getDeltaTime());
-						scene->drop();
 					}
 				}
 
-				engine->releaseWindowsReadLock();
+				engine->releaseScenesReadLock();
 				application->postPhysics();
 
 #ifdef PXE_DEBUG_TIMING
@@ -99,21 +94,19 @@ namespace pxengine {
 			uint64_t time = SDL_GetTicks64();
 #endif
 			engine->acquireWindowsReadLock();
+			engine->acquireScenesReadLock();
+			NpRenderPipeline& renderPipeline = engine->getNpRenderPipeline();
 			const std::unordered_map<uint32_t, NpWindow*>& windows = engine->getWindows();
 			for (auto it = windows.begin(); it != windows.end(); ++it) {
 				NpWindow& window = *(it->second);
 				if (window.getAssetStatus() != PxeGLAssetStatus::INITIALIZED || !window.getScene() || !window.getCamera() || !window.getWindowWidth() || !window.getWindowHeight()) continue;
-				engine->newFrame(window);
-				application->preRender(window);
+				window.prepareForRender();
 				NpScene* scene = window.getNpScene();
-				engine->renderFrame(window);
-				application->preGUI(window);
-				engine->renderGui(window);
-				application->postGUI(window);
-				application->postRender(window);
-				engine->swapFramebuffer(window);
+				renderPipeline.renderScene(*scene, *window.getRenderTexture(), window.getCamera()->getPVMatrix(), true);
+				window.swapFramebuffers();
 			}
 
+			engine->releaseScenesReadLock();
 			engine->releaseWindowsReadLock();
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Render thread took: " + std::to_string(SDL_GetTicks64() - time));
@@ -184,7 +177,7 @@ namespace pxengine {
 			tempTime = SDL_GetTicks64();
 #endif
 
-			engine->getNpFontManager().updateFontAtlas();
+			engine->getNpRenderPipeline().rebuildGuiFontAtlas();
 
 #ifdef PXE_DEBUG_TIMING
 			PXE_INFO("Font processing took: " + std::to_string(SDL_GetTicks64() - tempTime));

@@ -45,6 +45,18 @@ namespace pxengine {
 		// Remove PxeObject object from the scene
 		virtual void removeObject(PxeObject& obj) = 0;
 
+		// Sets scene update flags
+		virtual void setUpdateFlags(PxeSceneUpdateFlagsType flags) = 0;
+
+		// Returns the current scene update flags
+		virtual PxeSceneUpdateFlagsType getUpdateFlags() const = 0;
+
+		// Sets a scene update flag
+		virtual void setUpdateFlag(PxeSceneUpdateFlags flag) = 0;
+
+		// Returns if the flag is set
+		virtual bool getUpdateFlag(PxeSceneUpdateFlags flag) const = 0;
+
 		// Returns the user data void*
 		// Note: this is purely for application uses and is not used by the engine 
 		virtual PXE_NODISCARD void* getUserData() const = 0;

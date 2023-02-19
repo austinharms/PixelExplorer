@@ -2,12 +2,13 @@
 #define PXENGINE_GLVERTEXBUFFER_H_
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
+#include "PxeGlBindable.h"
 #include "PxeBuffer.h"
 #include "PxeVertexBufferFormat.h"
 
 namespace pxengine {
 	// Wrapper class for GL_ARRAY_BUFFER
-	class PxeVertexBuffer : public PxeGLAsset
+	class PxeVertexBuffer : public PxeGLAsset, public PxeGlBindable
 	{
 	public:
 		PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer = nullptr, bool delayAssetInitialization = false);

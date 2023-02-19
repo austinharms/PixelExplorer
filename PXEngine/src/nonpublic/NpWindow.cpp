@@ -1,12 +1,14 @@
 #include "NpWindow.h"
 
 #include <cstring>
+#include <string>
 
-#include "NpEngine.h"
 #include "NpLogger.h"
+#include "NpEngine.h"
+#include "NpRenderPipeline.h"
+#include "PxeDefaultCamera.h"
 #include "backends/imgui_impl_sdl.h"
 #include "glm/ext/matrix_clip_space.hpp"
-#include "PxeDefaultCamera.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -20,19 +22,19 @@ namespace pxengine {
 			_sdlGlContext = nullptr;
 			_guiContext = nullptr;
 			_renderTexture = nullptr;
-			_externalFramebuffer = static_cast<uint32_t>(-1);
+			_internalFramebuffer = 0;
 			_width = width;
 			_height = height;
 			_flags = 0;
-			// Invalid dummy value to force VSync mode refresh
-			_vsyncMode = static_cast<int8_t>(0xff);
+			// Invalid dummy value
+			_vsyncMode = -128;
 			setWindowTitle(title);
 		}
 
 		NpWindow::~NpWindow()
 		{
 			// Don't handle _sdlWindow, _sdlGlContext, _guiContext, _renderTexture
-			// as all should be managed by the NpEngine in initializeGl and uninitializeGl
+			// as all should be managed in initializeGl and uninitializeGl
 			_windowMutex.lock();
 			if (_scene) _scene->drop();
 			if (_title) free(_title);
@@ -93,22 +95,136 @@ namespace pxengine {
 			setFlag(WINDOW_CLOSE);
 		}
 
-		void NpWindow::setPrimaryWindow()
-		{
-			std::unique_lock lock(_windowMutex);
-			setFlag(PRIMARY_WINDOW);
-		}
-
 		void NpWindow::initializeGl()
 		{
+			std::lock_guard lock(_windowMutex);
 			NpEngine& engine = NpEngine::getInstance();
-			engine.initializeWindow(*this);
+			_sdlWindow = SDL_CreateWindow(nullptr, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _width, _height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+			if (!_sdlWindow) {
+				PXE_CHECKSDLERROR();
+				PXE_ERROR("Failed to create PxeWindow's SDL_Window");
+				setErrorStatus();
+				setShouldClose();
+				return;
+			}
+
+			if (engine.hasPrimaryGlContext()) {
+				_renderTexture = new(std::nothrow) PxeRenderTexture(_width, _height, true);
+				if (!_renderTexture) {
+					PXE_ERROR("Failed to create PxeWindow's PxeRenderTexture");
+					setErrorStatus();
+					setShouldClose();
+					return;
+				}
+
+				engine.forceInitializeGlAsset(*_renderTexture);
+				SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+				PXE_CHECKSDLERROR();
+			}
+			else {
+				SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
+				PXE_CHECKSDLERROR();
+			}
+
+			_sdlGlContext = SDL_GL_CreateContext(_sdlWindow);
+			if (!_sdlGlContext) {
+				PXE_CHECKSDLERROR();
+				PXE_ERROR("Failed to create PxeWindow's OpenGl context");
+				setErrorStatus();
+				setShouldClose();
+				return;
+			}
+
+			engine.initGlContext();
+			// TODO Can this fail gracefully?
+			engine.getRenderPipeline().grab();
+			_guiContext = ImGui::CreateContext(engine.getNpRenderPipeline().getFontAtlas());
+			//if (!_guiContext) {
+			//	PXE_ERROR("Failed to create window GUI context");
+			//	setErrorStatus();
+			//	setShouldClose();
+			//	return;
+			//}
+
+			ImGui::SetCurrentContext(_guiContext);
+			ImGui::StyleColorsDark();
+			//ImGui::StyleColorsClassic();
+			//ImGui::StyleColorsLight();
+
+			// TODO Can this fail gracefully?
+			// OpenGl context is not needed here as this is not the ImGui docking branch
+			ImGui_ImplSDL2_InitForOpenGL(_sdlWindow, nullptr);
+			//if (!ImGui_ImplSDL2_InitForOpenGL(_sdlWindow, nullptr)) {
+			//	PXE_ERROR("Failed to create window GUI context");
+			//	setErrorStatus();
+			//	setShouldClose();
+			//	return;
+			//}
+
+			engine.getNpRenderPipeline().installGuiBackend();
+			// TODO De-duplicate this block
+			if (!engine.hasPrimaryGlContext()) {
+
+				_renderTexture = new(std::nothrow) PxeRenderTexture(_width, _height, true);
+				if (!_renderTexture) {
+					PXE_ERROR("Failed to create PxeWindow's PxeRenderTexture");
+					setErrorStatus();
+					setShouldClose();
+					return;
+				}
+
+				// We assume this context will become the primary OpenGl context
+				engine.forceInitializeGlAsset(*_renderTexture);
+			}
+
+			if (_renderTexture->getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+				PXE_ERROR("Failed to initialize PxeWindow's PxeRenderTexture");
+				setErrorStatus();
+				setShouldClose();
+				return;
+			}
+
+			if (!createFramebuffer()) {
+				PXE_ERROR("Failed to create PxeWindow's framebuffer");
+				setErrorStatus();
+				setShouldClose();
+				return;
+			}
+
+			_vsyncMode = engine.getRenderPipeline().getVSyncMode();
+			setFlag(SWAP_CHANGED);
+			engine.registerWindow(*this);
+			engine.bindPrimaryGlContext();
 		}
 
 		void NpWindow::uninitializeGl()
 		{
 			NpEngine& engine = NpEngine::getInstance();
-			engine.uninitializeWindow(*this);
+			engine.unregisterWindow(*this);
+			bindGlContext();
+			deleteFramebuffer();
+			engine.bindPrimaryGlContext();
+			if (_renderTexture) {
+				_renderTexture->drop();
+				_renderTexture = nullptr;
+			}
+
+			bindGuiContext();
+			engine.getNpRenderPipeline().uninstallGuiBackend();
+			ImGui_ImplSDL2_Shutdown();
+			engine.getRenderPipeline().drop();
+			ImGui::DestroyContext(_guiContext);
+			_guiContext = nullptr;
+
+			if (_sdlGlContext) {
+				SDL_GL_DeleteContext(_sdlGlContext);
+				_sdlGlContext = nullptr;
+			}
+
+			if (_sdlWindow) {
+				SDL_DestroyWindow(_sdlWindow);
+				_sdlWindow = nullptr;
+			}
 		}
 
 		bool NpWindow::getFlag(WindowFlag flag) const
@@ -133,6 +249,36 @@ namespace pxengine {
 			_flags |= (uint8_t)flag;
 		}
 
+		void NpWindow::deleteFramebuffer()
+		{
+			glDeleteFramebuffers(1, &_internalFramebuffer);
+			_internalFramebuffer = 0;
+		}
+
+		bool NpWindow::createFramebuffer()
+		{
+			if (_internalFramebuffer != 0) {
+				PXE_WARN("Called create framebuffer with existing framebuffer, deleting old framebuffer");
+				deleteFramebuffer();
+			}
+
+			if (!_renderTexture || _renderTexture->getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+				PXE_ERROR("Failed to create PxeWindow's glFramebuffer, invalid PxeRenderTexture");
+				return false;
+			}
+
+			glGenFramebuffers(1, &_internalFramebuffer);
+			glBindFramebuffer(GL_FRAMEBUFFER, _internalFramebuffer);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _renderTexture->getGlTextureId(), 0);
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+				deleteFramebuffer();
+				PXE_ERROR("Failed to create PxeWindow's glFramebuffer, Framebuffer status: " + std::to_string(glCheckFramebufferStatus(GL_FRAMEBUFFER)));
+				return false;
+			}
+
+			return true;
+		}
+
 		void NpWindow::bindGuiContext()
 		{
 #ifdef PXE_DEBUG
@@ -144,8 +290,9 @@ namespace pxengine {
 			ImGui::SetCurrentContext(_guiContext);
 		}
 
-		void NpWindow::updateSDLWindow()
+		void NpWindow::prepareForRender()
 		{
+			NpEngine& engine = NpEngine::getInstance();
 			std::unique_lock lock(_windowMutex);
 			if (!_sdlWindow) return;
 			if (getFlag(TITLE_CHANGED)) {
@@ -159,13 +306,32 @@ namespace pxengine {
 			}
 
 			SDL_GetWindowSizeInPixels(_sdlWindow, &_width, &_height);
+			_renderTexture->resize(_width, _height);
+			_camera->setWindowSize(_width, _height);
+			bindGuiContext();
+			ImGuiIO& io = ImGui::GetIO();
+			if (engine.getInputManager().getMouseFocusedWindow() == this) {
+				io.ConfigFlags &= !ImGuiConfigFlags_NoMouseCursorChange;
+			}
+			else {
+				io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+			}
+
+			ImGui_ImplSDL2_NewFrame();
+		}
+
+		void NpWindow::bindGlContext()
+		{
+			if (_sdlWindow && _sdlGlContext)
+				SDL_GL_MakeCurrent(_sdlWindow, _sdlGlContext);
 		}
 
 		void NpWindow::setVsyncMode(int8_t mode)
 		{
+			std::unique_lock lock(_windowMutex);
 			if (_vsyncMode != mode) {
 				_vsyncMode = mode;
-				SDL_GL_SetSwapInterval(_vsyncMode);
+				setFlag(SWAP_CHANGED);
 			}
 		}
 
@@ -179,14 +345,29 @@ namespace pxengine {
 			_windowMutex.unlock_shared();
 		}
 
-		void NpWindow::acquireWriteLock()
+		void NpWindow::swapFramebuffers()
 		{
-			_windowMutex.lock();
-		}
+			NpEngine& engine = NpEngine::getInstance();
+			setVsyncMode(engine.getRenderPipeline().getVSyncMode());
+			std::unique_lock lock(_windowMutex);
+			if (getFlag(SIZE_CHANGED)) {
+				PXE_WARN("PxeWindow size changed during frame render, skipping frame");
+				return;
+			}
 
-		void NpWindow::releaseWriteLock()
-		{
-			_windowMutex.unlock();
+			bindGlContext();
+			if (getFlag(SWAP_CHANGED)) {
+				SDL_GL_SetSwapInterval(_vsyncMode);
+				clearFlag(SWAP_CHANGED);
+			}
+
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, _internalFramebuffer);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glViewport(0, 0, _width, _height);
+			glDisable(GL_SCISSOR_TEST);
+			glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			SDL_GL_SwapWindow(_sdlWindow);
+			engine.bindPrimaryGlContext();
 		}
 
 		void NpWindow::setScene(PxeScene* scene)
@@ -210,11 +391,6 @@ namespace pxengine {
 			return _scene;
 		}
 
-		PXE_NODISCARD bool NpWindow::getPrimaryWindow() const
-		{
-			return getFlag(PRIMARY_WINDOW);
-		}
-
 		PXE_NODISCARD int32_t NpWindow::getWindowWidth() const
 		{
 			return _width;
@@ -228,9 +404,11 @@ namespace pxengine {
 		void NpWindow::setWindowSize(int32_t width, int32_t height)
 		{
 			std::unique_lock lock(_windowMutex);
-			_width = width;
-			_height = height;
-			setFlag(SIZE_CHANGED);
+			if (_width != width || _height != height) {
+				_width = width;
+				_height = height;
+				setFlag(SIZE_CHANGED);
+			}
 		}
 
 		PXE_NODISCARD const char* NpWindow::getWindowTitle() const
@@ -295,6 +473,11 @@ namespace pxengine {
 		PXE_NODISCARD NpScene* NpWindow::getNpScene() const
 		{
 			return _scene;
+		}
+
+		PXE_NODISCARD PxeRenderTexture* NpWindow::getRenderTexture() const
+		{
+			return _renderTexture;
 		}
 
 		PXE_NODISCARD void* NpWindow::getUserData() const {

@@ -60,9 +60,6 @@
     <ClCompile Include="src\PxeTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\backends\imgui_impl_opengl3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\imgui\backends\imgui_impl_sdl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,9 +99,6 @@
     <ClCompile Include="src\nonpublic\NpFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpFontManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\nonpublic\NpFontSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -120,7 +114,7 @@
     <ClCompile Include="src\nonpublic\NpGuiRenderMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpRenderCollection.cpp">
+    <ClCompile Include="src\nonpublic\NpRenderPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,9 +197,6 @@
     <ClInclude Include="include\PxeTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\backends\imgui_impl_opengl3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\imgui\backends\imgui_impl_sdl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -234,9 +225,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\backends\imgui_impl_opengl3_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeRenderTexture.h">
@@ -269,16 +257,10 @@
     <ClInclude Include="include\PxeStaticPhysicsRenderObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeFontManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\PxeFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\nonpublic\NpFont.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nonpublic\NpFontManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\nonpublic\NpFontSource.h">
@@ -302,9 +284,6 @@
     <ClInclude Include="include\PxeUnlitRenderMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpRenderCollection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\nonpublic\NpRenderPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -315,6 +294,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\nonpublic\NpGuiRenderMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeGlBindable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PxeRenderPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -21,9 +21,8 @@ namespace pxengine {
 			PXE_NODISCARD uint16_t getRequiredSize() const;
 			void setRequiredSize(float size);
 			void onDelete() override;
-			void clearGuiFont();
-			void updateFontAtlas();
-			bool updateRequired();
+			void addFontToAtlas(ImFontAtlas& atlas);
+			bool fontAtlasUpdateRequired();
 
 		private:
 			const std::filesystem::path _path;

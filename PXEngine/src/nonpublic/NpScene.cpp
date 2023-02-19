@@ -6,7 +6,7 @@
 #include "NpEngine.h"
 
 namespace pxengine::nonpublic {
-	NpScene::NpScene(physx::PxScene* scene) : _renderCollection(this)
+	NpScene::NpScene(physx::PxScene* scene)
 	{
 		_physScene = scene;
 		_physScene->userData = this;
@@ -14,13 +14,20 @@ namespace pxengine::nonpublic {
 		_simulationTimestep = 0.01f;
 		_simulationScale = 1;
 		_userData = nullptr;
+		_updateFlags = (PxeSceneUpdateFlagsType)PxeSceneUpdateFlags::ALL;
 		NpEngine::getInstance().grab();
 	}
 
 	NpScene::~NpScene()
 	{
 		_sceneMutex.lock();
-		_renderCollection.clear();
+		for (int32_t pass = 0; pass < PxeRenderPassCount; ++pass) {
+			for (PxeRenderObjectInterface* obj : _renderObjects[pass]) {
+				dynamic_cast<PxeObject*>(obj)->drop();
+			}
+
+			_renderObjects[pass].clear();
+		}
 
 		for (PxePhysicsUpdateObjectInterface* phys : _physicsUpdateObjects)
 			dynamic_cast<PxeObject*>(phys)->drop();
@@ -41,9 +48,14 @@ namespace pxengine::nonpublic {
 		_sceneMutex.unlock();
 	}
 
-	PXE_NODISCARD const NpRenderCollection& NpScene::getRenderCollection() const
+	void NpScene::onDelete()
 	{
-		return _renderCollection;
+		NpEngine::getInstance().removeScene(*this);
+	}
+
+	PXE_NODISCARD const std::list<PxeRenderObjectInterface*>& NpScene::getRenderObjects(PxeRenderPass pass) const
+	{
+		return _renderObjects[(int32_t)pass];
 	}
 
 	PXE_NODISCARD const std::list<PxePhysicsUpdateObjectInterface*>& NpScene::getPhysicsUpdateObjectList() const
@@ -163,7 +175,26 @@ namespace pxengine::nonpublic {
 		}
 
 		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::RENDER_OBJECT) {
-			_renderCollection.addObject(obj);
+			PxeRenderObjectInterface* renderObj = dynamic_cast<PxeRenderObjectInterface*>(&obj);
+			if (!renderObj) {
+				PXE_WARN("Attempted to add PxeObject to PxeScene with RENDER_OBJECT flag that did not inherit from PxeRenderObjectInterface");
+				return;
+			}
+
+			PxeRenderPass renderPass = renderObj->getRenderMaterial().getRenderPass();
+			if ((int32_t)renderPass >= PxeRenderPassCount) {
+				PXE_WARN("Attempted to add PxeRenderObjectInterface to PxeScene with invalid PxeRenderPass");
+				return;
+			}
+
+			if (renderPass == PxeRenderPass::GUI && &renderObj->getRenderMaterial() != NpEngine::getInstance().getRenderPipeline().getGuiRenderMaterial()) {
+				PXE_WARN("Attempted to add PxeRenderObjectInterface to PxeScene with GUI PxeRenderPass that did not use gui PxeRenderMaterial");
+				return;
+			}
+
+			obj.grab();
+			// TODO Sort this based on shader and material
+			_renderObjects[(int32_t)renderPass].emplace_back(renderObj);
 		}
 	}
 
@@ -211,8 +242,49 @@ namespace pxengine::nonpublic {
 		}
 
 		if (obj.getObjectFlags() & (PxeObjectFlagsType)PxeObjectFlags::RENDER_OBJECT) {
-			_renderCollection.removeObject(obj);
+			PxeRenderObjectInterface* renderObj = dynamic_cast<PxeRenderObjectInterface*>(&obj);
+			if (!renderObj) {
+				PXE_WARN("Attempted to remove PxeObject from PxeScene with RENDER_OBJECT flag that did not inherit from PxeRenderObjectInterface");
+				return;
+			}
+
+			PxeRenderPass renderPass = renderObj->getRenderMaterial().getRenderPass();
+			if ((int32_t)renderPass >= PxeRenderPassCount) {
+				PXE_WARN("Attempted to remove PxeRenderObjectInterface from PxeScene with invalid PxeRenderPass");
+				return;
+			}
+
+			if (_renderObjects[(int32_t)renderPass].remove(renderObj)) {
+				obj.drop();
+			}
+			else {
+				PXE_WARN("Attempted to remove PxeRenderObjectInterface that was not added to the PxeScene");
+			}
 		}
+	}
+
+	void NpScene::setUpdateFlags(PxeSceneUpdateFlagsType flags)
+	{
+		std::unique_lock lock(_sceneMutex);
+		_updateFlags = flags;
+	}
+
+	PxeSceneUpdateFlagsType NpScene::getUpdateFlags() const
+	{
+		std::shared_lock lock(_sceneMutex);
+		return _updateFlags;
+	}
+
+	void NpScene::setUpdateFlag(PxeSceneUpdateFlags flag)
+	{
+		std::unique_lock lock(_sceneMutex);
+		_updateFlags |= (PxeSceneUpdateFlagsType)flag;
+	}
+
+	bool NpScene::getUpdateFlag(PxeSceneUpdateFlags flag) const
+	{
+		std::shared_lock lock(_sceneMutex);
+		return _updateFlags & (PxeSceneUpdateFlagsType)flag;
 	}
 
 	PXE_NODISCARD void* NpScene::getUserData() const {

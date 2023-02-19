@@ -199,7 +199,6 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\imgui\backends\imgui_impl_sdl.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
@@ -209,13 +208,12 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
     <ClCompile Include="src\nonpublic\NpAction.cpp" />
     <ClCompile Include="src\nonpublic\NpActionSource.cpp" />
     <ClCompile Include="src\nonpublic\NpFont.cpp" />
-    <ClCompile Include="src\nonpublic\NpFontManager.cpp" />
     <ClCompile Include="src\nonpublic\NpFontSource.cpp" />
     <ClCompile Include="src\nonpublic\NpGuiGlBackend.cpp" />
     <ClCompile Include="src\nonpublic\NpGuiRenderMaterial.cpp" />
     <ClCompile Include="src\nonpublic\NpInputManager.cpp" />
     <ClCompile Include="src\nonpublic\NpEngine.cpp" />
-    <ClCompile Include="src\nonpublic\NpRenderCollection.cpp" />
+    <ClCompile Include="src\nonpublic\NpRenderPipeline.cpp" />
     <ClCompile Include="src\nonpublic\NpScene.cpp" />
     <ClCompile Include="src\nonpublic\NpShader.cpp" />
     <ClCompile Include="src\nonpublic\NpWindow.cpp" />
@@ -238,6 +236,7 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PxeAction.h" />
+    <ClInclude Include="include\PxeGlBindable.h" />
     <ClInclude Include="include\PxeCamera.h" />
     <ClInclude Include="include\PxeDefaultCamera.h" />
     <ClInclude Include="include\PxeRenderObjectInterface.h" />
@@ -255,6 +254,7 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
     <ClInclude Include="include\PxePhysicsObjectInterface.h" />
     <ClInclude Include="include\PxePhysicsUpdateObjectInterface.h" />
     <ClInclude Include="include\PxeRenderMaterialInterface.h" />
+    <ClInclude Include="include\PxeRenderPipeline.h" />
     <ClInclude Include="include\PxeStaticPhysicsRenderObject.h" />
     <ClInclude Include="include\PxeObject.h" />
     <ClInclude Include="include\PxeGUIObject.h" />
@@ -274,8 +274,6 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
     <ClInclude Include="include\PxeScene.h" />
     <ClInclude Include="include\PxeShader.h" />
     <ClInclude Include="include\PxeWindow.h" />
-    <ClInclude Include="src\imgui\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="src\imgui\backends\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="src\imgui\backends\imgui_impl_sdl.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
@@ -286,21 +284,18 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
     <ClInclude Include="src\nonpublic\NpAction.h" />
     <ClInclude Include="src\nonpublic\NpActionSource.h" />
     <ClInclude Include="src\nonpublic\NpFont.h" />
-    <ClInclude Include="src\nonpublic\NpFontManager.h" />
     <ClInclude Include="src\nonpublic\NpFontSource.h" />
     <ClInclude Include="src\nonpublic\NpGuiGlBackend.h" />
     <ClInclude Include="src\nonpublic\NpGuiRenderMaterial.h" />
     <ClInclude Include="src\nonpublic\NpInputManager.h" />
     <ClInclude Include="src\nonpublic\NpEngine.h" />
     <ClInclude Include="src\nonpublic\NpLogger.h" />
-    <ClInclude Include="src\nonpublic\NpRenderCollection.h" />
     <ClInclude Include="src\nonpublic\NpShader.h" />
     <ClInclude Include="src\nonpublic\NpRenderPipeline.h" />
     <ClInclude Include="src\NpLogger.h" />
     <ClInclude Include="src\nonpublic\NpScene.h" />
     <ClInclude Include="src\nonpublic\NpWindow.h" />
     <ClInclude Include="include\PxeFont.h" />
-    <ClInclude Include="include\PxeFontManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\pxengine_gui_shader.pxeshader" />

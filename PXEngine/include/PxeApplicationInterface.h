@@ -13,6 +13,8 @@ namespace pxengine {
 		virtual void onStart() = 0;
 		virtual void onStop() = 0;
 		virtual void onUpdate() = 0;
+		virtual void prePhysics() {}
+		virtual void postPhysics() {}
 	};
 }
 #endif // !PXENGINE_APPLICATION_INTERFACE_H_

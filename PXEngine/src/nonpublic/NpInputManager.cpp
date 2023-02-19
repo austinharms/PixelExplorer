@@ -110,6 +110,7 @@ namespace pxengine {
 
 		void NpInputManager::processEvents()
 		{
+			NpEngine::getInstance().acquireWindowsReadLock();
 			_cursorChange = glm::i32vec2(0);
 			SDL_Event evt;
 			while (SDL_PollEvent(&evt))
@@ -259,6 +260,8 @@ namespace pxengine {
 				break;
 				}
 			}
+
+			NpEngine::getInstance().releaseWindowsReadLock();
 		}
 
 		void NpInputManager::clearActiveWindow(NpWindow* window)

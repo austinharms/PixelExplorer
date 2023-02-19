@@ -9,25 +9,24 @@ namespace pxengine {
 		class NpGuiGlBackend : public PxeGLAsset
 		{
 		public:
-			NpGuiGlBackend();
+			NpGuiGlBackend(NpGuiRenderMaterial& guiMaterial);
 			virtual ~NpGuiGlBackend();
 
             // installs the gui backend to the current gui context
-            void bind() override;
+            void installBackend();
 
             // removes the gui backend from the current gui context
-            void unbind() override;
+            void uninstallBackend();
 
             void rebuildFontTexture();
             void renderDrawData();
-            PxeRenderMaterialInterface* getMaterial() const;
 
         protected:
             void initializeGl() override;
             void uninitializeGl() override;
 
 		private:
-            NpGuiRenderMaterial* _guiMaterial;
+            NpGuiRenderMaterial& _guiMaterial;
             uint32_t _glFontTextureId;
             uint32_t _glVertexArray;
             uint32_t _glArrayBuffer;

@@ -9,18 +9,15 @@
 
 namespace pxengine {
 	namespace nonpublic {
-		NpGuiGlBackend::NpGuiGlBackend() : PxeGLAsset(true) {
-			_guiMaterial = nullptr;
+		NpGuiGlBackend::NpGuiGlBackend(NpGuiRenderMaterial& guiMaterial) : _guiMaterial(guiMaterial) {
+			_guiMaterial.grab();
 		}
 
 		NpGuiGlBackend::~NpGuiGlBackend() {}
 
-		void NpGuiGlBackend::bind()
+		// TODO Make this if the backend was installed
+		void NpGuiGlBackend::installBackend()
 		{
-			if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
-				PXE_FATAL("Attempted to install non initialized gui render backend");
-			}
-
 			ImGuiIO& io = ImGui::GetIO();
 			if (io.BackendRendererUserData) {
 				PXE_ERROR("Attempted to initialize already initialized gui renderer backend");
@@ -30,10 +27,9 @@ namespace pxengine {
 			io.BackendRendererUserData = (void*)this;
 			io.BackendRendererName = "PXENGINE_NpGuiGlBackend";
 			io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
-
 		}
 
-		void NpGuiGlBackend::unbind()
+		void NpGuiGlBackend::uninstallBackend()
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			if (!io.BackendRendererUserData) {
@@ -56,23 +52,31 @@ namespace pxengine {
 			int32_t width;
 			int32_t height;
 			io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 			glBindTexture(GL_TEXTURE_2D, _glFontTextureId);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+			io.Fonts->SetTexID((ImTextureID)(intptr_t)_glFontTextureId);
 		}
 
 		void NpGuiGlBackend::renderDrawData()
 		{
+			if (getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
+				PXE_FATAL("Attempted to render gui using non initialized render backend");
+			}
+
 			ImDrawData* drawData = ImGui::GetDrawData();
 			int32_t fbWidth = (int32_t)(drawData->DisplaySize.x * drawData->FramebufferScale.x);
 			int32_t fbHeight = (int32_t)(drawData->DisplaySize.y * drawData->FramebufferScale.y);
 			if (fbWidth <= 0 || fbHeight <= 0) return;
 			glViewport(0, 0, fbWidth, fbHeight);
-			_guiMaterial->setProjectionMatrix(glm::ortho(drawData->DisplayPos.x, drawData->DisplayPos.x + drawData->DisplaySize.x, drawData->DisplayPos.y + drawData->DisplaySize.y, drawData->DisplayPos.y));
-			_guiMaterial->setTexture(0);
+			_guiMaterial.setProjectionMatrix(glm::ortho(drawData->DisplayPos.x, drawData->DisplayPos.x + drawData->DisplaySize.x, drawData->DisplayPos.y + drawData->DisplaySize.y, drawData->DisplayPos.y));
+			_guiMaterial.setTexture(0);
 			glBindVertexArray(_glVertexArray);
+			glBindBuffer(GL_ARRAY_BUFFER, _glArrayBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _glElementBuffer);
+
 			// Will project scissor/clipping rectangles into framebuffer space
 			ImVec2 clip_off = drawData->DisplayPos;         // (0,0) unless using multi-viewports
 			ImVec2 clip_scale = drawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
@@ -80,15 +84,15 @@ namespace pxengine {
 			for (int n = 0; n < drawData->CmdListsCount; n++)
 			{
 				const ImDrawList* cmdList = drawData->CmdLists[n];
-				glBufferData(GL_ARRAY_BUFFER, (ptrdiff_t)cmdList->VtxBuffer.Size * (ptrdiff_t)sizeof(ImDrawVert), (const void*)cmdList->VtxBuffer.Data, GL_STREAM_DRAW);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, (ptrdiff_t)cmdList->IdxBuffer.Size * (ptrdiff_t)sizeof(ImDrawIdx), (const void*)cmdList->IdxBuffer.Data, GL_STREAM_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, (size_t)cmdList->VtxBuffer.Size * sizeof(ImDrawVert), (const void*)cmdList->VtxBuffer.Data, GL_STREAM_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, (size_t)cmdList->IdxBuffer.Size * sizeof(ImDrawIdx), (const void*)cmdList->IdxBuffer.Data, GL_STREAM_DRAW);
 				for (int cmdIndex = 0; cmdIndex < cmdList->CmdBuffer.Size; cmdIndex++)
 				{
 					const ImDrawCmd* pcmd = &cmdList->CmdBuffer[cmdIndex];
 					if (pcmd->UserCallback != nullptr)
 					{
 						if (pcmd->UserCallback == ImDrawCallback_ResetRenderState) {
-							_guiMaterial->applyMaterial();
+							_guiMaterial.applyMaterial();
 						}
 						else {
 							pcmd->UserCallback(cmdList, pcmd);
@@ -100,32 +104,18 @@ namespace pxengine {
 						ImVec2 clipMax((pcmd->ClipRect.z - clip_off.x) * clip_scale.x, (pcmd->ClipRect.w - clip_off.y) * clip_scale.y);
 						if (clipMax.x <= clipMin.x || clipMax.y <= clipMin.y)
 							continue;
-						glScissor((int32_t)clipMin.x, (int32_t)((float)fbHeight - clipMax.y), (int)(clipMax.x - clipMin.x), (int)(clipMax.y - clipMin.y));
-						_guiMaterial->setTexture((uint32_t)(pcmd->GetTexID()));
+						glScissor((int)clipMin.x, (int)((float)fbHeight - clipMax.y), (int)(clipMax.x - clipMin.x), (int)(clipMax.y - clipMin.y));
+						_guiMaterial.setTexture((uint32_t)(pcmd->GetTexID()));
 						glDrawElementsBaseVertex(GL_TRIANGLES, (int32_t)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)), (int32_t)pcmd->VtxOffset);
 					}
 				}
 			}
-		}
 
-		PxeRenderMaterialInterface* NpGuiGlBackend::getMaterial() const
-		{
-			return _guiMaterial;
+			glBindVertexArray(0);
 		}
 
 		void NpGuiGlBackend::initializeGl()
 		{
-			PxeShader* shader = NpEngine::getInstance().loadShader(getAssetPath("shaders") / "pxengine_gui_shader.pxeshader");
-			if (!shader) {
-				PXE_FATAL("Failed to load gui render backend shader");
-			}
-
-			_guiMaterial = new(std::nothrow) NpGuiRenderMaterial(*shader);
-			shader->drop();
-			if (!_guiMaterial) {
-				PXE_FATAL("Failed to allocate gui render backend material");
-			}
-
 			int32_t previousTexture;
 			int32_t previousVertexArray;
 			glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
@@ -137,15 +127,16 @@ namespace pxengine {
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
-			glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, (const void*)0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, (const void*)8);
+			glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 20, (const void*)16);
 			glGenBuffers(1, &_glElementBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _glElementBuffer);
 			glGenTextures(1, &_glFontTextureId);
 			rebuildFontTexture();
 			glBindVertexArray(previousVertexArray);
 			glBindTexture(GL_TEXTURE_2D, previousTexture);
+			PXE_INFO("gui backend initialized");
 		}
 
 		void NpGuiGlBackend::uninitializeGl()
@@ -154,8 +145,8 @@ namespace pxengine {
 			glDeleteBuffers(1, &_glElementBuffer);
 			glDeleteVertexArrays(1, &_glVertexArray);
 			glDeleteTextures(1, &_glFontTextureId);
-			_guiMaterial->drop();
-			_guiMaterial = nullptr;
+			_guiMaterial.drop();
+			PXE_INFO("gui backend uninitialized");
 		}
 	}
 }

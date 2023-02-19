@@ -1,16 +1,12 @@
 #ifndef PXENGINE_NONPUBLIC_WINDOW_H_
 #define PXENGINE_NONPUBLIC_WINDOW_H_
-#include <mutex>
 #include <shared_mutex>
 
-#include "PxeTypes.h"
 #include "PxeWindow.h"
-#include "SDL_video.h"
-#include "PxeScene.h"
-#include "NpScene.h"
-#include "imgui.h"
-#include "PxeCamera.h"
 #include "PxeRenderTexture.h"
+#include "NpScene.h"
+#include "SDL_video.h"
+#include "imgui.h"
 
 namespace pxengine {
 	namespace nonpublic {
@@ -27,7 +23,6 @@ namespace pxengine {
 			PXE_NODISCARD bool getWindowShown() const override;
 			void setScene(PxeScene* scene) override;
 			PXE_NODISCARD PxeScene* getScene() const override;
-			PXE_NODISCARD bool getPrimaryWindow() const override;
 			PXE_NODISCARD int32_t getWindowWidth() const override;
 			PXE_NODISCARD int32_t getWindowHeight() const override;
 			void setWindowSize(int32_t width, int32_t height) override;
@@ -46,16 +41,19 @@ namespace pxengine {
 			PXE_NODISCARD SDL_Window* getSDLWindow() const;
 			PXE_NODISCARD uint32_t getSDLWindowId() const;
 			PXE_NODISCARD NpScene* getNpScene() const;
+			PXE_NODISCARD PxeRenderTexture* getRenderTexture() const;
 			void setShouldClose();
-			void setPrimaryWindow();
 			void bindGuiContext();
-			void updateSDLWindow();
-			// Note: this method assumes valid OpenGl context
+			// update the SLD window and gui context and prepare them for rendering
+			// Note: this binds the gui context
+			// Note: this requires the primary OpenGl context
+			void prepareForRender();
+			void bindGlContext();
 			void setVsyncMode(int8_t mode);
 			void acquireReadLock();
 			void releaseReadLock();
-			void acquireWriteLock();
-			void releaseWriteLock();
+			// Note: changes active OpenGl context
+			void swapFramebuffers();
 
 		protected:
 
@@ -70,7 +68,7 @@ namespace pxengine {
 			{
 				SIZE_CHANGED		= 0b00000001,
 				TITLE_CHANGED		= 0b00000010,
-				PRIMARY_WINDOW		= 0b00000100,
+				SWAP_CHANGED		= 0b00000100,
 				WINDOW_CLOSE		= 0b00001000,
 			};
 
@@ -78,6 +76,11 @@ namespace pxengine {
 			void clearFlag(WindowFlag flag);
 			void setFlag(WindowFlag flag, bool value);
 			void setFlag(WindowFlag flag);
+			// Note: deletes framebuffer for current OpenGl context
+			void deleteFramebuffer();
+			// Note: creates framebuffer for current OpenGl context
+			// Note: rebinds glFramebuffer
+			bool createFramebuffer();
 
 			mutable std::shared_mutex _windowMutex;
 			void* _userData;
@@ -88,7 +91,7 @@ namespace pxengine {
 			SDL_GLContext _sdlGlContext;
 			ImGuiContext* _guiContext;
 			PxeRenderTexture* _renderTexture;
-			uint32_t _externalFramebuffer;
+			uint32_t _internalFramebuffer;
 			int32_t _width;
 			int32_t _height;
 			uint8_t _flags;

@@ -6,7 +6,7 @@
 #include "PxeUnlitRenderMaterial.h"
 
 namespace pxengine {
-	PxeRenderMaterial* PxeRenderMaterial::createMaterial(PxeRenderMaterialType materialType)
+	PxeRenderMaterialInterface* PxeRenderMaterial::createMaterial(PxeRenderMaterialType materialType)
 	{
 		switch (materialType)
 		{
@@ -676,6 +676,18 @@ namespace pxengine {
 			PXE_WARN("Applying PxeRenderMaterial to PxeShader that's status was not INITIALIZED");
 		}
 #endif // PXE_DEBUG
+
+		glFrontFace(GL_CCW);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_STENCIL_TEST);
+		glDisable(GL_SCISSOR_TEST);
+		glDisable(GL_PRIMITIVE_RESTART);
+		glCullFace(GL_BACK);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glBindSampler(0, 0);
 
 		if (!_loadedPropertyLocations)
 			loadPropertyLocations();

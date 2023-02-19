@@ -9,7 +9,7 @@
 #include "PxeObject.h"
 #include "PxePhysicsObjectInterface.h"
 #include "PxePhysicsUpdateObjectInterface.h"
-#include "NpRenderCollection.h"
+#include "PxeRenderObjectInterface.h"
 #include "PxScene.h"
 
 namespace pxengine::nonpublic {
@@ -27,20 +27,28 @@ namespace pxengine::nonpublic {
 		void setPhysicsSimulationStep(float step) override;
 		void addObject(PxeObject& obj) override;
 		void removeObject(PxeObject& obj) override;
+		void setUpdateFlags(PxeSceneUpdateFlagsType flags) override;
+		PxeSceneUpdateFlagsType getUpdateFlags() const override;
+		void setUpdateFlag(PxeSceneUpdateFlags flag) override;
+		bool getUpdateFlag(PxeSceneUpdateFlags flag) const override;
 		PXE_NODISCARD void* getUserData() const override;
 		void setUserData(void* data) override;
 
+
+		//############# PxeRefCount API ##################
+
+		void onDelete() override;
 
 		//############# PRIVATE API ##################
 	
 		NpScene(physx::PxScene* scene);
 		virtual ~NpScene();
 		// Note: this does not lock the NpScene
-		PXE_NODISCARD const NpRenderCollection& getRenderCollection() const;
-		// Note: this does not lock the NpScene
 		PXE_NODISCARD const std::list<PxePhysicsUpdateObjectInterface*>& getPhysicsUpdateObjectList() const;
 		// Note: this does not lock the NpScene
 		PXE_NODISCARD const std::list<PxePhysicsObjectInterface*>& getPhysicsObjectList() const;
+		// Note: this does not lock the NpScene
+		PXE_NODISCARD const std::list<PxeRenderObjectInterface*>& getRenderObjects(PxeRenderPass pass) const;
 		void simulatePhysics(float time);
 		void acquireReadLock();
 		void releaseReadLock();
@@ -56,12 +64,13 @@ namespace pxengine::nonpublic {
 		std::shared_mutex _objectMutex;
 		void* _userData;
 		physx::PxScene* _physScene;
-		NpRenderCollection _renderCollection;
 		std::list<PxePhysicsUpdateObjectInterface*> _physicsUpdateObjects;
 		std::list<PxePhysicsObjectInterface*> _physicsObjects;
+		std::list<PxeRenderObjectInterface*> _renderObjects[PxeRenderPassCount];
 		float _simulationTimestep;
 		float _simulationAccumulator;
 		float _simulationScale;
+		PxeSceneUpdateFlagsType _updateFlags;
 	};
 }
 #endif // !PXENGINE_SCENE_H_
