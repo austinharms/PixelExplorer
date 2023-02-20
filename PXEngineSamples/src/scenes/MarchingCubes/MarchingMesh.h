@@ -143,7 +143,7 @@ namespace marchingcubes {
 			indexData->drop();
 		}
 
-		void onGeometry() override {
+		void onRender() override {
 			_vertexArray->bind();
 			_vertexBuffer->bind();
 			_indexBuffer->bind();

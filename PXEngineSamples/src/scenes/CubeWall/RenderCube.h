@@ -70,7 +70,7 @@ namespace cubewall {
 			_vertexArray->drop();
 		}
 
-		void onGeometry() override {
+		void onRender() override {
 			_vertexArray->bind();
 			_indexBuffer->bind();
 			glDrawElements(GL_TRIANGLES, _indexBuffer->getIndexCount(), (uint32_t)_indexBuffer->getIndexType(), nullptr);

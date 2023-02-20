@@ -23,6 +23,7 @@ public:
 	void onStart() override {
 		using namespace pxengine;
 		PxeEngine& engine = pxeGetEngine();
+		engine.getRenderPipeline().setVSyncMode(0);
 		_mainWindow = engine.createWindow(600, 400, "PXEngine Sample Application");
 		if (!_mainWindow) {
 			_error = true;

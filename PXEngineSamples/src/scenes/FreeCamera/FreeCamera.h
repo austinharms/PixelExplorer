@@ -51,7 +51,7 @@ public:
 
 		_window->setScene(scene);
 
-		PxeShader* shader = engine.loadShader(getAssetPath("shaders") / "test.pxeshader");
+		PxeShader* shader = engine.getRenderPipeline().loadShader(getAssetPath("shaders") / "test.pxeshader");
 		if (!shader) {
 			scene->drop();
 			_error = true;
@@ -68,7 +68,7 @@ public:
 
 		texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
 
-		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader);
+		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader, PxeRenderPass::FORWARD);
 		if (!material) {
 			_error = true;
 			texture->drop();

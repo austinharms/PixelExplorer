@@ -11,15 +11,15 @@ namespace cubestack {
 	{
 	public:
 		static PhysicsCube* createPhysicsCube(const glm::vec3& pos, bool dynamic, pxengine::PxeRenderMaterial& material, pxengine::PxeIndexBuffer* indexBuffer = nullptr, pxengine::PxeVertexArray* vertextArray = nullptr, physx::PxShape* shape = nullptr, const glm::vec3& velocity = glm::vec3(0)) {
-			physx::PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
+			physx::PxPhysics& physics = pxengine::pxeGetEngine().getPhysicsBase();
 			physx::PxRigidActor* actor;
 			physx::PxTransform pxTransform(physx::PxVec3(pos.x, pos.y, pos.z));
 			if (dynamic) {
-				actor = physics->createRigidDynamic(pxTransform);
+				actor = physics.createRigidDynamic(pxTransform);
 				static_cast<physx::PxRigidDynamic*>(actor)->setLinearVelocity(physx::PxVec3(velocity.x, velocity.y, velocity.z));
 			}
 			else {
-				actor = physics->createRigidStatic(pxTransform);
+				actor = physics.createRigidStatic(pxTransform);
 			}
 
 			if (!actor) return nullptr;
@@ -39,7 +39,7 @@ namespace cubestack {
 			_pxShape->release();
 		}
 
-		void onGeometry() override {
+		void onRender() override {
 			_vertexArray->bind();
 			_indexBuffer->bind();
 			glDrawElements(GL_TRIANGLES, 36, (uint32_t)_indexBuffer->getIndexType(), nullptr);
@@ -108,7 +108,7 @@ namespace cubestack {
 				vertexBuffer = nullptr;
 			}
 
-			physx::PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
+			physx::PxPhysics& physics = pxengine::pxeGetEngine().getPhysicsBase();
 			if (shape) {
 				shape->acquireReference();
 				_pxShape = shape;
@@ -121,10 +121,10 @@ namespace cubestack {
 				meshDesc.points.data = &vertices;
 				meshDesc.points.stride = sizeof(float) * 5;
 				meshDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eDISABLE_MESH_VALIDATION | PxConvexFlag::eFAST_INERTIA_COMPUTATION;
-				PxCooking* cooking = pxeGetEngine().getPhysicsCooking();
-				PxConvexMesh* mesh = cooking->createConvexMesh(meshDesc, physics->getPhysicsInsertionCallback());
-				PxMaterial* material = physics->createMaterial(1.0f, 0.5f, 0.5f);
-				_pxShape = physics->createShape(PxConvexMeshGeometry(mesh), *material);
+				PxCooking& cooking = pxeGetEngine().getPhysicsCooking();
+				PxConvexMesh* mesh = cooking.createConvexMesh(meshDesc, physics.getPhysicsInsertionCallback());
+				PxMaterial* material = physics.createMaterial(1.0f, 0.5f, 0.5f);
+				_pxShape = physics.createShape(PxConvexMeshGeometry(mesh), *material);
 				mesh->release();
 				material->release();
 			}

@@ -24,7 +24,7 @@ public:
 
 	virtual ~MainMenu() {}
 
-	void onGUI() override
+	void onRender() override
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
 		ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
@@ -48,6 +48,7 @@ public:
 			_clickedActions |= QUIT;
 		ImGui::End();
 		ImGui::PopStyleVar();
+		ImGui::ShowDemoWindow();
 	}
 
 	uint8_t getClickedActions()
