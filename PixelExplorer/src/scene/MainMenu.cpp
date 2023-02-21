@@ -20,6 +20,7 @@ namespace pixelexplorer {
 				return;
 			}
 
+			getScene()->setUpdateFlags(0);
 			getScene()->addObject(*_playMenu);
 		}
 

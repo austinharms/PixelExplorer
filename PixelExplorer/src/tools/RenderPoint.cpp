@@ -8,7 +8,7 @@
 
 namespace pixelexplorer {
 	namespace tools {
-		pxengine::PxeRenderMaterial* RenderPoint::s_material = nullptr;
+		pxengine::PxeUnlitRenderMaterial* RenderPoint::s_material = nullptr;
 		pxengine::PxeVertexArray* RenderPoint::s_vertexArray = nullptr;
 		std::mutex RenderPoint::s_renderDataMutex;
 
@@ -19,11 +19,7 @@ namespace pixelexplorer {
 			
 			std::lock_guard lock(s_renderDataMutex);
 			if (!s_material) {
-				PxeShader* shader = pxeGetEngine().loadShader(getAssetPath("shaders") / "basic.pxeshader");
-				if (!shader) return nullptr;
-				s_material = new(std::nothrow) PxeRenderMaterial(*shader);
-				shader->drop();
-
+				s_material = PxeUnlitRenderMaterial::createMaterial();
 				if (!s_material) {
 					return nullptr;
 				}
@@ -92,7 +88,6 @@ namespace pixelexplorer {
 				indexBuffer->drop();
 				s_vertexArray->addVertexBuffer(*vertexBuffer, 0, 0);
 				vertexBuffer->drop();
-				s_material->setProperty4f("u_Color", glm::vec4(1, 0, 1, 1));
 			}
 
 			RenderPoint* point = new(std::nothrow) RenderPoint(*s_material);
@@ -110,7 +105,7 @@ namespace pixelexplorer {
 			return point;
 		}
 
-		RenderPoint::RenderPoint(pxengine::PxeRenderMaterial& material) : pxengine::PxeRenderObject(material) {
+		RenderPoint::RenderPoint(pxengine::PxeRenderMaterialInterface& material) : pxengine::PxeRenderObject(material) {
 			Disabled = true;
 			Width = 1;
 			Color = glm::vec4(1, 0, 1, 1);
@@ -126,9 +121,9 @@ namespace pixelexplorer {
 			}
 		}
 
-		void RenderPoint::onGeometry() {
+		void RenderPoint::onRender() {
 			if (Disabled) return;
-			s_material->setProperty4f("u_Color", Color);
+			s_material->getShader().setUniform4f("u_Color", Color);
 			s_material->applyMaterial();
 			positionMatrix = glm::scale(glm::translate(glm::mat4(1), Point), glm::vec3(Width));
 			s_vertexArray->bind();

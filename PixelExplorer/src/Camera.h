@@ -43,12 +43,12 @@ namespace pixelexplorer {
 		};
 
 		static constexpr pxengine::PxeActionSourceCode DEFAULT_ACTION_CODES[ACTION_COUNT] = {
-			(uint64_t)pxengine::PxeActionSourceType::KEYBOARD << 32 | SDLK_SPACE,
-			(uint64_t)pxengine::PxeActionSourceType::KEYBOARD << 32 | SDLK_c,
-			(uint64_t)pxengine::PxeActionSourceType::KEYBOARD << 32 | SDLK_d,
-			(uint64_t)pxengine::PxeActionSourceType::KEYBOARD << 32 | SDLK_a,
-			(uint64_t)pxengine::PxeActionSourceType::KEYBOARD << 32 | SDLK_w,
-			(uint64_t)pxengine::PxeActionSourceType::KEYBOARD << 32 | SDLK_s,
+			pxengine::PxeKeyboardActionSourceCode(SDLK_SPACE),
+			pxengine::PxeKeyboardActionSourceCode(SDLK_c),
+			pxengine::PxeKeyboardActionSourceCode(SDLK_d),
+			pxengine::PxeKeyboardActionSourceCode(SDLK_a),
+			pxengine::PxeKeyboardActionSourceCode(SDLK_w),
+			pxengine::PxeKeyboardActionSourceCode(SDLK_s),
 		};
 
 		const char* ACTION_NAMES[ACTION_COUNT] = {

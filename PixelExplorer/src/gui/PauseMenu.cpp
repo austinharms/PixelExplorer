@@ -7,7 +7,7 @@
 #include "Application.h"
 #include "PxeFSHelpers.h"
 #include "Log.h"
-#include "PxeFontManager.h"
+#include "PxeRenderPipeline.h"
 #include "PxeEngine.h"
 #include "PexGui.h"
 
@@ -18,7 +18,7 @@ namespace pixelexplorer {
 			_actions = NONE;
 			memset(_textures, 0, sizeof(_textures));
 
-			_menuFont = pxeGetEngine().getFontManager().loadFont(getAssetPath("fonts") / "default.ttf", 14);
+			_menuFont = pxeGetEngine().getRenderPipeline().loadFont(getAssetPath("fonts") / "default.ttf", 14);
 			if (!_menuFont) {
 				Application::Error("Out of Memory, Failed to create pause menu font");
 				return;
@@ -55,7 +55,7 @@ namespace pixelexplorer {
 			return actions;
 		}
 
-		void PauseMenu::onGUI() {
+		void PauseMenu::onRender() {
 			ImGuiIO& io = ImGui::GetIO();
 			constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;
 			ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));

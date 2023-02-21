@@ -291,7 +291,7 @@ namespace pixelexplorer {
 		const uint8_t TriangleColorMixingTable[12][2] = { {0,1}, {1,2}, {2,3}, {3,0}, {4,5}, {5,6}, {6,7}, {7,4}, {4,0}, {5,1}, {6,2}, {7,3} };
 		const glm::vec3 TerrainColorTable[4] = { glm::vec3(1, 0, 1), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1) };
 
-		TerrainRenderMesh::TerrainRenderMesh(pxengine::PxeRenderMaterial& chunkMaterial) : pxengine::PxeStaticPhysicsRenderObject(chunkMaterial)
+		TerrainRenderMesh::TerrainRenderMesh(pxengine::PxeRenderMaterialInterface& chunkMaterial) : pxengine::PxeStaticPhysicsRenderObject(chunkMaterial)
 		{
 			using namespace pxengine;
 			_currentMeshDate = 0;
@@ -303,9 +303,9 @@ namespace pixelexplorer {
 			_meshVertexArray = nullptr;
 			memset(_chunks, 0, sizeof(_chunks));
 
-			physx::PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
+			physx::PxPhysics& physics = pxengine::pxeGetEngine().getPhysicsBase();
 			physx::PxTransform pxTransform(physx::PxIdentity);
-			physx::PxRigidStatic* actor = physics->createRigidStatic(pxTransform);
+			physx::PxRigidStatic* actor = physics.createRigidStatic(pxTransform);
 			setPhysicsActor(actor);
 
 			_meshIndexBuffer = new PxeIndexBuffer(PxeIndexType::UNSIGNED_16BIT, nullptr, true);
@@ -478,15 +478,15 @@ namespace pixelexplorer {
 			meshDesc.triangles.stride = sizeof(uint16_t) * 3;
 			meshDesc.triangles.count = indices.size() / 3;
 			meshDesc.flags = PxMeshFlag::e16_BIT_INDICES;
-			PxPhysics* physics = pxengine::pxeGetEngine().getPhysicsBase();
-			PxCooking* cooking = pxengine::pxeGetEngine().getPhysicsCooking();
+			PxPhysics& physics = pxengine::pxeGetEngine().getPhysicsBase();
+			PxCooking& cooking = pxengine::pxeGetEngine().getPhysicsCooking();
 			//if (!cooking->validateTriangleMesh(meshDesc)) {
 			//	PEX_WARN("Invalid terrain mesh");
 			//}
 
-			physx::PxTriangleMesh* mesh = cooking->createTriangleMesh(meshDesc, physics->getPhysicsInsertionCallback());
-			physx::PxMaterial* material = physics->createMaterial(1.0f, 0.5f, 0.5f);
-			physx::PxShape* shape = physics->createShape(physx::PxTriangleMeshGeometry(mesh), *material);
+			physx::PxTriangleMesh* mesh = cooking.createTriangleMesh(meshDesc, physics.getPhysicsInsertionCallback());
+			physx::PxMaterial* material = physics.createMaterial(1.0f, 0.5f, 0.5f);
+			physx::PxShape* shape = physics.createShape(physx::PxTriangleMeshGeometry(mesh), *material);
 			mesh->release();
 			material->release();
 			return shape;
@@ -662,7 +662,7 @@ namespace pixelexplorer {
 			//PEX_INFO(("Terrain Mesh Rebuild took " + std::to_string(SDL_GetTicks64() - buildDate) + "ms").c_str());
 		}
 
-		void TerrainRenderMesh::onGeometry()
+		void TerrainRenderMesh::onRender()
 		{
 			if (!_hasMesh || _meshVertexArray->getAssetStatus() != pxengine::PxeGLAssetStatus::INITIALIZED) return;
 			_meshVertexArray->bind();

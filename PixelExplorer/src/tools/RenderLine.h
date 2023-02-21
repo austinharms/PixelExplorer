@@ -7,11 +7,11 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 #include "PxeRenderObject.h"
-#include "PxeRenderMaterial.h"
 #include "PxeVertexArray.h"
 #include "PxeIndexBuffer.h"
 #include "PxeVertexBuffer.h"
 #include "PxeBuffer.h"
+#include "PxeUnlitRenderMaterial.h"
 
 namespace pixelexplorer {
 	namespace tools {
@@ -19,7 +19,7 @@ namespace pixelexplorer {
 		{
 		public:
 			static RenderLine* createLine();
-			void onGeometry() override;
+			void onRender() override;
 			virtual ~RenderLine();
 
 			glm::vec3 PointA;
@@ -30,13 +30,13 @@ namespace pixelexplorer {
 
 		private:
 			static std::mutex s_renderDataMutex;
-			static pxengine::PxeRenderMaterial* s_material;
+			static pxengine::PxeUnlitRenderMaterial* s_material;
 			static pxengine::PxeVertexArray* s_vertexArray;
 			static pxengine::PxeVertexBuffer* s_vertexBuffer;
 			static pxengine::PxeIndexBuffer* s_indexBuffer;
 			static pxengine::PxeBuffer* s_vertexData;
 
-			RenderLine(pxengine::PxeRenderMaterial& material);
+			RenderLine(pxengine::PxeRenderMaterialInterface& material);
 		};
 	}
 }

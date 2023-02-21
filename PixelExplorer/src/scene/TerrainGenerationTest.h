@@ -14,6 +14,7 @@
 #include "BS_thread_pool_light.hpp"
 #include "tools/RenderLine.h"
 #include "tools/RenderPoint.h"
+#include "PxeRenderMaterialInterface.h"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -36,7 +37,7 @@ namespace pixelexplorer {
 			void jobUnloadTerrain(const glm::i64vec3& terrainPos);
 
 			terrain::TerrainManager* _terrainManager;
-			pxengine::PxeRenderMaterial* _terrainRenderMaterial;
+			pxengine::PxeRenderMaterialInterface* _terrainRenderMaterial;
 			Camera* _camera;
 			tools::RenderLine* _debugLine;
 			tools::RenderPoint* _debugPoint;

@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "PxeEngine.h"
-#include "PxeFontManager.h"
+#include "PxeRenderPipeline.h"
 #include "PxeFSHelpers.h"
 #include "Log.h"
 
@@ -11,7 +11,7 @@ namespace pixelexplorer {
 		void ErrorScreen::setMessage(const char* msg)
 		{
 			_errorMessage = msg;
-			_font = pxengine::pxeGetEngine().getFontManager().loadFont(pxengine::getAssetPath("fonts") / "default.ttf", 20);
+			_font = pxengine::pxeGetEngine().getRenderPipeline().loadFont(pxengine::getAssetPath("fonts") / "default.ttf", 20);
 			if (!_font) {
 				PEX_ERROR("Failed to load error font");
 			}
@@ -22,7 +22,7 @@ namespace pixelexplorer {
 			_errorMessage = msg;
 		}
 
-		void ErrorScreen::onGUI()
+		void ErrorScreen::onRender()
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;

@@ -22,7 +22,7 @@ namespace pixelexplorer {
 			uint8_t getActions();
 
 		protected:
-			void onGUI() override;
+			void onRender() override;
 
 		private:
 			enum MenuTextures {

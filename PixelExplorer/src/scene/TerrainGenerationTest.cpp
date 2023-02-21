@@ -16,6 +16,8 @@
 #include "terrain/TerrainChunk.h"
 #include "SDL_timer.h"
 #include "PxScene.h"
+#include "PxeRenderPipeline.h"
+#include "PxeInputManager.h"
 
 namespace pixelexplorer {
 	namespace scene {
@@ -37,6 +39,10 @@ namespace pixelexplorer {
 			_loadDistance = 7;
 			_paused = false;
 			_pauseHeld = false;
+
+			PxeEngine& engine = pxeGetEngine();
+			PxeInputManager& inputManager = engine.getInputManager();
+			PxeRenderPipeline& renderPipeline = engine.getRenderPipeline();
 
 			if (!getScene()) {
 				Application::Error("Out of Memory, Failed to create terrain generation scene");
@@ -62,14 +68,14 @@ namespace pixelexplorer {
 			_debugPoint->Color = glm::vec4(1, 1, 1, 1);
 			getScene()->addObject(*_debugPoint);
 
-			_pauseAction = pxeGetEngine().getInputManager().getAction("Pause");
+			_pauseAction = inputManager.getAction("Pause");
 			if (!_pauseAction) {
 				Application::Error("Out of Memory, Failed to create pause action");
 				return;
 			}
 
 			if (!_pauseAction->hasSource()) {
-				PxeActionSource* pauseScr = pxeGetEngine().getInputManager().getActionSource(((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32) | SDLK_ESCAPE);
+				PxeActionSource* pauseScr = inputManager.getActionSource(PxeKeyboardActionSourceCode(SDLK_ESCAPE));
 				if (!pauseScr) {
 					Application::Error("Out of Memory, Failed to create pause action source");
 					return;
@@ -79,14 +85,14 @@ namespace pixelexplorer {
 				pauseScr->drop();
 			}
 
-			_placeAction = pxeGetEngine().getInputManager().getAction("Place");
+			_placeAction = inputManager.getAction("Place");
 			if (!_placeAction) {
 				Application::Error("Out of Memory, Failed to create place action");
 				return;
 			}
 
 			if (!_placeAction->hasSource()) {
-				PxeActionSource* actionSrc = pxeGetEngine().getInputManager().getActionSource(((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32) | SDLK_e);
+				PxeActionSource* actionSrc = inputManager.getActionSource(PxeKeyboardActionSourceCode(SDLK_e));
 				if (!actionSrc) {
 					Application::Error("Out of Memory, Failed to create place action source");
 					return;
@@ -96,14 +102,14 @@ namespace pixelexplorer {
 				actionSrc->drop();
 			}
 
-			_breakAction = pxeGetEngine().getInputManager().getAction("Break");
+			_breakAction = inputManager.getAction("Break");
 			if (!_breakAction) {
 				Application::Error("Out of Memory, Failed to create break action");
 				return;
 			}
 
 			if (!_breakAction->hasSource()) {
-				PxeActionSource* actionSrc = pxeGetEngine().getInputManager().getActionSource(((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32) | SDLK_q);
+				PxeActionSource* actionSrc = inputManager.getActionSource(PxeKeyboardActionSourceCode(SDLK_q));
 				if (!actionSrc) {
 					Application::Error("Out of Memory, Failed to create break action source");
 					return;
@@ -133,18 +139,20 @@ namespace pixelexplorer {
 				return;
 			}
 
-			PxeShader* shader = pxeGetEngine().loadShader(getAssetPath("shaders") / "terrain.pxeshader");
+			PxeShader* shader = renderPipeline.loadShader(getAssetPath("shaders") / "terrain.pxeshader");
 			if (!shader) {
 				Application::Error("Failed to load terrain shader");
 				return;
 			}
 
-			_terrainRenderMaterial = new(std::nothrow) PxeRenderMaterial(*shader);
+			_terrainRenderMaterial = new(std::nothrow) PxeRenderMaterial(*shader, PxeRenderPass::FORWARD);
 			shader->drop();
 			if (!_terrainRenderMaterial) {
 				Application::Error("Out of Memory, Failed to create terrain Render Material");
 				return;
 			}
+
+
 		}
 
 		TerrainGenerationTest::~TerrainGenerationTest()

@@ -7,7 +7,7 @@
 #include "Application.h"
 #include "PxeFSHelpers.h"
 #include "Log.h"
-#include "PxeFontManager.h"
+#include "PxeRenderPipeline.h"
 #include "PxeEngine.h"
 #include "PexGui.h"
 
@@ -17,14 +17,14 @@ namespace pixelexplorer {
 		PlayMenu::PlayMenu() {
 			_actions = NONE;
 			memset(_textures, 0, sizeof(_textures));
-
-			_titleFont = pxeGetEngine().getFontManager().loadFont(getAssetPath("fonts") / "main_menu_title.ttf", 50);
+			PxeRenderPipeline& renderPipeline = pxeGetEngine().getRenderPipeline();
+			_titleFont = renderPipeline.loadFont(getAssetPath("fonts") / "main_menu_title.ttf", 50);
 			if (!_titleFont) {
 				Application::Error("Out of Memory, Failed to create play menu title font");
 				return;
 			}
 
-			_buttonFont = pxeGetEngine().getFontManager().loadFont(getAssetPath("fonts") / "default.ttf", 24);
+			_buttonFont = renderPipeline.loadFont(getAssetPath("fonts") / "default.ttf", 24);
 			if (!_buttonFont) {
 				Application::Error("Out of Memory, Failed to create play menu button font");
 				return;
@@ -63,7 +63,7 @@ namespace pixelexplorer {
 			return actions;
 		}
 
-		void PlayMenu::onGUI() {
+		void PlayMenu::onRender() {
 			ImGuiIO& io = ImGui::GetIO();
 			constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;
 			ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));

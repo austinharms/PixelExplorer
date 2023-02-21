@@ -8,7 +8,7 @@
 
 namespace pixelexplorer {
 	namespace tools {
-		pxengine::PxeRenderMaterial* RenderLine::s_material = nullptr;
+		pxengine::PxeUnlitRenderMaterial* RenderLine::s_material = nullptr;
 		pxengine::PxeVertexArray* RenderLine::s_vertexArray = nullptr;
 		pxengine::PxeVertexBuffer* RenderLine::s_vertexBuffer = nullptr;
 		pxengine::PxeIndexBuffer* RenderLine::s_indexBuffer = nullptr;
@@ -21,11 +21,7 @@ namespace pixelexplorer {
 
 			std::lock_guard lock(s_renderDataMutex);
 			if (!s_material) {
-				PxeShader* shader = pxeGetEngine().loadShader(getAssetPath("shaders") / "basic.pxeshader");
-				if (!shader) return nullptr;
-				s_material = new(std::nothrow) PxeRenderMaterial(*shader);
-				shader->drop();
-
+				s_material = PxeUnlitRenderMaterial::createMaterial();
 				if (!s_material) {
 					return nullptr;
 				}
@@ -99,7 +95,6 @@ namespace pixelexplorer {
 
 				s_vertexArray->setIndexBuffer(s_indexBuffer);
 				s_vertexArray->addVertexBuffer(*s_vertexBuffer, 0, 0);
-				s_material->setProperty4f("u_Color", glm::vec4(1, 0, 1, 1));
 			}
 
 			RenderLine* line = new(std::nothrow) RenderLine(*s_material);
@@ -123,7 +118,7 @@ namespace pixelexplorer {
 			return line;
 		}
 
-		RenderLine::RenderLine(pxengine::PxeRenderMaterial& material) : pxengine::PxeRenderObject(material) {
+		RenderLine::RenderLine(pxengine::PxeRenderMaterialInterface& material) : pxengine::PxeRenderObject(material) {
 			Disabled = true;
 			Width = 0.1f;
 			Color = glm::vec4(1, 0, 1, 1);
@@ -145,10 +140,9 @@ namespace pixelexplorer {
 			}
 		}
 
-		void RenderLine::onGeometry() {
+		void RenderLine::onRender() {
 			if (Disabled) return;
-			s_material->setProperty4f("u_Color", Color);
-			s_material->applyMaterial();
+			s_material->getShader().setUniform4f("u_Color", Color);
 			glm::vec3* points = static_cast<glm::vec3*>(s_vertexData->getBuffer());
 			float halfWidth = Width / 2.0f;
 			points[0] = PointA + glm::vec3(0, -halfWidth, 0);

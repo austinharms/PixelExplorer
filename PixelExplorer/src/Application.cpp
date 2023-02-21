@@ -14,9 +14,6 @@ namespace pixelexplorer {
 		_window = nullptr;
 		_errorMenu = nullptr;
 		_activeScene = nullptr;
-		_frameCount = 0;
-		_frameCountTimer = 1000;
-		_lastFrameCount = 0;
 	}
 
 	Application& Application::getInstance()
@@ -49,7 +46,7 @@ namespace pixelexplorer {
 	{
 		_state = RUNNING;
 		PxeEngine& engine = pxeGetEngine();
-		engine.setVSyncMode(0);
+		engine.getRenderPipeline().setVSyncMode(0);
 		_window = engine.createWindow(600, 400, "Pixel Explorer");
 		if (!_window) {
 			PEX_FATAL("Failed to create main window");
@@ -82,13 +79,6 @@ namespace pixelexplorer {
 
 	void Application::onUpdate()
 	{
-		if (SDL_GetTicks64() > +_frameCountTimer) {
-			_frameCountTimer = SDL_GetTicks64() + 250;
-			_lastFrameCount = _frameCount * 4;
-			_frameCount = 0;
-		}
-
-		++_frameCount;
 		if (_window->getShouldClose()) {
 			_window->resetShouldClose();
 			quit();
@@ -97,24 +87,6 @@ namespace pixelexplorer {
 		if (_activeScene) {
 			_activeScene->update();
 		}
-	}
-
-	void Application::postGUI(pxengine::PxeWindow& window)
-	{
-		char fpsText[16];
-		sprintf_s(fpsText, "FPS: %u", _lastFrameCount);
-		ImGui::PushFont(nullptr);
-		ImVec2 textSize = ImGui::CalcTextSize(fpsText);
-		constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_UnsavedDocument;
-		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-		ImGui::SetNextWindowSize(textSize);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::Begin("FPS TEXT", nullptr, flags);
-		ImGui::Text(fpsText);
-		ImGui::End();
-		ImGui::PopStyleVar(2);
-		ImGui::PopFont();
 	}
 
 	void Application::setError()

@@ -21,7 +21,6 @@ namespace pixelexplorer {
 		void onStart() override;
 		void onStop() override;
 		void onUpdate() override;
-		void postGUI(pxengine::PxeWindow& window) override;
 		void setError();
 		void setError(const char* msg);
 		void setError(const std::string& msg);
@@ -43,9 +42,6 @@ namespace pixelexplorer {
 		UpdatableScene* _activeScene;
 		scene::ErrorMenu* _errorMenu;
 		ApplicationState _state;
-		uint64_t _frameCountTimer;
-		uint16_t _frameCount;
-		uint16_t _lastFrameCount;
 	};
 }
 #endif // !PIXELEXPLORER_APPLICATION_H_

@@ -6,7 +6,7 @@
 #include "PxeStaticPhysicsRenderObject.h"
 #include "glm/vec3.hpp"
 #include "TerrainChunk.h"
-#include "PxeRenderMaterial.h"
+#include "PxeRenderMaterialInterface.h"
 #include "TerrainManager.h"
 #include "PxeVertexArray.h"
 #include "PxeIndexBuffer.h"
@@ -25,7 +25,7 @@ namespace pixelexplorer {
 				REFINED
 			};
 
-			TerrainRenderMesh(pxengine::PxeRenderMaterial& chunkMaterial);
+			TerrainRenderMesh(pxengine::PxeRenderMaterialInterface& chunkMaterial);
 			virtual ~TerrainRenderMesh();
 			void loadChunks(const glm::i64vec3& chunkPos, TerrainManager& mgr);
 			void unloadChunks();
@@ -38,7 +38,7 @@ namespace pixelexplorer {
 			void setWorkPending();
 			void resetWorkPending();
 			void rebuildMesh(MeshType type = REFINED);
-			void onGeometry() override;
+			void onRender() override;
 			glm::i64vec3 getChunkPosition() const;
 
 		private:

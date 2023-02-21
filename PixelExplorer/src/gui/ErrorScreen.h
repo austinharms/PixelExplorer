@@ -18,7 +18,7 @@ namespace pixelexplorer {
 			void setMessage(const std::string& msg);
 
 		protected:
-			void onGUI() override;
+			void onRender() override;
 
 		private:
 			std::string _errorMessage;

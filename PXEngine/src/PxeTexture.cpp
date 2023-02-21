@@ -110,7 +110,6 @@ namespace pxengine {
 		int width = 0;
 		int height = 0;
 		int channels = 0;
-		stbi_set_flip_vertically_on_load(true);
 		void* pixels = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
 		if (!pixels) {
 			PXE_ERROR("Failed to load texture from " + path.string() + " " + stbi_failure_reason());
