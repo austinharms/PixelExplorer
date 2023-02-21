@@ -17,6 +17,8 @@
 #include "glm/mat3x4.hpp"
 #include "glm/mat4x3.hpp"
 
+#define PXE_NODISCARD [[nodiscard]]
+
 namespace pxengine {
 	enum class PxeGLAssetStatus : uint8_t
 	{
@@ -106,6 +108,14 @@ namespace pxengine {
 		CONTROLLER_BUTTON,
 	};
 
+	typedef int32_t SDL_Keycode;
+
+	// Creates a PxeActionSourceCode from PxeActionSourceType and the desired actionCode
+	PXE_NODISCARD inline constexpr PxeActionSourceCode CreatePxeActionSourceCode(PxeActionSourceType sourceType, int32_t actionCode) { return (PxeActionSourceCode)sourceType << 32 | actionCode; }
+
+	// Creates a PxeActionSourceCode from a SDL_Keycode
+	PXE_NODISCARD inline constexpr PxeActionSourceCode PxeKeyboardActionSourceCode(SDL_Keycode keyboardKey) { return CreatePxeActionSourceCode(PxeActionSourceType::KEYBOARD, keyboardKey); }
+
 	enum class PxeRenderPass : uint8_t
 	{
 		DEFERED = 0,	// All lighting calculations are done on this pass
@@ -124,6 +134,4 @@ namespace pxengine {
 		UNLIT,
 	};
 }
-
-#define PXE_NODISCARD [[nodiscard]]
 #endif // !PXENGINE_TYPES_H_
