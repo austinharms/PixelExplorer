@@ -2,7 +2,7 @@
 #define PXENGINESAMPELS_SCENES_CUBESTACK_H_
 #include "PxeEngineAPI.h"
 #include "../../SampleSceneBase.h"
-#include "PhysicsCube.h"
+#include "PhysicsCube.hpp"
 #include "SDL_keycode.h"
 
 class CubeStack : public SampleSceneBase
@@ -10,7 +10,6 @@ class CubeStack : public SampleSceneBase
 public:
 	CubeStack() {
 		using namespace pxengine;
-		using namespace cubestack;
 		_error = false;
 		_window = nullptr;
 		_quitAction = nullptr;
@@ -32,7 +31,7 @@ public:
 
 		_quitAction->grab();
 		if (!_quitAction->hasSource()) {
-			PxeActionSource* quitSource = inputMgr.getActionSource((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32 | SDLK_ESCAPE);
+			PxeActionSource* quitSource = inputMgr.getActionSource(PxeKeyboardActionSourceCode(SDLK_ESCAPE));
 			if (!quitSource) {
 				_error = true;
 				return;
@@ -48,58 +47,43 @@ public:
 		}
 
 		_window->setScene(scene);
-
-		PxeShader* shader = engine.getRenderPipeline().loadShader(getAssetPath("shaders") / "test.pxeshader");
-		if (!shader) {
-			scene->drop();
+		PxeUnlitRenderMaterial* cubeMaterial = PxeUnlitRenderMaterial::createMaterial();
+		if (!cubeMaterial) {
 			_error = true;
-			return;
-		}
-
-		PxeTexture* texture = new(std::nothrow) PxeTexture();
-		if (!texture) {
-			_error = true;
-			shader->drop();
 			scene->drop();
 			return;
 		}
 
-		texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
-
-		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader, PxeRenderPass::FORWARD);
-		if (!material) {
-			_error = true;
-			texture->drop();
-			shader->drop();
-			scene->drop();
-			return;
+		{
+			PxeTexture* texture = new(std::nothrow) PxeTexture();
+			if (texture) {
+				texture->loadImage(pxengine::getAssetPath("textures") / "cube.png");
+				cubeMaterial->setTexture(texture);
+				texture->drop();
+			}
 		}
 
-		material->setTexture("u_Texture", *texture, 0);
-		material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));
+		{
+			PhysicsCube* baseCube = PhysicsCube::createPhysicsCube(glm::vec3(0, -9, 0), false, *cubeMaterial);
+			if (!baseCube) {
+				_error = true;
+				cubeMaterial->drop();
+				scene->drop();
+				return;
+			}
 
-		PhysicsCube* baseCube = PhysicsCube::createPhysicsCube(glm::vec3(0, -10, 0), false, *material);
-		if (!baseCube) {
-			_error = true;
-			material->drop();
-			texture->drop();
-			shader->drop();
-			scene->drop();
-			return;
+			scene->addObject(*baseCube);
+			baseCube->drop();
 		}
 
-		scene->addObject(*baseCube);
-		for (int32_t y = -9; y < 10; ++y) {
-			PhysicsCube* cube = PhysicsCube::createPhysicsCube(glm::vec3(0, y * 1.1f, 0), true, *material, baseCube->getIndexBuffer(), baseCube->getVertexArray(), baseCube->getShape());
+		for (int32_t y = -8; y < 10; ++y) {
+			PhysicsCube* cube = PhysicsCube::createPhysicsCube(glm::vec3(0, y * 1.05f, 0), true, *cubeMaterial);
 			if (!cube) continue;
 			scene->addObject(*cube);
 			cube->drop();
 		}
 
-		baseCube->drop();
-		material->drop();
-		texture->drop();
-		shader->drop();
+		cubeMaterial->drop();
 		scene->drop();
 	}
 

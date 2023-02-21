@@ -12,7 +12,6 @@ public:
 		QUIT = 0x1,
 		CUBEWALL = 0x2,
 		CUBESTACK = 0x4,
-		MARCHINGCUBES = 0x8,
 		FREECAMERA = 0x10,
 		ALL = 0xff
 	};
@@ -29,7 +28,9 @@ public:
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
 		ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNav);
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBringToFrontOnFocus);
+		ImGui::Text("FPS: %.0f", io.Framerate);
 		ImGui::Text("Main Menu");
 		ImGui::Text("Open Sample Scene:");
 		ImGui::Bullet();
@@ -38,9 +39,6 @@ public:
 		ImGui::Bullet();
 		if (ImGui::SmallButton("Cube Stack"))
 			_clickedActions |= CUBESTACK;
-		ImGui::Bullet();
-		if (ImGui::SmallButton("Marching Cubes"))
-			_clickedActions |= MARCHINGCUBES;
 		ImGui::Bullet();
 		if (ImGui::SmallButton("Free Camera"))
 			_clickedActions |= FREECAMERA;

@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.cpp" />
+    <ClCompile Include="src\scenes\shared\RenderData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\shaders\test.pxeshader">
@@ -29,19 +29,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h" />
+    <ClInclude Include="src\scenes\shared\RenderData.h" />
     <ClInclude Include="src\SampleSceneBase.h" />
     <ClInclude Include="src\scenes\CubeStack\CubeStack.h" />
-    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.h" />
+    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.hpp" />
     <ClInclude Include="src\scenes\CubeWall\CubeWall.h" />
-    <ClInclude Include="src\scenes\CubeWall\RenderCube.h" />
     <ClInclude Include="src\SampleApplication.h" />
     <ClInclude Include="src\MainMenu.h" />
     <ClInclude Include="src\scenes\FreeCamera\Camera.h" />
     <ClInclude Include="src\scenes\FreeCamera\FreeCamera.h" />
-    <ClInclude Include="src\scenes\FreeCamera\RenderCube.h" />
-    <ClInclude Include="src\scenes\MarchingCubes\MarchingCubes.h" />
-    <ClInclude Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.h" />
-    <ClInclude Include="src\scenes\MarchingCubes\MarchingMesh.h" />
+    <ClInclude Include="src\scenes\shared\RenderCube.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

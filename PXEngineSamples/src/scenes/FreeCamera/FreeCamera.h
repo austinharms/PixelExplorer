@@ -2,7 +2,7 @@
 #define PXENGINESAMPELS_SCENES_FREE_CAMERA_H_
 #include "PxeEngineAPI.h"
 #include "../../SampleSceneBase.h"
-#include "RenderCube.h"
+#include "../shared/RenderCube.hpp"
 #include "Camera.h"
 #include "SDL_keycode.h"
 
@@ -34,7 +34,7 @@ public:
 
 		_quitAction->grab();
 		if (!_quitAction->hasSource()) {
-			PxeActionSource* quitSource = inputMgr.getActionSource((PxeActionSourceCode)PxeActionSourceType::KEYBOARD << 32 | SDLK_ESCAPE);
+			PxeActionSource* quitSource = inputMgr.getActionSource(PxeKeyboardActionSourceCode(SDLK_ESCAPE));
 			if (!quitSource) {
 				_error = true;
 				return;
@@ -51,62 +51,36 @@ public:
 
 		_window->setScene(scene);
 
-		PxeShader* shader = engine.getRenderPipeline().loadShader(getAssetPath("shaders") / "test.pxeshader");
-		if (!shader) {
-			scene->drop();
+		PxeUnlitRenderMaterial* cubeMaterial = PxeUnlitRenderMaterial::createMaterial();
+		if (!cubeMaterial) {
 			_error = true;
-			return;
-		}
-
-		PxeTexture* texture = new(std::nothrow) PxeTexture();
-		if (!texture) {
-			_error = true;
-			shader->drop();
 			scene->drop();
 			return;
 		}
 
-		texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
-
-		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader, PxeRenderPass::FORWARD);
-		if (!material) {
-			_error = true;
-			texture->drop();
-			shader->drop();
-			scene->drop();
-			return;
+		{
+			PxeTexture* texture = new(std::nothrow) PxeTexture();
+			if (texture) {
+				texture->loadImage(pxengine::getAssetPath("textures") / "cube.png");
+				cubeMaterial->setTexture(texture);
+				texture->drop();
+			}
 		}
 
-		material->setTexture("u_Texture", *texture, 0);
-		material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));
-
-		RenderCube* cube = new(std::nothrow) RenderCube(*material);
-		if (!cube) {
-			_error = true;
-			material->drop();
-			texture->drop();
-			shader->drop();
-			scene->drop();
-			return;
-		}
+		RenderCube* cube = RenderCube::create(*cubeMaterial);
+		cubeMaterial->drop();
 
 		scene->addObject(*cube);
 		_camera = new(std::nothrow) Camera(*_window, glm::radians(90.0f));
 		if (!_camera || _camera->getErrorFlag()) {
 			_error = true;
 			cube->drop();
-			material->drop();
-			texture->drop();
-			shader->drop();
 			scene->drop();
 			return;
 		}
 
 		_camera->setPosition(glm::vec3(0, 0, -10));
 		cube->drop();
-		material->drop();
-		texture->drop();
-		shader->drop();
 		scene->drop();
 	}
 

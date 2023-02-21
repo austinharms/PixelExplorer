@@ -8,7 +8,6 @@
 #include "SampleSceneBase.h"
 #include "scenes/CubeWall/CubeWall.h"
 #include "scenes/CubeStack/CubeStack.h"
-#include "scenes/MarchingCubes/MarchingCubes.h"
 #include "scenes/FreeCamera/FreeCamera.h"
 
 class SampleApplication : public pxengine::PxeApplicationInterface
@@ -70,12 +69,6 @@ public:
 		if (menuAction & MainMenu::CUBESTACK)
 		{
 			CubeStack* scene = new(std::nothrow) CubeStack();
-			if (scene) _runningSamples.push_back(scene);
-		}
-
-		if (menuAction & MainMenu::MARCHINGCUBES)
-		{
-			MarchingCubes* scene = new(std::nothrow) MarchingCubes();
 			if (scene) _runningSamples.push_back(scene);
 		}
 

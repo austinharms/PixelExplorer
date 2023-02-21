@@ -5,7 +5,7 @@
 
 #include "PxeEngineAPI.h"
 #include "../../SampleSceneBase.h"
-#include "RenderCube.h"
+#include "../shared/RenderCube.hpp"
 #include "SDL_keycode.h"
 
 class CubeWall : public SampleSceneBase
@@ -13,7 +13,6 @@ class CubeWall : public SampleSceneBase
 public:
 	CubeWall() {
 		using namespace pxengine;
-		using namespace cubewall;
 		_error = false;
 		_window = nullptr;
 		_quitAction = nullptr;
@@ -51,52 +50,27 @@ public:
 		}
 
 		_window->setScene(scene);
-
-		PxeShader* shader = engine.getRenderPipeline().loadShader(getAssetPath("shaders") / "test.pxeshader");
-		if (!shader) {
-			scene->drop();
+		PxeUnlitRenderMaterial* cubeMaterial = PxeUnlitRenderMaterial::createMaterial();
+		if (!cubeMaterial) {
 			_error = true;
-			return;
-		}
-
-		PxeTexture* texture = new(std::nothrow) PxeTexture();
-		if (!texture) {
-			_error = true;
-			shader->drop();
 			scene->drop();
 			return;
 		}
 
-		texture->loadImage(pxengine::getAssetPath("textures") / "test.png");
-
-		PxeRenderMaterial* material = new(std::nothrow) PxeRenderMaterial(*shader, PxeRenderPass::FORWARD);
-		if (!material) {
-			_error = true;
-			texture->drop();
-			shader->drop();
-			scene->drop();
-			return;
-		}
-
-		material->setTexture("u_Texture", *texture, 0);
-		material->setProperty4f("u_Color", glm::vec4(1, 1, 1, 1));
-
-		RenderCube* baseCube = new(std::nothrow) RenderCube(*material);
-		if (!baseCube) {
-			_error = true;
-			material->drop();
-			texture->drop();
-			shader->drop();
-			scene->drop();
-			return;
+		{
+			PxeTexture* texture = new(std::nothrow) PxeTexture();
+			if (texture) {
+				texture->loadImage(pxengine::getAssetPath("textures") / "cube.png");
+				cubeMaterial->setTexture(texture);
+				texture->drop();
+			}
 		}
 
 		srand(static_cast<uint32_t>(time(nullptr)));
-		for (int32_t x = -25; x < 26; ++x) {
-			for (int32_t y = -25; y < 26; ++y) {
-				RenderCube* cube = new(std::nothrow) RenderCube(*material, baseCube->getIndexBuffer(), baseCube->getVertexArray());
-				if (!cube) continue;
-				cube->translate(glm::vec3(x, y, 0));
+		for (int32_t x = -10; x < 11; ++x) {
+			for (int32_t y = -10; y < 11; ++y) {
+				RenderCube* cube = RenderCube::create(*cubeMaterial);
+				cube->translate(glm::vec3(x * 2, y * 2, 0));
 				cube->rotateAbout(glm::vec3(1, 0, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
 				cube->rotateAbout(glm::vec3(0, 1, 0), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
 				cube->rotateAbout(glm::vec3(0, 0, 1), ((float)rand() / (float)RAND_MAX) * glm::two_pi<float>());
@@ -105,10 +79,7 @@ public:
 			}
 		}
 
-		baseCube->drop();
-		material->drop();
-		texture->drop();
-		shader->drop();
+		cubeMaterial->drop();
 		scene->drop();
 	}
 

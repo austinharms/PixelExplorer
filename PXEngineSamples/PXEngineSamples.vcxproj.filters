@@ -18,7 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.cpp">
+    <ClCompile Include="src\scenes\shared\RenderData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,31 +41,22 @@
     <ClInclude Include="src\scenes\CubeWall\CubeWall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\CubeWall\RenderCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\scenes\CubeStack\CubeStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\MarchingCubes\MarchingCubes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\MarchingCubes\MarchingCubesLookupTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\MarchingCubes\MarchingMesh.h">
+    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\scenes\FreeCamera\FreeCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\FreeCamera\RenderCube.h">
+    <ClInclude Include="src\scenes\shared\RenderCube.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\scenes\FreeCamera\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\shared\RenderData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
