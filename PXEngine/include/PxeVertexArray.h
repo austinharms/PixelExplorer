@@ -27,8 +27,8 @@ namespace pxengine {
 		void updateBufferBindings();
 
 		// Adds a PxeVertexBuffer binding
-		// {arrayAttribIndex} is glVertexAttribPointer index
 		// {vertexAttribIndex} is the index of the PxeVertexBufferAttrib to use from the {vertexBuffer}
+		// {arrayAttribIndex} is glVertexAttribPointer index
 		void addVertexBuffer(PxeVertexBuffer& vertexBuffer, size_t vertexAttribIndex, uint8_t arrayAttribIndex);
 
 		// Sets the PxeIndexBuffer binding

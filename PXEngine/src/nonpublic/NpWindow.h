@@ -28,8 +28,8 @@ namespace pxengine {
 			void setWindowSize(int32_t width, int32_t height) override;
 			PXE_NODISCARD const char* getWindowTitle() const override;
 			void setWindowTitle(const char* title) override;
-			void setCamera(PxeCamera* camera) override;
-			PXE_NODISCARD PxeCamera* getCamera() const override;
+			void setCamera(PxeCameraInterface* camera) override;
+			PXE_NODISCARD PxeCameraInterface* getCamera() const override;
 			PXE_NODISCARD void* getUserData() const override;
 			void setUserData(void* data) override;
 
@@ -86,7 +86,7 @@ namespace pxengine {
 			void* _userData;
 			char* _title;
 			NpScene* _scene;
-			PxeCamera* _camera;
+			PxeCameraInterface* _camera;
 			SDL_Window* _sdlWindow;
 			SDL_GLContext _sdlGlContext;
 			ImGuiContext* _guiContext;

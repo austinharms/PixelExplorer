@@ -3,7 +3,7 @@
 #include "PxeTypes.h"
 #include "PxeGLAsset.h"
 #include "PxeScene.h"
-#include "PxeCamera.h"
+#include "PxeCameraInterface.h"
 
 namespace pxengine {
 	// Wrapper for SDL_Window
@@ -46,10 +46,10 @@ namespace pxengine {
 		virtual void setWindowTitle(const char* title) = 0;
 
 		// Set the PxeCamera used when the scene is rendered
-		virtual void setCamera(PxeCamera* camera) = 0;
+		virtual void setCamera(PxeCameraInterface* camera) = 0;
 
 		// Returns the PxeCamera used when the scene is rendered
-		virtual PXE_NODISCARD PxeCamera* getCamera() const = 0;
+		virtual PXE_NODISCARD PxeCameraInterface* getCamera() const = 0;
 
 		// Returns the user data void*
 		// Note: this is purely for application uses and is not used by the engine 

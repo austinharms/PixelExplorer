@@ -88,6 +88,7 @@ namespace pxengine {
 					PxeRenderMaterialInterface* currentMaterial = nullptr;
 					PxeShader* currentShader = nullptr;
 					int32_t mvpLocation = -1;
+					int32_t camLocation = -1;
 					const std::list<PxeRenderObjectInterface*>& renderList = scene.getRenderObjects(PxeRenderPass::FORWARD);
 					if (!renderList.empty()) {
 						for (PxeRenderObjectInterface* obj : renderList) {
@@ -97,12 +98,14 @@ namespace pxengine {
 									currentShader = &(currentMaterial->getShader());
 									currentShader->bind();
 									mvpLocation = currentShader->getUniformLocation("u_MVP");
+									camLocation = currentShader->getUniformLocation("u_CAMPOS");
 								}
 
 								currentMaterial->applyMaterial();
 							}
 
 							currentShader->setUniformM4f(mvpLocation, PVMatrix * obj->getPositionMatrix());
+							//currentShader->setUniform3f(camLocation, );
 							obj->onRender();
 						}
 					}

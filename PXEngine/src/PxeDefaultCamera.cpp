@@ -66,6 +66,11 @@ namespace pxengine {
 		_viewMatrix = glm::rotate(_viewMatrix, rad, axis);
 	}
 
+	PXE_NODISCARD glm::vec3 PxeDefaultCamera::getPosition() const
+	{
+		return glm::vec3(_viewMatrix[3]);
+	}
+
 	PXE_NODISCARD glm::mat4 PxeDefaultCamera::getPVMatrix() const
 	{
 		return _projectionMatrix * _viewMatrix;

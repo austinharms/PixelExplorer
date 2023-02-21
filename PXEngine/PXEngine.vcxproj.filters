@@ -248,7 +248,7 @@
     <ClInclude Include="src\nonpublic\NpActionSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeCamera.h">
+    <ClInclude Include="include\PxeCameraInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PxeDefaultCamera.h">

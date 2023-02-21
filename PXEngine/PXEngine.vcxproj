@@ -237,7 +237,7 @@ xcopy /i /e /s /y /f "$(ProjectDir)assets/*" "$(SolutionDir)$(PlatformName)\$(Co
   <ItemGroup>
     <ClInclude Include="include\PxeAction.h" />
     <ClInclude Include="include\PxeGlBindable.h" />
-    <ClInclude Include="include\PxeCamera.h" />
+    <ClInclude Include="include\PxeCameraInterface.h" />
     <ClInclude Include="include\PxeDefaultCamera.h" />
     <ClInclude Include="include\PxeRenderObjectInterface.h" />
     <ClInclude Include="include\PxeInputManager.h" />

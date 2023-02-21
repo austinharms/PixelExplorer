@@ -444,7 +444,7 @@ namespace pxengine {
 			setFlag(TITLE_CHANGED);
 		}
 
-		void NpWindow::setCamera(PxeCamera* camera)
+		void NpWindow::setCamera(PxeCameraInterface* camera)
 		{
 			std::unique_lock lock(_windowMutex);
 			if (_camera) _camera->drop();
@@ -452,7 +452,7 @@ namespace pxengine {
 			if (_camera) _camera->grab();
 		}
 
-		PXE_NODISCARD PxeCamera* NpWindow::getCamera() const
+		PXE_NODISCARD PxeCameraInterface* NpWindow::getCamera() const
 		{
 			std::shared_lock lock(_windowMutex);
 			return _camera;

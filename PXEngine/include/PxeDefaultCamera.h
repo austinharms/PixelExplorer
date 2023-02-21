@@ -1,10 +1,10 @@
 #ifndef PXENGINE_DEFAULT_CAMERA_H_
 #define PXENGINE_DEFAULT_CAMERA_H_
 #include "PxeTypes.h"
-#include "PxeCamera.h"
+#include "PxeCameraInterface.h"
 
 namespace pxengine {
-	class PxeDefaultCamera : public PxeCamera
+	class PxeDefaultCamera : public PxeCameraInterface
 	{
 	public:
 		// Returns a new PxeDefaultCamera instance with a perspective projection
@@ -28,6 +28,7 @@ namespace pxengine {
 		// Rotate the camera on {axis} be {rad} radians
 		void rotateAbout(const glm::vec3& axis, float rad);
 
+		PXE_NODISCARD glm::vec3 getPosition() const override;
 		PXE_NODISCARD glm::mat4 getPVMatrix() const override;
 		void setWindowSize(int32_t width, int32_t height) override;
 		virtual ~PxeDefaultCamera() = default;
