@@ -3,6 +3,7 @@
 #include "PxeTypes.h"
 #include "PxeRenderMaterialInterface.h"
 #include "PxeShader.h"
+#include "PxeTexture.h"
 
 namespace pxengine {
 	class PxeUnlitRenderMaterial : public PxeRenderMaterialInterface
@@ -13,8 +14,11 @@ namespace pxengine {
 		virtual ~PxeUnlitRenderMaterial();
 
 		// Sets the tint color
-		// Note: default value is <1,1,1> (white)
-		void setColor(const glm::vec3& color);
+		// Note: default value is <1,1,1,1> (white)
+		void setColor(const glm::vec4& color);
+		// Sets the active texture or pass nullptr to disable the texture
+		// Note: this sets the active OpenGl texture slot to GL_TEXTURE0
+		void setTexture(PxeTexture* texture);
 
 		void applyMaterial() override;
 
@@ -24,6 +28,7 @@ namespace pxengine {
 		enum UNIFORMS
 		{
 			COLOR = 0,
+			TEXTURE,
 			UNIFORM_COUNT
 		};
 
@@ -32,7 +37,8 @@ namespace pxengine {
 
 		PxeShader& _shader;
 		int32_t _locations[UNIFORM_COUNT];
-		glm::vec3 _color;
+		glm::vec4 _color;
+		PxeTexture* _texture;
 		bool _loadedLocations;
 	};
 }

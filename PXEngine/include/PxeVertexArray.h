@@ -31,8 +31,11 @@ namespace pxengine {
 		// {vertexAttribIndex} is the index of the PxeVertexBufferAttrib to use from the {vertexBuffer}
 		void addVertexBuffer(PxeVertexBuffer& vertexBuffer, size_t vertexAttribIndex, uint8_t arrayAttribIndex);
 
-		// Adds a PxeVertexBuffer binding
+		// Sets the PxeIndexBuffer binding
 		void setIndexBuffer(PxeIndexBuffer* indexBuffer);
+
+		// Returns the set PxeIndexBuffer
+		PXE_NODISCARD PxeIndexBuffer* getIndexBuffer() const;
 
 		// Remove and disable ArrayAttrib at {index}
 		void removeArrayAttrib(uint8_t index);

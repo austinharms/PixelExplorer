@@ -76,6 +76,11 @@ namespace pxengine {
 		_bufferBindingsDirty = true;
 	}
 
+	PXE_NODISCARD PxeIndexBuffer* PxeVertexArray::getIndexBuffer() const
+	{
+		return _indexBuffer;
+	}
+
 	void PxeVertexArray::removeArrayAttrib(uint8_t index)
 	{
 		auto it = _bufferBindings.find(index);

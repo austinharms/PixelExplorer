@@ -1,6 +1,7 @@
 #include "PxeUnlitRenderMaterial.h"
 
 #include <new>
+#include <cstring>
 
 #include "NpLogger.h"
 #include "PxeFSHelpers.h"
@@ -27,9 +28,17 @@ namespace pxengine {
 		return material;
 	}
 
-	void PxeUnlitRenderMaterial::setColor(const glm::vec3& color)
+	void PxeUnlitRenderMaterial::setColor(const glm::vec4& color)
 	{
 		_color = color;
+	}
+
+	void PxeUnlitRenderMaterial::setTexture(PxeTexture* texture)
+	{
+		if (_texture)
+			_texture->drop();
+		_texture = texture;
+		if (_texture) _texture->grab();
 	}
 
 	void PxeUnlitRenderMaterial::applyMaterial()
@@ -42,7 +51,18 @@ namespace pxengine {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		_shader.setUniform3f(_locations[COLOR], _color);
+		glDisable(GL_SCISSOR_TEST);
+		glDisable(GL_STENCIL_TEST);
+		glActiveTexture(GL_TEXTURE0);
+		_shader.setUniform1i(_locations[TEXTURE], 0);
+		if (_texture && _texture->getAssetStatus() == PxeGLAssetStatus::INITIALIZED) {
+			glBindTexture(GL_TEXTURE_2D, _texture->getGlTextureId());
+		}
+		else {
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		_shader.setUniform4f(_locations[COLOR], _color);
 	}
 
 	PxeShader& PxeUnlitRenderMaterial::getShader() const
@@ -52,14 +72,17 @@ namespace pxengine {
 
 	PxeUnlitRenderMaterial::PxeUnlitRenderMaterial(PxeShader& shader) : PxeRenderMaterialInterface(PxeRenderPass::FORWARD), _shader(shader) {
 		_shader.grab();
-		_color = glm::vec3(1);
+		memset(_locations, 0, sizeof(_locations));
+		_color = glm::vec4(1);
+		_texture = nullptr;
 		_loadedLocations = false;
 	}
 
 	void PxeUnlitRenderMaterial::loadLocations()
 	{
 		constexpr const char* uniformNames[] = {
-			"u_Color"
+			"u_Color",
+			"u_Texture"
 		};
 
 		for (int32_t i = 0; i < UNIFORM_COUNT; ++i)
@@ -69,5 +92,6 @@ namespace pxengine {
 
 	PxeUnlitRenderMaterial::~PxeUnlitRenderMaterial() { 
 		_shader.drop();
+		setTexture(nullptr);
 	}
 }
