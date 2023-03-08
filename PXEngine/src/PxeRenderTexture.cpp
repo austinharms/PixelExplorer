@@ -1,7 +1,7 @@
 #include "PxeRenderTexture.h"
 
 #include "GL/glew.h"
-#include "NpLogger.h"
+#include "PxeLogger.h"
 
 namespace pxengine {
 	PxeRenderTexture::PxeRenderTexture(uint32_t width, uint32_t height, bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization) {

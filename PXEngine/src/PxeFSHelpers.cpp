@@ -14,7 +14,7 @@
 #include <pwd.h>
 #endif // PXE_LINUX_OS
 
-#include "NpLogger.h"
+#include "PxeLogger.h"
 
 // ################ WARNING all of the PXE_LINUX_OS code in this file is untested ################
 namespace pxengine {

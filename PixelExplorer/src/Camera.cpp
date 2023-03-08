@@ -95,7 +95,7 @@ namespace pixelexplorer {
 
 	PXE_NODISCARD float Camera::getFarClip() const { return _far; }
 
-	PXE_NODISCARD const glm::vec3& Camera::getPosition() const { return _position; }
+	PXE_NODISCARD glm::vec3 Camera::getPosition() const { return _position; }
 
 	PXE_NODISCARD const glm::vec3& Camera::getForward() const { return _directionVectors[2]; }
 

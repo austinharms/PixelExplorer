@@ -5,7 +5,7 @@
 #include <processthreadsapi.h>
 #endif // PXE_WIN_OS
 
-#include "NpLogger.h"
+#include "PxeLogger.h"
 
 namespace pxengine {
 	bool setThreadName(const wchar_t* threadName)

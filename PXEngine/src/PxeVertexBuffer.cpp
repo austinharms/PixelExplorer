@@ -1,7 +1,7 @@
 #include "PxeVertexBuffer.h"
 
 #include "GL/glew.h"
-#include "nonpublic/NpLogger.h"
+#include "PxeLogger.h"
 
 namespace pxengine {
 	PxeVertexBuffer::PxeVertexBuffer(const PxeVertexBufferFormat& bufferFormat, PxeBuffer* buffer, bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization)

@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #endif // !PXE_DISABLE_DEFAULT_ASSERT_ABORT
 
+#include "PxeEngine.h"
+
 namespace pxengine {
 	namespace {
 		class PxeDefaultAssertHandler : public pxengine::PxeAssertInterface
@@ -34,5 +36,10 @@ namespace pxengine {
 	void pxeSetAssertInterface(PxeAssertInterface& assertInterface)
 	{
 		pxeAssertInterface = &assertInterface;
+	}
+
+	void pxeLog(PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line)
+	{
+		PxeEngine::getInstance().getLoggingInterface().onLog(level, msg, file, function, line);
 	}
 }

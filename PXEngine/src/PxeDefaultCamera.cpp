@@ -2,7 +2,9 @@
 
 #include <new>
 
-#include "NpLogger.h"
+#include "PxeLogger.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
 
 namespace pxengine {
 	PxeDefaultCamera* PxeDefaultCamera::createCamera(float fov, float near, float far) {

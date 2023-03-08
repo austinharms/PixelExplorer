@@ -1,6 +1,7 @@
 #include "PxeVertexArray.h"
 
-#include "nonpublic/NpLogger.h"
+#include "PxeLogger.h"
+#include "GL/glew.h"
 
 namespace pxengine {
 	PxeVertexArray::PxeVertexArray(bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization)

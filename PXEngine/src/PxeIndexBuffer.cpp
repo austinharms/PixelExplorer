@@ -1,7 +1,7 @@
 #include "PxeIndexBuffer.h"
 
 #include "GL/glew.h"
-#include "nonpublic/NpLogger.h"
+#include "PxeLogger.h"
 
 namespace pxengine {
 	size_t PxeIndexBuffer::getIndexSize(PxeIndexType type)

@@ -1,6 +1,6 @@
 #include "PxeTexture.h"
 
-#include "NpLogger.h"
+#include "PxeLogger.h"
 #include "GL/glew.h"
 #include "stb_image.h"
 

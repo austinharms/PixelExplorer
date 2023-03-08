@@ -48,7 +48,7 @@ namespace pxengine {
 		return *this;
 	}
 
-	PXE_NODISCARD size_t PxeBuffer::getSize() const {
+	PXE_NODISCARD PxeSize PxeBuffer::getSize() const {
 		return _size;
 	}
 

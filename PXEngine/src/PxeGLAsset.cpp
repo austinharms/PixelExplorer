@@ -1,14 +1,14 @@
 #include "PxeGLAsset.h"
 
-#include "nonpublic/NpLogger.h"
-#include "nonpublic/NpEngine.h"
+#include "PxeLogger.h"
+#include "PxeEngine.h"
 
 namespace pxengine {
 	PxeGLAsset::PxeGLAsset(bool delayInitialization) : _delayedInitialization(delayInitialization)
 	{
 		_status = PxeGLAssetStatus::UNINITIALIZED;
 		if (!_delayedInitialization)
-			nonpublic::NpEngine::getInstance().initializeGlAsset(*this);
+			PxeEngine::getInstance().initializeGlAsset(*this);
 	}
 
 	PxeGLAsset::~PxeGLAsset()
@@ -30,7 +30,7 @@ namespace pxengine {
 	void PxeGLAsset::initializeAsset() {
 		if (_delayedInitialization) {
 			if (_status == PxeGLAssetStatus::UNINITIALIZED) {
-				nonpublic::NpEngine::getInstance().initializeGlAsset(*this);
+				PxeEngine::getInstance().initializeGlAsset(*this);
 			}
 			else {
 				PXE_WARN("Attempted to initialize asset multiple times");
@@ -44,7 +44,7 @@ namespace pxengine {
 	void PxeGLAsset::onDelete()
 	{
 		if (_status >= PxeGLAssetStatus::INITIALIZED) {
-			nonpublic::NpEngine::getInstance().uninitializeGlAsset(*this);
+			PxeEngine::getInstance().uninitializeGlAsset(*this);
 		}
 		// this should never happen as the engine grabs things that are pending
 		else if (_status != PxeGLAssetStatus::UNINITIALIZED) {
@@ -70,7 +70,7 @@ namespace pxengine {
 		}
 
 		_status = PxeGLAssetStatus::INITIALIZING;
-		nonpublic::NpEngine::getInstance().grab();
+		PxeEngine::getInstance().grab();
 		initializeGl();
 		if (_status != PxeGLAssetStatus::ERROR)
 			_status = PxeGLAssetStatus::INITIALIZED;
@@ -85,7 +85,7 @@ namespace pxengine {
 
 		_status = PxeGLAssetStatus::UNINITIALIZING;
 		uninitializeGl();
-		nonpublic::NpEngine::getInstance().drop();
+		PxeEngine::getInstance().drop();
 		_status = PxeGLAssetStatus::UNINITIALIZED;
 	}
 }

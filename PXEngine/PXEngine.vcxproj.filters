@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\nonpublic\NpEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PxeLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -25,12 +22,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeRefCount.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nonpublic\NpWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nonpublic\NpScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeIndexBuffer.cpp">
@@ -45,13 +36,7 @@
     <ClCompile Include="src\PxeVertexArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PxeFSHelpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PxeRenderMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\stb_image.cpp">
@@ -84,117 +69,129 @@
     <ClCompile Include="src\PxeRenderTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpInputManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nonpublic\NpAction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nonpublic\NpActionSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PxeDefaultCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nonpublic\NpFont.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nonpublic\NpFontSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PxeOSHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PxeUnlitRenderMaterial.cpp">
+    <ClCompile Include="src\PxeGlShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpGuiGlBackend.cpp">
+    <ClCompile Include="src\PxeComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpGuiRenderMaterial.cpp">
+    <ClCompile Include="src\PxeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\nonpublic\NpRenderPipeline.cpp">
+    <ClCompile Include="src\PxeRenderProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeGuiShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeGlImGuiBackend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeRenderPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeFontFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeInputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeActionSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeGuiRenderProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeRenderComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeUpdateComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxePhysicsComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\PxeEngine.h">
+    <ClInclude Include="public\PxeEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeRefCount.h">
+    <ClInclude Include="public\PxeRefCount.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeGLAsset.h">
+    <ClInclude Include="public\PxeGLAsset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeLogger.h">
+    <ClInclude Include="public\PxeLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\NpLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeWindow.h">
+    <ClInclude Include="public\PxeWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpWindow.h">
+    <ClInclude Include="public\PxeScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeScene.h">
+    <ClInclude Include="public\PxeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpScene.h">
+    <ClInclude Include="public\PxeIndexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeShader.h">
+    <ClInclude Include="public\PxeBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeIndexBuffer.h">
+    <ClInclude Include="public\PxeVertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeBuffer.h">
+    <ClInclude Include="public\PxeVertexBufferFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeVertexBuffer.h">
+    <ClInclude Include="public\PxeVertexBufferAttrib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeVertexBufferFormat.h">
+    <ClInclude Include="public\PxeVertexArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeVertexBufferAttrib.h">
+    <ClInclude Include="public\PxeFSHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeVertexArray.h">
+    <ClInclude Include="public\PxeObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpLogger.h">
+    <ClInclude Include="public\PxeRenderProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeFSHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeRenderObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeGUIObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeRenderMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeTexture.h">
+    <ClInclude Include="public\PxeTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\imgui\backends\imgui_impl_sdl.h">
@@ -218,93 +215,77 @@
     <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeApplicationInterface.h">
+    <ClInclude Include="public\PxeApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeEngineAPI.h">
+    <ClInclude Include="public\PxeTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeTypes.h">
+    <ClInclude Include="public\PxeRenderTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeRenderTexture.h">
+    <ClInclude Include="public\PxeInputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeInputManager.h">
+    <ClInclude Include="public\PxeAction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeAction.h">
+    <ClInclude Include="public\PxeActionSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeActionSource.h">
+    <ClInclude Include="public\PxeCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpInputManager.h">
+    <ClInclude Include="public\PxeDefaultCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpAction.h">
+    <ClInclude Include="public\PxeFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpActionSource.h">
+    <ClInclude Include="public\PxeOSHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeCameraInterface.h">
+    <ClInclude Include="public\PxeGlBindable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeDefaultCamera.h">
+    <ClInclude Include="public\PxeRenderPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeStaticPhysicsRenderObject.h">
+    <ClInclude Include="public\PxeGlShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeFont.h">
+    <ClInclude Include="public\PxeComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpFont.h">
+    <ClInclude Include="public\PxeGuiShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nonpublic\NpFontSource.h">
+    <ClInclude Include="public\PxeGuiRenderProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeDynamicPhysicsRenderObject.h">
+    <ClInclude Include="public\PxeRenderComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeRenderObjectInterface.h">
+    <ClInclude Include="public\PxeUpdateComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxePhysicsObjectInterface.h">
+    <ClInclude Include="public\PxePhysicsComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxePhysicsUpdateObjectInterface.h">
+    <ClInclude Include="public\PxeRenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeOSHelpers.h">
+    <ClInclude Include="private\PxeFontFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PxeUnlitRenderMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nonpublic\NpRenderPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nonpublic\NpGuiGlBackend.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeRenderMaterialInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nonpublic\NpGuiRenderMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeGlBindable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PxeRenderPipeline.h">
+    <ClInclude Include="private\PxeGlImGuiBackend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\pxengine_unlit_shader.pxeshader" />
     <None Include="assets\shaders\pxengine_gui_shader.pxeshader" />
+    <None Include="tools\StripPrivateImplementation.py" />
+    <None Include="tools\CreateAPIHeader.py" />
   </ItemGroup>
 </Project>
