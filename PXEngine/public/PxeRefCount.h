@@ -12,6 +12,10 @@ namespace pxengine {
 	class PxeRefCount
 	{
 	public:
+		// Returns the number of PxeRefCount instances that currently exist
+		// Note: this only works if PXE_DEBUG is defined
+		static PxeSize getPxeRefCountInstanceCount();
+
 		// Increment the reference count by 1
 		// Note: This insures the object will not be deleted until drop is called
 		void grab();
@@ -33,9 +37,15 @@ namespace pxengine {
 		// Note: if grab is called in this function it behaves like it was called before the last drop
 		// Warning: calling drop in this function may cause recursive behavior 
 		virtual void onDelete() {}
-
+		
 	private:
 		std::atomic<PxeSize> _refCount;
+		PXE_PRIVATE_IMPLEMENTATION_START
+	private:
+#ifdef PXE_DEBUG
+		static std::atomic<PxeSize> s_totalCount;
+#endif // PXE_DEBUG
+		PXE_PRIVATE_IMPLEMENTATION_END
 	};
 }
 #endif // !PXENGINE_REFCOUNT_H_

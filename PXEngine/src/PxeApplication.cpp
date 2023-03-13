@@ -4,12 +4,16 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#ifdef PXE_DEBUG
+#include <iostream>
+#endif // PXE_DEBUG
 
 #include "SDL_timer.h"
 #include "PxeScene.h"
 #include "PxeWindow.h"
 #include "PxeLogger.h"
 #include "PxeOSHelpers.h"
+#include "PxeRefCount.h"
 
 namespace pxengine {
 	struct PxeApplication::Impl
@@ -35,6 +39,12 @@ namespace pxengine {
 	PxeApplication::~PxeApplication()
 	{
 		impl().~Impl();
+#ifdef PXE_DEBUG
+		PxeSize refCount;
+		if ((refCount = PxeRefCount::getPxeRefCountInstanceCount()))
+			std::cout << "[WARN] there are still " << refCount << " PxeRefCount instances, this may indicate a memory leak or incorrect reference tracking" << std::endl;
+#endif // PXE_DEBUG
+
 	}
 
 	void PxeApplication::start(PxeLogInterface& logInterface)

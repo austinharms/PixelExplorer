@@ -38,6 +38,15 @@ namespace pxengine {
 		imp._physAccumulator = 0.0f;
 	}
 
+	PxeScene::~PxeScene()
+	{
+		Impl& imp = impl();
+		while (!imp._objects.empty())
+			removeObject(**(imp._objects.begin()));
+		imp._physScene.release();
+		imp.~Impl();
+	}
+
 	PXE_NODISCARD bool PxeScene::getFlag(PxeSceneFlags flag) const
 	{
 		const Impl& imp = impl();
@@ -48,13 +57,6 @@ namespace pxengine {
 	void PxeScene::onDelete()
 	{
 		PxeEngine::getInstance().removeScene(*this);
-	}
-
-	PxeScene::~PxeScene()
-	{
-		Impl& imp = impl();
-		imp._physScene.release();
-		imp.~Impl();
 	}
 
 	void PxeScene::updatePhysics(float deltaTime) {
@@ -143,15 +145,27 @@ namespace pxengine {
 
 	bool PxeScene::addObject(PxeObject& obj)
 	{
+		Impl& imp = impl();
+		std::lock_guard lock(imp._objectsMutex);
 		if (!obj.setScene(*this)) return false;
+		obj.grab();
+		imp._objects.emplace_back(&obj);
 		obj.addComponentsToScene();
 		return true;
 	}
 
 	void PxeScene::removeObject(PxeObject& obj)
 	{
+		Impl& imp = impl();
+		std::lock_guard lock(imp._objectsMutex);
+		if (!imp._objects.remove(&obj)) {
+			PXE_WARN("Attempted to remove PxeObject from incorrect PxeScene");
+			return;
+		}
+
 		obj.removeComponentsFromScene();
 		obj.clearScene(*this);
+		obj.drop();
 	}
 
 	void PxeScene::setFlags(PxeSceneFlags flags)

@@ -62,6 +62,7 @@ namespace pxengine {
 		imp._windowMutex.lock();
 		if (imp._scene) imp._scene->drop();
 		if (imp._title) free(imp._title);
+		if (imp._camera) imp._camera->drop();
 		imp._windowMutex.unlock();
 		imp.~Impl();
 	}

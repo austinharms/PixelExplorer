@@ -26,6 +26,7 @@ namespace pxengine {
 		}
 
 		cam->setProjectionOrthographic(near, far);
+		return cam;
 	}
 
 	PxeDefaultCamera::PxeDefaultCamera() {
