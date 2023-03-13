@@ -4,21 +4,25 @@
 #include "PxeShader.h"
 
 namespace pxengine {
+	class PxeRenderPipeline;
+
 	// Class that stores properties to apply when rendering the object
-	// TODO Add implementation to file
 	class PxeRenderProperties : public PxeRefCount
 	{
 	public:
-		PXE_NODISCARD PxeShader* getShader() const;
-		virtual ~PxeRenderProperties();
-		PXE_NOCOPY(PxeRenderProperties);
+		PXE_NODISCARD virtual PxeShader* getShader() const = 0;
+		virtual ~PxeRenderProperties() = default;
 
 	protected:
-		PxeRenderProperties(PxeShader* shader = nullptr);
-		void setShader(PxeShader* shader);
-
+		PxeRenderProperties() = default;
+		// this should apply the properties to the shader
+		// Note: you can assume the PxeShader returned by getShader() is bound
+		virtual void onApplyProperties() = 0;
+		PXE_PRIVATE_IMPLEMENTATION_START
 	private:
-		PxeShader* _renderShader;
+		friend class PxeRenderPipeline;
+		void apply();
+		PXE_PRIVATE_IMPLEMENTATION_END
 	};
 }
 #endif // !PXENGINE_RENDER_PROPERTIES_H_

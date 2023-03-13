@@ -11,14 +11,18 @@ namespace pxengine {
 	public:
 		// Returns a PxeGuiRenderProperties instance or nullptr on failure
 		static PxeGuiRenderProperties* getInstance();
+
+		PXE_NODISCARD PxeShader* getShader() const override;
 		virtual ~PxeGuiRenderProperties();
 		PXE_NOCOPY(PxeGuiRenderProperties);
 
 	protected:
-		virtual void onDelete() override;
+		void onApplyProperties() override;
+		void onDelete() override;
 
 	private:
 		PxeGuiRenderProperties();
+		PxeShader* _guiShader;
 		PXE_PRIVATE_IMPLEMENTATION_START
 	private:
 		static PxeGuiRenderProperties* s_propertiesInstance;

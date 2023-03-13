@@ -4,7 +4,7 @@ namespace pxengine {
 	std::mutex PxeShader::s_shaderIdMutex;
 	uint32_t PxeShader::s_shaderIdCounter = 0;
 
-	PxeShader::PxeShader(bool delayAssetInitialization) : PxeGLAsset(delayAssetInitialization) {
+	PxeShader::PxeShader() : PxeGLAsset(true) {
 	
 	}
 

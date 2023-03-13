@@ -239,7 +239,7 @@ namespace pxengine {
 					curShader = &shader;
 				}
 
-				shader.updateProperties(properties);
+				properties.apply();
 				curProperties = &properties;
 			}
 			
@@ -291,7 +291,7 @@ namespace pxengine {
 					curShader = &shader;
 				}
 
-				shader.updateProperties(properties);
+				properties.apply();
 				curProperties = &properties;
 			}
 

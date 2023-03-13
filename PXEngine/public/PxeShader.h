@@ -35,14 +35,13 @@ namespace pxengine {
 		PXE_NOCOPY(PxeShader);
 
 	protected:
-		PxeShader(bool delayAssetInitialization = false);
+		PxeShader();
 		// TODO Comment functions
 		virtual void initializeGl() override = 0;
 		virtual void uninitializeGl() override = 0;
 		virtual void bind() override = 0;
 		virtual void setRenderTarget(PxeRenderTarget& renderTarget) {}
 		virtual void unbind() override = 0;
-		virtual void updateProperties(const PxeRenderProperties& renderProperties) = 0;
 
 	private:
 		static PxeShaderId getNextShaderId();

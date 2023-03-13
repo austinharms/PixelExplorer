@@ -90,8 +90,4 @@ namespace pxengine {
 		PxeEngine::getInstance().getRenderPipeline().getGuiBackend()->renderDrawData();
 		_glProgram->unbind();
 	}
-
-	void PxeGuiShader::updateProperties(const PxeRenderProperties& renderProperties)
-	{
-	}
 }

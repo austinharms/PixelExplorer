@@ -20,7 +20,6 @@ namespace pxengine {
 		void uninitializeGl() override;
 		void bind() override;
 		void unbind() override;
-		void updateProperties(const PxeRenderProperties& renderProperties) override;
 
 	private:
 		PxeGlShaderProgram* _glProgram;

@@ -49,6 +49,7 @@ namespace pxengine {
 			}
 
 			shader = new(std::nothrow) T();
+			shader->initializeAsset();
 			addShader(id, shader);
 			unlockShaders();
 			return static_cast<T*>(shader);

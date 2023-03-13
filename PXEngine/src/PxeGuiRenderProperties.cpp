@@ -20,7 +20,6 @@ namespace pxengine {
 				return nullptr;
 			}
 
-			s_propertiesInstance->setShader(PxeEngine::getInstance().getRenderPipeline().getShader<PxeGuiShader>());
 			if (!s_propertiesInstance->getShader()) {
 				PXE_ERROR("Failed to load PxeGuiRenderProperties PxeGuiShader");
 			}
@@ -34,10 +33,20 @@ namespace pxengine {
 	}
 
 	PxeGuiRenderProperties::PxeGuiRenderProperties() {
-	
+		_guiShader = PxeEngine::getInstance().getRenderPipeline().getShader<PxeGuiShader>();
+	}
+
+	PXE_NODISCARD PxeShader* PxeGuiRenderProperties::getShader() const
+	{
+		return _guiShader;
 	}
 
 	PxeGuiRenderProperties::~PxeGuiRenderProperties()
+	{
+		_guiShader->drop();
+	}
+
+	void PxeGuiRenderProperties::onApplyProperties()
 	{
 	}
 
