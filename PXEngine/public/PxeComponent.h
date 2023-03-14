@@ -34,6 +34,8 @@ namespace pxengine {
 			return componentOfType(getComponentId<T>());
 		}
 
+		PXE_NODISCARD PxeObject* getParentObject() const;
+
 		virtual ~PxeComponent();
 		PXE_NOCOPY(PxeComponent);
 

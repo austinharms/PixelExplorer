@@ -52,6 +52,11 @@ namespace pxengine {
 		_parentObject = nullptr;
 	}
 
+	PXE_NODISCARD PxeObject* PxeComponent::getParentObject() const
+	{
+		return _parentObject;
+	}
+
 	void PxeComponent::addToScene(PxeScene& scene)
 	{
 		scene.addComponent(*this);

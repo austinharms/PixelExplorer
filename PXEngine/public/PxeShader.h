@@ -40,8 +40,10 @@ namespace pxengine {
 		virtual void initializeGl() override = 0;
 		virtual void uninitializeGl() override = 0;
 		virtual void bind() override = 0;
-		virtual void setRenderTarget(PxeRenderTarget& renderTarget) {}
+		virtual void setRenderTarget(PxeRenderTarget& renderTarget) = 0;
+		virtual void setObjectTransform(const glm::mat4& transform) = 0;
 		virtual void unbind() override = 0;
+		virtual void onDelete() override;
 
 	private:
 		static PxeShaderId getNextShaderId();

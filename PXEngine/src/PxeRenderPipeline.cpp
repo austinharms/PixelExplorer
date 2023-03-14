@@ -243,6 +243,7 @@ namespace pxengine {
 				curProperties = &properties;
 			}
 			
+			curShader->setObjectTransform(component.getParentObject()->getTransform());
 			component.onRender();
 			++renderItr;
 		}
@@ -295,6 +296,7 @@ namespace pxengine {
 				curProperties = &properties;
 			}
 
+			curShader->setObjectTransform(component.getParentObject()->getTransform());
 			component.onRender();
 			++renderItr;
 		}

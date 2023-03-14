@@ -20,6 +20,8 @@ namespace pxengine {
 		void uninitializeGl() override;
 		void bind() override;
 		void unbind() override;
+		void setRenderTarget(PxeRenderTarget& renderTarget) override;
+		void setObjectTransform(const glm::mat4& transform) override;
 
 	private:
 		PxeGlShaderProgram* _glProgram;

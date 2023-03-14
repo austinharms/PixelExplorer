@@ -129,6 +129,7 @@ namespace pxengine {
 
 		if (imp._parentScene)
 			component.addToScene(*imp._parentScene);
+		return true;
 	}
 
 	void PxeObject::removeComponent(PxeComponent& component)

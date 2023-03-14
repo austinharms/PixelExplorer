@@ -15,8 +15,11 @@ namespace pxengine {
 	{
 	public:
 		// Returns the last PxeActionSource that was activated
+		// Note: this function pre-increments the PxeRefCount and you must call drop when the returned value is not longer needed
 		PXE_NODISCARD PxeActionSource* getLastActionSource();
+		// Note: this function pre-increments the PxeRefCount and you must call drop when the returned value is not longer needed
 		PXE_NODISCARD PxeActionSource* getActionSource(PxeActionSourceCode sourceCode);
+		// Note: this function pre-increments the PxeRefCount and you must call drop when the returned value is not longer needed
 		PXE_NODISCARD PxeAction* getAction(const std::string& actionName);
 		PXE_NODISCARD int32_t getCursorXPos() const;
 		PXE_NODISCARD int32_t getCursorYPos() const;

@@ -53,7 +53,11 @@ namespace pxengine {
 	{
 		Impl& imp = impl();
 		auto sourceItr = imp._sources.find(sourceCode);
-		if (sourceItr != imp._sources.end()) return sourceItr->second;
+		if (sourceItr != imp._sources.end()) {
+			sourceItr->second->grab();
+			return sourceItr->second;
+		}
+
 		PxeActionSource* source = new(std::nothrow) PxeActionSource(imp._lastActionCode);
 		if (!source) {
 			PXE_ERROR("Failed to allocate PxeActionSource");
@@ -68,7 +72,11 @@ namespace pxengine {
 	{
 		Impl& imp = impl();
 		auto it = imp._actions.find(actionName);
-		if (it != imp._actions.end()) return it->second;
+		if (it != imp._actions.end()) {
+			it->second->grab();
+			return it->second;
+		}
+
 		PxeAction* action = new(std::nothrow) PxeAction(actionName);
 		if (!action) {
 			PXE_ERROR("Failed to allocate PxeAction");

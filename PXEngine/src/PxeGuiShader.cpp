@@ -90,4 +90,12 @@ namespace pxengine {
 		PxeEngine::getInstance().getRenderPipeline().getGuiBackend()->renderDrawData();
 		_glProgram->unbind();
 	}
+
+	void PxeGuiShader::setRenderTarget(PxeRenderTarget& renderTarget)
+	{
+	}
+
+	void PxeGuiShader::setObjectTransform(const glm::mat4& transform)
+	{
+	}
 }
