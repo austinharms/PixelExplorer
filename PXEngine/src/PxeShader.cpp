@@ -13,7 +13,8 @@ namespace pxengine {
 
 	void PxeShader::onDelete()
 	{
-		PxeEngine::getInstance().getRenderPipeline().removeShader(*this);
+		if (getAssetStatus() >= PxeGLAssetStatus::INITIALIZED)
+			PxeEngine::getInstance().getRenderPipeline().removeShader(*this);
 		PxeGLAsset::onDelete();
 	}
 
