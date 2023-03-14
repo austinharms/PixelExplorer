@@ -34,6 +34,7 @@ namespace pixelexplorer {
 				}
 
 				_actions[i]->addSource(*src);
+				src->drop();
 			}
 		}
 
