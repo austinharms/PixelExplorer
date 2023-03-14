@@ -412,7 +412,7 @@ namespace pxengine {
 	{
 		Impl& imp = impl();
 		uint64_t ticks = SDL_GetTicks64();
-		imp._lastDeltaTime = (float)(ticks - imp._lastDeltaUpdate);
+		imp._lastDeltaTime = (float)(ticks - imp._lastDeltaUpdate)/1000;
 		imp._lastDeltaUpdate = ticks;
 	}
 
