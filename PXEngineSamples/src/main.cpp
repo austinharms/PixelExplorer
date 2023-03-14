@@ -5,6 +5,6 @@
 int main(int argc, char* args[]) {
 	LogHandle log;
 	SampleApplication app;
-	pxengine::pxeRunApplication(app, log);
+	app.start(log);
 	return 0;
 }

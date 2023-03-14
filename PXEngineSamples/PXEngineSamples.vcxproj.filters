@@ -18,12 +18,24 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\shared\RenderData.cpp">
+    <ClCompile Include="src\shared\CubeData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared\PxesRenderData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared\PxesRenderDataComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared\PxesBasicShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared\PxesBasicRenderProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\shaders\test.pxeshader" />
+    <Text Include="assets\shaders\basic.pxeshader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h">
@@ -38,25 +50,34 @@
     <ClInclude Include="src\SampleSceneBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\CubeWall\CubeWall.h">
+    <ClInclude Include="src\samples\CubeWall\CubeWallSample.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\CubeStack\CubeStack.h">
+    <ClInclude Include="src\samples\CubeStack\CubeStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.hpp">
+    <ClInclude Include="src\samples\CubeStack\PhysicsCube.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\FreeCamera\FreeCamera.h">
+    <ClInclude Include="src\samples\FreeCamera\FreeCameraSample.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\shared\RenderCube.hpp">
+    <ClInclude Include="src\samples\FreeCamera\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\FreeCamera\Camera.h">
+    <ClInclude Include="src\shared\CubeData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\shared\RenderData.h">
+    <ClInclude Include="src\shared\PxesRenderData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\PxesRenderDataComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\PxesBasicShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\PxesBasicRenderProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

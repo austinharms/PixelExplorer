@@ -20,25 +20,32 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\scenes\shared\RenderData.cpp" />
+    <ClCompile Include="src\shared\CubeData.cpp" />
+    <ClCompile Include="src\shared\PxesBasicRenderProperties.cpp" />
+    <ClCompile Include="src\shared\PxesBasicShader.cpp" />
+    <ClCompile Include="src\shared\PxesRenderData.cpp" />
+    <ClCompile Include="src\shared\PxesRenderDataComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\shaders\test.pxeshader">
+    <Text Include="assets\shaders\basic.pxeshader">
       <FileType>Text</FileType>
     </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h" />
-    <ClInclude Include="src\scenes\shared\RenderData.h" />
+    <ClInclude Include="src\shared\PxesBasicRenderProperties.h" />
+    <ClInclude Include="src\shared\PxesBasicShader.h" />
+    <ClInclude Include="src\shared\PxesRenderData.h" />
+    <ClInclude Include="src\shared\CubeData.h" />
     <ClInclude Include="src\SampleSceneBase.h" />
-    <ClInclude Include="src\scenes\CubeStack\CubeStack.h" />
-    <ClInclude Include="src\scenes\CubeStack\PhysicsCube.hpp" />
-    <ClInclude Include="src\scenes\CubeWall\CubeWall.h" />
+    <ClInclude Include="src\samples\CubeStack\CubeStack.h" />
+    <ClInclude Include="src\samples\CubeStack\PhysicsCube.hpp" />
+    <ClInclude Include="src\samples\CubeWall\CubeWallSample.h" />
     <ClInclude Include="src\SampleApplication.h" />
     <ClInclude Include="src\MainMenu.h" />
-    <ClInclude Include="src\scenes\FreeCamera\Camera.h" />
-    <ClInclude Include="src\scenes\FreeCamera\FreeCamera.h" />
-    <ClInclude Include="src\scenes\shared\RenderCube.hpp" />
+    <ClInclude Include="src\samples\FreeCamera\Camera.h" />
+    <ClInclude Include="src\samples\FreeCamera\FreeCameraSample.h" />
+    <ClInclude Include="src\shared\PxesRenderDataComponent.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -118,7 +125,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -140,7 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -163,7 +170,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -185,7 +192,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)PixelExplorer\src;$(SolutionDir)glew\include;$(SolutionDir)PXEngine\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(SolutionDir)PXEngine\include;$(SolutionDir)glew\include;$(SolutionDir)SDL2\include;$(SolutionDir)PhysX\pxshared\include;$(SolutionDir)PhysX\physx\include;$(SolutionDir)shared;$(SolutionDir)shared\glm;$(SolutionDir)shared\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

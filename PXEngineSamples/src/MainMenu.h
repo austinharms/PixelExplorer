@@ -3,7 +3,7 @@
 #include "PxeEngineAPI.h"
 #include "imgui.h"
 
-class MainMenu : public pxengine::PxeGUIObject
+class MainMenu : public pxengine::PxeRenderComponent
 {
 public:
 	enum MENUACTIONS
@@ -16,9 +16,15 @@ public:
 		ALL = 0xff
 	};
 
-	MainMenu()
-	{
-		_clickedActions = NONE;
+	static pxengine::PxeObject& createMainMenuObject() {
+		using namespace pxengine;
+		PxeObject& obj = *PxeObject::create();
+		PxeGuiRenderProperties* guiProperties = PxeGuiRenderProperties::getInstance();
+		MainMenu& menu = *(new MainMenu(*guiProperties));
+		guiProperties->drop();
+		obj.addComponent(menu);
+		menu.drop();
+		return obj;
 	}
 
 	virtual ~MainMenu() {}
@@ -56,7 +62,17 @@ public:
 		return lastActions;
 	}
 
+	PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(MainMenu, pxengine::PxeRenderComponent);
+
+protected:
+	PXE_DEFAULT_PROTECTED_COMPONENT_IMPLMENTATION(pxengine::PxeRenderComponent);
+
 private:
+	MainMenu(pxengine::PxeRenderProperties& renderProps) : pxengine::PxeRenderComponent(renderProps)
+	{
+		_clickedActions = NONE;
+	}
+
 	uint8_t _clickedActions;
 };
 #endif // !PXENGINESAMPELS_MAIN_MENU_H_
