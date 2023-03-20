@@ -135,6 +135,18 @@
     <ClCompile Include="src\PxeRenderProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PxeStaticPhysicsActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxeDynamicPhysicsActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxePhysicsActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PxePhysicsShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public\PxeEngine.h">
@@ -279,6 +291,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="private\PxeGlImGuiBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="public\PxeStaticPhysicsActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="public\PxePhysicsShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="public\PxePhysicsActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="public\PxeDynamicPhysicsActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

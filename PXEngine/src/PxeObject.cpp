@@ -1,27 +1,17 @@
 #include "PxeObject.h"
 
 #include <new>
-#include <shared_mutex>
+#include <mutex>
 
 #include "PxeLogger.h"
 #include "PxeScene.h"
-
-#define LOCK_SCOPE_READ() std::shared_lock objectScopeLock(impl()._objectMutex)
-#define LOCK_SCOPE_WRITE() std::unique_lock objectScopeLock(impl()._objectMutex)
-
-#define LOCK_READ() impl()._objectMutex.lock_shared()
-#define UNLOCK_READ() impl()._objectMutex.unlock_shared()
-
-#define LOCK_WRITE() impl()._objectMutex.lock()
-#define UNLOCK_WRITE() impl()._objectMutex.unlock()
 
 namespace pxengine {
 	struct PxeObject::Impl {
 		PxeScene* _parentScene;
 		PxeComponent* _nextComponent;
-		PxeSize _componentCount;
 		glm::mat4 _transform;
-		mutable std::shared_mutex _objectMutex;
+		mutable std::recursive_mutex _objectMutex;
 	};
 
 	PxeObject::PxeObject() {
@@ -33,13 +23,12 @@ namespace pxengine {
 		imp._parentScene = nullptr;
 		imp._nextComponent = nullptr;
 		imp._transform = glm::mat4(1.0f);
-		imp._componentCount = 0;
 	}
 
 	PxeObject::~PxeObject() {
 		{
-			LOCK_SCOPE_WRITE();
 			Impl& imp = impl();
+			std::lock_guard lock(imp._objectMutex);
 			if (imp._parentScene) {
 				PXE_ERROR("PxeObject destroyed without being removed from PxeScene");
 			}
@@ -58,21 +47,22 @@ namespace pxengine {
 	}
 
 	bool PxeObject::setScene(PxeScene& scene) {
-		LOCK_SCOPE_WRITE();
 		Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
 		if (imp._parentScene != nullptr) {
 			PXE_WARN("Attempted to add PxeObject to PxeScene that was already added to a PxeScene");
 			return false;
 		}
 
 		imp._parentScene = &scene;
+		return true;
 	}
 
 	void PxeObject::clearScene(PxeScene& scene) {
 		Impl& imp = impl();
-		LOCK_SCOPE_WRITE();
+		std::lock_guard lock(imp._objectMutex);
 		if (imp._parentScene != &scene) {
-			PXE_ERROR("Attempted to remove PxeObject from incorrect or invalid PxeScene");
+			PXE_ERROR("Attempted to remove PxeObject from incorrect or invalid PxeScene, PxeObject not removed");
 			return;
 		}
 
@@ -81,8 +71,8 @@ namespace pxengine {
 
 	void PxeObject::addComponentsToScene()
 	{
-		LOCK_SCOPE_READ();
 		Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
 		PxeComponent* next = imp._nextComponent;
 		while (next)
 		{
@@ -93,8 +83,8 @@ namespace pxengine {
 
 	void PxeObject::removeComponentsFromScene()
 	{
-		LOCK_SCOPE_READ();
 		Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
 		PxeComponent* next = imp._nextComponent;
 		while (next)
 		{
@@ -111,22 +101,17 @@ namespace pxengine {
 	PXE_NODISCARD bool PxeObject::addComponent(PxeComponent& component)
 	{
 		Impl& imp = impl();
-
-		{
-			LOCK_SCOPE_WRITE();
-			component.grab();
-			if (!component.checkComponentRequirements(*this)) {
-				PXE_WARN("Failed to add PxeComponent to PxeObject, component requirements failed");
-				component.drop();
-				return false;
-			}
-
-			component.addToObject(*this);
-			++imp._componentCount;
-			component._nextComponent = imp._nextComponent;
-			imp._nextComponent = &component;
+		std::lock_guard lock(imp._objectMutex);
+		component.grab();
+		if (!component.checkComponentRequirements(*this)) {
+			PXE_WARN("Failed to add PxeComponent to PxeObject, object did not meet component requirements");
+			component.drop();
+			return false;
 		}
 
+		component.addToObject(*this);
+		component._nextComponent = imp._nextComponent;
+		imp._nextComponent = &component;
 		if (imp._parentScene)
 			component.addToScene(*imp._parentScene);
 		return true;
@@ -134,52 +119,48 @@ namespace pxengine {
 
 	void PxeObject::removeComponent(PxeComponent& component)
 	{
-		LOCK_SCOPE_WRITE();
 		if (component._parentObject != this) {
-			PXE_WARN("Attempted to remove PxeComponent from incorrect/invalid PxeObject");
+			PXE_WARN("Attempted to remove PxeComponent from incorrect PxeObject");
 			return;
 		}
 
 		Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
 		PxeComponent*& lastItr = imp._nextComponent;
 		PxeComponent* itr = imp._nextComponent;
 		while (itr)
 		{
 			if (itr == &component) {
+				if (imp._parentScene)
+					component.removeFromScene(*imp._parentScene);
+				// Remove component from list
 				lastItr = component._nextComponent;
-				goto componentRemoved;
+				component.removeFromObject(*this);
+				component.drop();
+				return;
 			}
 
 			lastItr = itr->_nextComponent;
 			itr = itr->_nextComponent;
 		}
 
-		PXE_ERROR("Failed to remove PxeComponent from PxeObject, failed to find PxeComponent");
-		return;
-
-	componentRemoved:
-		if (imp._parentScene)
-			component.removeFromScene(*imp._parentScene);
-		--imp._componentCount;
-		component.removeFromObject(*this);
-		component.drop();
+		PXE_ERROR("Failed to remove PxeComponent from PxeObject, failed to find PxeComponent in PxeObject's component list");
 	}
 
 	PXE_NODISCARD PxeScene* PxeObject::getScene() const
 	{
-		LOCK_SCOPE_READ();
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
 		return impl()._parentScene;
 	}
 
 	PXE_NODISCARD const glm::mat4& PxeObject::getTransform() const
 	{
-		LOCK_SCOPE_READ();
 		return impl()._transform;
 	}
 
 	void PxeObject::setTransform(const glm::mat4& t)
 	{
-		LOCK_SCOPE_WRITE();
 		impl()._transform = t;
 	}
 
@@ -195,8 +176,9 @@ namespace pxengine {
 
 	PXE_NODISCARD PxeComponent* PxeObject::getComponent(PxeComponentId component, PxeSize index) const
 	{
-		LOCK_SCOPE_READ();
-		PxeComponent* next = impl()._nextComponent;
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeComponent* next = imp._nextComponent;
 		PxeSize curIndex = 0;
 		while (next)
 		{
@@ -210,8 +192,9 @@ namespace pxengine {
 
 	PXE_NODISCARD PxeComponent* PxeObject::getExactComponent(PxeComponentId component, PxeSize index) const
 	{
-		LOCK_SCOPE_READ();
-		PxeComponent* next = impl()._nextComponent;
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeComponent* next = imp._nextComponent;
 		PxeSize curIndex = 0;
 		while (next)
 		{
@@ -225,13 +208,13 @@ namespace pxengine {
 
 	PXE_NODISCARD PxeSize PxeObject::getComponentCount(PxeComponentId component) const
 	{
-		LOCK_SCOPE_READ();
-		if (component == 0) return impl()._componentCount;
-		PxeComponent* next = impl()._nextComponent;
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeComponent* next = imp._nextComponent;
 		PxeSize count = 0;
 		while (next)
 		{
-			if (next->componentOfType(component))
+			if (component == 0 || next->componentOfType(component))
 				++count;
 			next = next->_nextComponent;
 		}
@@ -241,8 +224,9 @@ namespace pxengine {
 
 	PXE_NODISCARD PxeSize PxeObject::getExactComponentCount(PxeComponentId component) const
 	{
-		LOCK_SCOPE_READ();
-		PxeComponent* next = impl()._nextComponent;
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeComponent* next = imp._nextComponent;
 		PxeSize count = 0;
 		while (next)
 		{
@@ -254,10 +238,11 @@ namespace pxengine {
 		return count;
 	}
 
-	PXE_NODISCARD PxeSize PxeObject::getComponents(PxeComponentId component, PxeComponent** componentBuffer, PxeSize componentBufferSize, PxeSize offset)
+	PXE_NODISCARD PxeSize PxeObject::getComponents(PxeComponentId component, PxeComponent** componentBuffer, PxeSize componentBufferSize, PxeSize offset) const
 	{
-		LOCK_SCOPE_READ();
-		PxeComponent* next = impl()._nextComponent;
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeComponent* next = imp._nextComponent;
 		PxeSize index = 0;
 		while (next)
 		{
@@ -277,10 +262,11 @@ namespace pxengine {
 		return index - offset;
 	}
 
-	PXE_NODISCARD PxeSize PxeObject::getExactComponents(PxeComponentId component, PxeComponent** componentBuffer, PxeSize componentBufferSize, PxeSize offset)
+	PXE_NODISCARD PxeSize PxeObject::getExactComponents(PxeComponentId component, PxeComponent** componentBuffer, PxeSize componentBufferSize, PxeSize offset) const
 	{
-		LOCK_SCOPE_READ();
-		PxeComponent* next = impl()._nextComponent;
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeComponent* next = imp._nextComponent;
 		PxeSize index = 0;
 		while (next)
 		{
@@ -298,5 +284,113 @@ namespace pxengine {
 
 		if (index <= offset) return 0;
 		return index - offset;
+	}
+
+	void PxeObject::lock() const
+	{
+		impl()._objectMutex.lock();
+	}
+
+	void PxeObject::unlock() const
+	{
+		impl()._objectMutex.unlock();
+	}
+
+	// TODO is this faster then getting the count and preallocating the buffer 
+	PXE_NODISCARD PxeComponent** PxeObject::getComponents(PxeComponentId component) const
+	{
+		struct StackNode
+		{
+			StackNode(StackNode* nextNode) {
+				next = nextNode;
+				component = nullptr;
+			}
+
+			StackNode* next;
+			PxeComponent* component;
+		};
+
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		int64_t nodeCount = 0;
+		PxeComponent* itr = imp._nextComponent;
+		StackNode* nodeItr = nullptr;
+	createNode:
+		nodeItr = new(alloca(sizeof(StackNode))) StackNode(nodeItr);
+		++nodeCount;
+
+		while (itr)
+		{
+			if (itr->componentOfType(component)) {
+				nodeItr->component = itr;
+				itr = itr->_nextComponent;
+				goto createNode;
+			}
+
+			itr = itr->_nextComponent;
+		}
+
+		PxeComponent** buf = static_cast<PxeComponent**>(malloc(sizeof(PxeComponent*) * nodeCount));
+		if (!buf) {
+			PXE_ERROR("Failed to allocate PxeComponent* buffer");
+			return nullptr;
+		}
+
+		for (int64_t i = nodeCount - 1; i >= 0; i--)
+		{
+			buf[i] = nodeItr->component;
+			nodeItr = nodeItr->next;
+		}
+
+		return buf;
+	}
+
+	// TODO is this faster then getting the count and preallocating the buffer 
+	PXE_NODISCARD PxeComponent** PxeObject::getExactComponents(PxeComponentId component) const
+	{
+		struct StackNode
+		{
+			StackNode(StackNode* nextNode) {
+				next = nextNode;
+				component = nullptr;
+			}
+
+			StackNode* next;
+			PxeComponent* component;
+		};
+
+		const Impl& imp = impl();
+		std::lock_guard lock(imp._objectMutex);
+		PxeSize nodeCount = 0;
+		PxeComponent* itr = imp._nextComponent;
+		StackNode* nodeItr = nullptr;
+	createNode:
+		nodeItr = new(alloca(sizeof(StackNode))) StackNode(nodeItr);
+		++nodeCount;
+
+		while (itr)
+		{
+			if (itr->getComponentId() == component) {
+				nodeItr->component = itr;
+				itr = itr->_nextComponent;
+				goto createNode;
+			}
+
+			itr = itr->_nextComponent;
+		}
+
+		PxeComponent** buf = static_cast<PxeComponent**>(malloc(sizeof(PxeComponent*) * nodeCount));
+		if (!buf) {
+			PXE_ERROR("Failed to allocate PxeComponent* buffer");
+			return nullptr;
+		}
+
+		for (PxeSize i = nodeCount - 1; i >= 0; i--)
+		{
+			buf[i] = nodeItr->component;
+			nodeItr = nodeItr->next;
+		}
+
+		return buf;
 	}
 }

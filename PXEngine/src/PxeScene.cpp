@@ -34,7 +34,7 @@ namespace pxengine {
 		Impl& imp = impl();
 		imp._flags = PxeSceneFlag::NONE;
 		imp._physTimeScale = 1.0f;
-		imp._physStep = 0.5f;
+		imp._physStep = 0.035f;
 		imp._physAccumulator = 0.0f;
 	}
 

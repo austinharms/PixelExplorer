@@ -219,6 +219,9 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\PxeDynamicPhysicsActor.cpp" />
+    <ClCompile Include="src\PxePhysicsActor.cpp" />
+    <ClCompile Include="src\PxePhysicsShape.cpp" />
     <ClCompile Include="src\PxeRenderProperties.cpp" />
     <ClCompile Include="src\PxeGuiRenderProperties.cpp" />
     <ClCompile Include="src\PxeAction.cpp" />
@@ -231,6 +234,7 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <ClCompile Include="src\PxePhysicsComponent.cpp" />
     <ClCompile Include="src\PxeRenderComponent.cpp" />
     <ClCompile Include="src\PxeRenderPipeline.cpp" />
+    <ClCompile Include="src\PxeStaticPhysicsActor.cpp" />
     <ClCompile Include="src\PxeUpdateComponent.cpp" />
     <ClCompile Include="src\PxeWindow.cpp" />
     <ClCompile Include="src\imgui\backends\imgui_impl_sdl.cpp" />
@@ -264,6 +268,7 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <ClInclude Include="public\PxeAction.h" />
     <ClInclude Include="public\PxeComponent.h" />
     <ClInclude Include="private\PxeFontFile.h" />
+    <ClInclude Include="public\PxeDynamicPhysicsActor.h" />
     <ClInclude Include="public\PxeGlBindable.h" />
     <ClInclude Include="public\PxeCamera.h" />
     <ClInclude Include="public\PxeDefaultCamera.h" />
@@ -281,13 +286,16 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="public\PxeIndexBuffer.h" />
     <ClInclude Include="public\PxeOSHelpers.h" />
+    <ClInclude Include="public\PxePhysicsActor.h" />
     <ClInclude Include="public\PxePhysicsComponent.h" />
+    <ClInclude Include="public\PxePhysicsShape.h" />
     <ClInclude Include="public\PxeRenderComponent.h" />
     <ClInclude Include="public\PxeRenderPipeline.h" />
     <ClInclude Include="public\PxeObject.h" />
     <ClInclude Include="public\PxeRenderProperties.h" />
     <ClInclude Include="public\PxeRenderTarget.h" />
     <ClInclude Include="public\PxeRenderTexture.h" />
+    <ClInclude Include="public\PxeStaticPhysicsActor.h" />
     <ClInclude Include="public\PxeTexture.h" />
     <ClInclude Include="public\PxeTypes.h" />
     <ClInclude Include="public\PxeUpdateComponent.h" />

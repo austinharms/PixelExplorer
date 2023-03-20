@@ -135,7 +135,7 @@ namespace pxengine {
 			char* linkLog = static_cast<char*>(alloca(logLength + 1));
 			linkLog[logLength] = '\0';
 			glGetProgramInfoLog(glProgram, logLength, nullptr, linkLog);
-			PXE_INFO("Linked shader file " + shaderPath.string() + " glProgram Log: " + std::string(linkLog));
+			PXE_INFO("Linked shader file " + shaderPath.string() + " glProgramId: " + std::to_string(glProgram) + " glProgram Log: " + std::string(linkLog));
 		}
 #endif // PXE_DEBUG
 
@@ -154,6 +154,9 @@ namespace pxengine {
 	{
 		if (!program) return;
 		glDeleteProgram(program->getGlProgramId());
+#ifdef PXE_DEBUG
+		PXE_INFO("Deleted glProgram with id: " + std::to_string(program->getGlProgramId()));
+#endif // PXE_DEBUG
 		delete program;
 		program = nullptr;
 	}
