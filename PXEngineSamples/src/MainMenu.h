@@ -3,6 +3,8 @@
 #include "PxeEngineAPI.h"
 #include "imgui.h"
 
+#include <cassert>
+
 class MainMenu : public pxengine::PxeRenderComponent
 {
 public:
@@ -22,7 +24,7 @@ public:
 		PxeGuiRenderProperties* guiProperties = PxeGuiRenderProperties::getInstance();
 		MainMenu& menu = *(new MainMenu(*guiProperties));
 		guiProperties->drop();
-		obj.addComponent(menu);
+		assert(obj.addComponent(menu));
 		menu.drop();
 		return obj;
 	}

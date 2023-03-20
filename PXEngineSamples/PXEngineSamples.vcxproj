@@ -39,7 +39,6 @@
     <ClInclude Include="src\shared\CubeData.h" />
     <ClInclude Include="src\SampleSceneBase.h" />
     <ClInclude Include="src\samples\CubeStack\CubeStack.h" />
-    <ClInclude Include="src\samples\CubeStack\PhysicsCube.hpp" />
     <ClInclude Include="src\samples\CubeWall\CubeWallSample.h" />
     <ClInclude Include="src\SampleApplication.h" />
     <ClInclude Include="src\MainMenu.h" />

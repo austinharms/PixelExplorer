@@ -56,9 +56,6 @@
     <ClInclude Include="src\samples\CubeStack\CubeStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\samples\CubeStack\PhysicsCube.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\samples\FreeCamera\FreeCameraSample.h">
       <Filter>Header Files</Filter>
     </ClInclude>

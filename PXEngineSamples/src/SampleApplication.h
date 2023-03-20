@@ -8,7 +8,7 @@
 #include "SampleSceneBase.h"
 #include "samples/FreeCamera/FreeCameraSample.h"
 #include "samples/CubeWall/CubeWallSample.h"
-//#include "scenes/CubeStack/CubeStack.h"
+#include "samples/CubeStack/CubeStack.h"
 
 class SampleApplication : public pxengine::PxeApplication
 {
@@ -58,11 +58,11 @@ public:
 			_runningSamples.push_back(scene);
 		}
 
-		//if (menuAction & MainMenu::CUBESTACK)
-		//{
-		//	CubeStack* scene = new(std::nothrow) CubeStack();
-		//	if (scene) _runningSamples.push_back(scene);
-		//}
+		if (menuAction & MainMenu::CUBESTACK)
+		{
+			CubeStackSample* scene = new CubeStackSample();
+			_runningSamples.push_back(scene);
+		}
 
 		if (menuAction & MainMenu::FREECAMERA)
 		{
