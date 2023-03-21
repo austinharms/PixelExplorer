@@ -18,31 +18,25 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\PlayMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\UpdatableScene.cpp">
+    <ClCompile Include="src\ApplicationScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scene\ErrorMenu.cpp">
+    <ClCompile Include="src\scenes\error\ErrorScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\ErrorScreen.cpp">
+    <ClCompile Include="src\scenes\error\ErrorScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scene\MainMenu.cpp">
+    <ClCompile Include="src\common\gui\PexGui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\PexGui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scene\TerrainGenerationTest.cpp">
+    <ClCompile Include="src\scenes\terrain\TerrainGenerationTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\terrain\TerrainChunk.cpp">
@@ -57,42 +51,42 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\PauseMenu.cpp">
+    <ClCompile Include="src\scenes\terrain\PauseMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tools\RenderLine.cpp">
+    <ClCompile Include="src\common\tools\RenderLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tools\RenderPoint.cpp">
+    <ClCompile Include="src\common\tools\RenderPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\title\TitleScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\title\TitleScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gui\PlayMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\UpdatableScene.h">
+    <ClInclude Include="src\ApplicationScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\MainMenu.h">
+    <ClInclude Include="src\scenes\error\ErrorScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\ErrorMenu.h">
+    <ClInclude Include="src\scenes\error\ErrorScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\ErrorScreen.h">
+    <ClInclude Include="src\common\gui\PexGui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\PexGui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scene\TerrainGenerationTest.h">
+    <ClInclude Include="src\scenes\terrain\TerrainGenerationTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\terrain\TerrainManager.h">
@@ -113,16 +107,22 @@
     <ClInclude Include="src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\PauseMenu.h">
+    <ClInclude Include="src\scenes\terrain\PauseMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\terrain\DebugTerrainGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\RenderLine.h">
+    <ClInclude Include="src\common\tools\RenderLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\RenderPoint.h">
+    <ClInclude Include="src\common\tools\RenderPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\title\TitleScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\title\TitleScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

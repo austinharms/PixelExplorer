@@ -10,17 +10,17 @@ namespace pxengine {
 	{
 	public:
 		void start(PxeLogInterface& logInterface);
+		~PxeApplication();
+		PXE_NOCOPY(PxeApplication);
 
+	protected:
 		virtual void onStart() = 0;
 		virtual void onStop() = 0;
 		virtual void onUpdate() = 0;
 		virtual void postUpdate() {}
 		virtual void prePhysics() {}
 		virtual void postPhysics() {}
-
 		PxeApplication();
-		~PxeApplication();
-		PXE_NOCOPY(PxeApplication);
 
 	private:
 		static constexpr PxeSize STORAGE_SIZE = 320;

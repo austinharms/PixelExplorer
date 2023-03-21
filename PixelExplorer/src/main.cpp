@@ -6,6 +6,7 @@
 #include "PxeEngine.h"
 
 int main(void) {
+	pixelexplorer::Log log;
 	pxengine::pxeRunApplication(pixelexplorer::Application::getInstance(), pixelexplorer::Log::getInstance());
 	return 0;
 }

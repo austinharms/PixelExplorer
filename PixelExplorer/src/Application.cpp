@@ -4,7 +4,7 @@
 
 #include "PxeEngine.h"
 #include "Log.h"
-#include "scene/MainMenu.h"
+#include "scenes/MainMenu.h"
 #include "SDL_timer.h"
 
 using namespace pxengine;

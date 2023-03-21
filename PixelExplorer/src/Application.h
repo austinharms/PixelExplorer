@@ -2,30 +2,32 @@
 #define PIXELEXPLORER_APPLICATION_H_
 #include <string>
 
-#include "PxeApplicationInterface.h"
+#include "PxeApplication.h"
+#include "ApplicationScene.h"
 #include "PxeWindow.h"
-#include "UpdatableScene.h"
-#include "scene/ErrorMenu.h"
+#include "scenes/error/ErrorScene.h"
 
 namespace pixelexplorer {
-	class Application : public pxengine::PxeApplicationInterface
+	class Application : public pxengine::PxeApplication
 	{
 	public:
 		static Application& getInstance();
 		static void Error();
-		static void Error(const char* msg);
 		static void Error(const std::string& msg);
-		static void ChangeScene(UpdatableScene* scene);
+		static void Error(const char* msg);
 
-		~Application() = default;
+		void switchScene(ApplicationScene& scene);
+		void quit();
+		~Application();
+		PXE_NOCOPY(Application);
+
+	protected:
 		void onStart() override;
 		void onStop() override;
 		void onUpdate() override;
-		void setError();
-		void setError(const char* msg);
-		void setError(const std::string& msg);
-		void quit();
-		void setActiveScene(UpdatableScene* scene);
+		void postUpdate() override;
+		void prePhysics() override;
+		void postPhysics() override;
 
 	private:
 		enum ApplicationState
@@ -39,8 +41,8 @@ namespace pixelexplorer {
 		Application();
 
 		pxengine::PxeWindow* _window;
-		UpdatableScene* _activeScene;
-		scene::ErrorMenu* _errorMenu;
+		ApplicationScene* _currentScene;
+		scenes::error::ErrorScene* _errorScene;
 		ApplicationState _state;
 	};
 }

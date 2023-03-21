@@ -1,31 +1,12 @@
 #include "Log.h"
+
+#include "PxeEngine.h"
 #include <iostream>
 
 namespace pixelexplorer {
-	Log& Log::getInstance()
+	void Log::log(pxengine::PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line)
 	{
-		static Log log;
-		return log;
-	}
-
-	void Log::info(const char* msg, const char* file, const char* function, uint64_t line)
-	{
-		getInstance().onLog(pxengine::PxeLogLevel::PXE_INFO, msg, file, function, line);
-	}
-
-	void Log::warn(const char* msg, const char* file, const char* function, uint64_t line)
-	{
-		getInstance().onLog(pxengine::PxeLogLevel::PXE_WARN, msg, file, function, line);
-	}
-
-	void Log::error(const char* msg, const char* file, const char* function, uint64_t line)
-	{
-		getInstance().onLog(pxengine::PxeLogLevel::PXE_ERROR, msg, file, function, line);
-	}
-
-	void Log::fatal(const char* msg, const char* file, const char* function, uint64_t line)
-	{
-		getInstance().onLog(pxengine::PxeLogLevel::PXE_FATAL, msg, file, function, line);
+		pxengine::PxeEngine::getInstance().getLoggingInterface().onLog(level, msg, file, function, line);
 	}
 
 	void Log::onLog(pxengine::PxeLogLevel level, const char* msg, const char* file, const char* function, uint64_t line)
