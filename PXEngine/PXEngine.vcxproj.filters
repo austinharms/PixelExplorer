@@ -147,6 +147,9 @@
     <ClCompile Include="src\PxePhysicsShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PxeGuiComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public\PxeEngine.h">
@@ -269,10 +272,10 @@
     <ClInclude Include="public\PxeComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="public\PxeGuiShader.h">
+    <ClInclude Include="private\PxeGuiShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="public\PxeGuiRenderProperties.h">
+    <ClInclude Include="private\PxeGuiRenderProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="public\PxeRenderComponent.h">
@@ -303,6 +306,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="public\PxeDynamicPhysicsActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="public\PxeGuiComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

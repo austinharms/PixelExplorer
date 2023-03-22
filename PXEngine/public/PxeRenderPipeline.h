@@ -8,6 +8,7 @@
 #include "PxeShader.h"
 #include "PxeFont.h"
 #include "PxeRenderTarget.h"
+#include "PxeRenderProperties.h"
 PXE_PRIVATE_IMPLEMENTATION_START
 #include "PxeGlImGuiBackend.h"
 PXE_PRIVATE_IMPLEMENTATION_END
@@ -34,10 +35,13 @@ namespace pxengine {
 		// Returns VSync mode for all windows
 		PXE_NODISCARD int8_t getVSyncMode() const;
 
-		// Creates and returns PxeShader or nullptr on failure 
-		// Note: all PxeShader are cached by PxeShaderId
+		// Returns the PxeRenderProperties required for rendering gui elements
+		PXE_NODISCARD PxeRenderProperties& getGuiRenderProperties();
+
+		// Returns an existing PxeShader instance or creates one if none exist, returns nullptr on failure
+		// Note: all PxeShader are loaded and cached by PxeShaderId
 		template<class T, typename std::enable_if<std::is_base_of<PxeShader, T>::value>::type* = nullptr>
-		PXE_NODISCARD inline T* getShader()
+		PXE_NODISCARD inline T* loadShader()
 		{
 			PxeShaderId id = PxeShader::getShaderId<T>();
 			PxeShader* shader;
@@ -65,7 +69,7 @@ namespace pxengine {
 		void lockShaders();
 		void unlockShaders();
 
-		static constexpr PxeSize STORAGE_SIZE = 1528;
+		static constexpr PxeSize STORAGE_SIZE = 1600;
 		static constexpr PxeSize STORAGE_ALIGN = 8;
 		std::aligned_storage<STORAGE_SIZE, STORAGE_ALIGN>::type _storage;
 		PXE_PRIVATE_IMPLEMENTATION_START

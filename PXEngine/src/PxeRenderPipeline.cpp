@@ -12,17 +12,19 @@
 #include "PxeRenderComponent.h"
 #include "PxeScene.h"
 #include "PxeRenderProperties.h"
+#include "PxeGuiRenderProperties.h"
 
 namespace pxengine {
 	struct PxeRenderPipeline::Impl {
 		PxeGlImGuiBackend* _guiBackend;
+		PxeGuiRenderProperties* _guiProperties;
+		uint32_t _framebuffer;
+		uint32_t _depthbuffer;
 		std::mutex _shadersMutex;
 		std::mutex _fontFilesMutex;
 		std::unordered_map<PxeShaderId, PxeShader*> _shaders;
 		std::unordered_map<std::filesystem::path, PxeFontFile*> _fontFiles;
 		ImFontAtlas _fontAtlas;
-		uint32_t _framebuffer;
-		uint32_t _depthbuffer;
 		int8_t _vsyncMode;
 		uint8_t _renderDepth;
 		uint8_t _maxRenderDepth;
@@ -36,6 +38,7 @@ namespace pxengine {
 		new(&_storage) Impl();
 		Impl& imp = impl();
 		imp._guiBackend = nullptr;
+		imp._guiProperties = nullptr;
 		imp._framebuffer = 0;
 		imp._depthbuffer = 0;
 		imp._vsyncMode = 0;
@@ -121,83 +124,17 @@ namespace pxengine {
 		return impl()._vsyncMode;
 	}
 
-	//void PxeRenderPipeline::renderScene(PxeScene& scene, PxeRenderTexture& targetTexture, const glm::mat4& PVMatrix, bool renderGui)
-	//{
-	//	if (targetTexture.getAssetStatus() != PxeGLAssetStatus::INITIALIZED) {
-	//		PXE_WARN("Attempted to render to invalid PxeRenderTexture");
-	//		return;
-	//	}
+	PXE_NODISCARD PxeRenderProperties& PxeRenderPipeline::getGuiRenderProperties()
+	{
+		Impl& imp = impl();
+		if (imp._guiProperties) return *imp._guiProperties;
+		imp._guiProperties = PxeGuiRenderProperties::create();
+		if (!imp._guiProperties) {
+			PXE_FATAL("Failed to create PxeGuiRenderProperties");
+		}
 
-	//	if (targetTexture.getWidth() == 0 || targetTexture.getHeight() == 0) {
-	//		PXE_WARN("Attempted to render to PxeRenderTexture with invalid size");
-	//		return;
-	//	}
-
-	//	glBindRenderbuffer(GL_RENDERBUFFER, _depthbuffer);
-	//	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, targetTexture.getWidth(), targetTexture.getHeight());
-	//	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	//	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
-	//	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthbuffer);
-	//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, targetTexture.getGlTextureId(), 0);
-
-	//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-	//		scene.acquireObjectsReadLock();
-	//		glViewport(0, 0, targetTexture.getWidth(), targetTexture.getHeight());
-	//		glClearColor(0, 0, 0, 1);
-	//		// Ensure we clear the full framebuffer
-	//		glDisable(GL_SCISSOR_TEST);
-	//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//		{
-	//			PxeRenderMaterialInterface* currentMaterial = nullptr;
-	//			PxeShader* currentShader = nullptr;
-	//			int32_t mvpLocation = -1;
-	//			int32_t camLocation = -1;
-	//			const std::list<PxeRenderObjectInterface*>& renderList = scene.getRenderObjects(PxeRenderPass::FORWARD);
-	//			if (!renderList.empty()) {
-	//				for (PxeRenderObjectInterface* obj : renderList) {
-	//					if (&(obj->getRenderMaterial()) != currentMaterial) {
-	//						currentMaterial = &(obj->getRenderMaterial());
-	//						if (&(currentMaterial->getShader()) != currentShader) {
-	//							currentShader = &(currentMaterial->getShader());
-	//							currentShader->bind();
-	//							mvpLocation = currentShader->getUniformLocation("u_MVP");
-	//							camLocation = currentShader->getUniformLocation("u_CAMPOS");
-	//						}
-
-	//						currentMaterial->applyMaterial();
-	//					}
-
-	//					currentShader->setUniformM4f(mvpLocation, PVMatrix * obj->getPositionMatrix());
-	//					//currentShader->setUniform3f(camLocation, );
-	//					obj->onRender();
-	//				}
-	//			}
-	//		}
-
-	//		if (renderGui) {
-	//			_guiRenderMaterial->getShader().bind();
-	//			_guiRenderMaterial->applyMaterial();
-	//			ImGui::NewFrame();
-	//			const std::list<PxeRenderObjectInterface*>& renderList = scene.getRenderObjects(PxeRenderPass::GUI);
-	//			for (PxeRenderObjectInterface* obj : renderList) {
-	//				obj->onRender();
-	//			}
-
-	//			ImGui::Render();
-	//			_guiBackend->renderDrawData();
-	//		}
-
-	//		scene.releaseObjectsReadLock();
-	//	}
-	//	else {
-	//		PXE_ERROR("Failed to create render framebuffer");
-	//	}
-
-	//	glUseProgram(0);
-	//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//}
+		return *imp._guiProperties;
+	}
 
 	void PxeRenderPipeline::render(PxeRenderTarget& renderTarget)
 	{
@@ -369,6 +306,8 @@ namespace pxengine {
 			PXE_FATAL("Failed to allocate PxeGlImGuiBackend");
 		}
 
+		// Ensure the gui PxeGuiRenderProperties are created by this point
+		std::ignore = getGuiRenderProperties();
 		PXE_INFO("PxeRenderPipeline initialized");
 	}
 
@@ -378,6 +317,7 @@ namespace pxengine {
 		glDeleteFramebuffers(1, &imp._framebuffer);
 		glDeleteRenderbuffers(1, &imp._depthbuffer);
 		imp._guiBackend->drop();
+		imp._guiProperties->drop();
 		PXE_INFO("PxeRenderPipeline uninitialized");
 	}
 }

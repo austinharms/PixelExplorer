@@ -7,53 +7,39 @@
 #include "PxeGuiShader.h"
 
 namespace pxengine {
-	PxeGuiRenderProperties* PxeGuiRenderProperties::s_propertiesInstance = nullptr;
-	std::mutex PxeGuiRenderProperties::s_instanceMutex;
-
-	PxeGuiRenderProperties* PxeGuiRenderProperties::getInstance()
+	PxeGuiRenderProperties* PxeGuiRenderProperties::create()
 	{
-		std::lock_guard lock(s_instanceMutex);
-		if (!s_propertiesInstance) {
-			s_propertiesInstance = new(std::nothrow) PxeGuiRenderProperties();
-			if (!s_propertiesInstance) {
-				PXE_ERROR("Failed to allocate PxeGuiRenderProperties");
-				return nullptr;
-			}
-
-			if (!s_propertiesInstance->getShader()) {
-				PXE_ERROR("Failed to load PxeGuiRenderProperties PxeGuiShader");
-			}
-
-			return s_propertiesInstance;
+		PxeGuiShader* guiShader = PxeEngine::getInstance().getRenderPipeline().loadShader<PxeGuiShader>();
+		if (!guiShader) {
+			PXE_ERROR("Failed to load PxeGuiRenderProperties PxeGuiShader");
+			return nullptr;
 		}
-		else {
-			s_propertiesInstance->grab();
-			return s_propertiesInstance;
+
+		PxeGuiRenderProperties* renderProps = new(std::nothrow) PxeGuiRenderProperties(*guiShader);
+		guiShader->drop();
+		if (!renderProps) {
+			PXE_ERROR("Failed to allocate PxeGuiRenderProperties");
+			return nullptr;
 		}
+
+		return renderProps;
 	}
 
-	PxeGuiRenderProperties::PxeGuiRenderProperties() {
-		_guiShader = PxeEngine::getInstance().getRenderPipeline().getShader<PxeGuiShader>();
+	PxeGuiRenderProperties::PxeGuiRenderProperties(PxeShader& guiShader) : _guiShader(guiShader) {
+		guiShader.grab();
 	}
 
 	PXE_NODISCARD PxeShader* PxeGuiRenderProperties::getShader() const
 	{
-		return _guiShader;
+		return &_guiShader;
 	}
 
 	PxeGuiRenderProperties::~PxeGuiRenderProperties()
 	{
-		_guiShader->drop();
+		_guiShader.drop();
 	}
 
 	void PxeGuiRenderProperties::onApplyProperties()
 	{
-	}
-
-	void PxeGuiRenderProperties::onDelete()
-	{
-		std::lock_guard lock(s_instanceMutex);
-		if (getRefCount()) return;
-		s_propertiesInstance = nullptr;
 	}
 }

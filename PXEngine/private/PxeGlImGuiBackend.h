@@ -18,8 +18,6 @@ namespace pxengine {
             void rebuildFontTexture();
             void renderDrawData();
 
-            PXE_NODISCARD PxeGuiRenderProperties* getGuiRenderProperties();
-
             PxeGlImGuiBackend();
             virtual ~PxeGlImGuiBackend();
             PXE_NOCOPY(PxeGlImGuiBackend);
@@ -30,7 +28,6 @@ namespace pxengine {
 
         private:
             PxeGuiShader* _guiShader;
-            PxeGuiRenderProperties* _guiRenderProperties;
             uint32_t _glFontTextureId;
             uint32_t _glVertexArray;
             uint32_t _glArrayBuffer;

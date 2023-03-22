@@ -7,12 +7,11 @@
 
 namespace pxengine {
 	PxeGlImGuiBackend::PxeGlImGuiBackend() {
-		_guiShader = PxeEngine::getInstance().getRenderPipeline().getShader<PxeGuiShader>();
+		_guiShader = PxeEngine::getInstance().getRenderPipeline().loadShader<PxeGuiShader>();
 		_glVertexArray = 0;
 		_glArrayBuffer = 0;
 		_glElementBuffer = 0;
 		_glFontTextureId = 0;
-		_guiRenderProperties = nullptr;
 	}
 
 	PxeGlImGuiBackend::~PxeGlImGuiBackend() {
@@ -119,11 +118,6 @@ namespace pxengine {
 		glBindVertexArray(0);
 	}
 
-	PXE_NODISCARD PxeGuiRenderProperties* PxeGlImGuiBackend::getGuiRenderProperties()
-	{
-		return _guiRenderProperties;
-	}
-
 	void PxeGlImGuiBackend::initializeGl()
 	{
 		int32_t previousTexture;
@@ -146,19 +140,11 @@ namespace pxengine {
 		rebuildFontTexture();
 		glBindVertexArray(previousVertexArray);
 		glBindTexture(GL_TEXTURE_2D, previousTexture);
-		_guiRenderProperties = PxeGuiRenderProperties::getInstance();
-		if (!_guiRenderProperties) {
-			PXE_ERROR("Failed to create PxeGuiRenderProperties");
-		}
-
 		PXE_INFO("PxeGlImGuiBackend initialized");
 	}
 
 	void PxeGlImGuiBackend::uninitializeGl()
 	{
-		if (_guiRenderProperties)
-			_guiRenderProperties->drop();
-		_guiRenderProperties = nullptr;
 		glDeleteBuffers(1, &_glArrayBuffer);
 		glDeleteBuffers(1, &_glElementBuffer);
 		glDeleteVertexArrays(1, &_glVertexArray);
