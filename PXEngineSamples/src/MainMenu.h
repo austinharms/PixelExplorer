@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-class MainMenu : public pxengine::PxeRenderComponent
+class MainMenu : public pxengine::PxeGuiComponent
 {
 public:
 	enum MENUACTIONS
@@ -21,9 +21,7 @@ public:
 	static pxengine::PxeObject& createMainMenuObject() {
 		using namespace pxengine;
 		PxeObject& obj = *PxeObject::create();
-		PxeGuiRenderProperties* guiProperties = PxeGuiRenderProperties::getInstance();
-		MainMenu& menu = *(new MainMenu(*guiProperties));
-		guiProperties->drop();
+		MainMenu& menu = *(new MainMenu());
 		assert(obj.addComponent(menu));
 		menu.drop();
 		return obj;
@@ -70,7 +68,7 @@ protected:
 	PXE_DEFAULT_PROTECTED_COMPONENT_IMPLMENTATION(pxengine::PxeRenderComponent);
 
 private:
-	MainMenu(pxengine::PxeRenderProperties& renderProps) : pxengine::PxeRenderComponent(renderProps)
+	MainMenu()
 	{
 		_clickedActions = NONE;
 	}

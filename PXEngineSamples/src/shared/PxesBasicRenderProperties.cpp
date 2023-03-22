@@ -9,7 +9,7 @@ PxesBasicRenderProperties::PxesBasicRenderProperties(pxengine::PxeTexture& textu
 	using namespace pxengine;
 	_texture.grab();
 	PxeEngine& engine = PxeEngine::getInstance();
-	assert((_basicShader = engine.getRenderPipeline().getShader<PxesBasicShader>()));
+	assert((_basicShader = engine.getRenderPipeline().loadShader<PxesBasicShader>()));
 }
 
 PxesBasicRenderProperties::~PxesBasicRenderProperties()

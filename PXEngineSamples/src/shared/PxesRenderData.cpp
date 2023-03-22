@@ -1,5 +1,7 @@
 #include "PxesRenderData.h"
 
+#include <cassert>
+
 #include "PxeVertexBuffer.h"
 #include "PxeIndexBuffer.h"
 #include "PxeVertexBufferFormat.h"
@@ -13,14 +15,16 @@ PxesRenderData::PxesRenderData() {
 	format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 3, false));
 	format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 2, false));
 	pxengine::PxeVertexBuffer* vertexBuffer = new pxengine::PxeVertexBuffer(format);
-	pxengine::PxeBuffer* vertexData = new pxengine::PxeBuffer(sizeof(cubeRenderVertices));
+	pxengine::PxeBuffer* vertexData = pxengine::PxeBuffer::create(sizeof(cubeRenderVertices));
+	assert(vertexData);
 	memcpy(vertexData->getBuffer(), cubeRenderVertices, vertexData->getSize());
 	vertexBuffer->bufferData(*vertexData);
 	vertexData->drop();
 
 	// Create and load index buffer
 	pxengine::PxeIndexBuffer* indexBuffer = new pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_8BIT);
-	pxengine::PxeBuffer* indexData = new pxengine::PxeBuffer(sizeof(cubeRenderIndices));
+	pxengine::PxeBuffer* indexData = pxengine::PxeBuffer::create(sizeof(cubeRenderIndices));
+	assert(indexData);
 	memcpy(indexData->getBuffer(), cubeRenderIndices, indexData->getSize());
 	indexBuffer->bufferData(*indexData);
 	indexData->drop();
