@@ -14,13 +14,13 @@ namespace pxengine {
 		physx::PxTransform t(physx::PxIdentity);
 		physx::PxRigidDynamic* actor = engine.getPhysicsBase().createRigidDynamic(t);
 		if (!actor) {
-			//PXE_ERROR("Failed to create PxeDynamicPhysicsActor's physx::PxRigidStatic actor");
+			PXE_ERROR("Failed to create PxeDynamicPhysicsActor's physx::PxRigidStatic actor");
 			return nullptr;
 		}
 
 		PxeDynamicPhysicsActor* pxeActor = new(std::nothrow) PxeDynamicPhysicsActor(*actor);
 		if (!pxeActor) {
-			//PXE_ERROR("Failed to allocate PxeDynamicPhysicsActor");
+			PXE_ERROR("Failed to allocate PxeDynamicPhysicsActor");
 			actor->release();
 			return nullptr;
 		}
@@ -31,7 +31,6 @@ namespace pxengine {
 	PxeDynamicPhysicsActor::PxeDynamicPhysicsActor(physx::PxRigidDynamic& actor) : _actor(actor)
 	{
 		_lastTransform = glm::mat4(1.0f);
-		//glm::make_mat4(physx::PxMat44(getPhysicsRigidActor()->getGlobalPose()).front())
 	}
 
 	PxeDynamicPhysicsActor::~PxeDynamicPhysicsActor()

@@ -72,7 +72,7 @@ namespace pxengine {
 		static PxeEngine* s_engineInstance;
 
 		PxeEngine(PxeLogInterface& logInterface);
-		static constexpr PxeSize STORAGE_SIZE = 2100;
+		static constexpr PxeSize STORAGE_SIZE = 2256;
 		static constexpr PxeSize STORAGE_ALIGN = 8;
 		std::aligned_storage<STORAGE_SIZE, STORAGE_ALIGN>::type _storage;
 		PXE_PRIVATE_IMPLEMENTATION_START

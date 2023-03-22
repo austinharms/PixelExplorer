@@ -147,7 +147,6 @@ namespace pxengine {
 	PXE_PRIVATE_IMPLEMENTATION_START
 	private:
 		PXE_NODISCARD static uint32_t compileShader(uint32_t shaderType, const char* source);
-		
 	PXE_PRIVATE_IMPLEMENTATION_END
 	};
 }

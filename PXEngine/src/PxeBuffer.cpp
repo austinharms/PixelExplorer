@@ -1,51 +1,44 @@
 #include "PxeBuffer.h"
 
+#include <new>
+#include <malloc.h>
+
+#include "PxeLogger.h"
+
 namespace pxengine {
-	PxeBuffer::PxeBuffer(const PxeBuffer& other)
+	PxeBuffer* PxeBuffer::create(PxeSize size)
 	{
-		_buffer = nullptr;
-		_size = 0;
-		(*this) = other;
+		void* buf = nullptr;
+		if (size) {
+			buf = malloc(size);
+			if (!buf) {
+				PXE_ERROR("Failed to allocate PxeBuffer's buffer");
+				return nullptr;
+			}
+		}
+
+		PxeBuffer* pxeBuf = new(std::nothrow) PxeBuffer(size, buf);
+		if (!pxeBuf) {
+			PXE_ERROR("Failed to allocate PxeBuffer");
+			if (buf) free(buf);
+		}
+
+		return pxeBuf;
 	}
 
-	PxeBuffer::PxeBuffer(size_t size)
+	PxeBuffer* PxeBuffer::create(const PxeBuffer& buffer)
 	{
-		_buffer = nullptr;
-		_size = size;
-		if (_size) {
-			_buffer = malloc(_size);
-			if (!_buffer)
-				_size = 0;
-		}
+		PxeBuffer* pxeBuf = create(buffer._size);
+		if (pxeBuf && buffer._size)
+			memcpy(pxeBuf->_buffer, buffer._buffer, buffer._size);
+		return pxeBuf;
 	}
+
+	PxeBuffer::PxeBuffer(PxeSize size, void* buffer) : _buffer(buffer), _size(size) {}
 
 	PxeBuffer::~PxeBuffer()
 	{
-		if (_buffer)
-			free(_buffer);
-	}
-
-	PXE_NODISCARD bool PxeBuffer::getAllocated() const
-	{
-		return _buffer;
-	}
-
-	PxeBuffer& PxeBuffer::operator=(const PxeBuffer& other)
-	{
-		if (_buffer)
-			free(_buffer);
-		_buffer = nullptr;
-		_size = other._size;
-		if (_size) {
-			_buffer = malloc(_size);
-			if (!_buffer)
-				_size = 0;
-		}
-		
-		if (_size)
-			memcpy(_buffer, other._buffer, _size);
-
-		return *this;
+		if (_buffer) free(_buffer);
 	}
 
 	PXE_NODISCARD PxeSize PxeBuffer::getSize() const {

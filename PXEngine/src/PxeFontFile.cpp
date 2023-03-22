@@ -51,6 +51,10 @@ namespace pxengine {
 		ImFontConfig fontConfig;
 		fontConfig.FontDataOwnedByAtlas = false;
 		fontConfig.FontData = _fontFileData;
+		if (_fontFileSize > INT_MAX) {
+			PXE_FATAL("Failed to load font file, file size too big");
+		}
+
 		fontConfig.FontDataSize = _fontFileSize;
 		fontConfig.SizePixels = _imFontSize = _requestedSize;
 		_font = atlas.AddFont(&fontConfig);

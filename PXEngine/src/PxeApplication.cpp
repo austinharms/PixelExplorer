@@ -55,7 +55,7 @@ namespace pxengine {
 		imp._objectsWorkCompleted = true;
 		imp._engine = new(std::nothrow) PxeEngine(logInterface);
 		if (!imp._engine) {
-			PXE_FATAL("Failed to allocate PxeEngine");
+			logInterface.onLog(PxeLogLevel::PXE_FATAL, "Failed to allocate PxeEngine", __FILE__, __FUNCTION__, __LINE__);
 			return;
 		}
 

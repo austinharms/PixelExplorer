@@ -7,32 +7,27 @@ namespace pxengine {
 	class PxeBuffer : public PxeRefCount
 	{
 	public:
-		// Returns true if the buffer is allocated and false on failure
-		PXE_NODISCARD bool getAllocated() const;
+		// Returns a new PxeBuffer instance with buffer of {size} bytes or nullptr on failure
+		// Note: the allocated buffer is uninitialized
+		static PxeBuffer* create(PxeSize size);
 
-		// Returns the byte size of the buffer
-		// Note: if there was an allocation error this will return 0
+		// Returns a new PxeBuffer instance that is a copy of {buffer} or nullptr on failure
+		static PxeBuffer* create(const PxeBuffer& buffer);
+
+		// Returns the byte size of the allocated buffer
 		PXE_NODISCARD PxeSize getSize() const;
 
-		// Returns a pointer to the internal buffer
-		// Note: return value may be nullptr if there was an allocation error
+		// Returns a pointer to the allocated memory
+		// Note: this will return nullptr if the buffer size is 0
 		PXE_NODISCARD void* getBuffer() const;
 
-		// Allocates a buffer with a byte length of {size}
-		// Note: the buffer is not initialized to 0's
-		PxeBuffer(size_t size);
-
-		// Copy buffer data
-		PxeBuffer(const PxeBuffer& other);
-
-		// Copy buffer data
-		// Note: a new block of memory will be allocated and the old one freed
-		PxeBuffer& operator=(const PxeBuffer& other);
-
 		virtual ~PxeBuffer();
+		PXE_NOCOPY(PxeBuffer);
+
 	private:
-		PxeSize _size;
-		void* _buffer;
+		PxeBuffer(PxeSize size, void* buffer);
+		const PxeSize _size;
+		void* const _buffer;
 	};
 }
 #endif // !PXENGINE_BUFFER_H_
