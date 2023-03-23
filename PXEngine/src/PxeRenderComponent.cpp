@@ -6,6 +6,11 @@ namespace pxengine {
 		_renderProperties.grab();
 	}
 
+	PXE_NODISCARD const PxeRenderProperties& PxeRenderComponent::getRenderProperties() const
+	{
+		return _renderProperties;
+	}
+
 	PxeRenderComponent::~PxeRenderComponent()
 	{
 		_renderProperties.drop();

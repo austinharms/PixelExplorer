@@ -110,7 +110,29 @@ namespace pxengine {
 		}
 		else if (component.componentOfType<PxeRenderComponent>()) {
 			component.grab();
-			imp._renderComponents.emplace_back(static_cast<PxeRenderComponent*>(&component));
+			PxeRenderComponent* renderCmp = static_cast<PxeRenderComponent*>(&component);
+			const PxeRenderProperties& props = const_cast<const PxeRenderComponent*>(renderCmp)->getRenderProperties();
+			PxeShader* shader = props.getShader();
+			if (shader) {
+				PxeShaderExecutionOrder shaderOrder = shader->getExecutionOrder();
+				bool inserted = false;
+				for (auto i = imp._renderComponents.begin(); i != imp._renderComponents.end(); ++i) {
+					if (&(const_cast<const PxeRenderComponent*>(*i)->getRenderProperties()) == &props ||
+						const_cast<const PxeRenderComponent*>(*i)->getRenderProperties().getShader()->getExecutionOrder() > shaderOrder)
+					{
+						imp._renderComponents.emplace(i, renderCmp);
+						inserted = true;
+						break;
+					}
+				}
+
+				if (!inserted)
+					imp._renderComponents.emplace_back(renderCmp);
+			}
+			else {
+				PXE_WARN("Attempted to add PxeRenderComponent without PxeShader to PxeScene, PxeRenderComponent not added");
+				component.drop();
+			}
 		}
 	}
 

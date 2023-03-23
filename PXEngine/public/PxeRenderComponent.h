@@ -10,15 +10,16 @@ namespace pxengine {
 	class PxeRenderComponent : public PxeComponent
 	{
 	public:
+		PXE_NODISCARD const PxeRenderProperties& getRenderProperties() const;
+		PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(PxeRenderComponent, PxeComponent);
 		virtual ~PxeRenderComponent();
 		PXE_NOCOPY(PxeRenderComponent);
-		PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(PxeRenderComponent, PxeComponent);
 		
 	protected:
 		virtual void onRender() = 0;
 		PXE_NODISCARD PxeRenderProperties& getRenderProperties();
-		PxeRenderComponent(PxeRenderProperties& renderProperties);
 		PXE_DEFAULT_PROTECTED_COMPONENT_IMPLMENTATION(PxeComponent);
+		PxeRenderComponent(PxeRenderProperties& renderProperties);
 
 	private:
 		PxeRenderProperties& _renderProperties;
