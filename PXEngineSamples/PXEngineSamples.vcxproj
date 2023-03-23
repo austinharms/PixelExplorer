@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LogHandler.h" />
+    <ClInclude Include="src\samples\CubeStack\StackGui.h" />
     <ClInclude Include="src\shared\PxesBasicRenderProperties.h" />
     <ClInclude Include="src\shared\PxesBasicShader.h" />
     <ClInclude Include="src\shared\PxesRenderData.h" />

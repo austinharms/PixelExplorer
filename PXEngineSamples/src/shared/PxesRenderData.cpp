@@ -12,6 +12,7 @@
 
 PxesRenderData::PxesRenderData() {
 	pxengine::PxeVertexBufferFormat format;
+	assert(cubeRenderVertexStride == 5 && "PxesRenderData's PxeVertexBufferAttribs need updating");
 	format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 3, false));
 	format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 2, false));
 	pxengine::PxeVertexBuffer* vertexBuffer = new pxengine::PxeVertexBuffer(format);
@@ -22,7 +23,8 @@ PxesRenderData::PxesRenderData() {
 	vertexData->drop();
 
 	// Create and load index buffer
-	pxengine::PxeIndexBuffer* indexBuffer = new pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_8BIT);
+	assert(cubeRenderIndexCount * 2 == sizeof(cubeRenderIndices) && "PxesRenderData's PxeIndexType need updating");
+	pxengine::PxeIndexBuffer* indexBuffer = new pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_16BIT);
 	pxengine::PxeBuffer* indexData = pxengine::PxeBuffer::create(sizeof(cubeRenderIndices));
 	assert(indexData);
 	memcpy(indexData->getBuffer(), cubeRenderIndices, indexData->getSize());

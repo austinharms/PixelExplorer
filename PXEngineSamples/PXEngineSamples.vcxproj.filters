@@ -77,5 +77,8 @@
     <ClInclude Include="src\shared\PxesBasicRenderProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\samples\CubeStack\StackGui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
