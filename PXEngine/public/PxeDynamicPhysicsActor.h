@@ -9,9 +9,11 @@ namespace pxengine {
 	public:
 		// Creates and returns a new PxeStaticPhysicsActor instance or nullptr on failure
 		static PxeDynamicPhysicsActor* create();
+		physx::PxRigidActor& getActor() override;
+		physx::PxRigidDynamic& getDynamicActor();
+		PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(PxeDynamicPhysicsActor, PxePhysicsActor);
 		virtual ~PxeDynamicPhysicsActor();
 		PXE_NOCOPY(PxeDynamicPhysicsActor);
-		PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(PxeDynamicPhysicsActor, PxePhysicsActor);
 
 	protected:
 		PXE_NODISCARD virtual bool checkComponentRequirements(pxengine::PxeObject& object) override;
@@ -20,7 +22,6 @@ namespace pxengine {
 		virtual void addToScene(pxengine::PxeScene& scene) override;
 		virtual void removeFromScene(pxengine::PxeScene& scene) override;
 		void onPhysics() override;
-		physx::PxRigidActor& getActor() override;
 		// Note: this will call release on the actor on destruction
 		PxeDynamicPhysicsActor(physx::PxRigidDynamic& actor);
 

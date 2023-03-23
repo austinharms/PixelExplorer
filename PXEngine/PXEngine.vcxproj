@@ -324,6 +324,7 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <None Include="assets\shaders\pxengine_gui_shader.pxeshader" />
     <None Include="assets\shaders\pxengine_unlit_shader.pxeshader" />
     <None Include="tools\CreateAPIHeader.py" />
+    <None Include="tools\ModelLoader.py" />
     <None Include="tools\StripPrivateImplementation.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

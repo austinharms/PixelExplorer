@@ -92,4 +92,9 @@ namespace pxengine {
 	{
 		return _actor;
 	}
+
+	physx::PxRigidDynamic& PxeDynamicPhysicsActor::getDynamicActor()
+	{
+		return _actor;
+	}
 }

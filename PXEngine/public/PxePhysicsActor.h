@@ -11,8 +11,9 @@ namespace pxengine {
 	class PxePhysicsActor : public PxePhysicsComponent
 	{
 	public:
-		virtual ~PxePhysicsActor();
+		virtual physx::PxRigidActor& getActor() = 0;
 		PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(PxePhysicsActor, PxePhysicsComponent);
+		virtual ~PxePhysicsActor();
 
 	protected:
 		PXE_NODISCARD virtual bool checkComponentRequirements(pxengine::PxeObject& object) override;
@@ -21,7 +22,6 @@ namespace pxengine {
 		virtual void addToScene(pxengine::PxeScene& scene) override;
 		virtual void removeFromScene(pxengine::PxeScene& scene) override;
 		virtual void onPhysics() override = 0;
-		virtual physx::PxRigidActor& getActor() = 0;
 		PxePhysicsActor();
 
 	private:

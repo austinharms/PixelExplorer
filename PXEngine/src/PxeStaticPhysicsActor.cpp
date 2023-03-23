@@ -87,4 +87,9 @@ namespace pxengine {
 	{
 		return _actor;
 	}
+
+	physx::PxRigidStatic& PxeStaticPhysicsActor::getStaticActor()
+	{
+		return _actor;
+	}
 }

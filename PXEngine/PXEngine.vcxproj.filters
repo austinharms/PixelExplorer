@@ -317,5 +317,6 @@
     <None Include="assets\shaders\pxengine_gui_shader.pxeshader" />
     <None Include="tools\StripPrivateImplementation.py" />
     <None Include="tools\CreateAPIHeader.py" />
+    <None Include="tools\ModelLoader.py" />
   </ItemGroup>
 </Project>
