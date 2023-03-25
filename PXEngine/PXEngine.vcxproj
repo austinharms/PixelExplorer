@@ -220,6 +220,7 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\PxeDynamicPhysicsActor.cpp" />
+    <ClCompile Include="src\PxeFixedBuffer.cpp" />
     <ClCompile Include="src\PxeGuiComponent.cpp" />
     <ClCompile Include="src\PxePhysicsActor.cpp" />
     <ClCompile Include="src\PxePhysicsShape.cpp" />
@@ -245,7 +246,6 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\PxeApplication.cpp" />
-    <ClCompile Include="src\PxeBuffer.cpp" />
     <ClCompile Include="src\PxeComponent.cpp" />
     <ClCompile Include="src\PxeDefaultCamera.cpp" />
     <ClCompile Include="src\PxeEngine.cpp" />
@@ -270,6 +270,7 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <ClInclude Include="public\PxeComponent.h" />
     <ClInclude Include="private\PxeFontFile.h" />
     <ClInclude Include="public\PxeDynamicPhysicsActor.h" />
+    <ClInclude Include="public\PxeFixedBuffer.h" />
     <ClInclude Include="public\PxeGlBindable.h" />
     <ClInclude Include="public\PxeCamera.h" />
     <ClInclude Include="public\PxeDefaultCamera.h" />
@@ -301,6 +302,7 @@ python $(ProjectDir)tools\CreateAPIHeader.py $(ProjectDir)include PxeEngineAPI.h
     <ClInclude Include="public\PxeTexture.h" />
     <ClInclude Include="public\PxeTypes.h" />
     <ClInclude Include="public\PxeUpdateComponent.h" />
+    <ClInclude Include="public\PxeVectorBuffer.h" />
     <ClInclude Include="public\PxeVertexArray.h" />
     <ClInclude Include="public\PxeVertexBuffer.h" />
     <ClInclude Include="public\PxeVertexBufferAttrib.h" />

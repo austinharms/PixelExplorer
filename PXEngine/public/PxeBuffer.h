@@ -4,30 +4,22 @@
 #include "PxeRefCount.h"
 
 namespace pxengine {
+	// Helper interface class for storing and sharing continuous blocks of memory
 	class PxeBuffer : public PxeRefCount
 	{
 	public:
-		// Returns a new PxeBuffer instance with buffer of {size} bytes or nullptr on failure
-		// Note: the allocated buffer is uninitialized
-		static PxeBuffer* create(PxeSize size);
-
-		// Returns a new PxeBuffer instance that is a copy of {buffer} or nullptr on failure
-		static PxeBuffer* create(const PxeBuffer& buffer);
-
 		// Returns the byte size of the allocated buffer
-		PXE_NODISCARD PxeSize getSize() const;
+		PXE_NODISCARD virtual PxeSize getSize() const = 0;
 
 		// Returns a pointer to the allocated memory
 		// Note: this will return nullptr if the buffer size is 0
-		PXE_NODISCARD void* getBuffer() const;
+		PXE_NODISCARD virtual void* getBuffer() const = 0;
 
-		virtual ~PxeBuffer();
+		virtual ~PxeBuffer() = default;
 		PXE_NOCOPY(PxeBuffer);
 
-	private:
-		PxeBuffer(PxeSize size, void* buffer);
-		const PxeSize _size;
-		void* const _buffer;
+	protected:
+		PxeBuffer() = default;
 	};
 }
 #endif // !PXENGINE_BUFFER_H_

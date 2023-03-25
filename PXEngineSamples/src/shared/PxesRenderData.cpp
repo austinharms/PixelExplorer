@@ -6,7 +6,7 @@
 #include "PxeIndexBuffer.h"
 #include "PxeVertexBufferFormat.h"
 #include "PxeVertexBufferAttrib.h"
-#include "PxeBuffer.h"
+#include "PxeFixedBuffer.h"
 #include "CubeData.h"
 #include "GL/glew.h"
 
@@ -16,7 +16,7 @@ PxesRenderData::PxesRenderData() {
 	format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 3, false));
 	format.addAttrib(pxengine::PxeVertexBufferAttrib(pxengine::PxeVertexBufferAttribType::FLOAT, 2, false));
 	pxengine::PxeVertexBuffer* vertexBuffer = new pxengine::PxeVertexBuffer(format);
-	pxengine::PxeBuffer* vertexData = pxengine::PxeBuffer::create(sizeof(cubeRenderVertices));
+	pxengine::PxeBuffer* vertexData = pxengine::PxeFixedBuffer::create(sizeof(cubeRenderVertices));
 	assert(vertexData);
 	memcpy(vertexData->getBuffer(), cubeRenderVertices, vertexData->getSize());
 	vertexBuffer->bufferData(*vertexData);
@@ -25,7 +25,7 @@ PxesRenderData::PxesRenderData() {
 	// Create and load index buffer
 	assert(cubeRenderIndexCount * 2 == sizeof(cubeRenderIndices) && "PxesRenderData's PxeIndexType need updating");
 	pxengine::PxeIndexBuffer* indexBuffer = new pxengine::PxeIndexBuffer(pxengine::PxeIndexType::UNSIGNED_16BIT);
-	pxengine::PxeBuffer* indexData = pxengine::PxeBuffer::create(sizeof(cubeRenderIndices));
+	pxengine::PxeBuffer* indexData = pxengine::PxeFixedBuffer::create(sizeof(cubeRenderIndices));
 	assert(indexData);
 	memcpy(indexData->getBuffer(), cubeRenderIndices, indexData->getSize());
 	indexBuffer->bufferData(*indexData);
