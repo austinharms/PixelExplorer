@@ -5,7 +5,7 @@
 
 #include "PxeTypes.h"
 #include "PxeGlBindable.h"
-#include <glm/glm/gtc/type_ptr.hpp>
+#include "glm/gtc/type_ptr.hpp"
 
 namespace pxengine {
 	// Wrapper for OpenGl shader program
