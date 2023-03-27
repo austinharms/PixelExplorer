@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -191,41 +191,41 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\scenes\error\ErrorScreen.cpp" />
-    <ClCompile Include="src\scenes\terrain\PauseMenu.cpp" />
+    <ClCompile Include="src\scenes\generation\PauseMenu.cpp" />
     <ClCompile Include="src\common\gui\PexGui.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\scenes\error\ErrorScene.cpp" />
-    <ClCompile Include="src\scenes\terrain\TerrainGenerationTest.cpp" />
+    <ClCompile Include="src\scenes\generation\TerrainGenerationTest.cpp" />
     <ClCompile Include="src\scenes\title\TitleScene.cpp" />
     <ClCompile Include="src\scenes\title\TitleScreen.cpp" />
+    <ClCompile Include="src\terrain\rendering\MeshGenerationTables.cpp" />
+    <ClCompile Include="src\terrain\rendering\TerrainRenderComponent.cpp" />
+    <ClCompile Include="src\terrain\rendering\TerrainRenderProperties.cpp" />
+    <ClCompile Include="src\terrain\rendering\TerrainShader.cpp" />
     <ClCompile Include="src\terrain\TerrainChunk.cpp" />
     <ClCompile Include="src\terrain\TerrainManager.cpp" />
-    <ClCompile Include="src\terrain\TerrainRenderMesh.cpp" />
-    <ClCompile Include="src\common\tools\RenderLine.cpp" />
-    <ClCompile Include="src\common\tools\RenderPoint.cpp" />
     <ClCompile Include="src\ApplicationScene.cpp" />
+    <ClCompile Include="src\terrain\TerrainObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\scenes\error\ErrorScreen.h" />
-    <ClInclude Include="src\scenes\terrain\PauseMenu.h" />
+    <ClInclude Include="src\scenes\generation\PauseMenu.h" />
     <ClInclude Include="src\common\gui\PexGui.h" />
     <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\scenes\error\ErrorScene.h" />
-    <ClInclude Include="src\scenes\terrain\TerrainGenerationTest.h" />
+    <ClInclude Include="src\scenes\generation\TerrainGenerationTest.h" />
     <ClInclude Include="src\scenes\title\TitleScene.h" />
     <ClInclude Include="src\scenes\title\TitleScreen.h" />
     <ClInclude Include="src\terrain\DebugTerrainGenerator.h" />
     <ClInclude Include="src\terrain\FlatTerrainGenerator.h" />
+    <ClInclude Include="src\terrain\rendering\MeshGenerationTables.h" />
+    <ClInclude Include="src\terrain\TerrainObject.h" />
+    <ClInclude Include="src\terrain\rendering\TerrainRenderComponent.h" />
+    <ClInclude Include="src\terrain\rendering\TerrainRenderProperties.h" />
+    <ClInclude Include="src\terrain\rendering\TerrainShader.h" />
     <ClInclude Include="src\terrain\TerrainChunk.h" />
     <ClInclude Include="src\terrain\TerrainGenerator.h" />
     <ClInclude Include="src\terrain\TerrainManager.h" />
-    <ClInclude Include="src\terrain\TerrainRenderMesh.h" />
-    <ClInclude Include="src\common\tools\RenderLine.h" />
-    <ClInclude Include="src\common\tools\RenderPoint.h" />
     <ClInclude Include="src\ApplicationScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

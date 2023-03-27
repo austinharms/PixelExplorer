@@ -1,15 +1,14 @@
 #ifndef PIXELEXPLORER_SCENES_TITLE_SCREEN_H_
 #define PIXELEXPLORER_SCENES_TITLE_SCREEN_H_
 #include "PxeTypes.h"
-#include "PxeRenderComponent.h"
+#include "PxeGuiComponent.h"
 #include "PxeTexture.h"
 #include "PxeFont.h"
-#include "PxeGuiRenderProperties.h"
 
 namespace pixelexplorer {
 	namespace scenes {
 		namespace title {
-			class TitleScreen : public pxengine::PxeRenderComponent
+			class TitleScreen : public pxengine::PxeGuiComponent
 			{
 			public:
 				typedef uint8_t TitleScreenAction;
@@ -19,11 +18,10 @@ namespace pixelexplorer {
 					PLAY = 0x01
 				};
 
-				static TitleScreen* create();
-
 				TitleScreenAction getActions();
 				TitleScreenAction peekActions() const;
 				void clearActions();
+				TitleScreen();
 				virtual ~TitleScreen();
 				PXE_NOCOPY(TitleScreen);
 				PXE_DEFAULT_PUBLIC_COMPONENT_IMPLMENTATION(TitleScreen, pxengine::PxeRenderComponent);
@@ -49,11 +47,9 @@ namespace pixelexplorer {
 					FONT_COUNT
 				};
 
-				TitleScreen(pxengine::PxeGuiRenderProperties& renderProperties);
 				pxengine::PxeTexture* _textures[TEXTURE_COUNT];
 				pxengine::PxeFont* _fonts[FONT_COUNT];
 				TitleScreenAction _actions;
-				bool _loaded;
 			};
 		}
 	}

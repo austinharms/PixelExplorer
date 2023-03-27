@@ -17,10 +17,10 @@ namespace pixelexplorer {
 			~TerrainManager();
 			TerrainGenerator& getTerrainGenerator();
 			// Note: you do not need to grab the returned chunk but you must drop it
-			TerrainChunk* getTerrainChunk(const glm::i64vec3& position);
+			TerrainChunk* grabTerrainChunk(const glm::i64vec3& position);
 			bool getTerrainChunkLoaded(const glm::i64vec3& position);
 			// Note: you do not need to grab the returned chunk but you must drop it
-			TerrainChunk* getLoadedTerrainChunk(const glm::i64vec3& position);
+			TerrainChunk* grabLoadedTerrainChunk(const glm::i64vec3& position);
 
 			// TerrainChunk::TerrainDropCallback
 			void operator()(TerrainChunk& chunk) override;

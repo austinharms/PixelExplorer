@@ -7,6 +7,8 @@
 
 int main(void) {
 	pixelexplorer::Log log;
-	pxengine::pxeRunApplication(pixelexplorer::Application::getInstance(), pixelexplorer::Log::getInstance());
+	log.onLog(pxengine::PxeLogLevel::PXE_INFO, "PixelExplore start", __FILE__, __FUNCTION__, __LINE__);
+	pixelexplorer::Application::getInstance().start(log);
+	log.onLog(pxengine::PxeLogLevel::PXE_INFO, "PixelExplore stop", __FILE__, __FUNCTION__, __LINE__);
 	return 0;
 }

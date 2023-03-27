@@ -4,6 +4,11 @@
 #include "PxeInputManager.h"
 #include "PxeActionSource.h"
 #include "SDL.h"
+#include "glm/ext/scalar_constants.hpp"
+#include "glm/trigonometric.hpp"
+#include "glm/gtc/constants.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 namespace pixelexplorer {
 	Camera::Camera(pxengine::PxeWindow& targetWindow, float fov, float nearClip, float farClip) {
@@ -18,7 +23,7 @@ namespace pixelexplorer {
 		_rotation = glm::vec3(0, glm::pi<float>(), glm::half_pi<float>());
 		updateDirectionVectors();
 
-		pxengine::PxeInputManager& inputMgr = pxengine::pxeGetEngine().getInputManager();
+		pxengine::PxeInputManager& inputMgr = pxengine::PxeEngine::getInstance().getInputManager();
 		for (uint8_t i = 0; i < ACTION_COUNT; ++i) {
 			_actions[i] = inputMgr.getAction(ACTION_NAMES[i]);
 			if (!_actions[i]) {
@@ -63,7 +68,7 @@ namespace pixelexplorer {
 
 	void Camera::update() {
 		if (_error) return;
-		pxengine::PxeInputManager& inputMgr = pxengine::pxeGetEngine().getInputManager();
+		pxengine::PxeInputManager& inputMgr = pxengine::PxeEngine::getInstance().getInputManager();
 		if (inputMgr.getKeyboardFocusedWindow() != _targetWindow) return;
 		const glm::i32vec2& cursorChange = inputMgr.getCursorChange();
 		_rotation.y += glm::radians((float)cursorChange.x);
@@ -77,7 +82,7 @@ namespace pixelexplorer {
 		}
 		updateDirectionVectors();
 
-		float dt = pxengine::pxeGetEngine().getDeltaTime();
+		float dt = pxengine::PxeEngine::getInstance().getDeltaTime();
 		for (uint8_t i = 0; i < ACTION_COUNT; ++i) {
 			float value = _actions[i]->getValue();
 			if (!value) continue;

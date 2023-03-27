@@ -1,52 +1,29 @@
 #include "TitleScene.h"
 
+#include <new>
+
 #include "Log.h"
 #include "PxeEngine.h"
+#include "Application.h"
+#include "scenes/generation/TerrainGenerationTest.h"
 
 namespace pixelexplorer {
 	namespace scenes {
 		namespace title {
-			TitleScene* TitleScene::create()
-			{
+			TitleScene::TitleScene() {
 				using namespace pxengine;
-				PxeEngine& engine = PxeEngine::getInstance();
-				PxeScene* scene = engine.createScene();
-				if (!scene) {
-					PEX_ERROR("Failed to create TitleScene's PxeScene");
-					return nullptr;
-				}
-
+				_titleScreen = new(std::nothrow) TitleScreen();
+				if (!_titleScreen) { PEX_FATAL("Failed to allocate TitleScene's TitleScreen"); }
 				PxeObject* obj = PxeObject::create();
-				if (!obj) {
-					PEX_ERROR("Failed to create TitleScene's PxeObject");
-					return nullptr;
-				}
-
-				TitleScreen* screen = TitleScreen::create();
-				if (!screen) {
-					PEX_ERROR("Failed to create TitleScene's TitleScreen");
-					return nullptr;
-				}
-
-				if (!obj->addComponent(*screen)) {
-					PEX_FATAL("Failed to add ErrorScreen to TitleScene's PxeObject");
-					return nullptr;
-				}
-
-				if (!scene->addObject(*obj)) {
-					PEX_FATAL("Failed to add PxeObject to TitleScene's PxeScene");
-					return nullptr;
-				}
-
+				if (!obj) { PEX_FATAL("Failed to create TitleScene's PxeObject"); }
+				if (!obj->addComponent(*_titleScreen)) { PEX_FATAL("Failed to add ErrorScreen to TitleScene's PxeObject"); }
+				if (!getScene().addObject(*obj)) { PEX_FATAL("Failed to add PxeObject to TitleScene's PxeScene"); }
 				obj->drop();
-				TitleScene* titleScene = new(std::nothrow) TitleScene(*scene, *screen);
-				screen->drop();
-				if (!titleScene) {
-					PEX_FATAL("Failed to create TitleScene");
-					return nullptr;
-				}
+			}
 
-				return titleScene;
+			TitleScene::~TitleScene()
+			{
+				_titleScreen->drop();
 			}
 
 			void TitleScene::onStart(pxengine::PxeWindow& window)
@@ -57,12 +34,16 @@ namespace pixelexplorer {
 			{
 			}
 
-			TitleScene::TitleScene(pxengine::PxeScene& scene, TitleScreen& title) : ApplicationScene(scene), _titleScreen(title) {
-				_titleScreen.grab();
-			}
-
-			TitleScene::~TitleScene()
+			void TitleScene::onUpdate()
 			{
+				if (_titleScreen->getActions() & TitleScreen::PLAY) {
+					generation::TerrainGenerationTest* scene = new(std::nothrow) generation::TerrainGenerationTest();
+					if (!scene) {
+						PEX_FATAL("Failed to allocate TerrainGenerationTest");
+					}
+
+					Application::getInstance().switchScene(scene);
+				}
 			}
 		}
 	}

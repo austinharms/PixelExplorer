@@ -4,10 +4,6 @@
 #include "PxeLogger.h"
 #include "PxeOSHelpers.h"
 
-#ifdef PXE_WIN_OS
-#include <Windows.h>
-#endif // PXE_OS_WIN
-
 #define PEX_INFO(msg) pixelexplorer::Log::log(pxengine::PxeLogLevel::PXE_INFO, msg, __FILE__, __FUNCTION__, __LINE__);
 #define PEX_WARN(msg) pixelexplorer::Log::log(pxengine::PxeLogLevel::PXE_WARN, msg, __FILE__, __FUNCTION__, __LINE__);
 #define PEX_ERROR(msg) pixelexplorer::Log::log(pxengine::PxeLogLevel::PXE_ERROR, msg, __FILE__, __FUNCTION__, __LINE__);
@@ -24,7 +20,7 @@ namespace pixelexplorer {
 
 	private:
 #ifdef PXE_WIN_OS
-		HANDLE _stdOutHandle;
+		void* _stdOutHandle;
 #endif // PXE_WIN_OS
 
 	};

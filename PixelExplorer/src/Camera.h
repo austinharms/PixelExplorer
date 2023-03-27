@@ -1,13 +1,13 @@
 #ifndef PIXELEXPLORER_CAMERA_H_
 #define PIXELEXPLORER_CAMERA_H_
 #include "PxeTypes.h"
-#include "PxeCameraInterface.h"
+#include "PxeCamera.h"
 #include "PxeAction.h"
 #include "PxeWindow.h"
 #include "SDL_keycode.h"
 
 namespace pixelexplorer {
-	class Camera : public pxengine::PxeCameraInterface
+	class Camera : public pxengine::PxeCamera
 	{
 	public:
 		Camera(pxengine::PxeWindow& targetWindow, float fov, float nearClip = 0.1f, float farClip = 100.0f);

@@ -1,14 +1,20 @@
 #include "ApplicationScene.h"
 
 #include "PxeEngine.h"
+#include "Log.h"
 
 namespace pixelexplorer {
-	pxengine::PxeScene* ApplicationScene::createPxeScene()
+	pxengine::PxeScene& ApplicationScene::createPxeScene()
 	{
-		return pxengine::PxeEngine::getInstance().createScene();
+		pxengine::PxeScene* scene = pxengine::PxeEngine::getInstance().createScene();
+		if (!scene) {
+			PEX_FATAL("Failed to create PxeScene");
+		}
+
+		return *scene;
 	}
 
-	ApplicationScene::ApplicationScene(pxengine::PxeScene& scene) : _scene(scene)
+	ApplicationScene::ApplicationScene() : _scene(createPxeScene())
 	{
 		_scene.userData = this;
 	}

@@ -10,16 +10,15 @@ namespace pixelexplorer {
 			class TitleScene : public ApplicationScene
 			{
 			public:
-				static TitleScene* create();
 				void onStart(pxengine::PxeWindow& window) override;
 				void onStop() override;
+				void onUpdate() override;
+				TitleScene();
 				virtual ~TitleScene();
 				PXE_NOCOPY(TitleScene);
 
 			private:
-				TitleScene(pxengine::PxeScene& scene, TitleScreen& title);
-
-				TitleScreen& _titleScreen;
+				TitleScreen* _titleScreen;
 			};
 		}
 	}

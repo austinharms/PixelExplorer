@@ -22,9 +22,9 @@ namespace pixelexplorer {
 		PXE_NOCOPY(ApplicationScene);
 
 	protected:
-		static pxengine::PxeScene* createPxeScene();
+		static pxengine::PxeScene& createPxeScene();
 
-		ApplicationScene(pxengine::PxeScene& scene);
+		ApplicationScene();
 
 	private:
 		pxengine::PxeScene& _scene;

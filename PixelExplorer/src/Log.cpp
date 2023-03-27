@@ -1,6 +1,9 @@
 #include "Log.h"
 
 #include <iostream>
+#ifdef PXE_WIN_OS
+#include <Windows.h>
+#endif // PXE_OS_WIN
 
 #include "PxeEngine.h"
 
@@ -77,6 +80,12 @@ namespace pixelexplorer {
 
 		//std::cout << "Log: " << msg << " Level: " << level << " File: " << file << " Function: " << function << " Line: " << line << std::endl;
 		std::cout << msg << std::endl;
-		assert(level != pxengine::PxeLogLevel::PXE_FATAL);
+		if (level == pxengine::PxeLogLevel::PXE_FATAL) {
+#ifdef DEBUG
+			assert(msg && false);
+#else
+			abort();
+#endif // DEBUG
+		}
 	}
 }

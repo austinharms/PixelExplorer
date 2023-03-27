@@ -36,15 +36,15 @@ namespace pixelexplorer {
 			return *_terrainGenerator;
 		}
 
-		TerrainChunk* TerrainManager::getTerrainChunk(const glm::i64vec3& position)
+		TerrainChunk* TerrainManager::grabTerrainChunk(const glm::i64vec3& position)
 		{
-			TerrainChunk* chunk = getLoadedTerrainChunk(position);
+			TerrainChunk* chunk = grabLoadedTerrainChunk(position);
 			if (!chunk) {
 				{
 					std::unique_lock lock(_terrainMutex);
 					chunk = new(std::nothrow) TerrainChunk(position);
 					if (!chunk) {
-						Application::Error("Out of Memory, Failed to allocate Terrain Chunk");
+						PEX_FATAL("Failed to allocate Terrain Chunk");
 						return nullptr;
 					}
 
@@ -64,7 +64,7 @@ namespace pixelexplorer {
 			return _loadedTerrain.find(position) != _loadedTerrain.end();
 		}
 
-		TerrainChunk* TerrainManager::getLoadedTerrainChunk(const glm::i64vec3& position)
+		TerrainChunk* TerrainManager::grabLoadedTerrainChunk(const glm::i64vec3& position)
 		{
 			std::shared_lock lock(_terrainMutex);
 			auto chunkItr = _loadedTerrain.find(position);

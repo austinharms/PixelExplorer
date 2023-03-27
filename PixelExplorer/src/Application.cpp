@@ -4,7 +4,7 @@
 
 #include "PxeEngine.h"
 #include "Log.h"
-#include "scenes/MainMenu.h"
+#include "scenes/title/TitleScene.h"
 #include "SDL_timer.h"
 
 using namespace pxengine;
@@ -12,8 +12,7 @@ namespace pixelexplorer {
 	Application::Application() {
 		_state = INITIALIZING;
 		_window = nullptr;
-		_errorMenu = nullptr;
-		_activeScene = nullptr;
+		_currentScene = nullptr;
 	}
 
 	Application& Application::getInstance()
@@ -22,56 +21,40 @@ namespace pixelexplorer {
 		return app;
 	}
 
-	void Application::Error()
+	void Application::switchScene(ApplicationScene* scene)
 	{
-		getInstance().setError();
-	}
+		if (_currentScene == scene) return;
+		if (_currentScene) {
+			_currentScene->onStop();
+			_window->setScene(nullptr);
+			_currentScene->drop();
+		} 
 
-	void Application::Error(const char* msg)
-	{
-		getInstance().setError(msg);
-	}
-
-	void Application::Error(const std::string& msg)
-	{
-		getInstance().setError(msg);
-	}
-
-	void Application::ChangeScene(UpdatableScene* scene)
-	{
-		getInstance().setActiveScene(scene);
+		if ((_currentScene = scene)) {
+			scene->grab();
+			_window->setScene(&(scene->getScene()));
+			scene->onStart(*_window);
+		}
+	
 	}
 
 	void Application::onStart()
 	{
 		_state = RUNNING;
-		PxeEngine& engine = pxeGetEngine();
+		PxeEngine& engine = PxeEngine::getInstance();
 		engine.getRenderPipeline().setVSyncMode(0);
 		_window = engine.createWindow(600, 400, "Pixel Explorer");
-		if (!_window) {
-			PEX_FATAL("Failed to create main window");
-		}
+		if (!_window) { PEX_FATAL("Failed to create main window"); }
 
-		_errorMenu = new(std::nothrow) scene::ErrorMenu();
-		if (!_errorMenu) {
-			PEX_FATAL("Failed to allocate error menu");
-		}
-
-		scene::MainMenu* menu = new(std::nothrow) scene::MainMenu();
-		if (!menu) {
-			setError("Failed to allocate MainMenu scene");
-			return;
-		}
-
-		setActiveScene(menu);
-		menu->drop();
+		scenes::title::TitleScene* title = new(std::nothrow) scenes::title::TitleScene();
+		if (!title) { PEX_FATAL("Failed to allocate TitleScene"); }
+		switchScene(title);
+		title->drop();
 	}
 
 	void Application::onStop()
 	{
-		setActiveScene(nullptr);
-		_errorMenu->drop();
-		_errorMenu = nullptr;
+		switchScene(nullptr);
 		_window->drop();
 		_window = nullptr;
 		_state = STOPPED;
@@ -84,61 +67,21 @@ namespace pixelexplorer {
 			quit();
 		}
 
-		if (_activeScene) {
-			_activeScene->update();
+		if (_currentScene) {
+			_currentScene->onUpdate();
 		}
-	}
-
-	void Application::setError()
-	{
-		setActiveScene(_errorMenu);
-		_state = ERROR;
-	}
-
-	void Application::setError(const char* msg)
-	{
-		PEX_ERROR(msg);
-		if (_state == ERROR) return;
-		_errorMenu->setMessage(msg);
-		setError();
-	}
-
-	void Application::setError(const std::string& msg)
-	{
-		PEX_ERROR(msg.c_str());
-		if (_state == ERROR) return;
-		_errorMenu->setMessage(msg);
-		setError();
 	}
 
 	void Application::quit()
 	{
-		bool shouldQuit = true;
-		if (_activeScene) {
-			_activeScene->quit(shouldQuit);
+		bool shouldStop = true;
+		if (_currentScene) {
+			_currentScene->onClose(shouldStop);
 		}
 
-		if (shouldQuit) {
-			setActiveScene(nullptr);
-			pxeGetEngine().shutdown();
-		}
-	}
-
-	void Application::setActiveScene(UpdatableScene* scene)
-	{
-		if (_state == ERROR) return;
-		if (_activeScene == scene) return;
-		if (_activeScene) {
-			_activeScene->stop();
-			_window->setScene(nullptr);
-			_activeScene->drop();
-		}
-
-		_activeScene = scene;
-		if (_activeScene) {
-			_activeScene->grab();
-			_window->setScene(_activeScene->getScene());
-			_activeScene->start(*_window);
+		if (shouldStop) {
+			switchScene(nullptr);
+			PxeEngine::getInstance().shutdown();
 		}
 	}
 }

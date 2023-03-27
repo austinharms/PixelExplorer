@@ -13,25 +13,46 @@
 namespace pixelexplorer {
 	namespace scenes {
 		namespace title {
-			TitleScreen* TitleScreen::create()
-			{
+			TitleScreen::TitleScreen() {
 				using namespace pxengine;
-				PxeGuiRenderProperties* props = PxeGuiRenderProperties::getInstance();
-				if (!props)	return nullptr;
-				TitleScreen* screen = new(std::nothrow) TitleScreen(*props);
-				props->drop();
-				if (!screen) {
-					Application::Error("Failed to allocate TitleScreen");
-					return nullptr;
+				static_assert(TEXTURE_COUNT == 2, "TitleScreen textureFiles array needs to be updated");
+				constexpr const char* textureFiles[TEXTURE_COUNT] = { "main_menu_background.png", "primary_button_background.png" };
+				static_assert(FONT_COUNT == 2, "TitleScreen fontFiles array needs to be updated");
+				constexpr const uint16_t fontSizes[FONT_COUNT] = { 50, 24 };
+				constexpr const char* fontFiles[FONT_COUNT] = { "main_menu_title.ttf", "default.ttf" };
+
+				memset(_textures, 0, sizeof(_textures));
+				memset(_fonts, 0, sizeof(_textures));
+				_actions = NONE;
+				PxeRenderPipeline& pipe = PxeEngine::getInstance().getRenderPipeline();
+				for (uint8_t i = 0; i < FONT_COUNT; ++i) {
+					_fonts[i] = pipe.loadFont(getAssetPath("fonts") / fontFiles[i], fontSizes[i]);
+					if (!_fonts[i]) {
+						PEX_FATAL("Failed to create TitleScreen's PxeFont");
+						return;
+					}
 				}
 
-				if (!screen->_loaded) {
-					screen->drop();
-					Application::Error("Failed to load TitleScreen");
-					return nullptr;
+				for (uint8_t i = 0; i < TEXTURE_COUNT; ++i) {
+					_textures[i] = new(std::nothrow) PxeTexture();
+					if (!_textures[i]) {
+						PEX_FATAL("Failed to allocate TitleScreen's PxeTexture");
+						return;
+					}
+
+					_textures[i]->loadImage(getAssetPath("textures") / textureFiles[i]);
+				}
+			}
+
+			TitleScreen::~TitleScreen()
+			{
+				for (uint8_t i = 0; i < FONT_COUNT; ++i) {
+					if (_fonts[i]) _fonts[i]->drop();
 				}
 
-				return screen;
+				for (uint8_t i = 0; i < TEXTURE_COUNT; ++i) {
+					if (_textures[i]) _textures[i]->drop();
+				}
 			}
 
 			TitleScreen::TitleScreenAction TitleScreen::getActions()
@@ -49,51 +70,6 @@ namespace pixelexplorer {
 			void TitleScreen::clearActions()
 			{
 				_actions = NONE;
-			}
-
-			TitleScreen::TitleScreen(pxengine::PxeGuiRenderProperties& renderProperties) : PxeRenderComponent(renderProperties) {
-				using namespace pxengine;
-				static_assert(TEXTURE_COUNT == 2, "TitleScreen textureFiles array needs to be updated");
-				constexpr const char* textureFiles[TEXTURE_COUNT] = { "main_menu_background.png", "primary_button_background.png" };
-				static_assert(FONT_COUNT == 2, "TitleScreen fontFiles array needs to be updated");
-				constexpr const uint16_t fontSizes[FONT_COUNT] = { 50, 24 };
-				constexpr const char* fontFiles[FONT_COUNT] = { "main_menu_title.ttf", "default.ttf" };
-
-				_loaded = false;
-				memset(_textures, 0, sizeof(_textures));
-				memset(_fonts, 0, sizeof(_textures));
-				_actions = NONE;
-				PxeRenderPipeline& pipe = PxeEngine::getInstance().getRenderPipeline();
-				for (uint8_t i = 0; i < FONT_COUNT; ++i) {
-					_fonts[i] = pipe.loadFont(getAssetPath("fonts") / fontFiles[i], fontSizes[i]);
-					if (!_fonts[i]) {
-						PEX_ERROR("Failed to create TitleScreen's PxeFont");
-						return;
-					}
-				}
-
-				for (uint8_t i = 0; i < TEXTURE_COUNT; ++i) {
-					_textures[i] = new(std::nothrow) PxeTexture();
-					if (!_textures[i]) {
-						PEX_ERROR("Failed to allocate TitleScreen's PxeTexture");
-						return;
-					}
-
-					_textures[i]->loadImage(getAssetPath("textures") / textureFiles[i]);
-				}
-
-				_loaded = true;
-			}
-
-			TitleScreen::~TitleScreen()
-			{
-				for (uint8_t i = 0; i < FONT_COUNT; ++i) {
-					if (_fonts[i]) _fonts[i]->drop();
-				}
-
-				for (uint8_t i = 0; i < TEXTURE_COUNT; ++i) {
-					if (_textures[i]) _textures[i]->drop();
-				}
 			}
 
 			void TitleScreen::onRender()
