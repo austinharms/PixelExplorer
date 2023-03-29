@@ -4,6 +4,7 @@
 #include "PxeScene.h"
 #include "PxRigidActor.h"
 #include "PxePhysicsShape.h"
+#include "PxeLogger.h"
 
 namespace pxengine {
 	PxePhysicsActor::PxePhysicsActor()
@@ -17,7 +18,7 @@ namespace pxengine {
 	PXE_NODISCARD bool PxePhysicsActor::checkComponentRequirements(pxengine::PxeObject& object)
 	{
 		if (object.hasComponent<PxePhysicsActor>()) {
-			//PXE_WARN("Only one PxePhysicsActor can be attached to a PxeObject");
+			PXE_WARN("Only one PxePhysicsActor can be attached to a PxeObject");
 			return false;
 		}
 
@@ -38,20 +39,20 @@ namespace pxengine {
 				}
 			}
 			else {
-				//PXE_ERROR("Failed to add existing PxePhysicsShapes to PxePhysicsActor, actor is part of scene");
+				PXE_ERROR("Failed to add existing PxePhysicsShapes to PxePhysicsActor, actor is part of scene");
 			}
 
 			free(pxeShapes);
 		}
 		else {
-			//PXE_ERROR("Failed to get existing PxePhysicsShapes");
+			PXE_ERROR("Failed to get existing PxePhysicsShapes");
 		}
 
 		PxePhysicsComponent::addToObject(object);
 	}
 
 	void PxePhysicsActor::removeFromObject(pxengine::PxeObject& object)
-	{
+  	{
 		physx::PxRigidActor& actor = getActor();
 		if (!actor.getScene()) {
 			uint32_t shapeCount = actor.getNbShapes();
@@ -63,7 +64,7 @@ namespace pxengine {
 			}
 		}
 		else {
-			//PXE_ERROR("Failed to remove PxePhysicsShapes from PxePhysicsActor, actor is part of scene");
+			PXE_ERROR("Failed to remove PxePhysicsShapes from PxePhysicsActor, actor is part of scene");
 		}
 
 		PxePhysicsComponent::removeFromObject(object);
@@ -85,7 +86,7 @@ namespace pxengine {
 		physx::PxScene* scene = actor.getScene();
 		if (scene) scene->lockWrite(__FILE__, __LINE__);
 		if (!actor.attachShape(shape.getShape())) {
-			//PXE_ERROR("Failed to attachShape to PxePhysicsActor");
+			PXE_ERROR("Failed to attachShape to PxePhysicsActor");
 		}
 
 		if (scene) scene->unlockWrite();

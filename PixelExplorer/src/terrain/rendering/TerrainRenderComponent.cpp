@@ -10,7 +10,7 @@ namespace pixelexplorer {
 		TerrainRenderComponent* TerrainRenderComponent::create(TerrainRenderProperties& renderProperties)
 		{
 			using namespace pxengine;
-			static PxeVertexBufferFormat fmt;
+			PxeVertexBufferFormat fmt;
 			if (!fmt.getAttribCount()) {
 				fmt.addAttrib(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
 				fmt.addAttrib(PxeVertexBufferAttrib{ PxeVertexBufferAttribType::FLOAT, 3, false, 0 });
@@ -41,7 +41,7 @@ namespace pixelexplorer {
 			vertArray->setIndexBuffer(indexBuf);
 			vertArray->addVertexBuffer(*vertBuf, 0, 0);
 			vertArray->addVertexBuffer(*vertBuf, 1, 1);
-			vertArray->addVertexBuffer(*vertBuf, 2, 3);
+			vertArray->addVertexBuffer(*vertBuf, 2, 2);
 
 			TerrainRenderComponent* cmp = new(std::nothrow) TerrainRenderComponent(renderProperties, *vertArray, *vertBuf, *indexBuf);
 			if (!cmp) { 
@@ -84,7 +84,7 @@ namespace pixelexplorer {
 			if (_cleared) return;
 			_vertexArray.bind();
 			glDrawElements(GL_TRIANGLES, _indexBuffer.getIndexCount(), (uint32_t)_indexBuffer.getIndexType(), nullptr);
-			_vertexArray.unbind();
+   			_vertexArray.unbind();
 		}
 	}
 }

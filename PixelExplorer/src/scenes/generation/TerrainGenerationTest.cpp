@@ -98,8 +98,7 @@ namespace pixelexplorer {
 
 				_terrainRenderProperties = new(std::nothrow) TerrainRenderProperties();
 				if (!_terrainRenderProperties) { PEX_FATAL("Failed to allocate TerrainGenerationTest's TerrainRenderProperties"); }
-
-
+				_terrainRenderProperties->setLightDirection(glm::normalize(glm::vec3(1, -2, 1)));
 			}
 
 			TerrainGenerationTest::~TerrainGenerationTest()
@@ -212,8 +211,8 @@ namespace pixelexplorer {
 						terrainChunk->drop();
 					}
 
-					glm::vec3 pos(hitPos);
-					PEX_INFO(("Ray Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
+					//glm::vec3 pos(hitPos);
+					//PEX_INFO(("Ray Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
 					//glm::i64vec3 chunkSpacePos = TerrainChunk::WorldToChunkSpace(pos);
 					//pos = chunkSpacePos;
 					//PEX_INFO(("Chunk Space Pos: x:" + std::to_string(pos.x) + ", y: " + std::to_string(pos.y) + ", z: " + std::to_string(pos.z)).c_str());
@@ -245,7 +244,7 @@ namespace pixelexplorer {
 					for (auto pair : _terrainObjects) {
 						TerrainObject* obj = pair.second;
 						if (obj->getMeshBuildPending()) continue;
-						if (obj->getCurrentMeshOutdated() || obj->getMeshRefinement() == TerrainObject::NO_MESH) {
+						if (obj->getMeshOutdated()) {
 							obj->setMeshBuildPending();
 							obj->grab();
 							_threadPool.push_task_priority(&TerrainGenerationTest::jobUpdateTerrain, this, obj);
@@ -305,7 +304,7 @@ namespace pixelexplorer {
 					PEX_WARN("Attempted to update unloaded TerrainObject");
 					terrain->clearMeshBuildPending();
 				}
-				else if (terrain->getCurrentMeshOutdated()) {
+				else if (terrain->getMeshOutdated()) {
 					terrain->buildTerrainMesh(terrain::TerrainObject::FAST);
 				}
 				else if (terrain->getMeshRefinement() == terrain::TerrainObject::FAST) {

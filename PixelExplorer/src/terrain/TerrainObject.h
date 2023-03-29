@@ -31,7 +31,7 @@ namespace pixelexplorer {
 			PXE_NODISCARD MeshRefinement getMeshRefinement() const;
 			PXE_NODISCARD uint64_t getPendingMeshTimestamp() const;
 			PXE_NODISCARD MeshRefinement getPendingMeshRefinement() const;
-			PXE_NODISCARD bool getCurrentMeshOutdated() const;
+			PXE_NODISCARD bool getMeshOutdated() const;
 			void buildTerrainMesh(MeshRefinement refinement = REFINED);
 			void loadTerrainChunk(const glm::i64vec3& chunkPos, TerrainManager& terrainMgr);
 			void unloadTerrainChunk();

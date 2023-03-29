@@ -139,11 +139,12 @@ namespace pixelexplorer {
 			return _pendingRefinement;
 		}
 
-		PXE_NODISCARD bool TerrainObject::getCurrentMeshOutdated() const
+		PXE_NODISCARD bool TerrainObject::getMeshOutdated() const
 		{
+			std::lock_guard lock(_workMutex);
 			for (uint8_t i = 0; i < CHUNK_COUNT; ++i)
 			{
-				if (_neighboringChunks[i] && _neighboringChunks[i]->getLastModified() >= _currentTimestamp)
+				if (_neighboringChunks[i] && _neighboringChunks[i]->getLastModified() >= _pendingTimestamp)
 					return true;
 			}
 
@@ -192,6 +193,7 @@ namespace pixelexplorer {
 			}
 
 			if (buildData.indexBuffer.getSize() && buildData.vertexBuffer.getSize()) {
+				_renderComponent.clearRenderMesh();
 				_renderComponent.setRenderMesh(buildData.indexBuffer, buildData.vertexBuffer);
 			}
 			else {
