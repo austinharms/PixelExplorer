@@ -12,6 +12,8 @@ set(BUILD_SHARED_LIBS false)
 set(SDL_SHARED true)
 set(SDL_STATIC false)
 
+add_subdirectory("Vendor/SDL")
+add_subdirectory("Vendor/glm")
 add_subdirectory("PECore")
 if (BUILD_PECORE_TESTS)
 add_subdirectory("PETests")
