@@ -1,0 +1,8 @@
+﻿project("PixelExplorer" VERSION 0.0.0)
+message(STATUS "PixelExplorer: Version ${PROJECT_VERSION}")
+add_executable(PixelExplorer "src/PixelExplorer.cpp" "public/PixelExplorer.h")
+set_property(TARGET PixelExplorer PROPERTY CXX_STANDARD 17)
+target_include_directories(PixelExplorer PUBLIC "public")
+target_include_directories(PixelExplorer PRIVATE "private")
+add_dependencies(PixelExplorer PECore)
+target_link_libraries(PixelExplorer PECore)

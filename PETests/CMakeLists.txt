@@ -1,0 +1,8 @@
+project("PETests" VERSION 0.0.0)
+message(STATUS "PETests: Version ${PROJECT_VERSION}")
+add_executable(PETests "src/test.cpp")
+set_property(TARGET PETests PROPERTY CXX_STANDARD 17)
+target_include_directories(PETests PRIVATE "private")
+add_dependencies(PETests PECore)
+target_link_libraries(PETests PECore)
+add_test(NAME PETests COMMAND PETests)

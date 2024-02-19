@@ -1,0 +1,8 @@
+project("PECore" VERSION 0.0.0)
+message(STATUS "PECore: Version ${PROJECT_VERSION}")
+add_library(PECore "public/PECore.h" "src/PECore.cpp")
+set_property(TARGET PECore PROPERTY CXX_STANDARD 17)
+target_include_directories(PECore PUBLIC "public")
+target_include_directories(PECore PRIVATE "private")
+# add_dependencies(PixelExplorer PECore)
+# target_link_libraries(PixelExplorer PECore)
