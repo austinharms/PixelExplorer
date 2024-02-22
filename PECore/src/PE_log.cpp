@@ -1,4 +1,5 @@
 #include "PE_log.h"
+#include <cstdlib>
 
 PE_EXTERN_C PE_API void PE_CALL PE_InitLog()
 {
@@ -11,4 +12,8 @@ PE_EXTERN_C PE_API void PE_CALL PE_InitLog()
 	PE_STATIC_ASSERT(PE_LOG_CATEGORY_CUSTOM == 35, PE_TEXT("PE_log.cpp PE_LOG_CATEGORY_* count changed update PE_InitLog"));
 	// Log here to ensure all SDL thread synchronization mechanisms are created before returning
 	PE_LogInfo(PE_LOG_CATEGORY_CORE, "PixelExplorer Log Begin");
+}
+
+PE_NORETURN PE_EXTERN_C PE_API void PE_CALL PE_LogCriticalAbort() {
+	std::abort();
 }
