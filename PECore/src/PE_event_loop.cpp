@@ -20,12 +20,12 @@ namespace {
 	bool l_eventThreadFlag = false;
 }
 
-PE_EXTERN_C PE_API void PE_CALL PE_PrepareSDLEventLoop()
+PE_EXTERN_C void PE_CALL PE_PrepareSDLEventLoop()
 {
 	l_eventThreadFlag = true;
 }
 
-PE_EXTERN_C PE_API void PE_CALL PE_RunSDLEventLoop() {
+PE_EXTERN_C void PE_CALL PE_RunSDLEventLoop() {
 	PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Entry"));
 	while (l_eventThreadFlag)
 	{
@@ -53,12 +53,12 @@ PE_EXTERN_C PE_API void PE_CALL PE_RunSDLEventLoop() {
 	PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Exit"));
 }
 
-PE_EXTERN_C PE_API void PE_CALL PE_StopSDLEventLoop()
+PE_EXTERN_C void PE_CALL PE_StopSDLEventLoop()
 {
 	l_eventThreadFlag = false;
 }
 
-PE_EXTERN_C PE_API void* PE_CALL PE_RunEventLoopFunction(PE_EventLoopFunction fn, void* userdata)
+PE_EXTERN_C void* PE_CALL PE_RunEventLoopFunction(PE_EventLoopFunction fn, void* userdata)
 {
 	PE_EventLoopFunctionData fnData{ fn, userdata, nullptr, false };
 	std::unique_lock lock(l_functionQueueMutex);

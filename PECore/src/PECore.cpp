@@ -22,7 +22,7 @@ PE_EXTERN_C PE_API int PE_CALL PECORE_main(int argc, char** argv)
 	constexpr Uint32 SDL_SYSTEMS = SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK;
 	PE_InitLog();
 	int returnRes = SDL_Init(SDL_SYSTEMS);
-	PE_ASSERT(returnRes == 0, "Failed to init SDL " SDL_PRIs32, returnRes);
+	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init SDL ") SDL_PRIs32, returnRes);
 	PE_PrepareSDLEventLoop();
 	// Run the application on a different thread as events must be polled on the main thread
 	// and there is a bug when resizing windows will freeze the event loop
