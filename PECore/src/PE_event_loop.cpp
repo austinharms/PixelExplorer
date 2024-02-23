@@ -5,7 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace {
+namespace pecore {
 	struct PE_EventLoopFunctionData {
 		PE_EventLoopFunction function;
 		void* data;
@@ -13,64 +13,64 @@ namespace {
 		bool executed;
 	};
 
-	PE_EventLoopFunctionData* l_functionQueueHead = nullptr;
-	PE_EventLoopFunctionData* l_functionQueueTail = nullptr;
-	std::mutex l_functionQueueMutex;
-	std::condition_variable l_functionQueueCondition;
-	bool l_eventThreadFlag = false;
-}
+	static PE_EventLoopFunctionData* s_function_queue_head = nullptr;
+	static PE_EventLoopFunctionData* s_function_queue_tail = nullptr;
+	static std::mutex s_function_queue_mutex;
+	static std::condition_variable s_function_queue_condition;
+	static bool s_event_thread_flag = false;
 
-void PE_PrepareSDLEventLoop()
-{
-	l_eventThreadFlag = true;
-}
-
-void PE_RunSDLEventLoop() {
-	PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Entry"));
-	while (l_eventThreadFlag)
+	void PE_PrepareSDLEventLoop()
 	{
-		l_functionQueueMutex.lock();
-		PE_EventLoopFunctionData* fnData = l_functionQueueHead;
-		if (fnData)
+		s_event_thread_flag = true;
+	}
+
+	void PE_RunSDLEventLoop() {
+		PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Entry"));
+		while (s_event_thread_flag)
 		{
-			if (l_functionQueueTail == l_functionQueueHead) {
-				l_functionQueueTail = nullptr;
+			s_function_queue_mutex.lock();
+			PE_EventLoopFunctionData* fnData = s_function_queue_head;
+			if (fnData)
+			{
+				if (s_function_queue_tail == s_function_queue_head) {
+					s_function_queue_tail = nullptr;
+				}
+
+				s_function_queue_head = fnData->next;
+				s_function_queue_mutex.unlock();
+				fnData->data = fnData->function(fnData->data);
+				fnData->executed = true;
+				s_function_queue_condition.notify_all();
+			}
+			else {
+				s_function_queue_mutex.unlock();
 			}
 
-			l_functionQueueHead = fnData->next;
-			l_functionQueueMutex.unlock();
-			fnData->data = fnData->function(fnData->data);
-			fnData->executed = true;
-			l_functionQueueCondition.notify_all();
+			SDL_PumpEvents();
+		}
+
+		PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Exit"));
+	}
+
+	void PE_StopSDLEventLoop()
+	{
+		s_event_thread_flag = false;
+	}
+
+	void* PE_RunEventLoopFunction(PE_EventLoopFunction fn, void* userdata)
+	{
+		PE_EventLoopFunctionData fn_data{ fn, userdata, nullptr, false };
+		std::unique_lock lock(s_function_queue_mutex);
+		if (s_function_queue_tail) {
+			s_function_queue_tail->next = &fn_data;
 		}
 		else {
-			l_functionQueueMutex.unlock();
+			s_function_queue_head = &fn_data;
+			s_function_queue_tail = &fn_data;
 		}
 
-		SDL_PumpEvents();
+		s_function_queue_condition.wait(lock, [&] { return fn_data.executed; });
+		lock.unlock();
+		return fn_data.data;
 	}
-
-	PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Exit"));
-}
-
-void PE_StopSDLEventLoop()
-{
-	l_eventThreadFlag = false;
-}
-
-void* PE_RunEventLoopFunction(PE_EventLoopFunction fn, void* userdata)
-{
-	PE_EventLoopFunctionData fnData{ fn, userdata, nullptr, false };
-	std::unique_lock lock(l_functionQueueMutex);
-	if (l_functionQueueTail) {
-		l_functionQueueTail->next = &fnData;
-	}
-	else {
-		l_functionQueueHead = &fnData;
-		l_functionQueueTail = &fnData;
-	}
-
-	l_functionQueueCondition.wait(lock, [&] { return fnData.executed; });
-	lock.unlock();
-	return fnData.data;
 }

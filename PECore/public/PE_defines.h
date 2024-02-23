@@ -17,11 +17,14 @@
 #define PE_MAYBE_UNUSED [[maybe_unused]]
 #define PE_STATIC_ASSERT(exp, msg) static_assert(exp, msg)
 #define PE_ARRAY_LEN(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-#define PE_EXTERN_C extern "C"
+#define PE_TEXT_INTERNAL(text) text
+#define PE_TEXT(text) PE_TEXT_INTERNAL(text)
+#define PE_STATIC_ASSERT(exp, msg) static_assert(exp, msg)
 
 #if !defined(NDEBUG) || defined(DEBUG)
 #define PE_DEBUG 1
 #else
 #define PE_DEBUG 0
 #endif
+
 #endif // !PE_DEFINES_H_

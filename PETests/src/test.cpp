@@ -5,14 +5,8 @@
 #include "SDL.h"
 #include <thread>
 
-//void* PE_CALL PET_CreateWindow(void*) {
-//	return SDL_CreateWindow(PE_TEXT("Test Window"), 1000, 800, 0);
-//}
-//
-//void* PE_CALL PET_DestroyWindow(void* window) {
-//	SDL_DestroyWindow(static_cast<SDL_Window*>(window));
-//	return nullptr;
-//}
+using namespace pecore;
+using namespace pe_graphics;
 
 void PET_main(int* returnValue, int argc, char** argv) {
 	for (int i = 0; i < 100; ++i) {

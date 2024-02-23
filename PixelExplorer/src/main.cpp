@@ -2,5 +2,5 @@
 #include "PECore.h"
 
 int main(int argc, char** argv) {
-	return PECORE_main(argc, argv);
+	return pecore::PECORE_main(argc, argv);
 }

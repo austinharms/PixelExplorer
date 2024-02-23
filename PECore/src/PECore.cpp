@@ -4,28 +4,30 @@
 #include "SDL.h"
 #include <thread>
 
-// entry point for the application thread
-static void PE_main(int* returnValue, int argc, char** argv) {
-	PE_LogDebug(PE_LOG_CATEGORY_CORE, PE_TEXT("PE_main Thread Entry"));
-	// TODO Add main loop
+namespace pecore {
+	// entry point for the application thread
+	static void PE_main(int* returnValue, int argc, char** argv) {
+		PE_LogDebug(PE_LOG_CATEGORY_CORE, PE_TEXT("PE_main Thread Entry"));
+		// TODO Add main loop
 
-	PE_StopSDLEventLoop();
-	*returnValue = 0;
-	PE_LogDebug(PE_LOG_CATEGORY_CORE, PE_TEXT("PE_main Thread Exit"));
-}
+		PE_StopSDLEventLoop();
+		*returnValue = 0;
+		PE_LogDebug(PE_LOG_CATEGORY_CORE, PE_TEXT("PE_main Thread Exit"));
+	}
 
-// main entry point for the application
-int PECORE_main(int argc, char** argv)
-{
-	constexpr Uint32 SDL_SYSTEMS = SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK;
-	PE_InitLog();
-	int returnRes = SDL_Init(SDL_SYSTEMS);
-	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init SDL ") SDL_PRIs32, returnRes);
-	PE_PrepareSDLEventLoop();
-	// Run the application on a different thread as events must be polled on the main thread
-	// and there is a bug when resizing windows will freeze the event loop
-	std::thread appThread(PE_main, &returnRes, argc, argv);
-	PE_RunSDLEventLoop();
-	appThread.join();
-	return returnRes;
+	// main entry point for the application
+	int PECORE_main(int argc, char** argv)
+	{
+		constexpr Uint32 SDL_SYSTEMS = SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK;
+		PE_InitLog();
+		int rtn = SDL_Init(SDL_SYSTEMS);
+		PE_ASSERT(rtn == 0, PE_TEXT("Failed to init SDL %") SDL_PRIs32, rtn);
+		PE_PrepareSDLEventLoop();
+		// Run the application on a different thread as events must be polled on the main thread
+		// and there is a bug when resizing windows will freeze the event loop
+		std::thread appThread(PE_main, &rtn, argc, argv);
+		PE_RunSDLEventLoop();
+		appThread.join();
+		return rtn;
+	}
 }
