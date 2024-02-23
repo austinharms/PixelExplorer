@@ -1,7 +1,7 @@
 #include "PE_log.h"
 #include <cstdlib>
 
-PE_EXTERN_C PE_API void PE_CALL PE_InitLog()
+void PE_InitLog()
 {
 	SDL_LogSetPriority(PE_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_VERBOSE);
 	SDL_LogSetPriority(PE_LOG_CATEGORY_ASSERT, SDL_LOG_PRIORITY_VERBOSE);
@@ -14,6 +14,6 @@ PE_EXTERN_C PE_API void PE_CALL PE_InitLog()
 	PE_LogInfo(PE_LOG_CATEGORY_CORE, "PixelExplorer Log Begin");
 }
 
-PE_NORETURN PE_EXTERN_C PE_API void PE_CALL PE_LogCriticalAbort() {
+void PE_LogCriticalAbort() {
 	std::abort();
 }

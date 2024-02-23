@@ -15,7 +15,4 @@ struct PE_DGAPI_GraphicsJumpTable {
 #include "PE_dgapi.h"
 #undef PE_GRAPHICS_API
 };
-
-// Returns 0 on success and a negative value on error
-PE_EXTERN_C PE_NODISCARD int PE_CALL PE_InitGraphicsAdapter();
 #endif // !PE_GRAPHICS_ADAPTER_H_

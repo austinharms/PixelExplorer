@@ -14,7 +14,7 @@
 //	return nullptr;
 //}
 
-void PE_CALL PET_main(int* returnValue, int argc, char** argv) {
+void PET_main(int* returnValue, int argc, char** argv) {
 	for (int i = 0; i < 100; ++i) {
 		//SDL_Window* window = static_cast<SDL_Window*>(PE_RunEventLoopFunction(PET_CreateWindow));
 		SDL_Window* window = PE_CreateWindow(PE_TEXT("Test Window"), 1000, 800, 0);
