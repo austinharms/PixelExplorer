@@ -33,9 +33,9 @@ int main(int argc, char** argv)
 	PE_InitLog();
 	PE_LogInfo(PE_LOG_CATEGORY_TEST, PE_TEXT("Hello World"));
 	int returnRes = SDL_Init(SDL_SYSTEMS);
-	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init SDL ") SDL_PRIs32, returnRes);
+	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init SDL %") SDL_PRIs32, returnRes);
 	returnRes = PE_InitGraphicsAdapter();
-	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init PE_Graphics ") SDL_PRIs32, returnRes);
+	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init PE_Graphics %") SDL_PRIs32, returnRes);
 	PE_PrepareSDLEventLoop();
 	std::thread appThread(PET_main, &returnRes, argc, argv);
 	PE_RunSDLEventLoop();

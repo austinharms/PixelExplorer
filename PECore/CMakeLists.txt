@@ -1,6 +1,6 @@
 project("PECore" VERSION 0.0.0)
 message(STATUS "PECore: Version ${PROJECT_VERSION}")
-add_library(PECore "public/PECore.h" "src/PECore.cpp" "src/PE_event_loop.cpp" "src/PE_log.cpp" "public/PE_log.h" "public/PE_defines.h" "private/PE_event_loop.h" "public/PE_graphics.h" "private/PE_opengl_adapter.h" "private/PE_graphics_adapter.h" "private/PE_graphics_api.h" "src/PE_graphics.cpp" "src/PE_opengl_adapter.cpp")
+add_library(PECore "public/PECore.h" "src/PECore.cpp" "src/PE_event_loop.cpp" "src/PE_log.cpp" "public/PE_log.h" "public/PE_defines.h" "private/PE_event_loop.h" "public/PE_graphics.h" "private/PE_opengl_adapter.h" "private/PE_graphics_adapter.h" "private/PE_dgapi.h" "src/PE_graphics.cpp" "src/PE_opengl_adapter.cpp" "public/PE_graphics_types.h")
 set_property(TARGET PECore PROPERTY CXX_STANDARD 17)
 # Preprocess to file
 # set_property(TARGET PECore PROPERTY COMPILE_FLAGS "-P")
@@ -10,13 +10,17 @@ add_dependencies(PECore SDL3::SDL3)
 target_link_libraries(PECore SDL3::SDL3)
 add_dependencies(PECore glm::glm)
 target_link_libraries(PECore glm::glm)
+add_dependencies(PECore libglew_static)
+target_link_libraries(PECore libglew_static)
+# Add PE_dgapi.h gerneration build step
+add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/private/PE_dgapi.h" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/public/PE_graphics.h" COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/tools/genDGAPI.py ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (WIN32)
 # TODO Make this a dynamic list
 set(PECORE_DEPENDENCIES "${SDL3_BINARY_DIR}/SDL3.dll")
 endif()
 
-set(PECORE_DEPENDENCIES ${PECORE_DEPENDENCIES} CACHE FORCE "PECore Dependencies")
+set(PECORE_DEPENDENCIES ${PECORE_DEPENDENCIES} CACHE INTERNAL "PECore Dependencies")
 message(STATUS "PECore: Dependencies ${PECORE_DEPENDENCIES}")
 function(CopyPECoreDependencies caller dest)
     foreach( dep ${PECORE_DEPENDENCIES})

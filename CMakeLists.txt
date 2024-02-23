@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.13)
+﻿cmake_minimum_required (VERSION 3.16)
 project("PERoot")
 
 # Enable Hot Reload for MSVC compilers if supported.
@@ -11,8 +11,12 @@ set(BUILD_PECORE_TESTS true CACHE BOOL "Builds tests for PECore")
 set(BUILD_SHARED_LIBS false)
 set(SDL_SHARED true)
 set(SDL_STATIC false)
+set(glew-cmake_BUILD_SHARED false)
+set(BUILD_UTILS false)
+add_compile_definitions(GLEW_STATIC)
 
 add_subdirectory("Vendor/SDL")
+add_subdirectory("Vendor/glew")
 add_subdirectory("Vendor/glm")
 add_subdirectory("PECore")
 if (BUILD_PECORE_TESTS)
