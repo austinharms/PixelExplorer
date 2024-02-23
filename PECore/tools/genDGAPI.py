@@ -1,8 +1,9 @@
+# coding=utf8
 import sys
 import os
 import re
 
-regex = r"PE_EXTERN_C\s+\w*\s*PE_API\s+(\b\S+\b\**)\s+PE_CALL\s(\w+)\((.*)\);"
+regex = r"(?:PE_NO_DGAPI)?\s?PE_EXTERN_C\s+\w*\s*PE_API\s+(\b\S+\b\**)\s+PE_CALL\s(\w+)\((.*)\);"
 srcFile = open(os.path.join(sys.argv[1], "public", "PE_graphics.h"));
 dstFile = open(os.path.join(sys.argv[1], "private", "PE_dgapi.h"), "w")
 functions = re.finditer(regex, srcFile.read(), re.MULTILINE)
@@ -21,11 +22,12 @@ struct PE_DGAPI_GraphicsJumpTable;
 struct SDL_Window;
 #endif // !PE_GRAPHICS_API
 
-PE_GRAPHICS_API(int, PE_InitGraphics, (PE_DGAPI_GraphicsJumpTable* jmpTable), (jmpTable), return)
 """
 
 dstFile.write(fileHeader)
 for function in functions:
+    if "PE_NO_DGAPI" in function.group():
+        continue
     returnType, fucName, params = function.groups()
     paramList = params.split(",")
     paramNames = []
