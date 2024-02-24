@@ -12,6 +12,7 @@
 #define PE_NOCOPY(Class) Class(const Class&) = delete; Class& operator=(const Class&) = delete;
 #define PE_OVERRIDE override
 #define PE_NOINLINE __declspec(noinline)
+#define PE_FINAL final
 #define PE_WEAK __attribute__((weak))
 #define PE_NOEXCEPT noexcept
 #define PE_MAYBE_UNUSED [[maybe_unused]]

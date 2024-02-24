@@ -4,6 +4,6 @@
 [submodule "Vendor/glm"]
 	path = Vendor/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "Vendor/glew"]
-	path = Vendor/glew
-	url = https://github.com/Perlmint/glew-cmake.git
+[submodule "Vendor/glad"]
+	path = Vendor/glad
+	url = https://github.com/Dav1dde/glad.git

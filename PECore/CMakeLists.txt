@@ -10,8 +10,9 @@ add_dependencies(PECore SDL3::SDL3)
 target_link_libraries(PECore SDL3::SDL3)
 add_dependencies(PECore glm::glm)
 target_link_libraries(PECore glm::glm)
-add_dependencies(PECore libglew_static)
-target_link_libraries(PECore libglew_static)
+glad_add_library(glad_gl_core_mx_33 REPRODUCIBLE MX API gl:core=3.3)
+add_dependencies(PECore glad_gl_core_mx_33)
+target_link_libraries(PECore glad_gl_core_mx_33)
 # Add PE_dgapi.h gerneration build step
 add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/private/PE_dgapi.h" DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/public/PE_graphics.h" COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/tools/genDGAPI.py ${CMAKE_CURRENT_SOURCE_DIR})
 
