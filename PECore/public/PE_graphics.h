@@ -6,9 +6,12 @@
 // An empty macro that will prevent the function from being generated in PE_dgapi.h
 #define PE_NO_DGAPI
 namespace pecore::pe_graphics {
-	// Returns 0 on success
-	// Note: positive return values are reserved for PE_ERROR_* codes
+	// Sets up the graphics adapter, returns 0 on success
+	// Note: must be run on the events aka main thread
+	// positive return values are reserved for PE_ERROR_* codes
 	PE_NO_DGAPI PE_NODISCARD PE_API int PE_CALL PE_InitGraphicsAdapter();
+	// Quits the graphics adapter created by PE_InitGraphicsAdapter
+	// Note: must be run on the events aka main thread
 	PE_NO_DGAPI PE_API void PE_CALL PE_QuitGraphicsAdapter();
 	PE_NODISCARD PE_API SDL_Window* PE_CALL PE_CreateWindow(char* title, int width, int height, Uint32 flags);
 	PE_API void PE_CALL PE_DestroyWindow(SDL_Window* window);

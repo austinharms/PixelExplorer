@@ -17,6 +17,7 @@ namespace pecore::pe_graphics {
 #undef PE_GRAPHICS_API
 
     int PE_InitGraphicsAdapter() {
+        // TODO Add check for event thread
         if (s_graphics_adapter) {
             return PE_ERROR_ALREADY_INITIALIZED;
         }
@@ -37,5 +38,14 @@ namespace pecore::pe_graphics {
         }
 
         return res;
+    }
+
+    void PE_QuitGraphicsAdapter() {
+        // TODO Add check for event thread
+        if (s_graphics_adapter) {
+            s_graphics_adapter->~GraphicsAdapterInterface();
+            PE_free(s_graphics_adapter);
+            s_graphics_adapter = nullptr;
+        }
     }
 }

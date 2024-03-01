@@ -10,6 +10,9 @@ namespace pecore {
 
 	// Runs the provided function on the event loop thread, passes userdata as the function parameter and returns function return value
 	// Note: this requires the event thread to be running and will block until the function is executed
-	void* PE_CALL PE_RunEventLoopFunction(PE_EventLoopFunction fn, void* userdata = nullptr);
+	void* PE_CALL PE_RunEventLoopFunctionBlocking(PE_EventLoopFunction fn, void* userdata = nullptr);
+
+	// Runs the provided function on the event loop thread, passes userdata as the function parameter returns 0 on success
+	int PE_CALL PE_RunEventLoopFunction(PE_EventLoopFunction fn, void* userdata = nullptr);
 }
 #endif // !PE_EVENT_LOOP_H_

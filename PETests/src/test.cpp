@@ -10,13 +10,11 @@ using namespace pe_graphics;
 
 void PET_main(int* returnValue, int argc, char** argv) {
 	for (int i = 0; i < 100; ++i) {
-		//SDL_Window* window = static_cast<SDL_Window*>(PE_RunEventLoopFunction(PET_CreateWindow));
 		SDL_Window* window = PE_CreateWindow(PE_TEXT("Test Window"), 1000, 800, 0);
 		PE_ASSERT(window, PE_TEXT("Failed to create SDL window"));
 		PE_DestroyWindow(window);
-		//PE_RunEventLoopFunction(PET_DestroyWindow, window);
 	}
-
+	
 	PE_StopSDLEventLoop();
 	*returnValue = 0;
 }
@@ -34,6 +32,6 @@ int main(int argc, char** argv)
 	std::thread appThread(PET_main, &returnRes, argc, argv);
 	PE_RunSDLEventLoop();
 	appThread.join();
+	PE_QuitGraphicsAdapter();
 	return returnRes;
-	return 0;
 }

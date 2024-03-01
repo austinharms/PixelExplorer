@@ -2,6 +2,7 @@
 #ifndef PE_OPENGL_ADAPTER_H_
 #define PE_OPENGL_ADAPTER_H_
 #include "PE_defines.h"
+#include "PE_worker_thread.h"
 #include "PE_graphics_adapter.h"
 #include "glad/gl.h"
 
@@ -14,7 +15,7 @@
 // Note: this does not ensure only one context exists,
 // if PE_OGL_BACKGROUND_LOADING is true it will still create it's own context
 #ifndef PE_OGL_SINGLE_CONTEXT
-#define PE_OGL_SINGLE_CONTEXT 1
+#define PE_OGL_SINGLE_CONTEXT 0
 #endif // !PE_OGL_SINGLE_CONTEXT
 
 namespace pecore::pe_graphics::open_gl {
@@ -33,6 +34,7 @@ namespace pecore::pe_graphics::open_gl {
 #endif
 #if PE_OGL_BACKGROUND_LOADING
 		GladGLContext background_glad_ctx_;
+		ThreadWorker background_load_worker_;
 #endif
 
 		// Helper PE_EventLoopFunction that creates a SDL_Window
