@@ -6,6 +6,8 @@ namespace pecore {
 		PE_ERROR_NONE = 0,
 		PE_ERROR_OUT_OF_MEMORY,
 		PE_ERROR_ALREADY_INITIALIZED,
+		PE_ERROR_NOT_FOUND,
+		PE_ERROR_EMPTY,
 	};
 }
 #endif // !PE_ERRORS_H_

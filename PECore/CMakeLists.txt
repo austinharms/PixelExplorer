@@ -1,6 +1,6 @@
 project("PECore" VERSION 0.0.0)
 message(STATUS "PECore: Version ${PROJECT_VERSION}")
-add_library(PECore "public/PECore.h" "src/PECore.cpp" "src/PE_event_loop.cpp" "src/PE_log.cpp" "public/PE_log.h" "public/PE_defines.h" "private/PE_event_loop.h" "public/PE_graphics.h" "private/PE_opengl_adapter.h" "private/PE_graphics_adapter.h" "private/PE_dgapi.h" "src/PE_graphics.cpp" "src/PE_opengl_adapter.cpp" "public/PE_graphics_types.h" "private/PE_worker_thread.h" "private/PE_memory.h" "src/PE_memory.cpp" "public/PE_errors.h" "src/PE_worker_thread.cpp")
+add_library(PECore "public/PECore.h" "src/PECore.cpp" "src/PE_event_loop.cpp" "src/PE_log.cpp" "public/PE_log.h" "public/PE_defines.h" "private/PE_event_loop.h" "public/PE_graphics.h" "private/PE_opengl_adapter.h" "private/PE_graphics_adapter.h" "private/PE_dgapi.h" "src/PE_graphics.cpp" "src/PE_opengl_adapter.cpp" "public/PE_graphics_types.h" "private/PE_worker_thread.h" "private/PE_memory.h" "src/PE_memory.cpp" "public/PE_errors.h" "src/PE_worker_thread.cpp" "public/PE_asset_manager.h" "src/PE_asset_manager.cpp")
 set_property(TARGET PECore PROPERTY CXX_STANDARD 17)
 # Preprocess to file
 # set_property(TARGET PECore PROPERTY COMPILE_FLAGS "-P")
