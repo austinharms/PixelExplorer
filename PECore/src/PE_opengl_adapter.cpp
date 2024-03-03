@@ -2,87 +2,50 @@
 #include "PE_opengl_adapter.h"
 #include "PE_event_loop.h"
 #include "PE_worker_thread.h"
+#include "PE_asset_manager_internal.h"
 #include "PE_log.h"
 #include "PE_memory.h"
 #include "PE_errors.h"
 #include "SDL_video.h"
+#include <filesystem>
+#include <fstream>
 
 #define PE_OGL_CTX_KEY PE_TEXT("PE_GLCTX")
+#if PE_OGL_BACKGROUND_LOADING
+#define PE_OGL_TASK_RUNNER background_load_worker_.RunBlocking
+#else
+#define PE_OGL_TASK_RUNNER PE_RunEventLoopFunctionBlocking
+#endif
 
 namespace pecore::pe_graphics::open_gl {
-	struct PE_WindowParameters {
+	namespace {
+		struct PE_OGLShader : PE_Shader {
+			GLuint vertex_shader;
+			GLuint fragment_shader;
+		};
+
+		struct WindowContext {
+			SDL_Window* window;
+			GladGLContext glad_ctx;
+			ThreadWorker worker;
+		};
+
+		struct SetGLContextParams {
+			SDL_Window* window;
+			SDL_GLContext context;
+			// Note: this returns a SDL error value NOT PE_ERROR
+			int return_code;
+		};
+	}
+
+	struct OpenGLGraphicsAdapter::CreateWindowParams {
 		OpenGLGraphicsAdapter* self;
 		char* title;
 		int width;
 		int height;
 		Uint32 flags;
+		SDL_Window* return_window;
 	};
-
-#if !PE_OGL_SINGLE_CONTEXT
-	struct PE_WindowContextData {
-		SDL_Window* window;
-		GladGLContext ctx;
-		ThreadWorker worker;
-	};
-#endif
-
-#if PE_OGL_BACKGROUND_LOADING
-	struct PE_SetGLContextActiveFuncParams {
-		SDL_Window* window;
-		SDL_GLContext context;
-	};
-
-	static void* PE_SetGLContextActiveFunc(void* data) {
-		PE_SetGLContextActiveFuncParams* params = static_cast<PE_SetGLContextActiveFuncParams*>(data);
-		intptr_t ret = SDL_GL_MakeCurrent(params->window, params->context);
-		if (ret != 0) {
-			PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set OpenGL context active: %s"), SDL_GetError());
-		}
-
-		return reinterpret_cast<void*>(ret);
-	}
-#endif
-
-	// Helper PE_EventLoopFunction that destroys a GladGLContext and SDL_GLContext
-	// Note: it is expected that GladGLContext.userptr contains the SDL_GLContext
-	static void* PE_DestroyGladContextFunc(void* ctx) {
-		if (SDL_GL_DeleteContext(static_cast<GladGLContext*>(ctx)->userptr) != 0) {
-			PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to delete OpenGL context: %s"), SDL_GetError());
-		}
-
-		memset(ctx, 0, sizeof(GladGLContext));
-		return nullptr;
-	}
-
-	// Helper PE_EventLoopFunction that destroys a SDL_Window
-	// This must be run on the PE event loop aka main thread
-	static void* PE_DestroyWindowFunc(void* window) {
-#if !PE_OGL_SINGLE_CONTEXT
-		PE_WindowContextData* ctx = nullptr;
-		SDL_PropertiesID props = SDL_GetWindowProperties(static_cast<SDL_Window*>(window));
-		if (props != 0) {
-			ctx = static_cast<PE_WindowContextData*>(SDL_GetProperty(props, PE_OGL_CTX_KEY, nullptr));
-		}
-		else {
-			PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to get window context: %s"), SDL_GetError());
-		}
-
-		if (ctx) {
-			PE_SetGLContextActiveFuncParams params = { nullptr, nullptr };
-			ctx->worker.RunBlocking(PE_SetGLContextActiveFunc, &params);
-			PE_DestroyGladContextFunc(&ctx->ctx);
-			ctx->~PE_WindowContextData();
-			PE_free(ctx);
-		}
-		else {
-			PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Destroyed window with missing context property"));
-		}
-#endif
-
-		SDL_DestroyWindow(static_cast<SDL_Window*>(window));
-		return nullptr;
-	}
-
 
 	// Error Codes:
 	//		 0: No Error
@@ -131,30 +94,60 @@ namespace pecore::pe_graphics::open_gl {
 	OpenGLGraphicsAdapter::~OpenGLGraphicsAdapter() {
 #if PE_OGL_SINGLE_CONTEXT
 		if (primary_glad_ctx_.userptr) {
-			PE_DestroyGladContextFunc(&primary_glad_ctx_);
+			DestroyContextHelper(&primary_glad_ctx_);
 		}
 #endif
 
 #if PE_OGL_BACKGROUND_LOADING
 		if (background_glad_ctx_.userptr) {
-			background_load_worker_.RunBlocking(PE_DestroyGladContextFunc, &background_glad_ctx_);
+			background_load_worker_.RunBlocking(DestroyContextHelper, &background_glad_ctx_);
 		}
 #endif
 	}
 
 	SDL_Window* OpenGLGraphicsAdapter::CreateWindow(char* title, int width, int height, Uint32 flags) {
 		flags = (flags & ~(SDL_WINDOW_VULKAN | SDL_WINDOW_METAL)) | SDL_WINDOW_OPENGL;
-		PE_WindowParameters params{ this, title, width, height, flags };
-		return static_cast<SDL_Window*>(PE_RunEventLoopFunctionBlocking(PE_CreateWindowFunc, &params));
+		CreateWindowParams params{ this, title, width, height, flags, nullptr };
+		PE_RunEventLoopFunctionBlocking(CreateWindowHelper, &params);
+		return static_cast<SDL_Window*>(params.return_window);
 	}
 
 	void OpenGLGraphicsAdapter::DestroyWindow(SDL_Window* window) {
 		if (window) {
-			PE_RunEventLoopFunctionBlocking(PE_DestroyWindowFunc, window);
+			PE_RunEventLoopFunctionBlocking(DestroyWindowHelper, window);
 		}
 	}
 
 	PE_Shader* OpenGLGraphicsAdapter::LoadShader(const char* name) {
+		//std::filesystem::path shader_path(std::filesystem::path(PE_TEXT("res")) / PE_TEXT("shaders") / name);
+		//shader_path.append(PE_TEXT(".pegls"));
+		//std::ifstream shader_stream;
+		//size_t shader_size;
+		//int err = PE_GetFileHandle(shader_path, shader_stream, shader_size);
+		//if (err != PE_ERROR_NONE) {
+		//	PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, error code: %") SDL_PRIs32, name, err);
+		//	return nullptr;
+		//}
+
+		//PE_OGLShader* shader = static_cast<PE_OGLShader*>(PE_malloc(sizeof(PE_OGLShader)));
+		//if (!shader) {
+		//	PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate shader %s"), name);
+		//	return nullptr;
+		//}
+
+		//memset(shader, 0, sizeof(PE_OGLShader));
+		//PE_OGL_TASK_RUNNER();
+
+		//shader->vertex_shader = ;
+
+		//	if (!PE_ParseShaderFile(shader_stream, shader_size, *shader)) {
+		//		PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, failed to parse shader file"), name);
+		//		return nullptr;
+		//	}
+
+
+
+		//return static_cast<PE_Shader*>(shader);
 		return nullptr;
 	}
 
@@ -162,103 +155,151 @@ namespace pecore::pe_graphics::open_gl {
 
 	}
 
-	void* OpenGLGraphicsAdapter::PE_CreateWindowFunc(void* windowData) {
-		PE_WindowParameters* params = static_cast<PE_WindowParameters*>(windowData);
-		OpenGLGraphicsAdapter* this_ = params->self;
-		SDL_Window* window = SDL_CreateWindow(params->title, params->width, params->height, params->flags);
+	void OpenGLGraphicsAdapter::CreateWindowHelper(void* window_parameters) {
+		CreateWindowParams* params = static_cast<CreateWindowParams*>(window_parameters);
+		params->self->CreateWindowHelperInternal(*params);
+	}
+
+	void OpenGLGraphicsAdapter::CreateWindowHelperInternal(CreateWindowParams& params) {
+		params.return_window = nullptr;
+		SDL_Window* window = SDL_CreateWindow(params.title, params.width, params.height, params.flags);
 		if (!window) {
 			PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window: %s"), SDL_GetError());
-			return nullptr;
+			return;
 		}
 
 #if PE_OGL_BACKGROUND_LOADING
-		if (this_->background_glad_ctx_.userptr == nullptr) {
+		if (background_glad_ctx_.userptr == nullptr) {
 			SDL_GLContext ctx = SDL_GL_CreateContext(window);
 			if (!ctx) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to create background OpenGL context: %s"), SDL_GetError());
 				SDL_DestroyWindow(window);
-				return nullptr;
+				return;
 			}
 
-			int ver = gladLoadGLContext(&this_->background_glad_ctx_, SDL_GL_GetProcAddress);
+			int ver = gladLoadGLContext(&background_glad_ctx_, SDL_GL_GetProcAddress);
 			PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Background GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
 			SDL_GL_MakeCurrent(nullptr, nullptr);
-			PE_SetGLContextActiveFuncParams set_params{ window, ctx };
-			intptr_t set_active_ret = reinterpret_cast<intptr_t>(this_->background_load_worker_.RunBlocking(PE_SetGLContextActiveFunc, &set_params));
-			if (set_active_ret != 0) {
+			SetGLContextParams set_params{ window, ctx, 0 };
+			background_load_worker_.RunBlocking(SetGLContextHelper, &set_params);
+			if (set_params.return_code != 0) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set background OpenGL context active"));
 				SDL_GL_DeleteContext(ctx);
-				memset(&this_->background_glad_ctx_, 0, sizeof(GladGLContext));
+				memset(&background_glad_ctx_, 0, sizeof(GladGLContext));
 				SDL_DestroyWindow(window);
-				return nullptr;
+				return;
 			}
 
-			this_->background_glad_ctx_.userptr = ctx;
+			background_glad_ctx_.userptr = ctx;
 		}
 #endif
 
 #if PE_OGL_SINGLE_CONTEXT
-		if (this_->primary_glad_ctx_.userptr == nullptr) {
-			this_->active_ctx_window_ = window;
+		if (primary_glad_ctx_.userptr == nullptr) {
+			active_ctx_window_ = window;
 			SDL_GLContext ctx = SDL_GL_CreateContext(window);
 			if (!ctx) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to create OpenGL context: %s"), SDL_GetError());
 				SDL_DestroyWindow(window);
-				return nullptr;
+				return;
 			}
 
-			int ver = gladLoadGLContext(&this_->primary_glad_ctx_, SDL_GL_GetProcAddress);
+			int ver = gladLoadGLContext(&primary_glad_ctx_, SDL_GL_GetProcAddress);
 			PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Primary GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
-			this_->primary_glad_ctx_.userptr = ctx;
+			primary_glad_ctx_.userptr = ctx;
 		}
 #else
 		{
-			PE_WindowContextData* window_context = static_cast<PE_WindowContextData*>(PE_malloc(sizeof(PE_WindowContextData)));
-			memset(window_context, 0, sizeof(PE_WindowContextData));
-			new(window_context) PE_WindowContextData();
+			WindowContext* window_context = static_cast<WindowContext*>(PE_malloc(sizeof(WindowContext)));
+			memset(window_context, 0, sizeof(WindowContext));
+			new(window_context) WindowContext();
 			if (window_context == nullptr) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to allocate window context"));
 				SDL_DestroyWindow(window);
-				return nullptr;
+				return;
 			}
 
 			SDL_GLContext ctx = SDL_GL_CreateContext(window);
 			if (ctx == nullptr) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to create OpenGL context: %s"), SDL_GetError());
 				SDL_DestroyWindow(window);
-				window_context->~PE_WindowContextData();
+				window_context->~WindowContext();
 				PE_free(window_context);
-				return nullptr;
+				return;
 			}
 
-			int ver = gladLoadGLContext(&window_context->ctx, SDL_GL_GetProcAddress);
+			int ver = gladLoadGLContext(&window_context->glad_ctx, SDL_GL_GetProcAddress);
 			PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Window GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
 			SDL_GL_MakeCurrent(nullptr, nullptr);
-			PE_SetGLContextActiveFuncParams set_params{ window, ctx };
-			intptr_t set_active_ret = reinterpret_cast<intptr_t>(window_context->worker.RunBlocking(PE_SetGLContextActiveFunc, &set_params));
-			if (set_active_ret != 0) {
+			SetGLContextParams set_params{ window, ctx, 0 };
+			window_context->worker.RunBlocking(SetGLContextHelper, &set_params);
+			if (set_params.return_code != 0) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set window OpenGL context active"));
 				SDL_GL_DeleteContext(ctx);
-				window_context->~PE_WindowContextData();
+				window_context->~WindowContext();
 				PE_free(window_context);
 				SDL_DestroyWindow(window);
-				return nullptr;
+				return;
 			}
 
 			window_context->window = window;
-			window_context->ctx.userptr = ctx;
+			window_context->glad_ctx.userptr = ctx;
 			SDL_PropertiesID window_props = SDL_GetWindowProperties(window);
 			if (SDL_SetProperty(window_props, PE_OGL_CTX_KEY, window_context) != 0) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set window context property: %s"), SDL_GetError());
 				SDL_GL_DeleteContext(ctx);
-				window_context->~PE_WindowContextData();
+				window_context->~WindowContext();
 				PE_free(window_context);
 				SDL_DestroyWindow(window);
-				return nullptr;
+				return;
 			}
 		}
 #endif
-		return window;
+		params.return_window = window;
+	}
+
+	void OpenGLGraphicsAdapter::DestroyWindowHelper(void* window) {
+#if !PE_OGL_SINGLE_CONTEXT
+		WindowContext* window_ctx = nullptr;
+		SDL_PropertiesID props = SDL_GetWindowProperties(static_cast<SDL_Window*>(window));
+		if (props != 0) {
+			window_ctx = static_cast<WindowContext*>(SDL_GetProperty(props, PE_OGL_CTX_KEY, nullptr));
+		}
+		else {
+			PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to get window context: %s"), SDL_GetError());
+		}
+
+		if (window_ctx) {
+			SetGLContextParams params = { nullptr, nullptr };
+			window_ctx->worker.RunBlocking(SetGLContextHelper, &params);
+			DestroyContextHelper(&window_ctx->glad_ctx);
+			window_ctx->~WindowContext();
+			PE_free(window_ctx);
+		}
+		else {
+			PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Destroyed window with missing context property"));
+		}
+#endif
+
+		SDL_DestroyWindow(static_cast<SDL_Window*>(window));
+	}
+
+	void OpenGLGraphicsAdapter::SetGLContextHelper(void* context_parameters) {
+		SetGLContextParams* params = static_cast<SetGLContextParams*>(context_parameters);
+		params->return_code = SDL_GL_MakeCurrent(params->window, params->context);
+		if (params->return_code != 0) {
+			PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set OpenGL context active: %s"), SDL_GetError());
+		}
+	}
+
+	void OpenGLGraphicsAdapter::DestroyContextHelper(void* ctx) {
+		if (SDL_GL_DeleteContext(static_cast<GladGLContext*>(ctx)->userptr) != 0) {
+			PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to delete OpenGL context: %s"), SDL_GetError());
+		}
+
+		memset(ctx, 0, sizeof(GladGLContext));
 	}
 }
+
+#undef PE_OGL_TASK_RUNNER
 #endif
