@@ -4,97 +4,26 @@
 #include "PE_log.h"
 
 namespace pecore {
-	enum class ThreadWorkTypeEnum
-	{
-		PE_THREAD_WORK_TYPE_DEFAULT,
-		PE_THREAD_WORK_TYPE_BLOCKING,
-	};
-
-	struct ThreadWorker::WorkDataBase {
-		WorkDataBase* next;
-		WorkerFunction function;
-		void* userdata;
-		ThreadWorkTypeEnum work_type;
-	};
-
-	struct ThreadWorker::WorkData : public WorkDataBase
-	{
-		WorkData() {
-			next = nullptr;
-			work_type = ThreadWorkTypeEnum::PE_THREAD_WORK_TYPE_DEFAULT;
-		}
-	};
-
-	struct ThreadWorker::BlockingWorkData : public WorkDataBase {
-		std::mutex result_mutex;
-		std::condition_variable result_condition;
-		void* result;
-		bool function_executed;
-
-		BlockingWorkData() {
-			next = nullptr;
-			function_executed = false;
-			work_type = ThreadWorkTypeEnum::PE_THREAD_WORK_TYPE_BLOCKING;
-			result = nullptr;
-		}
-	};
-
 	ThreadWorker::ThreadWorker() :
 		enable_flag_(true),
-		work_head_(nullptr),
-		work_tail_(nullptr),
 		worker_thread_(&ThreadWorker::ThreadWorkerEntry, this) {
 	}
 
 	ThreadWorker::~ThreadWorker()
 	{
 		enable_flag_ = false;
-		work_condition_.notify_all();
+		work_queue_.ForceWaitWakeup();
 		worker_thread_.join();
 	}
 
-	int ThreadWorker::Run(WorkerFunction function, void* userdata)
+	int ThreadWorker::Run(PE_WorkFunction function, void* userdata)
 	{
-		WorkData* work_data = static_cast<WorkData*>(PE_malloc(sizeof(WorkData)));
-		if (work_data == nullptr) {
-			return PE_ERROR_OUT_OF_MEMORY;
-		}
-
-		work_data->function = function;
-		work_data->userdata = userdata;
-		std::lock_guard worker_lock(work_mutex_);
-		if (work_tail_) {
-			work_tail_->next = work_data;
-		}
-		else {
-			work_head_ = work_data;
-		}
-
-		work_tail_ = work_data;
-		return PE_ERROR_NONE;
+		return work_queue_.PushAsyncWork(function, userdata);
 	}
 
-	void* ThreadWorker::RunBlocking(WorkerFunction function, void* userdata)
+	void ThreadWorker::RunBlocking(PE_WorkFunction function, void* userdata)
 	{
-		BlockingWorkData work_data;
-		work_data.function = function;
-		work_data.userdata = userdata;
-		std::unique_lock work_lock(work_data.result_mutex);
-		{
-			std::lock_guard worker_lock(work_mutex_);
-			if (work_tail_) {
-				work_tail_->next = &work_data;
-			}
-			else {
-				work_head_ = &work_data;
-			}
-
-			work_tail_ = &work_data;
-		}
-
-		work_condition_.notify_all();
-		work_data.result_condition.wait(work_lock, [&] { return work_data.function_executed; });
-		return work_data.result;
+		work_queue_.PushBlockingWork(function, userdata);
 	}
 
 	void ThreadWorker::ThreadWorkerEntry()
@@ -105,39 +34,11 @@ namespace pecore {
 		bool has_work = false;
 		while (enable_flag_ || has_work)
 		{
-			has_work = false;
-			std::unique_lock lock(work_mutex_);
-			work_condition_.wait(lock, [&] { return work_head_ != nullptr || !enable_flag_; });
-			if (work_head_ != nullptr) {
-				has_work = true;
-				WorkDataBase* work = work_head_;
-				if (work_tail_ == work_head_) {
-					work_tail_ = nullptr;
-				}
-
-				work_head_ = work->next;
-				lock.unlock();
-				void* res = work->function(work->userdata);
-				switch (work->work_type)
-				{
-				case ThreadWorkTypeEnum::PE_THREAD_WORK_TYPE_BLOCKING: {
-					BlockingWorkData* blocking_work = static_cast<BlockingWorkData*>(work);
-					blocking_work->result = res;
-					blocking_work->result_mutex.lock();
-					blocking_work->function_executed = true;
-					blocking_work->result_mutex.unlock();
-					blocking_work->result_condition.notify_all();
-				} break;
-
-				case ThreadWorkTypeEnum::PE_THREAD_WORK_TYPE_DEFAULT:
-					PE_free(work);
-					break;
-
-				default:
-					PE_DEBUG_ASSERT(false, PE_TEXT("Unknown ThreadWorkTypeEnum value"));
-					break;
-				}
+			if (enable_flag_) {
+				work_queue_.WaitForWork();
 			}
+
+			has_work = work_queue_.PerformWork();
 		}
 	}
 }
