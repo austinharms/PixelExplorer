@@ -9,12 +9,13 @@ namespace pecore {
 	int PE_GetFileBytes(const char* filepath, void*& file_data, size_t& file_size)
 	{
 		std::ifstream stream;
-		size_t size;
-		int err = PE_GetFileHandle(filepath, stream, size);
+		std::streampos end_pos;
+		int err = PE_GetFileHandle(filepath, stream, end_pos);
 		if (err != PE_ERROR_NONE) {
 			return err;
 		}
 
+		std::streamsize size = end_pos - stream.tellg();
 		if (size == 0) {
 			return PE_ERROR_EMPTY;
 		}
