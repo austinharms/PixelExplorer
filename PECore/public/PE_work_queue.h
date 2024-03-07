@@ -28,6 +28,14 @@ namespace pecore {
 		// Takes the first work item from the queue and runs it and returns true, returns false if no work was available
 		bool PerformWork();
 
+		// Should be called on the worker thread before performing work
+		// this ensures only one worker is running at a time
+		void WorkerEntry();
+
+		// Should be called on the worker thread once it will no longer perform work
+		// this ensures the WorkQueue will not be destroyed before the worker exits
+		void WorkerExit();
+
 	private:
 		struct WorkBase;
 		struct AsyncWork;
@@ -36,9 +44,10 @@ namespace pecore {
 		WorkBase* work_head_;
 		WorkBase* work_tail_;
 		std::mutex work_mutex_;
+		std::mutex worker_sync_mutex_;
 		std::condition_variable work_condition_;
+		bool force_wake_;
 
-		static void DummyWork(void*);
 		void PushWork(WorkBase* work);
 	};
 }

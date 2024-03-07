@@ -28,6 +28,7 @@ namespace pecore {
 
 	void ThreadWorker::ThreadWorkerEntry()
 	{
+		work_queue_.WorkerEntry();
 		PE_DEBUG_ASSERT(enable_flag_, PE_TEXT("ThreadWorker enable_flag_ was false during start"));
 		// Ensure all work is completed before exiting
 		// Note: if there is recursive work this thread may never exit and cause a softlock
@@ -40,5 +41,7 @@ namespace pecore {
 
 			has_work = work_queue_.PerformWork();
 		}
+
+		work_queue_.WorkerExit();
 	}
 }

@@ -29,10 +29,15 @@ namespace pecore {
 	{
 		work_head_ = nullptr;
 		work_tail_ = nullptr;
+		force_wake_ = false;
 	}
 
 	WorkQueue::~WorkQueue()
 	{
+		ForceWaitWakeup();
+		// Ensure worker has exited
+		worker_sync_mutex_.lock();
+		worker_sync_mutex_.unlock();
 		work_mutex_.lock();
 		if (work_tail_ || work_head_) {
 			PE_LogError(PE_LOG_CATEGORY_CORE, PE_TEXT("WorkQueue destroyed with work pending"));
@@ -78,13 +83,14 @@ namespace pecore {
 	void WorkQueue::WaitForWork()
 	{
 		std::unique_lock lock(work_mutex_);
-		work_condition_.wait(lock, [&] { return work_head_ != nullptr; });
+		work_condition_.wait(lock, [&] { return work_head_ != nullptr || force_wake_; });
+		force_wake_ = false;
 	}
 
 	void WorkQueue::ForceWaitWakeup()
 	{
-		// Pushing work forces a wakeup and blocking to prevent possible allocation failure
-		PushBlockingWork(DummyWork);
+		force_wake_ = true;
+		work_condition_.notify_one();
 	}
 
 	bool WorkQueue::PerformWork()
@@ -117,7 +123,14 @@ namespace pecore {
 		}
 	}
 
-	void WorkQueue::DummyWork(void*) {}
+	void WorkQueue::WorkerEntry() {
+		// Ensure only one worker by locking the worker mutex here and releasing it in WorkerExit()
+		worker_sync_mutex_.lock();
+	}
+
+	void WorkQueue::WorkerExit() {
+		worker_sync_mutex_.unlock();
+	}
 
 	void WorkQueue::PushWork(WorkBase* work)
 	{
