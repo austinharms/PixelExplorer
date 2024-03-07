@@ -9,13 +9,20 @@ using namespace pecore;
 using namespace pe_graphics;
 
 void PET_main(int* returnValue, int argc, char** argv) {
-	for (int i = 0; i < 100; ++i) {
+	PE_Shader* shader = nullptr;
+	for (int i = 0; i < 1; ++i) {
 		SDL_Window* window = PE_CreateWindow(PE_TEXT("Test Window"), 1000, 800, 0);
 		PE_ASSERT(window, PE_TEXT("Failed to create SDL window"));
+		if (i == 0) {
+			shader = PE_LoadShader("test");
+			PE_ASSERT(shader, PE_TEXT("Failed to load test shader"));
+		}
+
 		PE_DestroyWindow(window);
 	}
 	
-	PE_StopSDLEventLoop();
+	PE_UnloadShader(shader);
+	EventLoop::Stop();
 	*returnValue = 0;
 }
 
@@ -28,9 +35,9 @@ int main(int argc, char** argv)
 	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init SDL %") SDL_PRIs32, returnRes);
 	returnRes = PE_InitGraphicsAdapter();
 	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init PE_Graphics %") SDL_PRIs32, returnRes);
-	PE_PrepareSDLEventLoop();
+	EventLoop::Prepare();
 	std::thread appThread(PET_main, &returnRes, argc, argv);
-	PE_RunSDLEventLoop();
+	EventLoop::Start();
 	appThread.join();
 	PE_QuitGraphicsAdapter();
 	return returnRes;
