@@ -1,21 +1,31 @@
 #ifndef PE_GRAPHICS_H_
 #define PE_GRAPHICS_H_
 #include "PE_defines.h"
-#include "PE_graphics_types.h"
 
-// An empty macro that will prevent the function from being generated in PE_dgapi.h
-#define PE_NO_DGAPI
-namespace pecore::pe_graphics {
+// Functions using this will be generated in PE_generated_graphics_api.h header file
+#define PE_GRAPHICS_API PE_API
+// Empty macro used to created functions that are only generated in the PE_generated_graphics_api.h header file
+#define PE_GRAPHICS_ONLY_API(...) 
+
+struct SDL_Window;
+
+namespace pecore::graphics {
+	struct Shader {};
+
 	// Sets up the graphics adapter, returns 0 on success
 	// Note: must be run on the events aka main thread
 	// positive return values are reserved for PE_ERROR_* codes
-	PE_NO_DGAPI PE_NODISCARD PE_API int PE_CALL PE_InitGraphicsAdapter();
-	// Quits the graphics adapter created by PE_InitGraphicsAdapter
+	PE_NODISCARD PE_API int PE_CALL Init();
+
+	// Quits the graphics adapter created by Init()
 	// Note: must be run on the events aka main thread
-	PE_NO_DGAPI PE_API void PE_CALL PE_QuitGraphicsAdapter();
-	PE_NODISCARD PE_API SDL_Window* PE_CALL PE_CreateWindow(char* title, int width, int height, Uint32 flags);
-	PE_API void PE_CALL PE_DestroyWindow(SDL_Window* window);
-	PE_API PE_Shader* PE_CALL PE_LoadShader(const char* name);
-	PE_NODISCARD PE_API void PE_CALL PE_UnloadShader(PE_Shader* shader);
+	PE_API void PE_CALL Quit();
+
+	PE_GRAPHICS_ONLY_API(PE_GRAPHICS_API int PE_CALL InitSystem();)
+	PE_GRAPHICS_ONLY_API(PE_GRAPHICS_API void PE_CALL QuitSystem();)
+	PE_NODISCARD PE_GRAPHICS_API SDL_Window* PE_CALL CreateWindow(char* title, int width, int height, Uint32 flags);
+	PE_GRAPHICS_API void PE_CALL DestroyWindow(SDL_Window* window);
+	PE_GRAPHICS_API Shader* PE_CALL LoadShader(const char* name);
+	PE_NODISCARD PE_GRAPHICS_API void PE_CALL UnloadShader(Shader* shader);
 }
 #endif // !PE_GRAPHICS_H_ 
