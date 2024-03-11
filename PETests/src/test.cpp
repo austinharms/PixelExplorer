@@ -8,7 +8,7 @@ using namespace pecore;
 
 void PET_main(int* returnValue, int argc, char** argv) {
 	graphics::Shader* shader = nullptr;
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		SDL_Window* window = graphics::CreateWindow(PE_TEXT("Test Window"), 1000, 800, 0);
 		PE_ASSERT(window, PE_TEXT("Failed to create SDL window"));
 		if (i == 0) {

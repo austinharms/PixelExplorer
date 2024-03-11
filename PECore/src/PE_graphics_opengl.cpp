@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 // Should all windows use one OpenGl context and render on the event loop aka main thread
 // Note: this does not ensure only one context exists,
@@ -47,6 +48,20 @@
 
 namespace pecore::graphics::implementation {
 	namespace {
+		struct GlShader : public Shader {
+			size_t ref_count;
+			const std::string* cache_key;
+			GLuint program;
+			bool loaded;
+
+			GlShader() :
+				ref_count(0),
+				cache_key(nullptr),
+				program(0),
+				loaded(false) {
+			}
+		};
+
 		struct OpenGlGraphicsImp : public GraphicsCommands {
 #if PE_GL_SINGLE_CONTEXT
 			GladGLContext primary_ctx;
@@ -56,11 +71,9 @@ namespace pecore::graphics::implementation {
 			GladGLContext background_ctx;
 			ThreadWorker background_worker;
 #endif
+			std::unordered_map<std::string, GlShader> shader_cache;
+			std::mutex shader_cache_mutex;
 			bool init;
-		};
-
-		struct GlShader : public Shader {
-			GLuint program;
 		};
 
 		struct CreateSdlWindowParams {
@@ -433,25 +446,27 @@ namespace pecore::graphics::implementation {
 
 		Shader* LoadShaderImp(const char* name) {
 			PE_GL_REQUIRE_CTX(PE_TEXT("You must create a window before calling LoadShader"), nullptr);
-			std::filesystem::path shader_path(std::filesystem::path(PE_TEXT("res")) / PE_TEXT("shaders") / name);
-			shader_path.concat(PE_TEXT(".pegls"));
-			PE_LogVerbose(PE_LOG_CATEGORY_RENDER, PE_TEXT("Loading Shader %s from %s"), name, shader_path.generic_string().c_str());
-			std::ifstream shader_stream;
-			std::streampos shader_end;
-			int err = PE_GetFileHandle(shader_path, shader_stream, shader_end);
-			if (err != PE_ERROR_NONE) {
-				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, error code: %") SDL_PRIs32, name, err);
-				return nullptr;
-			}
-
-			GlShader* shader = static_cast<GlShader*>(PE_malloc(sizeof(GlShader)));
-			if (!shader) {
-				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate shader %s"), name);
-				return nullptr;
-			}
-
-			memset(shader, 0, sizeof(GlShader));
+			std::lock_guard cache_lock(self->shader_cache_mutex);
+			const std::string* name_ptr = nullptr;
 			try {
+				auto cache_res = self->shader_cache.insert({ name, GlShader()});
+				name_ptr = &cache_res.first->first;
+				GlShader& shader = cache_res.first->second;
+				if (shader.loaded) {
+					shader.ref_count += 1;
+					return static_cast<Shader*>(&shader);
+				}
+
+				std::filesystem::path shader_path(std::filesystem::path(PE_TEXT("res")) / PE_TEXT("shaders") / name);
+				shader_path.concat(PE_TEXT(".pegls"));
+				PE_LogVerbose(PE_LOG_CATEGORY_RENDER, PE_TEXT("Loading Shader %s from %s"), name, shader_path.generic_string().c_str());
+				std::ifstream shader_stream;
+				std::streampos shader_end;
+				int err = PE_GetFileHandle(shader_path, shader_stream, shader_end);
+				if (err != PE_ERROR_NONE) {
+					throw err;
+				}
+
 				// 0: vertex source
 				// 1: fragment source
 				std::stringstream shader_source_streams[2];
@@ -464,9 +479,7 @@ namespace pecore::graphics::implementation {
 						cur_shader = 1;
 					}
 					else if (cur_shader < 0 || cur_shader > 1) {
-						PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, failed to parse OpenGL shader file"), name);
-						PE_free(shader);
-						return nullptr;
+						throw std::exception("failed to parse OpenGL shader file");
 					}
 					else {
 						if (!line.empty() && line[line.size() - 1] == '\r') {
@@ -481,33 +494,47 @@ namespace pecore::graphics::implementation {
 				shader_source_streams[0].clear();
 				std::string fragment_source(shader_source_streams[1].str());
 				shader_source_streams[1].clear();
-				CreateGlProgramParams create_params{ vertex_source.c_str(), fragment_source.c_str(), shader };
+				CreateGlProgramParams create_params{ vertex_source.c_str(), fragment_source.c_str(), &shader };
 				PE_GL_LOAD(CreateGlProgram, &create_params);
-				if (shader->program == 0) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s"), name);
-					PE_free(shader);
-					return nullptr;
+				if (shader.program == 0) {
+					throw PE_ERROR_GENERAL;
 				}
+
+				shader.cache_key = name_ptr;
+				shader.ref_count = 1;
+				shader.loaded = true;
+				return static_cast<Shader*>(&shader);
 			}
-			catch (const std::bad_alloc& e) {
+			catch (const int& code) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, error code: %") SDL_PRIs32, name, code);
+			}
+			catch (const std::exception& e) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, error: %s"), name, e.what());
-				PE_free(shader);
-				return nullptr;
 			}
 			catch (...) {
-				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, unknow error"), name);
-				PE_free(shader);
-				return nullptr;
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, unknown error"), name);
 			}
 
-			return static_cast<Shader*>(shader);
+			if (name_ptr) {
+				try {
+					self->shader_cache.erase(*name_ptr);
+				}
+				catch (...) {}
+			}
+
+			return nullptr;
 		}
 
 		void UnloadShaderImp(Shader* shader) {
 			if (shader) {
 				GlShader* gl_shader = static_cast<GlShader*>(shader);
-				PE_GL_LOAD(DeleteGlProgram, gl_shader);
-				PE_free(gl_shader);
+				if (--gl_shader->ref_count == 0) {
+					std::lock_guard cache_lock(self->shader_cache_mutex);
+					if (gl_shader->ref_count == 0) {
+						PE_GL_LOAD(DeleteGlProgram, gl_shader);
+						self->shader_cache.erase(*(gl_shader->cache_key));
+					}
+				}
 			}
 		}
 	}
