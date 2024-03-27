@@ -3,10 +3,11 @@ import sys
 import os
 import re
 
-regex = r"\s?\w*\s*PE_GRAPHICS_API\s+(\b\S+\b\**)\s+PE_CALL\s(\w+)\((.*)\);"
+comment_regex = r"^\s*\/\/.*\n"
+func_regex = r"\s?\w*\s*PE_GRAPHICS_API\s+(\b\S+\b\**)\s+PE_CALL\s(\w+)\((.*)\);"
 srcFile = open(os.path.join(sys.argv[1], "public", "PE_graphics.h"));
 dstFile = open(os.path.join(sys.argv[1], "private", "PE_generated_graphics_api.h"), "w")
-functions = re.finditer(regex, srcFile.read(), re.MULTILINE)
+functions = re.finditer(func_regex, re.sub(comment_regex, "", srcFile.read(), 0, re.MULTILINE), re.MULTILINE)
 srcFile.close()
 
 fileHeader = """// THIS IS AN AUTO GENERATED FILE DO NOT EDIT
