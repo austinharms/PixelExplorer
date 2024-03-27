@@ -8,7 +8,7 @@ namespace pecore {
 	typedef void (*PE_WorkFunction)(void*);
 
 	// A FIFO queue of work to be performed on a different thread
-	// Note: this only expects one "consumer" thread to exist and ForceWaitWakeup may break with multipule threads
+	// Note: this only expects one "consumer" thread to exist and ForceWaitWakeup may break with multiple threads
 	class WorkQueue final {
 	public:
 		WorkQueue();
