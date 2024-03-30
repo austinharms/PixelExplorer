@@ -18,12 +18,12 @@
 // Note: this does not ensure only one context exists,
 // if PE_OGL_BACKGROUND_LOADING is true it will still create it's own context
 #ifndef PE_GL_SINGLE_CONTEXT
-#define PE_GL_SINGLE_CONTEXT 0
+#define PE_GL_SINGLE_CONTEXT 1
 #endif // !PE_GL_SINGLE_CONTEXT
 
 // Should we create and use a worker thread and context to load OpenGL data
 #ifndef PE_GL_BACKGROUND_LOADING
-#define PE_GL_BACKGROUND_LOADING 1
+#define PE_GL_BACKGROUND_LOADING 0
 #endif // !PE_GL_BACKGROUND_LOADING
 
 #if PE_GL_SINGLE_CONTEXT == 0 && PE_GL_BACKGROUND_LOADING == 0
@@ -40,6 +40,13 @@
 
 namespace pecore::graphics::implementation {
 	namespace {
+		constexpr GLenum GlIndexTypeLookup[] = { GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT };
+		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlIndexTypeLookup) == PE_INDEX_ENUM_VALUE_COUNT, PE_TEXT("GlIndexTypeLookup array need to be updated"));
+		constexpr GLenum GlMeshAttribTypeLookup[] = { GL_FLOAT, GL_HALF_FLOAT, GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT };
+		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlMeshAttribTypeLookup) == PE_MESH_ATR_ENUM_VALUE_COUNT, PE_TEXT("GlMeshAttribTypeLookup array need to be updated"));
+		constexpr GLenum GlCullFaceLookup[] = { GL_BACK, GL_FRONT, GL_FRONT_AND_BACK, GL_BACK };
+		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlCullFaceLookup) == PE_CULL_ENUM_VALUE_COUNT, PE_TEXT("GlCullFaceLookup array need to be updated"));
+
 		struct GlShader : public Shader {
 			size_t ref_count;
 			const std::string* cache_key;
@@ -52,6 +59,93 @@ namespace pecore::graphics::implementation {
 				program(0),
 				loaded(false) {
 			}
+		};
+
+		struct GlRenderMesh : public RenderMesh {
+			enum {
+				BUF_VERTEX = 0,
+				BUF_ELEMENT = 1,
+			};
+
+			GLuint buffers[2];
+			GLuint vao;
+			IndexType index_type;
+		};
+
+		enum GlCommandType : uint32_t
+		{
+			GL_CMD_SHADER = 0,
+			GL_CMD_MESH,
+			GL_CMD_DRAW,
+			GL_CMD_UNIFORM_VALUE,
+			GL_CMD_CULL_FACE,
+		};
+
+		template<class ValueT>
+		struct GlCmdPad {
+			enum { val = sizeof(ValueT) % 8 };
+		};
+
+		template<class ValueT, size_t PAD>
+		struct GlCommandBase {
+			constexpr GlCommandBase(GlCommandType cmd_type, const ValueT& cmd_value) :
+				cmd_size(sizeof(ValueT) + sizeof(uint32_t) + sizeof(GlCommandType) + PAD),
+				type(cmd_type),
+				value(cmd_value) {
+			}
+
+			uint32_t cmd_size;
+			GlCommandType type;
+			ValueT value;
+			uint8_t pad[PAD];
+		};
+
+		template<class ValueT>
+		struct GlCommandBase<ValueT, 0> {
+			constexpr GlCommandBase(GlCommandType cmd_type, const ValueT& cmd_value) :
+				cmd_size(sizeof(ValueT) + sizeof(uint32_t) + sizeof(GlCommandType)),
+				type(cmd_type),
+				value(cmd_value) {
+			}
+
+			uint32_t cmd_size;
+			GlCommandType type;
+			ValueT value;
+		};
+
+		template<class ValueT>
+		struct GlCommand : public GlCommandBase<ValueT, GlCmdPad<ValueT>::val> {
+			using GlCommandBase<ValueT, GlCmdPad<ValueT>::val>::GlCommandBase;
+		};
+
+		struct GlCommandBuffer {
+			GlCommandBuffer* next;
+			uint64_t* tail;
+			uint64_t data[2048];
+		};
+
+		struct GlCommandQueue : public CommandQueue {
+			GlCommandBuffer command_buffer;
+			GlCommandBuffer* active_buffer;
+		};
+
+		struct GlCommandExecutionState {
+			GLuint program;
+			GLuint mesh_vao;
+			GLenum index_type;
+		};
+
+		struct GlRGB8Color {
+			uint8_t r;
+			uint8_t g;
+			uint8_t b;
+		};
+
+		struct GlRect {
+			int x;
+			int y;
+			size_t width;
+			size_t height;
 		};
 
 		struct OpenGlGraphicsImp : public GraphicsCommands {
@@ -105,6 +199,14 @@ namespace pecore::graphics::implementation {
 		PE_FORCEINLINE void RunWorker(ThreadWorker& worker, Args&&... args) {
 			auto params = std::forward_as_tuple(args ...);
 			worker.RunBlocking(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+		}
+
+		PE_FORCEINLINE GladGLContext& GetBackgroundGladContext() {
+#if PE_GL_BACKGROUND_LOADING
+			return self->background_ctx;
+#else
+			return self->primary_ctx;
+#endif
 		}
 
 		// return_vale is a SDL return value not PE_ERROR
@@ -248,11 +350,7 @@ namespace pecore::graphics::implementation {
 		}
 
 		void CreateGlProgram(const char* vertex_source, const char* frag_source, GlShader& shader) {
-#if PE_GL_BACKGROUND_LOADING
-			GladGLContext& gl = self->background_ctx;
-#else
-			GladGLContext& gl = self->primary_ctx;
-#endif
+			GladGLContext& gl = GetBackgroundGladContext();
 			shader.program = 0;
 			GLint compiled;
 			GLuint vert_shader = gl.CreateShader(GL_VERTEX_SHADER);
@@ -317,14 +415,171 @@ namespace pecore::graphics::implementation {
 		}
 
 		void DeleteGlProgram(GlShader* shader) {
-#if PE_GL_BACKGROUND_LOADING
-			GladGLContext& gl = self->background_ctx;
-#else
-			GladGLContext& gl = self->primary_ctx;
-#endif
-
+			GladGLContext& gl = GetBackgroundGladContext();
 			gl.DeleteProgram(shader->program);
 			shader->program = 0;
+		}
+
+		void CreateGlMesh(GlRenderMesh& mesh, MeshFormatAttrib* format_attributes, size_t attribute_count, void* vertices, size_t vertices_size, void* indices, size_t indices_size) {
+			GladGLContext& gl = GetBackgroundGladContext();
+			mesh.vao = 0;
+			mesh.buffers[GlRenderMesh::BUF_VERTEX] = 0;
+			mesh.buffers[GlRenderMesh::BUF_ELEMENT] = 0;
+			gl.GenVertexArrays(1, &mesh.vao);
+			if (mesh.vao == 0) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create OpenGL vertex array (RenderMesh)"));
+				return;
+			}
+
+			gl.GenBuffers(PE_ARRAY_LEN(mesh.buffers), mesh.buffers);
+			for (int i = 0; i < PE_ARRAY_LEN(mesh.buffers); ++i) {
+				if (mesh.buffers[i] == 0) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create OpenGL buffer (RenderMesh)"));
+					gl.DeleteVertexArrays(1, &mesh.vao);
+					mesh.vao = 0;
+					return;
+				}
+			}
+
+			gl.BindVertexArray(mesh.vao);
+			gl.BindBuffer(GL_ARRAY_BUFFER, mesh.buffers[GlRenderMesh::BUF_VERTEX]);
+			gl.BufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
+			// TDOD Check if data was uploaded
+			for (size_t i = 0; i < attribute_count; ++i) {
+				MeshFormatAttrib& attrib = format_attributes[i];
+				gl.VertexAttribPointer(attrib.location, attrib.size, GlMeshAttribTypeLookup[attrib.type], attrib.normalized ? GL_TRUE : GL_FALSE, attrib.stride, reinterpret_cast<void*>(static_cast<uintptr_t>(attrib.offset)));
+				gl.EnableVertexAttribArray(attrib.location);
+			}
+
+			gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.buffers[GlRenderMesh::BUF_ELEMENT]);
+			// TDOO Check if data was uploaded
+			gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW);
+		}
+
+		void DeleteGlMesh(GlRenderMesh& mesh) {
+			GladGLContext& gl = GetBackgroundGladContext();
+			gl.DeleteVertexArrays(1, &mesh.vao);
+			gl.DeleteBuffers(PE_ARRAY_LEN(mesh.buffers), mesh.buffers);
+		}
+
+		template<class ValueT>
+		PE_NODISCARD int PushGlCommand(GlCommandQueue& queue, GlCommandType type, const ValueT& value) {
+			PE_STATIC_ASSERT(sizeof(GlCommand<ValueT>) < sizeof(GlCommandBuffer::data), PE_TEXT("GlCommand Too Big for GlCommandBuffer"));
+			constexpr size_t command_size = sizeof(GlCommand<ValueT>);
+			size_t active_buffer_remaining = sizeof(GlCommandBuffer::data) - (reinterpret_cast<uintptr_t>(queue.active_buffer->tail) - reinterpret_cast<uintptr_t>(queue.active_buffer->data));
+			if (active_buffer_remaining < command_size) {
+				GlCommandBuffer* buf = static_cast<GlCommandBuffer*>(PE_malloc(sizeof(GlCommandBuffer)));
+				if (!buf) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate OpenGL command buffer"));
+					return PE_ERROR_OUT_OF_MEMORY;
+				}
+
+				buf->tail = buf->data;
+				buf->next = nullptr;
+				queue.active_buffer->next = buf;
+				queue.active_buffer = buf;
+			}
+
+			new (static_cast<void*>(queue.active_buffer->tail)) GlCommand<ValueT>(type, value);
+			PE_STATIC_ASSERT(alignof(GlCommand<ValueT>) <= sizeof(queue.active_buffer->tail[0]) &&
+				sizeof(queue.active_buffer->tail[0]) % alignof(GlCommand<ValueT>) == 0,
+				PE_TEXT("GlCommand can not be aligned to command buffer data type (8 bytes)"));
+			PE_STATIC_ASSERT(command_size % sizeof(queue.active_buffer->tail[0]) == 0, PE_TEXT("GlCommand size is not a multiple of command buffer data type (8 bytes)"));
+			queue.active_buffer->tail += command_size / 8;
+			PE_DEBUG_ASSERT(reinterpret_cast<uintptr_t>(&(queue.active_buffer->data[0])) + sizeof(GlCommandBuffer::data) >= reinterpret_cast<uintptr_t>(queue.active_buffer->tail), PE_TEXT("GlCommandBuffer Overrun"));
+			return PE_ERROR_NONE;
+		}
+
+		int ExecuteGlCommandBuffer(GladGLContext& gl, GlCommandExecutionState& state, GlCommandBuffer& buffer) {
+			uint8_t* buffer_head = reinterpret_cast<uint8_t*>(buffer.data);
+			while (reinterpret_cast<uintptr_t>(buffer_head) < reinterpret_cast<uintptr_t>(buffer.tail))
+			{
+				// uint64_t is just a dummy type to allow reading of the true size and type of the current command
+				GlCommand<uint64_t>* cur_cmd = reinterpret_cast<GlCommand<uint64_t>*>(buffer_head);
+				switch (cur_cmd->type)
+				{
+				case GL_CMD_SHADER: {
+					GLuint program = reinterpret_cast<GlCommand<GLuint>*>(cur_cmd)->value;
+					if (state.program != program) {
+						gl.UseProgram(program);
+						state.program = program;
+					}
+				} break;
+				case GL_CMD_MESH:
+				{
+					GlRenderMesh& mesh = reinterpret_cast<GlCommand<GlRenderMesh>*>(cur_cmd)->value;
+					if (state.mesh_vao != mesh.vao) {
+						gl.BindVertexArray(mesh.vao);
+						gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.buffers[GlRenderMesh::BUF_ELEMENT]);
+						state.mesh_vao = mesh.vao;
+						state.index_type = GlIndexTypeLookup[mesh.index_type];
+					}
+				} break;
+				case GL_CMD_DRAW: {
+					std::pair<size_t, size_t>& pair = reinterpret_cast<GlCommand<std::pair<size_t, size_t>>*>(cur_cmd)->value;
+					gl.DrawElements(GL_TRIANGLES, pair.first, state.index_type, reinterpret_cast<void*>(pair.second));
+				} break;
+				case GL_CMD_UNIFORM_VALUE:
+					PE_DEBUG_ASSERT(false, PE_TEXT("ExecuteGlCommandBuffer GL_CMD_UNIFORM_VALUE not implemented"));
+					break;
+				case GL_CMD_CULL_FACE: {
+					CullMode mode = reinterpret_cast<GlCommand<CullMode>*>(cur_cmd)->value;
+					if (mode == PE_CULL_NONE) {
+						gl.Disable(GL_CULL_FACE);
+					}
+					else {
+						gl.Enable(GL_CULL_FACE);
+						gl.CullFace(GlCullFaceLookup[mode]);
+					}
+				} break;
+				default:
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to execute OpenGL command buffer, unknow command type: %") SDL_PRIu32, cur_cmd->type);
+					return PE_ERROR_INVALID_PARAMETERS;
+					break;
+				}
+
+				buffer_head += cur_cmd->cmd_size;
+			}
+
+			return PE_ERROR_NONE;
+		}
+
+		void ExecuteGlCommandQueues(GladGLContext& gl, SDL_Window* target_window, GlCommandQueue** queues, size_t queue_count, int& return_value) {
+			GlCommandExecutionState state;
+			memset(&state, 0, sizeof(state));
+#if PE_GL_SINGLE_CONTEXT
+			int res = SDL_GL_MakeCurrent(target_window, gl.userptr);
+			if (res != 0) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed execute command queue, failed set window context active: %s"), SDL_GetError());
+				return_value = PE_ERROR_GENERAL;
+				return;
+			}
+#endif
+			int w, h;
+			SDL_GetWindowSizeInPixels(target_window, &w, &h);
+			gl.Viewport(0, 0, w, h);
+			gl.PolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			// TODO color, scissor and, swap interval should be taken from some kind of Camera struct
+			gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			gl.Clear(GL_COLOR_BUFFER_BIT);
+			SDL_GL_SetSwapInterval(0);
+
+			for (size_t i = 0; i < queue_count; ++i) {
+				GlCommandBuffer* buf = &(queues[i]->command_buffer);
+				while (buf)
+				{
+					int rtn = ExecuteGlCommandBuffer(gl, state, *buf);
+					if (rtn != 0) {
+						return_value = rtn;
+						return;
+					}
+
+					buf = buf->next;
+				}
+			}
+
+			SDL_GL_SwapWindow(target_window);
+			return_value = PE_ERROR_NONE;
 		}
 
 		// Create graphics *Imp function declaration
@@ -385,6 +640,8 @@ namespace pecore::graphics::implementation {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set attribute SDL_GL_CONTEXT_PROFILE_MASK: %s"), SDL_GetError());
 				return -5;
 			}
+
+			SDL_GL_GetSwapInterval(0);
 
 			// Copy function pointers into GraphicsCommands struct
 #define PE_GENERATED_GRAPHICS_API(rc, fn, params, args, ret) self->##fn = fn##Imp;
@@ -510,6 +767,160 @@ namespace pecore::graphics::implementation {
 					}
 				}
 			}
+		}
+
+		RenderMesh* CreateMeshImp(void* vertices, size_t vertices_size, void* indices, size_t indices_size, IndexType index_type, MeshFormatAttrib* format_attributes, size_t attribute_count) {
+			if (!format_attributes || attribute_count == 0 || !vertices || vertices_size == 0 || !indices || indices_size == 0 || index_type >= PE_INDEX_ENUM_VALUE_COUNT) {
+				PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Invalid parameters sent to UploadMeshVertices"));
+				return nullptr;
+			}
+
+			GlRenderMesh* mesh = static_cast<GlRenderMesh*>(PE_malloc(sizeof(GlRenderMesh)));
+			if (!mesh) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate OpenGL RenderMesh"));
+				return nullptr;
+			}
+
+			mesh->index_type = index_type;
+			RunLoadWork<CreateGlMesh>(*mesh, format_attributes, attribute_count, vertices, vertices_size, indices, indices_size);
+			if (mesh->vao == 0) {
+				PE_free(mesh);
+				return nullptr;
+			}
+
+			return static_cast<RenderMesh*>(mesh);
+		}
+
+		void DestroyMeshImp(RenderMesh* mesh) {
+			if (!mesh) {
+				return;
+			}
+
+			GlRenderMesh* gl_mesh = static_cast<GlRenderMesh*>(mesh);
+			if (gl_mesh->vao != 0) {
+				RunLoadWork<DeleteGlMesh>(*gl_mesh);
+			}
+
+			PE_free(gl_mesh);
+		}
+
+		CommandQueue* CreateCommandQueueImp() {
+			GlCommandQueue* cmd_queue = static_cast<GlCommandQueue*>(PE_malloc(sizeof(GlCommandQueue)));
+			if (!cmd_queue) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate OpenGL command queue"));
+				return nullptr;
+			}
+
+			cmd_queue->active_buffer = &cmd_queue->command_buffer;
+			cmd_queue->active_buffer->tail = cmd_queue->active_buffer->data;
+			cmd_queue->command_buffer.next = nullptr;
+			return static_cast<CommandQueue*>(cmd_queue);
+		}
+
+		void ClearCommandQueueImp(CommandQueue* queue) {
+			if (!queue) {
+				return;
+			}
+
+			GlCommandQueue* cmd_queue = static_cast<GlCommandQueue*>(queue);
+			GlCommandBuffer* buf = &cmd_queue->command_buffer;
+			while (buf != nullptr)
+			{
+				buf->tail = buf->data;
+				buf = buf->next;
+			}
+		}
+
+		void DestroyCommandQueueImp(CommandQueue* queue) {
+			if (!queue) {
+				return;
+			}
+
+			GlCommandQueue* cmd_queue = static_cast<GlCommandQueue*>(queue);
+			GlCommandBuffer* sub_buffer = cmd_queue->command_buffer.next;
+			while (sub_buffer != nullptr)
+			{
+				GlCommandBuffer* buf = sub_buffer;
+				sub_buffer = buf->next;
+				PE_free(buf);
+			}
+
+			PE_free(cmd_queue);
+		}
+
+		int RenderToWindowImp(SDL_Window* target_window, CommandQueue** queues, size_t queue_count) {
+			if (!queues || !target_window) {
+				return PE_ERROR_INVALID_PARAMETERS;
+			}
+
+			if (queue_count == 0) {
+				return PE_ERROR_NONE;
+			}
+
+			for (size_t i = 0; i < queue_count; ++i) {
+				if (queues[i] == nullptr) {
+					return PE_ERROR_INVALID_PARAMETERS;
+				}
+			}
+
+			int return_value = 0;
+#if PE_GL_SINGLE_CONTEXT
+			RunMainWork<ExecuteGlCommandQueues>(self->primary_ctx, target_window, reinterpret_cast<GlCommandQueue**>(queues), queue_count, return_value);
+#else
+			WindowContext* window_ctx = nullptr;
+			SDL_PropertiesID props = SDL_GetWindowProperties(target_window);
+			if (props != 0) {
+				window_ctx = static_cast<WindowContext*>(SDL_GetProperty(props, PE_GL_CTX_KEY, nullptr));
+			}
+			else {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed execute command queue, failed to get window context: %s"), SDL_GetError());
+				return PE_ERROR_GENERAL;
+			}
+
+			if (!window_ctx) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed execute command queue, window missing context"));
+				return PE_ERROR_GENERAL;
+			}
+
+			RunWorker<ExecuteGlCommandQueues>(window_ctx->worker, window_ctx->glad_ctx, target_window, reinterpret_cast<GlCommandQueue**>(queues), queue_count, return_value);
+#endif
+			return return_value;
+		}
+
+		int CommandSetShaderImp(CommandQueue* queue, Shader* shader) {
+			if (!queue || !shader) {
+				return PE_ERROR_INVALID_PARAMETERS;
+			}
+
+			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_SHADER, static_cast<GlShader*>(shader)->program);
+		}
+
+		int CommandSetMeshImp(CommandQueue* queue, RenderMesh* mesh) {
+			if (!queue || !mesh) {
+				return PE_ERROR_INVALID_PARAMETERS;
+			}
+
+			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_MESH, *static_cast<GlRenderMesh*>(mesh));
+		}
+
+		int CommandDrawMeshImp(CommandQueue* queue, size_t index_count, size_t index_offset) {
+			if (!queue || index_count % 3 != 0) {
+				return PE_ERROR_INVALID_PARAMETERS;
+			}
+
+			if (index_count == 0) {
+				return PE_ERROR_NONE;
+			}
+
+			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_DRAW, std::pair<size_t, size_t>(index_count, index_offset));
+		}
+
+		int CommandCullImp(CommandQueue* queue, CullMode mode) {
+			if (!queue || mode >= PE_CULL_ENUM_VALUE_COUNT) {
+				return PE_ERROR_INVALID_PARAMETERS;
+			}
+
+			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_CULL_FACE, mode);
 		}
 	}
 
