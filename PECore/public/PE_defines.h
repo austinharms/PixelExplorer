@@ -21,6 +21,7 @@
 #define PE_TEXT_INTERNAL(text) text
 #define PE_TEXT(text) PE_TEXT_INTERNAL(text)
 #define PE_STATIC_ASSERT(exp, msg) static_assert(exp, msg)
+#define PE_EXTERN_C extern "C"
 
 #if !defined(NDEBUG) || defined(DEBUG)
 #define PE_DEBUG 1

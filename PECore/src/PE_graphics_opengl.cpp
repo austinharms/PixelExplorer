@@ -47,7 +47,7 @@ namespace pecore::graphics::implementation {
 		constexpr GLenum GlCullFaceLookup[] = { GL_BACK, GL_FRONT, GL_FRONT_AND_BACK, GL_BACK };
 		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlCullFaceLookup) == PE_CULL_ENUM_VALUE_COUNT, PE_TEXT("GlCullFaceLookup array need to be updated"));
 
-		struct GlShader : public Shader {
+		struct GlShader {
 			size_t ref_count;
 			const std::string* cache_key;
 			GLuint program;
@@ -61,7 +61,7 @@ namespace pecore::graphics::implementation {
 			}
 		};
 
-		struct GlRenderMesh : public RenderMesh {
+		struct GlRenderMesh {
 			enum {
 				BUF_VERTEX = 0,
 				BUF_ELEMENT = 1,
@@ -69,7 +69,7 @@ namespace pecore::graphics::implementation {
 
 			GLuint buffers[2];
 			GLuint vao;
-			IndexType index_type;
+			PE_IndexType index_type;
 		};
 
 		enum GlCommandType : uint32_t
@@ -124,7 +124,7 @@ namespace pecore::graphics::implementation {
 			uint64_t data[2048];
 		};
 
-		struct GlCommandQueue : public CommandQueue {
+		struct GlCommandQueue {
 			GlCommandBuffer command_buffer;
 			GlCommandBuffer* active_buffer;
 		};
@@ -133,19 +133,6 @@ namespace pecore::graphics::implementation {
 			GLuint program;
 			GLuint mesh_vao;
 			GLenum index_type;
-		};
-
-		struct GlRGB8Color {
-			uint8_t r;
-			uint8_t g;
-			uint8_t b;
-		};
-
-		struct GlRect {
-			int x;
-			int y;
-			size_t width;
-			size_t height;
 		};
 
 		struct OpenGlGraphicsImp : public GraphicsCommands {
@@ -420,7 +407,7 @@ namespace pecore::graphics::implementation {
 			shader->program = 0;
 		}
 
-		void CreateGlMesh(GlRenderMesh& mesh, MeshFormatAttrib* format_attributes, size_t attribute_count, void* vertices, size_t vertices_size, void* indices, size_t indices_size) {
+		void CreateGlMesh(GlRenderMesh& mesh, PE_MeshFormatAttrib* format_attributes, size_t attribute_count, void* vertices, size_t vertices_size, void* indices, size_t indices_size) {
 			GladGLContext& gl = GetBackgroundGladContext();
 			mesh.vao = 0;
 			mesh.buffers[GlRenderMesh::BUF_VERTEX] = 0;
@@ -446,7 +433,7 @@ namespace pecore::graphics::implementation {
 			gl.BufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
 			// TDOD Check if data was uploaded
 			for (size_t i = 0; i < attribute_count; ++i) {
-				MeshFormatAttrib& attrib = format_attributes[i];
+				PE_MeshFormatAttrib& attrib = format_attributes[i];
 				gl.VertexAttribPointer(attrib.location, attrib.size, GlMeshAttribTypeLookup[attrib.type], attrib.normalized ? GL_TRUE : GL_FALSE, attrib.stride, reinterpret_cast<void*>(static_cast<uintptr_t>(attrib.offset)));
 				gl.EnableVertexAttribArray(attrib.location);
 			}
@@ -523,7 +510,7 @@ namespace pecore::graphics::implementation {
 					PE_DEBUG_ASSERT(false, PE_TEXT("ExecuteGlCommandBuffer GL_CMD_UNIFORM_VALUE not implemented"));
 					break;
 				case GL_CMD_CULL_FACE: {
-					CullMode mode = reinterpret_cast<GlCommand<CullMode>*>(cur_cmd)->value;
+					PE_CullMode mode = reinterpret_cast<GlCommand<PE_CullMode>*>(cur_cmd)->value;
 					if (mode == PE_CULL_NONE) {
 						gl.Disable(GL_CULL_FACE);
 					}
@@ -594,7 +581,7 @@ namespace pecore::graphics::implementation {
 		//		-3: Failed to set SDL_GL_CONTEXT_MAJOR_VERSION Attribute
 		//		-4: Failed to set SDL_GL_CONTEXT_MINOR_VERSION Attribute
 		//		-5: Failed to set SDL_GL_CONTEXT_PROFILE_MASK Attribute
-		int InitSystemImp() {
+		int PE_INTERNAL_InitGraphicsSystemImp() {
 			// This should not be possible but we should return an error all the same
 			if (self == nullptr) {
 				return PE_ERROR_OUT_OF_MEMORY;
@@ -650,7 +637,7 @@ namespace pecore::graphics::implementation {
 			return PE_ERROR_NONE;
 		}
 
-		void QuitSystemImp() {
+		void PE_INTERNAL_QuitGraphicsSystemImp() {
 			if (!self) {
 				return;
 			}
@@ -663,20 +650,20 @@ namespace pecore::graphics::implementation {
 			self = nullptr;
 		}
 
-		SDL_Window* CreateWindowImp(char* title, int width, int height, Uint32 flags) {
+		SDL_Window* PE_CreateWindowImp(char* title, int width, int height, Uint32 flags) {
 			SDL_Window* window = nullptr;
 			flags = (flags & ~(SDL_WINDOW_VULKAN | SDL_WINDOW_METAL)) | SDL_WINDOW_OPENGL;
 			RunMainWork<CreateSdlWindow>(title, width, height, flags, window);
 			return window;
 		}
 
-		void DestroyWindowImp(SDL_Window* window) {
+		void PE_DestroyWindowImp(SDL_Window* window) {
 			if (window) {
 				RunMainWork<DestroySdlWindow>(window);
 			}
 		}
 
-		Shader* LoadShaderImp(const char* name) {
+		PE_Shader* PE_LoadShaderImp(const char* name) {
 			PE_GL_REQUIRE_CTX(PE_TEXT("You must create a window before calling LoadShader"), nullptr);
 			std::lock_guard cache_lock(self->shader_cache_mutex);
 			const std::string* name_ptr = nullptr;
@@ -686,7 +673,7 @@ namespace pecore::graphics::implementation {
 				GlShader& shader = cache_res.first->second;
 				if (shader.loaded) {
 					shader.ref_count += 1;
-					return static_cast<Shader*>(&shader);
+					return reinterpret_cast<PE_Shader*>(&shader);
 				}
 
 				std::filesystem::path shader_path(std::filesystem::path(PE_TEXT("res")) / PE_TEXT("shaders") / name);
@@ -734,7 +721,7 @@ namespace pecore::graphics::implementation {
 				shader.cache_key = name_ptr;
 				shader.ref_count = 1;
 				shader.loaded = true;
-				return static_cast<Shader*>(&shader);
+				return reinterpret_cast<PE_Shader*>(&shader);
 			}
 			catch (const int& code) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to load shader %s, error code: %") SDL_PRIs32, name, code);
@@ -756,9 +743,9 @@ namespace pecore::graphics::implementation {
 			return nullptr;
 		}
 
-		void UnloadShaderImp(Shader* shader) {
+		void PE_UnloadShaderImp(PE_Shader* shader) {
 			if (shader) {
-				GlShader* gl_shader = static_cast<GlShader*>(shader);
+				GlShader* gl_shader = reinterpret_cast<GlShader*>(shader);
 				if (--gl_shader->ref_count == 0) {
 					std::lock_guard cache_lock(self->shader_cache_mutex);
 					if (gl_shader->ref_count == 0) {
@@ -769,7 +756,7 @@ namespace pecore::graphics::implementation {
 			}
 		}
 
-		RenderMesh* CreateMeshImp(void* vertices, size_t vertices_size, void* indices, size_t indices_size, IndexType index_type, MeshFormatAttrib* format_attributes, size_t attribute_count) {
+		PE_RenderMesh* PE_CreateRenderMeshImp(void* vertices, size_t vertices_size, void* indices, size_t indices_size, PE_IndexType index_type, PE_MeshFormatAttrib* format_attributes, size_t attribute_count) {
 			if (!format_attributes || attribute_count == 0 || !vertices || vertices_size == 0 || !indices || indices_size == 0 || index_type >= PE_INDEX_ENUM_VALUE_COUNT) {
 				PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Invalid parameters sent to UploadMeshVertices"));
 				return nullptr;
@@ -788,15 +775,15 @@ namespace pecore::graphics::implementation {
 				return nullptr;
 			}
 
-			return static_cast<RenderMesh*>(mesh);
+			return reinterpret_cast<PE_RenderMesh*>(mesh);
 		}
 
-		void DestroyMeshImp(RenderMesh* mesh) {
+		void PE_DestroyRenderMeshImp(PE_RenderMesh* mesh) {
 			if (!mesh) {
 				return;
 			}
 
-			GlRenderMesh* gl_mesh = static_cast<GlRenderMesh*>(mesh);
+			GlRenderMesh* gl_mesh = reinterpret_cast<GlRenderMesh*>(mesh);
 			if (gl_mesh->vao != 0) {
 				RunLoadWork<DeleteGlMesh>(*gl_mesh);
 			}
@@ -804,7 +791,7 @@ namespace pecore::graphics::implementation {
 			PE_free(gl_mesh);
 		}
 
-		CommandQueue* CreateCommandQueueImp() {
+		PE_GraphicsCommandQueue* PE_CreateGraphicsCommandQueueImp() {
 			GlCommandQueue* cmd_queue = static_cast<GlCommandQueue*>(PE_malloc(sizeof(GlCommandQueue)));
 			if (!cmd_queue) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate OpenGL command queue"));
@@ -814,15 +801,15 @@ namespace pecore::graphics::implementation {
 			cmd_queue->active_buffer = &cmd_queue->command_buffer;
 			cmd_queue->active_buffer->tail = cmd_queue->active_buffer->data;
 			cmd_queue->command_buffer.next = nullptr;
-			return static_cast<CommandQueue*>(cmd_queue);
+			return reinterpret_cast<PE_GraphicsCommandQueue*>(cmd_queue);
 		}
 
-		void ClearCommandQueueImp(CommandQueue* queue) {
+		void PE_ClearGraphicsCommandQueueImp(PE_GraphicsCommandQueue* queue) {
 			if (!queue) {
 				return;
 			}
 
-			GlCommandQueue* cmd_queue = static_cast<GlCommandQueue*>(queue);
+			GlCommandQueue* cmd_queue = reinterpret_cast<GlCommandQueue*>(queue);
 			GlCommandBuffer* buf = &cmd_queue->command_buffer;
 			while (buf != nullptr)
 			{
@@ -831,12 +818,12 @@ namespace pecore::graphics::implementation {
 			}
 		}
 
-		void DestroyCommandQueueImp(CommandQueue* queue) {
+		void PE_DestroyGraphicsCommandQueueImp(PE_GraphicsCommandQueue* queue) {
 			if (!queue) {
 				return;
 			}
 
-			GlCommandQueue* cmd_queue = static_cast<GlCommandQueue*>(queue);
+			GlCommandQueue* cmd_queue = reinterpret_cast<GlCommandQueue*>(queue);
 			GlCommandBuffer* sub_buffer = cmd_queue->command_buffer.next;
 			while (sub_buffer != nullptr)
 			{
@@ -848,7 +835,7 @@ namespace pecore::graphics::implementation {
 			PE_free(cmd_queue);
 		}
 
-		int RenderToWindowImp(SDL_Window* target_window, CommandQueue** queues, size_t queue_count) {
+		int PE_RenderToWindowImp(SDL_Window* target_window, PE_GraphicsCommandQueue** queues, size_t queue_count) {
 			if (!queues || !target_window) {
 				return PE_ERROR_INVALID_PARAMETERS;
 			}
@@ -887,23 +874,23 @@ namespace pecore::graphics::implementation {
 			return return_value;
 		}
 
-		int CommandSetShaderImp(CommandQueue* queue, Shader* shader) {
+		int PE_GraphicsCommandSetShaderImp(PE_GraphicsCommandQueue* queue, PE_Shader* shader) {
 			if (!queue || !shader) {
 				return PE_ERROR_INVALID_PARAMETERS;
 			}
 
-			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_SHADER, static_cast<GlShader*>(shader)->program);
+			return PushGlCommand(*reinterpret_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_SHADER, reinterpret_cast<GlShader*>(shader)->program);
 		}
 
-		int CommandSetMeshImp(CommandQueue* queue, RenderMesh* mesh) {
+		int PE_GraphicsCommandSetMeshImp(PE_GraphicsCommandQueue* queue, PE_RenderMesh* mesh) {
 			if (!queue || !mesh) {
 				return PE_ERROR_INVALID_PARAMETERS;
 			}
 
-			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_MESH, *static_cast<GlRenderMesh*>(mesh));
+			return PushGlCommand(*reinterpret_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_MESH, *reinterpret_cast<GlRenderMesh*>(mesh));
 		}
 
-		int CommandDrawMeshImp(CommandQueue* queue, size_t index_count, size_t index_offset) {
+		int PE_GraphicsCommandDrawMeshImp(PE_GraphicsCommandQueue* queue, size_t index_count, size_t index_offset) {
 			if (!queue || index_count % 3 != 0) {
 				return PE_ERROR_INVALID_PARAMETERS;
 			}
@@ -912,15 +899,15 @@ namespace pecore::graphics::implementation {
 				return PE_ERROR_NONE;
 			}
 
-			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_DRAW, std::pair<size_t, size_t>(index_count, index_offset));
+			return PushGlCommand(*reinterpret_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_DRAW, std::pair<size_t, size_t>(index_count, index_offset));
 		}
 
-		int CommandCullImp(CommandQueue* queue, CullMode mode) {
+		int PE_GraphicsCommandCullImp(PE_GraphicsCommandQueue* queue, PE_CullMode mode) {
 			if (!queue || mode >= PE_CULL_ENUM_VALUE_COUNT) {
 				return PE_ERROR_INVALID_PARAMETERS;
 			}
 
-			return PushGlCommand(*static_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_CULL_FACE, mode);
+			return PushGlCommand(*reinterpret_cast<GlCommandQueue*>(queue), GlCommandType::GL_CMD_CULL_FACE, mode);
 		}
 	}
 
@@ -934,8 +921,8 @@ namespace pecore::graphics::implementation {
 		}
 
 		memset(self, 0, sizeof(OpenGlGraphicsImp));
-		self->InitSystem = InitSystemImp;
-		self->QuitSystem = QuitSystemImp;
+		self->PE_INTERNAL_InitGraphicsSystem = PE_INTERNAL_InitGraphicsSystemImp;
+		self->PE_INTERNAL_QuitGraphicsSystem = PE_INTERNAL_QuitGraphicsSystemImp;
 		return static_cast<GraphicsCommands*>(self);
 	}
 }

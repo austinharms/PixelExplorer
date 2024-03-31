@@ -6,8 +6,12 @@
 #include <fstream>
 
 namespace pecore {
-	int PE_GetFileBytes(const char* filepath, void*& file_data, size_t& file_size)
+	int PE_GetFileBytes(const char* filepath, void** file_data, size_t* file_size)
 	{
+		if (!filepath || !file_data || !file_size) {
+			return PE_ERROR_INVALID_PARAMETERS;
+		}
+
 		std::ifstream stream;
 		std::streampos end_pos;
 		int err = PE_GetFileHandle(filepath, stream, end_pos);
@@ -26,8 +30,8 @@ namespace pecore {
 		}
 
 		stream.read(static_cast<char*>(buffer), size);
-		file_data = buffer;
-		file_size = size;
+		*file_data = buffer;
+		*file_size = size;
 		return PE_ERROR_NONE;
 	}
 
