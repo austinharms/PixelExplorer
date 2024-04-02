@@ -4,27 +4,6 @@
 #include "PE_log.h"
 
 namespace pecore {
-	enum class WorkType
-	{
-		ASYNC,
-		BLOCKING,
-	};
-
-	struct WorkQueue::WorkBase {
-		WorkBase* next;
-		PE_WorkFunction function;
-		void* userdata;
-		WorkType type;
-	};
-
-	struct WorkQueue::AsyncWork : public WorkQueue::WorkBase {};
-
-	struct WorkQueue::BlockingWork : public WorkQueue::WorkBase {
-		std::mutex completion_mutex;
-		std::condition_variable completion_condition;
-		bool completed;
-	};
-
 	WorkQueue::WorkQueue()
 	{
 		work_head_ = nullptr;
@@ -48,12 +27,12 @@ namespace pecore {
 
 	int WorkQueue::PushAsyncWork(PE_WorkFunction function, void* userdata)
 	{
-		AsyncWork* work = static_cast<AsyncWork*>(PE_malloc(sizeof(AsyncWork)));
+		Work* work = static_cast<Work*>(PE_malloc(sizeof(Work)));
 		if (!work) {
 			return PE_ERROR_OUT_OF_MEMORY;
 		}
 
-		work->type = WorkType::ASYNC;
+		work->blocking = false;
 		work->next = nullptr;
 		work->function = function;
 		work->userdata = userdata;
@@ -63,15 +42,13 @@ namespace pecore {
 
 	void WorkQueue::PushBlockingWork(PE_WorkFunction function, void* userdata)
 	{
-		BlockingWork work{};
-		work.type = WorkType::BLOCKING;
+		WorkBarrier work(2);
+		work.blocking = true;
 		work.next = nullptr;
 		work.function = function;
 		work.userdata = userdata;
-		work.completed = false;
 		PushWork(&work);
-		std::unique_lock lock(work.completion_mutex);
-		work.completion_condition.wait(lock, [&] { return work.completed; });
+		work.Wait();
 	}
 
 	PE_NODISCARD bool WorkQueue::HasWork()
@@ -97,7 +74,7 @@ namespace pecore {
 	{
 		std::unique_lock lock(work_mutex_);
 		if (work_head_) {
-			WorkBase* work = work_head_;
+			Work* work = work_head_;
 			if (work_tail_ == work_head_) {
 				work_tail_ = nullptr;
 			}
@@ -105,12 +82,9 @@ namespace pecore {
 			work_head_ = work->next;
 			lock.unlock();
 			work->function(work->userdata);
-			if (work->type == WorkType::BLOCKING) {
-				BlockingWork* blocking_work = static_cast<BlockingWork*>(work);
-				blocking_work->completion_mutex.lock();
-				blocking_work->completed = true;
-				blocking_work->completion_mutex.unlock();
-				blocking_work->completion_condition.notify_one();
+			if (work->blocking) {
+				WorkBarrier* barrier = static_cast<WorkBarrier*>(work);
+				barrier->Trigger();
 			}
 			else {
 				PE_free(work);
@@ -132,7 +106,7 @@ namespace pecore {
 		worker_sync_mutex_.unlock();
 	}
 
-	void WorkQueue::PushWork(WorkBase* work)
+	void WorkQueue::PushWork(Work* work)
 	{
 		work_mutex_.lock();
 		if (work_tail_) {

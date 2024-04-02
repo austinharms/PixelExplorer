@@ -6,19 +6,14 @@
 
 namespace pecore {
 	// class that wraps a std::thread and allows queuing "work" to run on the thread
-	class ThreadWorker {
+	class ThreadWorker : protected WorkQueue {
 	public:
 		ThreadWorker();
 		~ThreadWorker();
-
-		// Runs function on the worker and returns immediately, returns 0 on success
-		int Run(PE_WorkFunction function, void* userdata = nullptr);
-
-		// Runs function on the worker and waits for the function to completed
-		void RunBlocking(PE_WorkFunction function, void* userdata = nullptr);
+		using WorkQueue::PushAsyncWork;
+		using WorkQueue::PushBlockingWork;
 
 	private:
-		WorkQueue work_queue_;
 		std::thread worker_thread_;
 		bool enable_flag_;
 

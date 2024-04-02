@@ -168,9 +168,9 @@ namespace pecore::graphics::implementation {
 		PE_FORCEINLINE void RunLoadWork(Args&&... args) {
 			auto params = std::forward_as_tuple(args ...);
 #if PE_GL_BACKGROUND_LOADING
-			self->background_worker.RunBlocking(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			self->background_worker.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 #else
-			event_loop::RunWorkBlocking(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 #endif
 		}
 
@@ -178,14 +178,14 @@ namespace pecore::graphics::implementation {
 		template<auto work, class... Args>
 		PE_FORCEINLINE void RunMainWork(Args&&... args) {
 			auto params = std::forward_as_tuple(args ...);
-			event_loop::RunWorkBlocking(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 		}
 
 		// Helper function that runs functions on the provided worker
 		template<auto work, class... Args>
 		PE_FORCEINLINE void RunWorker(ThreadWorker& worker, Args&&... args) {
 			auto params = std::forward_as_tuple(args ...);
-			worker.RunBlocking(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			worker.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 		}
 
 		PE_FORCEINLINE GladGLContext& GetBackgroundGladContext() {

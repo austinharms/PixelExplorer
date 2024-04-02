@@ -1,6 +1,7 @@
 #ifndef PE_WORK_QUEUE_H_
 #define PE_WORK_QUEUE_H_
 #include "PE_defines.h"
+#include "PE_barrier.h"
 #include <mutex>
 #include <condition_variable>
 
@@ -9,12 +10,30 @@ namespace pecore {
 
 	// A FIFO queue of work to be performed on a different thread
 	// Note: this only expects one "consumer" thread to exist and ForceWaitWakeup may break with multiple threads
-	class WorkQueue final {
+	class WorkQueue {
 	public:
+		struct Work {
+			Work* next;
+			PE_WorkFunction function;
+			void* userdata;
+			bool blocking;
+		};
+
+		struct WorkBarrier : public Barrier, public Work {
+			WorkBarrier(size_t count) : Barrier(count) {}
+		};
+
 		WorkQueue();
 		~WorkQueue();
+		// Push work onto the work queue, returns immediately
 		int PushAsyncWork(PE_WorkFunction function, void* userdata = nullptr);
+
+		// Push work that will block until the work is completed
 		void PushBlockingWork(PE_WorkFunction function, void* userdata = nullptr);
+
+		// Push work that will call WorkBarrier.Trigger() on completion
+		// You must call WorkBarrier.Wait() at some point after calling this method
+		void PushBlockingWork(PE_WorkFunction function, void* userdata, WorkBarrier& barrier);
 
 		// Returns true if there is work to be done
 		PE_NODISCARD bool HasWork();
@@ -37,18 +56,14 @@ namespace pecore {
 		void WorkerExit();
 
 	private:
-		struct WorkBase;
-		struct AsyncWork;
-		struct BlockingWork;
-
-		WorkBase* work_head_;
-		WorkBase* work_tail_;
+		Work* work_head_;
+		Work* work_tail_;
 		std::mutex work_mutex_;
 		std::mutex worker_sync_mutex_;
 		std::condition_variable work_condition_;
 		bool force_wake_;
 
-		void PushWork(WorkBase* work);
+		void PushWork(Work* work);
 	};
 }
 #endif // !PE_WORK_QUEUE_H_
