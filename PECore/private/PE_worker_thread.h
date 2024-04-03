@@ -12,6 +12,7 @@ namespace pecore {
 		~ThreadWorker();
 		using WorkQueue::PushAsyncWork;
 		using WorkQueue::PushBlockingWork;
+		using WorkQueue::PushBlockingTWork;
 
 	private:
 		std::thread worker_thread_;

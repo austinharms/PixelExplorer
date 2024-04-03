@@ -4,6 +4,7 @@
 #include "PE_barrier.h"
 #include <mutex>
 #include <condition_variable>
+#include <tuple>
 
 namespace pecore {
 	typedef void (*PE_WorkFunction)(void*);
@@ -30,6 +31,14 @@ namespace pecore {
 
 		// Push work that will block until the work is completed
 		void PushBlockingWork(PE_WorkFunction function, void* userdata = nullptr);
+
+		// Push templated work that will block until the work is completed
+		// This allows passing any arguments to the work function
+		template<auto work, class... Args>
+		void PushBlockingTWork(Args&&... args) {
+			auto params = std::forward_as_tuple(args ...);
+			PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+		}
 
 		// Push work that will call WorkBarrier.Trigger() on completion
 		// You must call WorkBarrier.Wait() at some point after calling this method
@@ -64,6 +73,12 @@ namespace pecore {
 		bool force_wake_;
 
 		void PushWork(Work* work);
+
+		// Helper function that wraps other functions to allow passing parameters as a tuple
+		template<typename FuncT, FuncT work, class ParamT>
+		static void WorkWrapper(void* userdata) {
+			std::apply(work, *static_cast<ParamT*>(userdata));
+		}
 	};
 }
 #endif // !PE_WORK_QUEUE_H_

@@ -15,6 +15,8 @@ namespace pecore {
 		using WorkQueue::PushAsyncWork;
 		// Runs the provided function on the event loop thread
 		using WorkQueue::PushBlockingWork;
+		// Runs the provided function on the event loop thread
+		using WorkQueue::PushBlockingTWork;
 
 	private:
 		bool run_flag_;
