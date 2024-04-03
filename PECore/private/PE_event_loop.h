@@ -6,6 +6,7 @@
 namespace pecore {
 	class EventLoopClass : protected WorkQueue {
 	public:
+		EventLoopClass() = default;
 		// Runs the event loop, this will not return until Stop() is called
 		void Start();
 		// Stops the event loop
@@ -16,10 +17,9 @@ namespace pecore {
 		using WorkQueue::PushBlockingWork;
 
 	private:
-		EventLoopClass() = default;
 		bool run_flag_;
 	};
 
-	extern EventLoopClass EventLoop;
+	extern EventLoopClass PE_EventLoop;
 }
 #endif // !PE_EVENT_LOOP_H_

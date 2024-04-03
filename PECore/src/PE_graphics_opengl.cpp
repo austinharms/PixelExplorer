@@ -170,7 +170,7 @@ namespace pecore::graphics::implementation {
 #if PE_GL_BACKGROUND_LOADING
 			self->background_worker.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 #else
-			EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			PE_EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 #endif
 		}
 
@@ -178,7 +178,7 @@ namespace pecore::graphics::implementation {
 		template<auto work, class... Args>
 		PE_FORCEINLINE void RunMainWork(Args&&... args) {
 			auto params = std::forward_as_tuple(args ...);
-			EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			PE_EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
 		}
 
 		// Helper function that runs functions on the provided worker

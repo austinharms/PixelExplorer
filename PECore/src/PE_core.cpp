@@ -11,7 +11,7 @@ namespace pecore {
 			PE_LogDebug(PE_LOG_CATEGORY_CORE, PE_TEXT("PE_main Thread Entry"));
 			// TODO Add main loop
 
-			event_loop::Stop();
+			PE_EventLoop.Stop();
 			*returnValue = 0;
 			PE_LogDebug(PE_LOG_CATEGORY_CORE, PE_TEXT("PE_main Thread Exit"));
 		}
@@ -24,11 +24,10 @@ namespace pecore {
 		PE_InitLog();
 		int rtn = SDL_Init(SDL_SYSTEMS);
 		PE_ASSERT(rtn == 0, PE_TEXT("Failed to init SDL %") SDL_PRIs32, rtn);
-		event_loop::Prepare();
 		// Run the application on a different thread as events must be polled on the main thread
 		// and there is a bug when resizing windows will freeze the event loop
 		std::thread appThread(PE_app_main, &rtn, argc, argv);
-		event_loop::Start();
+		PE_EventLoop.Start();
 		appThread.join();
 		return rtn;
 	}

@@ -3,6 +3,8 @@
 #include "SDL_events.h"
 
 namespace pecore {
+	EventLoopClass PE_EventLoop;
+
 	void EventLoopClass::Start() {
 		run_flag_ = true;
 		WorkQueue::WorkerEntry();

@@ -43,7 +43,7 @@ void PET_main(int* returnValue, int argc, char** argv) {
 	PE_DestroyGraphicsCommandQueue(cmd_queue);
 	PE_UnloadShader(shader);
 	PE_DestroyWindow(window);
-	event_loop::Stop();
+	PE_EventLoop.Stop();
 	*returnValue = 0;
 }
 
@@ -56,9 +56,8 @@ int main(int argc, char** argv)
 	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init SDL %") SDL_PRIs32, returnRes);
 	returnRes = PE_InitGraphics();
 	PE_ASSERT(returnRes == 0, PE_TEXT("Failed to init PE_Graphics %") SDL_PRIs32, returnRes);
-	event_loop::Prepare();
 	std::thread appThread(PET_main, &returnRes, argc, argv);
-	event_loop::Start();
+	PE_EventLoop.Start();
 	appThread.join();
 	PE_QuitGraphics();
 	return returnRes;
