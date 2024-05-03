@@ -3,7 +3,7 @@
 #include "PE_defines.h"
 #include "PE_graphics.h"
 
-namespace pecore::graphics::implementation {
+namespace pecore::graphics {
 #define PE_GENERATED_GRAPHICS_API(rc, fn, params, args, ret) typedef rc (*fn##_GDAPI) params;
 #include "PE_generated_graphics_api.h"
 #undef PE_GENERATED_GRAPHICS_API

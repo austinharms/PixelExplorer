@@ -5,6 +5,11 @@
 struct SDL_Window;
 typedef struct SDL_Window SDL_Window;
 
+struct PE_Window {
+	SDL_Window* window_handle;
+};
+typedef struct PE_Window PE_Window;
+
 struct PE_Shader;
 typedef struct PE_Shader PE_Shader;
 
@@ -29,7 +34,8 @@ typedef enum PE_MeshAttribType
 
 typedef enum PE_IndexType
 {
-	PE_INDEX_U8 = 0,
+	PE_INDEX_LINEAR = 0, // No mesh indices. assumes triangles are to be drawn in the order provided in the vertex buffer
+	PE_INDEX_U8,
 	PE_INDEX_U16,
 	PE_INDEX_U32,
 	PE_INDEX_ENUM_VALUE_COUNT
@@ -55,12 +61,17 @@ typedef enum PE_RenderPass {
 } PE_RenderPass;
 
 struct PE_MeshFormatAttrib {
-	PE_MeshAttribType type;
-	int32_t location;
-	int32_t size;
-	int32_t normalized;
-	int32_t stride;
-	int32_t offset;
+	uint8_t attrib_type;
+	uint8_t location;
+	uint8_t size;
+	uint8_t normalized;
 };
 typedef struct PE_MeshFormatAttrib PE_MeshFormatAttrib;
+
+struct PE_MeshFormat {
+	PE_MeshFormatAttrib vertex_attribs[16];
+	uint8_t index_type;
+	uint8_t packed;
+};
+typedef struct PE_MeshFormat PE_MeshFormat;
 #endif // !PE_GRAPHICS_TYPES_H_

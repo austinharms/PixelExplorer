@@ -15,6 +15,7 @@
 #define PE_FINAL final
 #define PE_WEAK __attribute__((weak))
 #define PE_NOEXCEPT noexcept
+#define PE_EXCEPT noexcept(false)
 #define PE_MAYBE_UNUSED [[maybe_unused]]
 #define PE_STATIC_ASSERT(exp, msg) static_assert(exp, msg)
 #define PE_ARRAY_LEN(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))

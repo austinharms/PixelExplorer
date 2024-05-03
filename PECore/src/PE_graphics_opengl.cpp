@@ -18,42 +18,51 @@
 // Note: this does not ensure only one context exists,
 // if PE_OGL_BACKGROUND_LOADING is true it will still create it's own context
 #ifndef PE_GL_SINGLE_CONTEXT
-#define PE_GL_SINGLE_CONTEXT 1
+#define PE_GL_SINGLE_CONTEXT 0
 #endif // !PE_GL_SINGLE_CONTEXT
 
 // Should we create and use a worker thread and context to load OpenGL data
 #ifndef PE_GL_BACKGROUND_LOADING
-#define PE_GL_BACKGROUND_LOADING 0
+#define PE_GL_BACKGROUND_LOADING 1
 #endif // !PE_GL_BACKGROUND_LOADING
 
 #if PE_GL_SINGLE_CONTEXT == 0 && PE_GL_BACKGROUND_LOADING == 0
 #error PE_GL_SINGLE_CONTEXT and or PE_GL_BACKGROUND_LOADING must be enabled
 #endif
 
-#define PE_GL_CTX_KEY PE_TEXT("PE_GL_CTX")
-
-#if PE_GL_SINGLE_CONTEXT
-#define PE_GL_REQUIRE_CTX(msg, rtn) if(self->primary_ctx.userptr == nullptr) { PE_LogError(PE_LOG_CATEGORY_RENDER, msg); return rtn; }
-#else 
-#define PE_GL_REQUIRE_CTX(msg, rtn) if(self->background_ctx.userptr == nullptr) { PE_LogError(PE_LOG_CATEGORY_RENDER, msg); return rtn; }
+// Returns load thread worker or PE_EventLoop if there is no load worker
+#if PE_GL_BACKGROUND_LOADING
+#define PE_GL_WORKER this_->load_thread_worker
+#else
+#define PE_GL_WORKER PE_EventLoop
 #endif
+
+//#define PE_GL_CTX_KEY PE_TEXT("PE_GL_CTX")
+//
+//#if PE_GL_SINGLE_CONTEXT
+//#define PE_GL_REQUIRE_CTX(msg, rtn) if(self->primary_ctx.userptr == nullptr) { PE_LogError(PE_LOG_CATEGORY_RENDER, msg); return rtn; }
+//#else 
+//#define PE_GL_REQUIRE_CTX(msg, rtn) if(self->background_ctx.userptr == nullptr) { PE_LogError(PE_LOG_CATEGORY_RENDER, msg); return rtn; }
+//#endif
+
+#define PE_GL_REQUIRE_CTX(msg, rtn)
 
 namespace pecore::graphics::implementation {
 	namespace {
-		constexpr GLenum GlIndexTypeLookup[] = { GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT };
+		constexpr GLenum GlIndexTypeLookup[] = { GL_UNSIGNED_INT, GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT };
 		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlIndexTypeLookup) == PE_INDEX_ENUM_VALUE_COUNT, PE_TEXT("GlIndexTypeLookup array need to be updated"));
 		constexpr GLenum GlMeshAttribTypeLookup[] = { GL_FLOAT, GL_HALF_FLOAT, GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT };
 		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlMeshAttribTypeLookup) == PE_MESH_ATR_ENUM_VALUE_COUNT, PE_TEXT("GlMeshAttribTypeLookup array need to be updated"));
 		constexpr GLenum GlCullFaceLookup[] = { GL_BACK, GL_FRONT, GL_FRONT_AND_BACK, GL_BACK };
 		PE_STATIC_ASSERT(PE_ARRAY_LEN(GlCullFaceLookup) == PE_CULL_ENUM_VALUE_COUNT, PE_TEXT("GlCullFaceLookup array need to be updated"));
 
-		struct GlShader {
+		struct PE_Shader {
 			size_t ref_count;
 			const std::string* cache_key;
 			GLuint program;
 			bool loaded;
 
-			GlShader() :
+			PE_Shader() :
 				ref_count(0),
 				cache_key(nullptr),
 				program(0),
@@ -61,20 +70,28 @@ namespace pecore::graphics::implementation {
 			}
 		};
 
-		struct GlRenderMesh {
+		//struct RenderMeshAttrib {
+		//	GLenum type;
+		//	int32_t location;
+		//	int32_t size;
+		//	GLboolean normalized;
+		//	int32_t stride;
+		//	int32_t offset;
+		//};
+
+		struct PE_RenderMesh {
 			enum {
 				BUF_VERTEX = 0,
 				BUF_ELEMENT = 1,
 			};
 
 			GLuint buffers[2];
-			GLuint vao;
-			PE_IndexType index_type;
 		};
 
-		enum GlCommandType : uint32_t
+		enum CommandType : uint32_t
 		{
 			GL_CMD_SHADER = 0,
+			GL_CMD_MESH_FORMAT,
 			GL_CMD_MESH,
 			GL_CMD_DRAW,
 			GL_CMD_UNIFORM_VALUE,
@@ -82,262 +99,287 @@ namespace pecore::graphics::implementation {
 		};
 
 		template<class ValueT>
-		struct GlCmdPad {
+		struct CmdPad {
 			enum { val = sizeof(ValueT) % 8 };
 		};
 
 		template<class ValueT, size_t PAD>
-		struct GlCommandBase {
-			constexpr GlCommandBase(GlCommandType cmd_type, const ValueT& cmd_value) :
-				cmd_size(sizeof(ValueT) + sizeof(uint32_t) + sizeof(GlCommandType) + PAD),
+		struct CommandBase {
+			constexpr CommandBase(CommandType cmd_type, const ValueT& cmd_value) :
+				cmd_size(sizeof(ValueT) + sizeof(uint32_t) + sizeof(CommandType) + PAD),
 				type(cmd_type),
 				value(cmd_value) {
 			}
 
 			uint32_t cmd_size;
-			GlCommandType type;
+			CommandType type;
 			ValueT value;
 			uint8_t pad[PAD];
 		};
 
 		template<class ValueT>
-		struct GlCommandBase<ValueT, 0> {
-			constexpr GlCommandBase(GlCommandType cmd_type, const ValueT& cmd_value) :
-				cmd_size(sizeof(ValueT) + sizeof(uint32_t) + sizeof(GlCommandType)),
+		struct CommandBase<ValueT, 0> {
+			constexpr CommandBase(CommandType cmd_type, const ValueT& cmd_value) :
+				cmd_size(sizeof(ValueT) + sizeof(uint32_t) + sizeof(CommandType)),
 				type(cmd_type),
 				value(cmd_value) {
 			}
 
 			uint32_t cmd_size;
-			GlCommandType type;
+			CommandType type;
 			ValueT value;
 		};
 
 		template<class ValueT>
-		struct GlCommand : public GlCommandBase<ValueT, GlCmdPad<ValueT>::val> {
-			using GlCommandBase<ValueT, GlCmdPad<ValueT>::val>::GlCommandBase;
+		struct Command : public CommandBase<ValueT, CmdPad<ValueT>::val> {
+			using CommandBase<ValueT, CmdPad<ValueT>::val>::CommandBase;
 		};
 
-		struct GlCommandBuffer {
-			GlCommandBuffer* next;
+		struct CommandBuffer {
+			CommandBuffer* next;
 			uint64_t* tail;
 			uint64_t data[2048];
 		};
 
-		struct GlCommandQueue {
-			GlCommandBuffer command_buffer;
-			GlCommandBuffer* active_buffer;
+		struct CommandQueue {
+			CommandBuffer command_buffer;
+			CommandBuffer* active_buffer;
 		};
 
-		struct GlCommandExecutionState {
+		struct CommandExecutionState {
 			GLuint program;
 			GLuint mesh_vao;
 			GLenum index_type;
 		};
 
-		struct OpenGlGraphicsImp : public GraphicsCommands {
+		struct Window : public PE_Window {
+#if !PE_GL_SINGLE_CONTEXT
+			GladGLContext glad_render_context;
+			SDL_GLContext opengl_render_context;
+			ThreadWorker render_thread_worker;
+			GLuint opengl_render_vao;
+#endif
+		};
+
+		struct OpenGlGraphicsCommands : public GraphicsCommands {
 #if PE_GL_SINGLE_CONTEXT
-			GladGLContext primary_ctx;
-			SDL_Window* active_window;
+			GladGLContext glad_render_context;
+			SDL_GLContext opengl_render_context;
+			SDL_Window* active_render_window;
+			GLuint opengl_render_vao;
 #endif
 #if PE_GL_BACKGROUND_LOADING
-			GladGLContext background_ctx;
-			ThreadWorker background_worker;
+			GladGLContext glad_load_context;
+			SDL_GLContext opengl_load_context;
+			ThreadWorker load_thread_worker;
 #endif
-			std::unordered_map<std::string, GlShader> shader_cache;
+			std::unordered_map<std::string, PE_Shader> shader_cache;
 			std::mutex shader_cache_mutex;
 			bool init;
 		};
 
-		struct WindowContext {
-			SDL_Window* window;
-			GladGLContext glad_ctx;
-			ThreadWorker worker;
-		};
+		OpenGlGraphicsCommands* this_ = nullptr;
 
-		OpenGlGraphicsImp* self = nullptr;
-
-		// Helper PE_WorkFunction function that wraps other functions to allow passing parameters as a tuple
-		template<typename FuncT, FuncT work, class ParamT>
-		void WorkWrapper(void* userdata) {
-			std::apply(work, *static_cast<ParamT*>(userdata));
-		}
-
-		// Helper function that runs functions on the OpenGL loading thread
-		template<auto work, class... Args>
-		PE_FORCEINLINE void RunLoadWork(Args&&... args) {
-			auto params = std::forward_as_tuple(args ...);
+		// Returns glad load context or glad render context if there is no load context
+		PE_NODISCARD PE_FORCEINLINE GladGLContext& GetGladContext() {
 #if PE_GL_BACKGROUND_LOADING
-			self->background_worker.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
+			return this_->glad_load_context;
 #else
-			PE_EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
-#endif
-		}
-
-		// Helper function that runs functions on the main/event thread
-		template<auto work, class... Args>
-		PE_FORCEINLINE void RunMainWork(Args&&... args) {
-			auto params = std::forward_as_tuple(args ...);
-			PE_EventLoop.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
-		}
-
-		// Helper function that runs functions on the provided worker
-		template<auto work, class... Args>
-		PE_FORCEINLINE void RunWorker(ThreadWorker& worker, Args&&... args) {
-			auto params = std::forward_as_tuple(args ...);
-			worker.PushBlockingWork(WorkWrapper<decltype(work), work, decltype(params)>, static_cast<void*>(&params));
-		}
-
-		PE_FORCEINLINE GladGLContext& GetBackgroundGladContext() {
-#if PE_GL_BACKGROUND_LOADING
-			return self->background_ctx;
-#else
-			return self->primary_ctx;
+			return this_->glad_render_context;
 #endif
 		}
 
 		// return_vale is a SDL return value not PE_ERROR
-		void SetContext(SDL_Window* window, SDL_GLContext ctx, int& return_val) {
+		void SetOpenGlContext(SDL_Window* window, SDL_GLContext ctx, int& return_val) {
 			return_val = SDL_GL_MakeCurrent(window, ctx);
 			if (return_val != 0) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set OpenGL context active: %s"), SDL_GetError());
 			}
 		}
 
-		// Destroys a GladGLContext and the corresponding SDL_GLContext
-		// Note: it is expected that GladGLContext.userptr contains the SDL_GLContext
-		void DestroyGladContext(GladGLContext* ctx) {
-			if (SDL_GL_DeleteContext(ctx->userptr) != 0) {
-				PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to delete OpenGL context: %s"), SDL_GetError());
+#if PE_GL_BACKGROUND_LOADING && !PE_GL_SINGLE_CONTEXT
+		// Helper that creates a gl context on the load thread
+		// This is required as SDL creates share lists with the active context and the only context we can assume exists is the load one
+		void CreateWindowGlContextHelper(Window& window, int& return_code) {
+			PE_DEBUG_ASSERT(!this_->opengl_load_context, PE_TEXT("Attempted to create Window OpenGl context without background OpenGl context"));
+			window.opengl_render_context = SDL_GL_CreateContext(window.window_handle);
+			if (!window.opengl_render_context) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window OpenGL context: %s"), SDL_GetError());
+				// TODO if creating a context fails can we assume the old context is still active?
+				SetOpenGlContext(window.window_handle, this_->opengl_load_context, return_code);
+				// We can not recover without a load context, abort
+				PE_ASSERT(return_code == PE_ERROR_NONE, PE_TEXT("Failed to reactivate OpenGl load context"));
+				return_code = PE_ERROR_GENERAL;
+				return;
 			}
 
-			memset(ctx, 0, sizeof(GladGLContext));
+			int ver = gladLoadGLContext(&window.glad_render_context, SDL_GL_GetProcAddress);
+			PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Render GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
+			SetOpenGlContext(window.window_handle, this_->opengl_load_context, return_code);
+			// We can not recover without a load context, abort
+			PE_ASSERT(return_code == PE_ERROR_NONE, PE_TEXT("Failed to reactivate OpenGl load context"));
+			window.render_thread_worker.PushBlockingTWork<SetOpenGlContext>(window.window_handle, window.opengl_render_context, return_code);
+			if (return_code != PE_ERROR_NONE) {
+				SDL_GL_DeleteContext(window.opengl_render_context);
+			}
+		}
+#endif
+
+		int CreateWindowGlContext(Window& window) {
+#if PE_GL_BACKGROUND_LOADING && PE_GL_SINGLE_CONTEXT
+			if (!this_->opengl_render_context) {
+				PE_DEBUG_ASSERT(!this_->opengl_load_context, PE_TEXT("Primary OpenGl context without background OpenGl context"));
+				SDL_GLContext bg_ctx = SDL_GL_CreateContext(window.window_handle);
+				if (!bg_ctx) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create background OpenGL context: %s"), SDL_GetError());
+					return PE_ERROR_GENERAL;
+				}
+
+				int ver = gladLoadGLContext(&this_->glad_load_context, SDL_GL_GetProcAddress);
+				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Background GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
+
+				SDL_GLContext main_ctx = SDL_GL_CreateContext(window.window_handle);
+				if (!main_ctx) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create primary OpenGL context: %s"), SDL_GetError());
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				ver = gladLoadGLContext(&this_->glad_render_context, SDL_GL_GetProcAddress);
+				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Primary GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
+				int set_rtn;
+				this_->load_thread_worker.PushBlockingTWork<SetOpenGlContext>(window.window_handle, bg_ctx, set_rtn);
+				if (set_rtn != 0) {
+					SDL_GL_DeleteContext(main_ctx);
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				this_->glad_render_context.CreateVertexArrays(1, &this_->opengl_render_vao);
+				if (this_->opengl_render_vao == 0) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create primary OpenGL vertex array object"));
+					SDL_GL_DeleteContext(main_ctx);
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				this_->opengl_load_context = bg_ctx;
+				this_->opengl_render_context = main_ctx;
+			}
+#elif PE_GL_SINGLE_CONTEXT
+			if (!this_->opengl_render_context) {
+				SDL_GLContext main_ctx = SDL_GL_CreateContext(window.window_handle);
+				if (!main_ctx) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create primary OpenGL context: %s"), SDL_GetError());
+					return PE_ERROR_GENERAL;
+				}
+
+				int ver = gladLoadGLContext(&this_->glad_render_context, SDL_GL_GetProcAddress);
+				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Primary GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
+				this_->glad_render_context.CreateVertexArrays(1, &this_->opengl_render_vao);
+				if (this_->opengl_render_vao == 0) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create primary OpenGL vertex array object"));
+					SDL_GL_DeleteContext(main_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				this_->opengl_render_context = main_ctx;
+			}
+#elif PE_GL_BACKGROUND_LOADING && !PE_GL_SINGLE_CONTEXT
+			if (!this_->opengl_load_context) {
+				SDL_GLContext bg_ctx = SDL_GL_CreateContext(window.window_handle);
+				if (!bg_ctx) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create background OpenGL context: %s"), SDL_GetError());
+					return PE_ERROR_GENERAL;
+				}
+
+				int ver = gladLoadGLContext(&this_->glad_load_context, SDL_GL_GetProcAddress);
+				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Background GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
+
+				window.opengl_render_context = SDL_GL_CreateContext(window.window_handle);
+				if (!window.opengl_render_context) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window OpenGL context: %s"), SDL_GetError());
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				ver = gladLoadGLContext(&window.glad_render_context, SDL_GL_GetProcAddress);
+				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Render GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
+				window.glad_render_context.CreateVertexArrays(1, &window.opengl_render_vao);
+				if (window.opengl_render_vao == 0) {
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create render OpenGL vertex array object"));
+					SDL_GL_DeleteContext(window.opengl_render_context);
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				int set_rtn = SDL_GL_MakeCurrent(nullptr, nullptr);
+				if (set_rtn != 0) {
+					SDL_GL_DeleteContext(window.opengl_render_context);
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				window.render_thread_worker.PushBlockingTWork<SetOpenGlContext>(window.window_handle, window.opengl_render_context, set_rtn);
+				if (set_rtn != 0) {
+					SDL_GL_DeleteContext(window.opengl_render_context);
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				this_->load_thread_worker.PushBlockingTWork<SetOpenGlContext>(window.window_handle, bg_ctx, set_rtn);
+				if (set_rtn != 0) {
+					SDL_GL_DeleteContext(window.opengl_render_context);
+					SDL_GL_DeleteContext(bg_ctx);
+					return PE_ERROR_GENERAL;
+				}
+
+				this_->opengl_load_context = bg_ctx;
+			}
+			else {
+				int rtn_code;
+				this_->load_thread_worker.PushBlockingTWork<CreateWindowGlContextHelper>(window, rtn_code);
+				return rtn_code;
+			}
+#else
+#error INVALID PE_GL_* DEFINES
+#endif
+			return PE_ERROR_NONE;
 		}
 
-		void CreateSdlWindow(const char* title, int width, int height, Uint32 flags, SDL_Window*& return_window) {
-			SDL_Window* window = SDL_CreateWindow(title, width, height, flags);
-			if (!window) {
+		void CreateWindow(const char* title, int width, int height, Uint32 flags, Window& window) {
+			window.window_handle = SDL_CreateWindow(title, width, height, flags);
+			if (!window.window_handle) {
 				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window: %s"), SDL_GetError());
 				return;
 			}
 
-#if PE_GL_BACKGROUND_LOADING
-			if (self->background_ctx.userptr == nullptr) {
-				SDL_GLContext ctx = SDL_GL_CreateContext(window);
-				if (!ctx) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to create background OpenGL context: %s"), SDL_GetError());
-					SDL_DestroyWindow(window);
-					return;
-				}
-
-				int ver = gladLoadGLContext(&self->background_ctx, SDL_GL_GetProcAddress);
-				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Background GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
-				SDL_GL_MakeCurrent(nullptr, nullptr);
-				int ctx_return;
-				RunLoadWork<SetContext>(window, ctx, ctx_return);
-				if (ctx_return != 0) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set background OpenGL context active"));
-					SDL_GL_DeleteContext(ctx);
-					memset(&self->background_ctx, 0, sizeof(GladGLContext));
-					SDL_DestroyWindow(window);
-					return;
-				}
-
-				self->background_ctx.userptr = ctx;
+			if (int ret = CreateWindowGlContext(window) != PE_ERROR_NONE) {
+				SDL_DestroyWindow(window.window_handle);
+				window.window_handle = nullptr;
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window: %") SDL_PRIs32, ret);
+				return;
 			}
-#endif
-#if PE_GL_SINGLE_CONTEXT
-			if (self->primary_ctx.userptr == nullptr) {
-				self->active_window = window;
-				SDL_GLContext ctx = SDL_GL_CreateContext(window);
-				if (!ctx) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to create OpenGL context: %s"), SDL_GetError());
-					SDL_DestroyWindow(window);
-					return;
-				}
-
-				int ver = gladLoadGLContext(&self->primary_ctx, SDL_GL_GetProcAddress);
-				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Primary GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
-				self->primary_ctx.userptr = ctx;
-			}
-#else
-			{
-				WindowContext* window_context = static_cast<WindowContext*>(PE_malloc(sizeof(WindowContext)));
-				memset(window_context, 0, sizeof(WindowContext));
-				new(window_context) WindowContext();
-				if (window_context == nullptr) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to allocate window context"));
-					SDL_DestroyWindow(window);
-					return;
-				}
-
-				SDL_GLContext ctx = SDL_GL_CreateContext(window);
-				if (ctx == nullptr) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create window, failed to create OpenGL context: %s"), SDL_GetError());
-					SDL_DestroyWindow(window);
-					window_context->~WindowContext();
-					PE_free(window_context);
-					return;
-				}
-
-				int ver = gladLoadGLContext(&window_context->glad_ctx, SDL_GL_GetProcAddress);
-				PE_LogDebug(PE_LOG_CATEGORY_RENDER, PE_TEXT("Window GL Version: %") SDL_PRIs32 PE_TEXT(".%") SDL_PRIs32, GLAD_VERSION_MAJOR(ver), GLAD_VERSION_MINOR(ver));
-				SDL_GL_MakeCurrent(nullptr, nullptr);
-				int ctx_return;
-				RunWorker<SetContext>(window_context->worker, window, ctx, ctx_return);
-				if (ctx_return != 0) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set window OpenGL context active"));
-					SDL_GL_DeleteContext(ctx);
-					window_context->~WindowContext();
-					PE_free(window_context);
-					SDL_DestroyWindow(window);
-					return;
-				}
-
-				window_context->window = window;
-				window_context->glad_ctx.userptr = ctx;
-				SDL_PropertiesID window_props = SDL_GetWindowProperties(window);
-				if (SDL_SetProperty(window_props, PE_GL_CTX_KEY, window_context) != 0) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to set window context property: %s"), SDL_GetError());
-					window_context->~WindowContext();
-					PE_free(window_context);
-					SDL_GL_DeleteContext(ctx);
-					SDL_DestroyWindow(window);
-					return;
-				}
-			}
-#endif
-			return_window = window;
 		}
 
-		void DestroySdlWindow(SDL_Window* window) {
+		void DestroyWindow(Window* window) {
+			if (!window) {
+				return;
+			}
+
 #if !PE_GL_SINGLE_CONTEXT
-			WindowContext* window_ctx = nullptr;
-			SDL_PropertiesID props = SDL_GetWindowProperties(window);
-			if (props != 0) {
-				window_ctx = static_cast<WindowContext*>(SDL_GetProperty(props, PE_GL_CTX_KEY, nullptr));
-			}
-			else {
-				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to get window context: %s"), SDL_GetError());
-			}
-
-			if (window_ctx) {
-				int ctx_return;
-				RunWorker<SetContext>(window_ctx->worker, nullptr, nullptr, ctx_return);
-				PE_DEBUG_ASSERT(ctx_return == 0, PE_TEXT("Failed to clear context"));
-				DestroyGladContext(&window_ctx->glad_ctx);
-				window_ctx->~WindowContext();
-				PE_free(window_ctx);
-			}
-			else {
-				PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Destroyed window with missing context property"));
-			}
+			int rtn_code;
+			window->render_thread_worker.PushBlockingTWork<SetOpenGlContext>(nullptr, nullptr, rtn_code);
+			PE_DEBUG_ASSERT(rtn_code == PE_ERROR_NONE, PE_TEXT("Failed to clear window render context"));
+			SDL_GL_DeleteContext(window->opengl_render_context);
 #endif
-			SDL_DestroyWindow(static_cast<SDL_Window*>(window));
+			SDL_DestroyWindow(window->window_handle);
+			window->~Window();
+			PE_free(window);
 		}
 
-		void CreateGlProgram(const char* vertex_source, const char* frag_source, GlShader& shader) {
-			GladGLContext& gl = GetBackgroundGladContext();
+		void CreateGlProgram(const char* vertex_source, const char* frag_source, PE_Shader& shader) {
+			GladGLContext& gl = GetGladContext();
 			shader.program = 0;
 			GLint compiled;
 			GLuint vert_shader = gl.CreateShader(GL_VERTEX_SHADER);
@@ -401,61 +443,50 @@ namespace pecore::graphics::implementation {
 			gl.DeleteProgram(frag_shader);
 		}
 
-		void DeleteGlProgram(GlShader* shader) {
-			GladGLContext& gl = GetBackgroundGladContext();
+		void DeleteGlProgram(PE_Shader* shader) {
+			GladGLContext& gl = GetGladContext();
 			gl.DeleteProgram(shader->program);
 			shader->program = 0;
 		}
 
-		void CreateGlMesh(GlRenderMesh& mesh, PE_MeshFormatAttrib* format_attributes, size_t attribute_count, void* vertices, size_t vertices_size, void* indices, size_t indices_size) {
-			GladGLContext& gl = GetBackgroundGladContext();
-			mesh.vao = 0;
-			mesh.buffers[GlRenderMesh::BUF_VERTEX] = 0;
-			mesh.buffers[GlRenderMesh::BUF_ELEMENT] = 0;
-			gl.GenVertexArrays(1, &mesh.vao);
-			if (mesh.vao == 0) {
-				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create OpenGL vertex array (RenderMesh)"));
-				return;
-			}
-
+		void CreateGlMesh(PE_RenderMesh& mesh, void* vertices, size_t vertices_size, void* indices, size_t indices_size) {
+			GladGLContext& gl = GetGladContext();
+			mesh.buffers[PE_RenderMesh::BUF_VERTEX] = 0;
+			mesh.buffers[PE_RenderMesh::BUF_ELEMENT] = 0;
 			gl.GenBuffers(PE_ARRAY_LEN(mesh.buffers), mesh.buffers);
 			for (int i = 0; i < PE_ARRAY_LEN(mesh.buffers); ++i) {
 				if (mesh.buffers[i] == 0) {
-					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create OpenGL buffer (RenderMesh)"));
-					gl.DeleteVertexArrays(1, &mesh.vao);
-					mesh.vao = 0;
+					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to create OpenGL buffers for PE_RenderMesh"));
 					return;
 				}
 			}
 
-			gl.BindVertexArray(mesh.vao);
-			gl.BindBuffer(GL_ARRAY_BUFFER, mesh.buffers[GlRenderMesh::BUF_VERTEX]);
+			gl.BindBuffer(GL_ARRAY_BUFFER, mesh.buffers[PE_RenderMesh::BUF_VERTEX]);
 			gl.BufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
-			// TDOD Check if data was uploaded
-			for (size_t i = 0; i < attribute_count; ++i) {
-				PE_MeshFormatAttrib& attrib = format_attributes[i];
-				gl.VertexAttribPointer(attrib.location, attrib.size, GlMeshAttribTypeLookup[attrib.type], attrib.normalized ? GL_TRUE : GL_FALSE, attrib.stride, reinterpret_cast<void*>(static_cast<uintptr_t>(attrib.offset)));
-				gl.EnableVertexAttribArray(attrib.location);
-			}
+			//// TDOD Check if data was uploaded
+			//for (size_t i = 0; i < attribute_count; ++i) {
+			//	PE_MeshFormatAttrib& attrib = format_attributes[i];
+			//	gl.VertexAttribPointer(attrib.location, attrib.size, GlMeshAttribTypeLookup[attrib.type], attrib.normalized ? GL_TRUE : GL_FALSE, attrib.stride, reinterpret_cast<void*>(static_cast<uintptr_t>(attrib.offset)));
+			//	gl.EnableVertexAttribArray(attrib.location);
+			//}
 
-			gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.buffers[GlRenderMesh::BUF_ELEMENT]);
+			gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.buffers[PE_RenderMesh::BUF_ELEMENT]);
 			// TDOO Check if data was uploaded
 			gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW);
 		}
 
-		void DeleteGlMesh(GlRenderMesh& mesh) {
-			GladGLContext& gl = GetBackgroundGladContext();
-			gl.DeleteVertexArrays(1, &mesh.vao);
+		void DeleteGlMesh(PE_RenderMesh& mesh) {
+			GladGLContext& gl = GetGladContext();
 			gl.DeleteBuffers(PE_ARRAY_LEN(mesh.buffers), mesh.buffers);
 		}
 
 		template<class ValueT>
-		PE_NODISCARD int PushGlCommand(GlCommandQueue& queue, GlCommandType type, const ValueT& value) {
+		PE_NODISCARD int PushGlCommand(CommandQueue& queue, CommandType type, const ValueT& value) {
 			PE_STATIC_ASSERT(sizeof(GlCommand<ValueT>) < sizeof(GlCommandBuffer::data), PE_TEXT("GlCommand Too Big for GlCommandBuffer"));
 			constexpr size_t command_size = sizeof(GlCommand<ValueT>);
 			size_t active_buffer_remaining = sizeof(GlCommandBuffer::data) - (reinterpret_cast<uintptr_t>(queue.active_buffer->tail) - reinterpret_cast<uintptr_t>(queue.active_buffer->data));
 			if (active_buffer_remaining < command_size) {
-				GlCommandBuffer* buf = static_cast<GlCommandBuffer*>(PE_malloc(sizeof(GlCommandBuffer)));
+				CommandBuffer* buf = static_cast<CommandBuffer*>(PE_malloc(sizeof(CommandBuffer)));
 				if (!buf) {
 					PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate OpenGL command buffer"));
 					return PE_ERROR_OUT_OF_MEMORY;
@@ -467,26 +498,26 @@ namespace pecore::graphics::implementation {
 				queue.active_buffer = buf;
 			}
 
-			new (static_cast<void*>(queue.active_buffer->tail)) GlCommand<ValueT>(type, value);
-			PE_STATIC_ASSERT(alignof(GlCommand<ValueT>) <= sizeof(queue.active_buffer->tail[0]) &&
-				sizeof(queue.active_buffer->tail[0]) % alignof(GlCommand<ValueT>) == 0,
-				PE_TEXT("GlCommand can not be aligned to command buffer data type (8 bytes)"));
-			PE_STATIC_ASSERT(command_size % sizeof(queue.active_buffer->tail[0]) == 0, PE_TEXT("GlCommand size is not a multiple of command buffer data type (8 bytes)"));
+			new(static_cast<void*>(queue.active_buffer->tail)) Command<ValueT>(type, value);
+			PE_STATIC_ASSERT(alignof(Command<ValueT>) <= sizeof(queue.active_buffer->tail[0]) &&
+				sizeof(queue.active_buffer->tail[0]) % alignof(Command<ValueT>) == 0,
+				PE_TEXT("Command can not be aligned to command buffer data type (8 bytes)"));
+			PE_STATIC_ASSERT(command_size % sizeof(queue.active_buffer->tail[0]) == 0, PE_TEXT("Command size is not a multiple of command buffer data type (8 bytes)"));
 			queue.active_buffer->tail += command_size / 8;
-			PE_DEBUG_ASSERT(reinterpret_cast<uintptr_t>(&(queue.active_buffer->data[0])) + sizeof(GlCommandBuffer::data) >= reinterpret_cast<uintptr_t>(queue.active_buffer->tail), PE_TEXT("GlCommandBuffer Overrun"));
+			PE_DEBUG_ASSERT(reinterpret_cast<uintptr_t>(queue.active_buffer->data) + sizeof(CommandBuffer::data) >= reinterpret_cast<uintptr_t>(queue.active_buffer->tail), PE_TEXT("CommandBuffer Overrun"));
 			return PE_ERROR_NONE;
 		}
 
-		int ExecuteGlCommandBuffer(GladGLContext& gl, GlCommandExecutionState& state, GlCommandBuffer& buffer) {
+		int ExecuteGlCommandBuffer(GladGLContext& gl, CommandExecutionState& state, CommandBuffer& buffer) {
 			uint8_t* buffer_head = reinterpret_cast<uint8_t*>(buffer.data);
 			while (reinterpret_cast<uintptr_t>(buffer_head) < reinterpret_cast<uintptr_t>(buffer.tail))
 			{
 				// uint64_t is just a dummy type to allow reading of the true size and type of the current command
-				GlCommand<uint64_t>* cur_cmd = reinterpret_cast<GlCommand<uint64_t>*>(buffer_head);
+				Command<uint64_t>* cur_cmd = reinterpret_cast<Command<uint64_t>*>(buffer_head);
 				switch (cur_cmd->type)
 				{
 				case GL_CMD_SHADER: {
-					GLuint program = reinterpret_cast<GlCommand<GLuint>*>(cur_cmd)->value;
+					GLuint program = reinterpret_cast<Command<GLuint>*>(cur_cmd)->value;
 					if (state.program != program) {
 						gl.UseProgram(program);
 						state.program = program;
@@ -494,16 +525,18 @@ namespace pecore::graphics::implementation {
 				} break;
 				case GL_CMD_MESH:
 				{
-					GlRenderMesh& mesh = reinterpret_cast<GlCommand<GlRenderMesh>*>(cur_cmd)->value;
+					PE_RenderMesh& mesh = reinterpret_cast<Command<PE_RenderMesh>*>(cur_cmd)->value;
+
+
 					if (state.mesh_vao != mesh.vao) {
 						gl.BindVertexArray(mesh.vao);
-						gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.buffers[GlRenderMesh::BUF_ELEMENT]);
+						gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.buffers[PE_RenderMesh::BUF_ELEMENT]);
 						state.mesh_vao = mesh.vao;
 						state.index_type = GlIndexTypeLookup[mesh.index_type];
 					}
 				} break;
 				case GL_CMD_DRAW: {
-					std::pair<size_t, size_t>& pair = reinterpret_cast<GlCommand<std::pair<size_t, size_t>>*>(cur_cmd)->value;
+					std::pair<size_t, size_t>& pair = reinterpret_cast<Command<std::pair<size_t, size_t>>*>(cur_cmd)->value;
 					gl.DrawElements(GL_TRIANGLES, pair.first, state.index_type, reinterpret_cast<void*>(pair.second));
 				} break;
 				case GL_CMD_UNIFORM_VALUE:
@@ -531,9 +564,9 @@ namespace pecore::graphics::implementation {
 			return PE_ERROR_NONE;
 		}
 
-		void ExecuteGlCommandQueues(GladGLContext& gl, SDL_Window* target_window, GlCommandQueue** queues, size_t queue_count, int& return_value) {
-			GlCommandExecutionState state;
-			memset(&state, 0, sizeof(state));
+		void ExecuteGlCommandQueues(Window* target, CommandQueue** queues, size_t queue_count, int& return_value) {
+			CommandExecutionState state;
+			memset(&state, 0, sizeof(state));			
 #if PE_GL_SINGLE_CONTEXT
 			int res = SDL_GL_MakeCurrent(target_window, gl.userptr);
 			if (res != 0) {
@@ -541,21 +574,23 @@ namespace pecore::graphics::implementation {
 				return_value = PE_ERROR_GENERAL;
 				return;
 			}
+#else
+			target->glad_render_context.BindVertexArray(target->opengl_render_vao);
 #endif
 			int w, h;
-			SDL_GetWindowSizeInPixels(target_window, &w, &h);
-			gl.Viewport(0, 0, w, h);
-			gl.PolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			SDL_GetWindowSizeInPixels(target->window_handle, &w, &h);
+			target->glad_render_context.Viewport(0, 0, w, h);
+			target->glad_render_context.PolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			// TODO color, scissor and, swap interval should be taken from some kind of Camera struct
-			gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			gl.Clear(GL_COLOR_BUFFER_BIT);
+			target->glad_render_context.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			target->glad_render_context.Clear(GL_COLOR_BUFFER_BIT);
 			SDL_GL_SetSwapInterval(0);
 
 			for (size_t i = 0; i < queue_count; ++i) {
-				GlCommandBuffer* buf = &(queues[i]->command_buffer);
+				CommandBuffer* buf = &(queues[i]->command_buffer);
 				while (buf)
 				{
-					int rtn = ExecuteGlCommandBuffer(gl, state, *buf);
+					int rtn = ExecuteGlCommandBuffer(target->glad_render_context, state, *buf);
 					if (rtn != 0) {
 						return_value = rtn;
 						return;
@@ -565,7 +600,7 @@ namespace pecore::graphics::implementation {
 				}
 			}
 
-			SDL_GL_SwapWindow(target_window);
+			SDL_GL_SwapWindow(target->window_handle);
 			return_value = PE_ERROR_NONE;
 		}
 
@@ -590,7 +625,7 @@ namespace pecore::graphics::implementation {
 			if (self->init) {
 				PE_LogWarn(PE_LOG_CATEGORY_RENDER, PE_TEXT("Called Init on OpenGl implementation multiple times"));
 				return PE_ERROR_ALREADY_INITIALIZED;
-			}
+		}
 
 			self = new(self) OpenGlGraphicsImp();
 			self->init = true;
@@ -635,7 +670,7 @@ namespace pecore::graphics::implementation {
 #include "PE_generated_graphics_api.h"
 #undef PE_GENERATED_GRAPHICS_API
 			return PE_ERROR_NONE;
-		}
+	}
 
 		void PE_INTERNAL_QuitGraphicsSystemImp() {
 			if (!self) {
@@ -650,16 +685,28 @@ namespace pecore::graphics::implementation {
 			self = nullptr;
 		}
 
-		SDL_Window* PE_CreateWindowImp(char* title, int width, int height, Uint32 flags) {
-			SDL_Window* window = nullptr;
+		PE_Window* PE_CreateWindowImp(char* title, int width, int height, Uint32 flags) {
 			flags = (flags & ~(SDL_WINDOW_VULKAN | SDL_WINDOW_METAL)) | SDL_WINDOW_OPENGL;
-			RunMainWork<CreateSdlWindow>(title, width, height, flags, window);
-			return window;
+			Window* window = static_cast<Window*>(PE_malloc(sizeof(Window)));
+			if (!window) {
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate window"));
+				return;
+			}
+
+			new(window) Window();
+			PE_EventLoop.PushBlockingTWork<CreateSdlWindow>(title, width, height, flags, *window);
+			if (!window->window_handle) {
+				window->~Window();
+				PE_free(window);
+				return nullptr;
+			}
+
+			return static_cast<PE_Window*>(window);
 		}
 
-		void PE_DestroyWindowImp(SDL_Window* window) {
+		void PE_DestroyWindowImp(PE_Window* window) {
 			if (window) {
-				RunMainWork<DestroySdlWindow>(window);
+				PE_EventLoop.PushBlockingTWork<DestroySdlWindow>(*static_cast<Window*>(window));
 			}
 		}
 
@@ -762,20 +809,27 @@ namespace pecore::graphics::implementation {
 				return nullptr;
 			}
 
-			GlRenderMesh* mesh = static_cast<GlRenderMesh*>(PE_malloc(sizeof(GlRenderMesh)));
+			PE_STATIC_ASSERT(alignof(PE_RenderMesh) >= alignof(RenderMeshAttrib) && alignof(PE_RenderMesh) % alignof(RenderMeshAttrib) == 0, PE_TEXT("RenderMeshAttrib has invalid alignment"));
+			PE_RenderMesh* mesh = static_cast<PE_RenderMesh*>(PE_malloc(sizeof(PE_RenderMesh) + (sizeof(RenderMeshAttrib) * attribute_count)));
 			if (!mesh) {
-				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate OpenGL RenderMesh"));
+				PE_LogError(PE_LOG_CATEGORY_RENDER, PE_TEXT("Failed to allocate PE_RenderMesh"));
 				return nullptr;
 			}
 
+			mesh->attribs = reinterpret_cast<RenderMeshAttrib*>(&(mesh[1]));
+			mesh->attrib_count = attribute_count;
 			mesh->index_type = index_type;
-			RunLoadWork<CreateGlMesh>(*mesh, format_attributes, attribute_count, vertices, vertices_size, indices, indices_size);
-			if (mesh->vao == 0) {
-				PE_free(mesh);
+			for (size_t i = 0; i < attribute_count; ++i) {
+				ConvertPEMeshFormatAttrib(format_attributes[i], mesh->attribs[i]);
+			}
+
+			PE_GL_WORKER.PushBlockingTWork<CreateGlMesh>(*mesh, vertices, vertices_size, indices, indices_size);
+			if (mesh->buffers[PE_RenderMesh::BUF_VERTEX] == 0 || mesh->buffers[PE_RenderMesh::BUF_ELEMENT] == 0) {
+				PE_DestroyRenderMeshImp(mesh);
 				return nullptr;
 			}
 
-			return reinterpret_cast<PE_RenderMesh*>(mesh);
+			return mesh;
 		}
 
 		void PE_DestroyRenderMeshImp(PE_RenderMesh* mesh) {
@@ -783,12 +837,11 @@ namespace pecore::graphics::implementation {
 				return;
 			}
 
-			GlRenderMesh* gl_mesh = reinterpret_cast<GlRenderMesh*>(mesh);
-			if (gl_mesh->vao != 0) {
-				RunLoadWork<DeleteGlMesh>(*gl_mesh);
+			if (mesh->buffers[PE_RenderMesh::BUF_VERTEX] != 0 || mesh->buffers[PE_RenderMesh::BUF_ELEMENT] != 0) {
+				PE_GL_WORKER.PushBlockingTWork<DeleteGlMesh>(*mesh);
 			}
 
-			PE_free(gl_mesh);
+			PE_free(mesh);
 		}
 
 		PE_GraphicsCommandQueue* PE_CreateGraphicsCommandQueueImp() {
@@ -848,7 +901,7 @@ namespace pecore::graphics::implementation {
 				if (queues[i] == nullptr) {
 					return PE_ERROR_INVALID_PARAMETERS;
 				}
-			}
+		}
 
 			int return_value = 0;
 #if PE_GL_SINGLE_CONTEXT
@@ -872,7 +925,7 @@ namespace pecore::graphics::implementation {
 			RunWorker<ExecuteGlCommandQueues>(window_ctx->worker, window_ctx->glad_ctx, target_window, reinterpret_cast<GlCommandQueue**>(queues), queue_count, return_value);
 #endif
 			return return_value;
-		}
+}
 
 		int PE_GraphicsCommandSetShaderImp(PE_GraphicsCommandQueue* queue, PE_Shader* shader) {
 			if (!queue || !shader) {
