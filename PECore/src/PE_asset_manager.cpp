@@ -5,38 +5,64 @@
 #include "PE_memory.h"
 #include <fstream>
 
-namespace pecore {
-	int PE_GetFileBytes(const char* filepath, void** file_data, size_t* file_size)
-	{
-		if (!filepath || !file_data || !file_size) {
-			return PE_ERROR_INVALID_PARAMETERS;
+namespace pe {
+	class FileAssetImp : public FileAsset {
+	public:
+		FileAssetImp(FileSize size, void* data) :
+			file_size_(size),
+			file_data_(data) {
 		}
 
-		std::ifstream stream;
-		std::streampos end_pos;
-		int err = PE_GetFileHandle(filepath, stream, end_pos);
-		if (err != PE_ERROR_NONE) {
-			return err;
+		PE_NODISCARD FileSize GetSize() PE_OVERRIDE {
+			return file_size_;
 		}
 
-		std::streamsize size = end_pos - stream.tellg();
-		if (size == 0) {
-			return PE_ERROR_EMPTY;
+		PE_NODISCARD const void* GetBytes() PE_OVERRIDE {
+			return file_data_;
 		}
 
-		void* buffer = PE_malloc(size);
-		if (buffer == nullptr) {
-			return PE_ERROR_OUT_OF_MEMORY;
+		void OnDrop() PE_OVERRIDE {
+			PE_free(this);
 		}
 
-		stream.read(static_cast<char*>(buffer), size);
-		*file_data = buffer;
-		*file_size = size;
-		return PE_ERROR_NONE;
-	}
+	private:
+		FileSize file_size_;
+		void* file_data_;
+	};
 
-	void PE_FreeFileBytes(void* file_data)
-	{
-		PE_free(file_data);
+	PE_NODISCARD FileAsset* FileAsset::LoadFile(const char* filepath, ErrorCode* error_out) {
+		if (!filepath) {
+			if (error_out) *error_out = PE_ERROR_INVALID_PARAMETERS;
+			return nullptr;
+		}
+
+		std::ifstream stream(filepath, std::ios_base::in | std::ios_base::binary | std::ios_base::ate);
+		if (stream.fail()) {
+			if (error_out) *error_out = PE_ERROR_NOT_FOUND;
+			return nullptr;
+		}
+
+		// We should already be at the end but just in case
+		stream.seekg(0, std::ios::end);
+		std::streampos end = stream.tellg();
+		stream.seekg(0, std::ios::beg);
+		std::streamsize stream_size = end - stream.tellg();
+		if (stream_size > FILE_SIZE_MAX) {
+			if (error_out) *error_out = PE_ERROR_TOO_BIG;
+			return nullptr;
+		}
+
+		FileSize file_size = stream_size;
+		if (file_size == 0 || stream.fail()) {
+			if (error_out) *error_out = PE_ERROR_EMPTY;
+			return nullptr;
+		}
+
+		stream.clear();
+		FileAsset* asset = static_cast<FileAsset*>(PE_malloc(sizeof(FileAsset) + file_size));
+		stream.read(reinterpret_cast<char*>(asset + 1), stream_size);
+		new(asset) FileAssetImp(file_size, asset + 1);
+		if (error_out) *error_out = PE_ERROR_NONE;
+		return asset;
 	}
 }
