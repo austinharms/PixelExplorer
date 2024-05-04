@@ -1,7 +1,6 @@
 #include "PE_asset_manager.h"
 #include "PE_memory.h"
 #include "PE_errors.h"
-#include "PE_asset_manager_internal.h"
 #include "PE_memory.h"
 #include <fstream>
 
@@ -60,9 +59,14 @@ namespace pe {
 
 		stream.clear();
 		FileAsset* asset = static_cast<FileAsset*>(PE_malloc(sizeof(FileAsset) + file_size));
+		if (!asset) {
+			if (error_out) *error_out = PE_ERROR_OUT_OF_MEMORY;
+			return nullptr;
+		}
+
 		stream.read(reinterpret_cast<char*>(asset + 1), stream_size);
 		new(asset) FileAssetImp(file_size, asset + 1);
 		if (error_out) *error_out = PE_ERROR_NONE;
-		return asset;
+		return static_cast<FileAsset*>(asset);
 	}
 }

@@ -3,10 +3,10 @@
 #include "PE_defines.h"
 #include "PE_work_queue.h"
 
-namespace pecore {
-	class EventLoopClass : protected WorkQueue {
+namespace pe::internal {
+	class EventLoop : protected WorkQueue {
 	public:
-		EventLoopClass() = default;
+		EventLoop() = default;
 		// Runs the event loop, this will not return until Stop() is called
 		void Start();
 		// Stops the event loop
@@ -21,7 +21,5 @@ namespace pecore {
 	private:
 		bool run_flag_;
 	};
-
-	extern EventLoopClass PE_EventLoop;
 }
 #endif // !PE_EVENT_LOOP_H_

@@ -2,10 +2,8 @@
 #include "PE_log.h"
 #include "SDL_events.h"
 
-namespace pecore {
-	EventLoopClass PE_EventLoop;
-
-	void EventLoopClass::Start() {
+namespace pe::internal {
+	void EventLoop::Start() {
 		run_flag_ = true;
 		WorkQueue::WorkerEntry();
 		PE_LogDebug(PE_LOG_CATEGORY_EVENT, PE_TEXT("Event Thread Entry"));
@@ -20,7 +18,7 @@ namespace pecore {
 		WorkQueue::WorkerExit();
 	}
 
-	void EventLoopClass::Stop() {
+	void EventLoop::Stop() {
 		run_flag_ = false;
 		WorkQueue::ForceWaitWakeup();
 	}

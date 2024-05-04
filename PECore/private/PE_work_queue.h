@@ -6,7 +6,7 @@
 #include <condition_variable>
 #include <tuple>
 
-namespace pecore {
+namespace pe::internal {
 	typedef void (*PE_WorkFunction)(void*);
 
 	// A FIFO queue of work to be performed on a different thread

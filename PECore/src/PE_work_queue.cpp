@@ -3,7 +3,7 @@
 #include "PE_errors.h"
 #include "PE_log.h"
 
-namespace pecore {
+namespace pe::internal {
 	WorkQueue::WorkQueue()
 	{
 		work_head_ = nullptr;

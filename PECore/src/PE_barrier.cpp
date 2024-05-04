@@ -1,6 +1,6 @@
 #include "PE_barrier.h"
 
-namespace pecore {
+namespace pe::internal {
 	Barrier::Barrier(size_t count) :
 		threshold_(count),
 		current_(count),

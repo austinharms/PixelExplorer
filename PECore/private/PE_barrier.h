@@ -4,7 +4,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace pecore {
+namespace pe::internal {
 	// A reusable thread synchronisation object
 	class Barrier {
 	public:

@@ -16,7 +16,7 @@ namespace pe {
 	public:
 		typedef uint64_t FileSize;
 		static constexpr FileSize FILE_SIZE_MAX = UINT64_MAX;
-		virtual ~FileAsset();
+		virtual ~FileAsset() = default;
 		PE_NOCOPY(FileAsset);
 
 		// Loads the file from filepath and returns a new FileAsset object or, nullptr on error
@@ -26,6 +26,7 @@ namespace pe {
 		}
 
 		// Loads the file from filepath and returns a new FileAsset object or, nullptr on error
+		// Sets error_out to an ErrorCode on error or PE_ERROR_NONE on success
 		PE_NODISCARD static FileAsset* LoadFile(const char* filepath, ErrorCode* error_out);
 		virtual PE_NODISCARD FileSize GetSize() = 0;
 		virtual PE_NODISCARD const void* GetBytes() = 0;

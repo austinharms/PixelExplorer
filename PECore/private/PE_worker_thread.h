@@ -4,7 +4,7 @@
 #include "PE_work_queue.h"
 #include <thread>
 
-namespace pecore {
+namespace pe::internal {
 	// class that wraps a std::thread and allows queuing "work" to run on the thread
 	class ThreadWorker : protected WorkQueue {
 	public:

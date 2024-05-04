@@ -3,7 +3,7 @@
 #include "PE_errors.h"
 #include "PE_log.h"
 
-namespace pecore {
+namespace pe::internal {
 	ThreadWorker::ThreadWorker() :
 		enable_flag_(true),
 		worker_thread_(&ThreadWorker::ThreadWorkerEntry, this) {
