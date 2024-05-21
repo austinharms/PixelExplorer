@@ -19,7 +19,7 @@
 #define PE_MAYBE_UNUSED [[maybe_unused]]
 #define PE_STATIC_ASSERT(exp, msg) static_assert(exp, msg)
 #define PE_ARRAY_LEN(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-#define PE_TEXT_INTERNAL(text) text
+#define PE_TEXT_INTERNAL(text) u8##text
 #define PE_TEXT(text) PE_TEXT_INTERNAL(text)
 #define PE_STATIC_ASSERT(exp, msg) static_assert(exp, msg)
 #define PE_EXTERN_C extern "C"

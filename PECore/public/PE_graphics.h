@@ -1,3 +1,101 @@
+#ifndef PE_GRAPHICS_H_
+#define PE_GRAPHICS_H_
+#include "PE_defines.h"
+#include "PE_referenced.h"
+#include "PE_errors.h"
+
+struct SDL_Window;
+
+namespace pe {
+	class PE_API Window : public Referenced {
+	public:
+		PE_NODISCARD virtual SDL_Window* GetSDLHandle() const;
+	};
+
+	namespace graphics {
+		enum class MeshAttribType
+		{
+			FLOAT_ATTRIB = 0,
+			HALF_FLOAT_ATTRIB,
+			INT8_ATTRIB,
+			UINT8_ATTRIB,
+			INT16_ATTRIB,
+			UINT16_ATTRIB,
+			INT32_ATTRIB,
+			UINT32_ATTRIB,
+			ENUM_VALUE_COUNT
+		};
+
+		enum class IndexType
+		{
+			LINEAR_INDEX = 0, // No mesh indices. assumes triangles are to be drawn in the order provided in the vertex buffer
+			U8_INDEX,
+			U16_INDEX,
+			U32_INDEX,
+			ENUM_VALUE_COUNT
+		};
+
+		enum class CullMode {
+			CULL_BACK = 0,
+			CULL_FRONT,
+			CULL_FRONT_BACK,
+			CULL_NONE,
+			ENUM_VALUE_COUNT
+		};
+
+		enum class RenderSwapMode {
+			SWAP_IMMEDIATE = 0,
+			SWAP_VSYNC,
+			ENUM_VALUE_COUNT
+		};
+
+		enum class RenderPass {
+			UNLIT_PASS,
+			ENUM_VALUE_COUNT
+		};
+
+		struct MeshFormatAttrib {
+			uint8_t attrib_type;
+			uint8_t location;
+			uint8_t size;
+			uint8_t normalized;
+		};
+
+		struct MeshFormat {
+			MeshFormatAttrib vertex_attribs[16];
+			uint8_t index_type;
+			uint8_t packed;
+		};
+
+		class PE_API Shader : public Referenced {};
+		class PE_API RenderMesh : public Referenced {};
+		class PE_API CommandQueue : public Referenced {
+		public:
+			virtual void Clear() = 0;
+			virtual ErrorCode SetShader(Shader* shader) = 0;
+			virtual ErrorCode SetMeshFormat(MeshFormat* format) = 0;
+			virtual ErrorCode SetMesh(RenderMesh* mesh) = 0;
+			virtual ErrorCode DrawMesh(size_t index_count, size_t index_offset) = 0;
+			virtual ErrorCode Cull(CullMode mode) = 0;
+		};
+
+		class PE_API GraphicsAPI {
+		public:
+			PE_NODISCARD virtual Window* CreateWindow(char* title, int width, int height, Uint32 flags, ErrorCode* err_out) = 0;
+			PE_NODISCARD virtual Shader* LoadShader(const char* name, ErrorCode* err_out) = 0;
+			PE_NODISCARD virtual RenderMesh* CreateRenderMesh(void* vertices, size_t vertices_size, void* indices, size_t indices_size, ErrorCode* err_out) = 0;
+			PE_NODISCARD virtual CommandQueue* CreateCommandQueue(ErrorCode* err_out) = 0;
+			virtual ErrorCode RenderToWindow(Window* target_window, CommandQueue** queues, size_t queue_count) = 0;
+			virtual ~GraphicsAPI() = default;
+			PE_NOCOPY(GraphicsAPI);
+
+		protected:
+			GraphicsAPI() = default;
+		};
+	}
+}
+#endif // !PE_GRAPHICS_H_ 
+
 //#ifndef PE_GRAPHICS_H_
 //#define PE_GRAPHICS_H_
 //#include "PE_defines.h"

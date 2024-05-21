@@ -8,7 +8,7 @@
 #include "PE_errors.h"
 #include "glad/gl.h"
 
-namespace pecore::graphics::open_gl {
+namespace pe::internal::graphics::open_gl {
 	struct PE_RenderMesh {
 	public:
 		enum {
