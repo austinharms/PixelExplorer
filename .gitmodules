@@ -7,3 +7,6 @@
 [submodule "Vendor/glad"]
 	path = Vendor/glad
 	url = https://github.com/Dav1dde/glad.git
+[submodule "Vendor/PhysX"]
+	path = Vendor/PhysX
+	url = https://github.com/NVIDIA-Omniverse/PhysX.git
