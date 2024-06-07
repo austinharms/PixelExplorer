@@ -7,6 +7,7 @@ namespace pe::internal {
 	class EventLoop : protected WorkQueue {
 	public:
 		EventLoop() = default;
+		PE_NODISCARD static EventLoop& GetEventLoop();
 		// Runs the event loop, this will not return until Stop() is called
 		void Start();
 		// Stops the event loop

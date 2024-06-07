@@ -64,7 +64,7 @@ namespace pe::internal {
 		force_wake_ = false;
 	}
 
-	void WorkQueue::ForceWaitWakeup()
+	void WorkQueue::ForceWaitWakeup() PE_NOEXCEPT
 	{
 		force_wake_ = true;
 		work_condition_.notify_one();
@@ -102,7 +102,7 @@ namespace pe::internal {
 		worker_sync_mutex_.lock();
 	}
 
-	void WorkQueue::WorkerExit() {
+	void WorkQueue::WorkerExit() PE_NOEXCEPT {
 		worker_sync_mutex_.unlock();
 	}
 

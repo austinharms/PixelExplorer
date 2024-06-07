@@ -30,5 +30,4 @@
 #else
 #define PE_DEBUG 0
 #endif
-
 #endif // !PE_DEFINES_H_
